@@ -459,6 +459,7 @@
   .cat-row { display: flex; justify-content: space-between; font-size: var(--fs-sm); }
   .cat-bar { background: var(--bg); border-radius: var(--r-sm); height: 7px; margin: 4px 0 2px; overflow: hidden; }
   .cat-bar-fill { height: 100%; border-radius: var(--r-sm); }
+  .cat-inner { display: flex; flex-direction: column; gap: var(--sp-sm); }
 
   /* =============================================
      TOP/BOTTOM REP BARS
@@ -602,6 +603,37 @@
   @media (max-width: 400px) {
     .kpi-cmp-grid { grid-template-columns: 1fr; }
   }
+
+  /* Spacing helpers */
+  .mb-lg { margin-bottom: var(--sp-lg); }
+  .mb-xl { margin-bottom: var(--sp-xl); }
+  .mt-lg { margin-top: var(--sp-lg); }
+  .mt-xl { margin-top: var(--sp-xl); }
+
+  /* KPI grid column overrides */
+  .kpi-3col { grid-template-columns: repeat(3, 1fr); }
+  .kpi-5col { grid-template-columns: repeat(5, 1fr); }
+
+  @media (max-width: 900px) {
+    .kpi-3col { grid-template-columns: repeat(3, 1fr); }
+    .kpi-5col { grid-template-columns: repeat(3, 1fr); }
+    .trio-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .kpi-3col { grid-template-columns: repeat(2, 1fr); }
+    .kpi-5col { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 400px) {
+    .kpi-3col, .kpi-5col { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* Section separator (replaces inline margin-top + border-top combos) */
+  .section-sep {
+    margin-top: var(--sp-xl);
+    padding-top: var(--sp-lg);
+    border-top: 2px solid var(--border);
+    margin-bottom: var(--sp-lg);
+  }
 </style>
 </head>
 <body>
@@ -619,7 +651,7 @@
 
 <div class="nav">
   <button class="nav-btn active" onclick="showTab('overview')">📈 نظرة عامة</button>
-
+  <button class="nav-btn" onclick="showTab('reps')">👥 أداء المناديب</button>
   <button class="nav-btn" onclick="showTab('products')">📦 الأصناف</button>
   <button class="nav-btn" onclick="showTab('customers')">🏪 العملاء</button>
   <button class="nav-btn" onclick="showTab('actions')">🎯 خطة العمل</button>
@@ -664,7 +696,7 @@
   </div>
 
   <!-- Payment Breakdown -->
-  <div class="charts-row" style="grid-template-columns: 1fr 1fr 1fr; margin-bottom:var(--gap);">
+  <div class="charts-row trio-grid mb-lg">
     <div class="kpi-card" style="border-color:rgba(100,100,255,0.4)">
       <div style="position:absolute;top:0;right:0;width:3px;height:100%;background:#7c6fff;border-radius:0 16px 16px 0"></div>
       <div class="kpi-icon">🏦</div>
@@ -716,9 +748,40 @@
 
 
 
+<!-- REPS TAB -->
+<div id="tab-reps" class="tab-panel">
+  <div class="table-card">
+    <div class="table-header">
+      <div>
+        <div class="chart-title">أداء المناديب التفصيلي</div>
+        <div class="chart-sub">33 مندوباً — الفترة: فبراير — مارس 2026</div>
+      </div>
+      <input type="text" class="search-input" placeholder="🔍 ابحث عن مندوب..." oninput="filterTable(this.value)">
+    </div>
+    <table id="repsTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>اسم المندوب</th>
+          <th>المبيعات</th>
+          <th>التحصيلات</th>
+          <th>نسبة الإنجاز (ROI)</th>
+          <th>مستوى الأداء</th>
+        </tr>
+      </thead>
+      <tbody id="repsBody"></tbody>
+    </table>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">تحليل ROI لجميع المناديب</div>
+    <div class="chart-sub">نسبة التحصيل من المبيعات — الخط الأحمر يمثل 80%</div>
+    <div class="chart-wrap" style="height:320px"><canvas id="allRepsChart"></canvas></div>
+  </div>
+</div>
+
 <!-- PRODUCTS TAB -->
 <div id="tab-products" class="tab-panel">
-  <div class="kpi-grid" style="grid-template-columns: repeat(3,1fr);">
+  <div class="kpi-grid kpi-3col">
     <div class="kpi-card blue"><div class="kpi-icon">🏆</div><div class="kpi-label">الصنف الأكثر مبيعاً</div><div class="kpi-value" style="font-size:16px">بتر صودا 175مل</div><div class="kpi-sub">1,949,630 دينار</div></div>
     <div class="kpi-card green"><div class="kpi-icon">📦</div><div class="kpi-label">إجمالي الأصناف</div><div class="kpi-value">35</div><div class="kpi-sub">صنفاً في المحفظة</div></div>
     <div class="kpi-card gold"><div class="kpi-icon">⭐</div><div class="kpi-label">مجموعة الندى</div><div class="kpi-value">~85%</div><div class="kpi-sub">من إجمالي المبيعات</div></div>
@@ -788,18 +851,18 @@
   <!-- Items Sales vs Collections Chart -->
   <div class="table-card" style="margin-bottom:var(--gap)">
     <div class="chart-title" style="margin-bottom:4px">أعلى 10 أصناف — المبيعات مقابل التحصيلات</div>
-    <div style="height:300px"><canvas id="itemsSalesChart"></canvas></div>
+    <div class="chart-wrap" style="height:300px"><canvas id="itemsSalesChart"></canvas></div>
   </div>
 
   <!-- Items Margin Chart -->
   <div class="table-card" style="margin-bottom:var(--gap)">
     <div class="chart-title" style="margin-bottom:4px">هامش الربح التقديري — أعلى 12 صنف</div>
-    <div style="height:300px"><canvas id="itemsMarginChart"></canvas></div>
+    <div class="chart-wrap" style="height:300px"><canvas id="itemsMarginChart"></canvas></div>
   </div>
 
   <!-- Items Full Table -->
   <div class="table-card">
-    <div class="table-header" style="flex-wrap:wrap;gap:var(--sp-sm)">
+    <div class="table-header">
       <div class="chart-title">جدول الأصناف الكامل — 35 صنف</div>
       <div class="filter-row">
         <input id="itemSearch" oninput="renderItems()" placeholder="🔍 بحث..." class="search-input">
@@ -838,7 +901,7 @@
 <div id="tab-customers" class="tab-panel">
 
   <!-- KPI Summary -->
-  <div class="kpi-grid" style="grid-template-columns: repeat(5,1fr); margin-bottom:var(--gap)">
+  <div class="kpi-grid kpi-5col">
     <div class="kpi-card blue">
       <div class="kpi-icon">🏪</div>
       <div class="kpi-label">إجمالي العملاء</div>
@@ -929,7 +992,7 @@
   </div>
 
   <!-- Classification Criteria -->
-  <div class="charts-row" style="grid-template-columns:1fr 1fr 1fr;margin-top:0">
+  <div class="charts-row trio-grid">
     <div class="insight-card" style="margin-bottom:0">
       <div class="insight-icon">⭐</div>
       <div>
@@ -1046,19 +1109,19 @@
   <div class="grid-auto" style="margin-bottom:var(--gap)">
 
     <!-- جملة -->
-    <div style="background:var(--surface2);border-radius:var(--r-xl);padding:var(--sp-lg);border:1px solid rgba(0,255,136,.3)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div class="cat-card" style="border:1px solid rgba(0,255,136,.3)">
+      <div class="cat-card-head">
         <div style="font-size:var(--fs-xl);font-weight:800;color:var(--accent2)">🏭 مناديب الجملة</div>
         <div style="background:rgba(0,255,136,.15);color:var(--accent2);border-radius:var(--r-pill);padding:3px 12px;font-size:var(--fs-md);font-weight:700">8 مناديب</div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:var(--sp-sm)">
+      <div class="cat-inner">
         <div class="cat-row"><span style="color:var(--text2)">إجمالي المبيعات</span><span style="font-weight:700">3,008,462</span></div>
         <div class="cat-row"><span style="color:var(--text2)">إجمالي التحصيلات</span><span style="font-weight:700;color:var(--accent2)">2,727,999</span></div>
         <div class="cat-row"><span style="color:var(--text2)">معدل التحصيل</span><span style="font-weight:800;color:var(--accent2)">90.68% ✓</span></div>
         <div class="cat-row"><span style="color:var(--text2)">المديونيات</span><span style="font-weight:700;color:#ff6b35">280,463</span></div>
         <div class="cat-row"><span style="color:var(--text2)">متوسط مبيعات/مندوب</span><span style="font-weight:700">376,058</span></div>
         <div class="cat-row"><span style="color:var(--text2)">متوسط ROI</span><span style="font-weight:700;color:var(--accent2)">102.71%</span></div>
-        <div style="background:var(--bg);border-radius:var(--r-md);padding:2px 0;margin-top:4px">
+        <div class="prog-wrap">
           <div style="width:90.68%;background:linear-gradient(90deg,var(--accent2),#00a855);height:8px;border-radius:var(--r-md)"></div>
         </div>
         <div style="font-size:var(--fs-xs);color:var(--text2);text-align:center">الحصة من المبيعات: 48.3% | من التحصيلات: 57.2%</div>
@@ -1066,19 +1129,19 @@
     </div>
 
     <!-- تجزئة -->
-    <div style="background:var(--surface2);border-radius:var(--r-xl);padding:var(--sp-lg);border:1px solid rgba(0,212,255,.3)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div class="cat-card" style="border:1px solid rgba(0,212,255,.3)">
+      <div class="cat-card-head">
         <div style="font-size:var(--fs-xl);font-weight:800;color:var(--accent)">🛒 مناديب التجزئة</div>
         <div style="background:rgba(0,212,255,.15);color:var(--accent);border-radius:var(--r-pill);padding:3px 12px;font-size:var(--fs-md);font-weight:700">23 مندوب</div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:var(--sp-sm)">
+      <div class="cat-inner">
         <div class="cat-row"><span style="color:var(--text2)">إجمالي المبيعات</span><span style="font-weight:700">2,843,263</span></div>
         <div class="cat-row"><span style="color:var(--text2)">إجمالي التحصيلات</span><span style="font-weight:700;color:#ff6b35">1,965,231</span></div>
         <div class="cat-row"><span style="color:var(--text2)">معدل التحصيل</span><span style="font-weight:800;color:#ff6b35">69.12% ⚠️</span></div>
         <div class="cat-row"><span style="color:var(--text2)">المديونيات</span><span style="font-weight:700;color:var(--red)">878,031</span></div>
         <div class="cat-row"><span style="color:var(--text2)">متوسط مبيعات/مندوب</span><span style="font-weight:700">123,620</span></div>
         <div class="cat-row"><span style="color:var(--text2)">متوسط ROI</span><span style="font-weight:700;color:#ff6b35">66.83%</span></div>
-        <div style="background:var(--bg);border-radius:var(--r-md);padding:2px 0;margin-top:4px">
+        <div class="prog-wrap">
           <div style="width:69.12%;background:linear-gradient(90deg,var(--accent),#0090c0);height:8px;border-radius:var(--r-md)"></div>
         </div>
         <div style="font-size:var(--fs-xs);color:var(--text2);text-align:center">الحصة من المبيعات: 45.7% | من التحصيلات: 41.2%</div>
@@ -1086,19 +1149,19 @@
     </div>
 
     <!-- أسواق -->
-    <div style="background:var(--surface2);border-radius:var(--r-xl);padding:var(--sp-lg);border:1px solid rgba(255,71,87,.4)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div class="cat-card" style="border:1px solid rgba(255,71,87,.4)">
+      <div class="cat-card-head">
         <div style="font-size:var(--fs-xl);font-weight:800;color:var(--red)">🏬 مناديب الأسواق</div>
         <div style="background:rgba(255,71,87,.15);color:var(--red);border-radius:var(--r-pill);padding:3px 12px;font-size:var(--fs-md);font-weight:700">2 مندوب</div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:var(--sp-sm)">
+      <div class="cat-inner">
         <div class="cat-row"><span style="color:var(--text2)">إجمالي المبيعات</span><span style="font-weight:700">372,522</span></div>
         <div class="cat-row"><span style="color:var(--text2)">إجمالي التحصيلات</span><span style="font-weight:700;color:var(--red)">77,700</span></div>
         <div class="cat-row"><span style="color:var(--text2)">معدل التحصيل</span><span style="font-weight:800;color:var(--red)">20.86% 🚨</span></div>
         <div class="cat-row"><span style="color:var(--text2)">المديونيات</span><span style="font-weight:700;color:var(--red)">294,822</span></div>
         <div class="cat-row"><span style="color:var(--text2)">متوسط مبيعات/مندوب</span><span style="font-weight:700">186,261</span></div>
         <div class="cat-row"><span style="color:var(--text2)">متوسط ROI</span><span style="font-weight:700;color:var(--red)">20.76%</span></div>
-        <div style="background:var(--bg);border-radius:var(--r-md);padding:2px 0;margin-top:4px">
+        <div class="prog-wrap">
           <div style="width:20.86%;background:linear-gradient(90deg,var(--red),#c0001a);height:8px;border-radius:var(--r-md)"></div>
         </div>
         <div style="font-size:var(--fs-xs);color:var(--text2);text-align:center">الحصة من المبيعات: 6.0% | من التحصيلات: 1.6%</div>
@@ -1108,7 +1171,7 @@
 
   <!-- Rep Comparison Table with Filters -->
   <div class="table-card">
-    <div class="table-header" style="flex-wrap:wrap;gap:var(--sp-sm)">
+    <div class="table-header">
       <div class="chart-title">قائمة مقارنة المناديب — 33 مندوب</div>
       <div class="filter-row">
         <input id="rcSearch" oninput="renderRepCmp()" placeholder="🔍 بحث باسم المندوب..." class="search-input">
@@ -1169,7 +1232,7 @@
   <!-- ROI Bar Chart -->
   <div class="table-card" style="margin-top:var(--gap)">
     <div class="chart-title" style="margin-bottom:4px">معدل التحصيل لجميع المناديب النشطين</div>
-    <div style="height:320px"><canvas id="repcmpChart"></canvas></div>
+    <div class="chart-wrap" style="height:320px"><canvas id="repcmpChart"></canvas></div>
   </div>
 
   <!-- ===== KPIs per Category ===== -->
@@ -1184,7 +1247,7 @@
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">المستهدف</span><span style="font-weight:700;color:var(--accent)">80%</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">الفعلي</span><span style="font-weight:800;color:#ff6b35">69.12%</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">الفجوة</span><span style="font-weight:700;color:var(--red)">−10.88%</span></div>
-        <div style="background:var(--bg);border-radius:var(--r-sm);height:6px;margin-top:4px;position:relative">
+        <div class="prog-wrap">
           <div style="width:80%;height:100%;background:rgba(0,212,255,.2);border-radius:var(--r-sm);position:absolute"></div>
           <div style="width:69.12%;height:100%;background:var(--accent);border-radius:var(--r-sm);position:absolute"></div>
         </div>
@@ -1201,7 +1264,7 @@
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">المستهدف</span><span style="font-weight:700;color:var(--accent2)">90%</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">الفعلي</span><span style="font-weight:800;color:var(--accent2)">90.68%</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">الفجوة</span><span style="font-weight:700;color:var(--accent2)">+0.68% ✓</span></div>
-        <div style="background:var(--bg);border-radius:var(--r-sm);height:6px;margin-top:4px;position:relative">
+        <div class="prog-wrap">
           <div style="width:90%;height:100%;background:rgba(0,255,136,.2);border-radius:var(--r-sm);position:absolute"></div>
           <div style="width:90.68%;height:100%;background:var(--accent2);border-radius:var(--r-sm);position:absolute"></div>
         </div>
@@ -1218,7 +1281,7 @@
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">المستهدف</span><span style="font-weight:700;color:var(--accent)">70%</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">الفعلي</span><span style="font-weight:800;color:var(--red)">20.86%</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">الفجوة</span><span style="font-weight:700;color:var(--red)">−49.14% 🚨</span></div>
-        <div style="background:var(--bg);border-radius:var(--r-sm);height:6px;margin-top:4px;position:relative">
+        <div class="prog-wrap">
           <div style="width:70%;height:100%;background:rgba(255,71,87,.2);border-radius:var(--r-sm);position:absolute"></div>
           <div style="width:20.86%;height:100%;background:var(--red);border-radius:var(--r-sm);position:absolute"></div>
         </div>
@@ -1308,14 +1371,14 @@
     <div class="grid-2">
       <div style="background:var(--surface2);border-radius:var(--r-lg);padding:var(--sp-md);border:1px solid rgba(0,255,136,.2)">
         <div style="font-size:var(--fs-md);color:var(--text2);margin-bottom:10px;font-weight:700">نوع التحصيل</div>
-        <div style="display:flex;flex-direction:column;gap:var(--sp-sm)">
+        <div class="cat-inner">
           <div>
             <div style="display:flex;justify-content:space-between;font-size:var(--fs-md);margin-bottom:4px"><span>حواالت مصرفية</span><span style="font-weight:800;color:var(--accent2)">4,797,623 — 93.85%</span></div>
-            <div style="background:var(--bg);border-radius:var(--r-sm);height:7px"><div style="width:93.85%;height:100%;background:var(--accent2);border-radius:var(--r-sm)"></div></div>
+            <div class="prog-wrap"><div style="width:93.85%;height:100%;background:var(--accent2);border-radius:var(--r-sm)"></div></div>
           </div>
           <div>
             <div style="display:flex;justify-content:space-between;font-size:var(--fs-md);margin-bottom:4px"><span>نقدي (كاش)</span><span style="font-weight:800;color:var(--accent)">314,466 — 6.15%</span></div>
-            <div style="background:var(--bg);border-radius:var(--r-sm);height:7px"><div style="width:6.15%;height:100%;background:var(--accent);border-radius:var(--r-sm)"></div></div>
+            <div class="prog-wrap"><div style="width:6.15%;height:100%;background:var(--accent);border-radius:var(--r-sm)"></div></div>
           </div>
           <div style="border-top:1px solid var(--border);padding-top:var(--sp-xs);display:flex;justify-content:space-between;font-size:var(--fs-md)">
             <span style="color:var(--text2)">الإجمالي</span>
@@ -1325,18 +1388,18 @@
       </div>
       <div style="background:var(--surface2);border-radius:var(--r-lg);padding:var(--sp-md);border:1px solid rgba(255,71,87,.2)">
         <div style="font-size:var(--fs-md);color:var(--text2);margin-bottom:10px;font-weight:700">المديونيات حسب الفئة</div>
-        <div style="display:flex;flex-direction:column;gap:var(--sp-sm)">
+        <div class="cat-inner">
           <div>
             <div style="display:flex;justify-content:space-between;font-size:var(--fs-md);margin-bottom:4px"><span style="color:var(--accent)">تجزئة</span><span style="font-weight:800;color:var(--red)">878,031</span></div>
-            <div style="background:var(--bg);border-radius:var(--r-sm);height:7px"><div style="width:82%;height:100%;background:#ff6b35;border-radius:var(--r-sm)"></div></div>
+            <div class="prog-wrap"><div style="width:82%;height:100%;background:#ff6b35;border-radius:var(--r-sm)"></div></div>
           </div>
           <div>
             <div style="display:flex;justify-content:space-between;font-size:var(--fs-md);margin-bottom:4px"><span style="color:var(--accent2)">جملة</span><span style="font-weight:800;color:#ff6b35">280,463</span></div>
-            <div style="background:var(--bg);border-radius:var(--r-sm);height:7px"><div style="width:26%;height:100%;background:var(--accent2);border-radius:var(--r-sm)"></div></div>
+            <div class="prog-wrap"><div style="width:26%;height:100%;background:var(--accent2);border-radius:var(--r-sm)"></div></div>
           </div>
           <div>
             <div style="display:flex;justify-content:space-between;font-size:var(--fs-md);margin-bottom:4px"><span style="color:var(--red)">أسواق</span><span style="font-weight:800;color:var(--red)">294,822 🚨</span></div>
-            <div style="background:var(--bg);border-radius:var(--r-sm);height:7px"><div style="width:27.5%;height:100%;background:var(--red);border-radius:var(--r-sm)"></div></div>
+            <div class="prog-wrap"><div style="width:27.5%;height:100%;background:var(--red);border-radius:var(--r-sm)"></div></div>
           </div>
           <div style="border-top:1px solid var(--border);padding-top:var(--sp-xs);display:flex;justify-content:space-between;font-size:var(--fs-md)">
             <span style="color:var(--text2)">الإجمالي</span>
@@ -1480,8 +1543,8 @@
   <!-- ======================================================
        قسم المرتجعات الشامل — مصدر: تقرير تحليلي شامل DOCX
        ====================================================== -->
-  <div style="margin-top:var(--sp-xl);padding-top:var(--sp-lg);border-top:2px solid var(--border)">
-    <div style="font-size:1.1rem;font-weight:800;color:var(--gold);margin-bottom:var(--sp-lg)">↩️ تحليل المرتجعات الشامل</div>
+  <div class="section-sep">
+    <div class="section-title">↩️ تحليل المرتجعات الشامل</div>
   </div>
 
   <!-- KPIs المرتجعات -->
@@ -1521,7 +1584,7 @@
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">إجمالي المرتجعات</span><span style="font-weight:700;color:#ff6b35">241,539</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">عدد المناديب</span><span style="font-weight:700">17</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">الهدف</span><span style="font-weight:700;color:var(--accent2)">6.00% خلال 3 أشهر</span></div>
-        <div style="background:var(--bg);border-radius:4px;height:6px;margin-top:4px">
+        <div class="prog-wrap">
           <div style="width:10.23%;height:100%;background:#ff6b35;border-radius:4px"></div>
         </div>
       </div>
@@ -1537,7 +1600,7 @@
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">إجمالي المرتجعات</span><span style="font-weight:700;color:var(--red)">390,336</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">عدد المناديب</span><span style="font-weight:700">6</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">الهدف</span><span style="font-weight:700;color:var(--accent2)">8.00% خلال 6 أشهر</span></div>
-        <div style="background:var(--bg);border-radius:4px;height:6px;margin-top:4px">
+        <div class="prog-wrap">
           <div style="width:13.66%;height:100%;background:var(--red);border-radius:4px"></div>
         </div>
       </div>
@@ -1553,7 +1616,7 @@
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">إجمالي المرتجعات</span><span style="font-weight:700;color:var(--accent2)">6,880</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">عدد المناديب</span><span style="font-weight:700">1</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">الهدف</span><span style="font-weight:700;color:var(--accent2)">2.00% خلال 6 أشهر</span></div>
-        <div style="background:var(--bg);border-radius:4px;height:6px;margin-top:4px">
+        <div class="prog-wrap">
           <div style="width:2.86%;height:100%;background:var(--accent2);border-radius:4px"></div>
         </div>
       </div>
@@ -1561,11 +1624,11 @@
   </div>
 
   <!-- أفضل وأسوأ مناديب في المرتجعات -->
-  <div class="duo-grid" style="margin-bottom:var(--sp-lg)">
+  <div class="duo-grid mb-lg">
     <!-- أفضل 5 -->
     <div class="table-card">
       <div class="chart-title" style="margin-bottom:var(--sp-md)">🏆 أفضل 5 مناديب — أقل مرتجعات</div>
-      <div style="overflow-x:auto">
+      <div class="table-scroll">
         <table>
           <thead><tr><th>المندوب</th><th>الفئة</th><th>المبيعات</th><th>المرتجعات</th><th>المعدل%</th></tr></thead>
           <tbody>
@@ -1581,7 +1644,7 @@
     <!-- أسوأ 5 -->
     <div class="table-card">
       <div class="chart-title" style="margin-bottom:var(--sp-md)">🚨 أسوأ 5 مناديب — أعلى مرتجعات</div>
-      <div style="overflow-x:auto">
+      <div class="table-scroll">
         <table>
           <thead><tr><th>المندوب</th><th>الفئة</th><th>المبيعات</th><th>المرتجعات</th><th>المعدل%</th></tr></thead>
           <tbody>
@@ -1602,14 +1665,14 @@
   <!-- رسم بياني المرتجعات بالفئات -->
   <div class="table-card" style="margin-bottom:var(--sp-lg)">
     <div class="chart-title" style="margin-bottom:4px">معدلات المرتجعات — مقارنة الفئات والأهداف</div>
-    <div style="height:220px"><canvas id="returnsChart"></canvas></div>
+    <div class="chart-wrap" style="height:220px"><canvas id="returnsChart"></canvas></div>
   </div>
 
   <!-- أكثر الأصناف مرتجعات -->
-  <div class="duo-grid" style="margin-bottom:var(--sp-lg)">
+  <div class="duo-grid mb-lg">
     <div class="table-card">
       <div class="chart-title" style="margin-bottom:var(--sp-md)">🔴 أعلى 10 أصناف مرتجعات</div>
-      <div style="overflow-x:auto">
+      <div class="table-scroll">
         <table>
           <thead><tr><th>#</th><th>الصنف</th><th>المعدل%</th></tr></thead>
           <tbody>
@@ -1629,7 +1692,7 @@
     </div>
     <div class="table-card">
       <div class="chart-title" style="margin-bottom:var(--sp-md)">✅ أقل 10 أصناف مرتجعات</div>
-      <div style="overflow-x:auto">
+      <div class="table-scroll">
         <table>
           <thead><tr><th>#</th><th>الصنف</th><th>المعدل%</th></tr></thead>
           <tbody>
@@ -1721,7 +1784,7 @@
   <!-- KPIs المقترحة للمرتجعات -->
   <div style="margin-bottom:var(--sp-lg)">
     <div class="mini-head">📐 KPIs المقترحة — المرتجعات</div>
-    <div style="overflow-x:auto">
+    <div class="table-scroll">
       <table>
         <thead>
           <tr><th>المؤشر</th><th>الحالي</th><th>المستهدف</th><th>الفترة</th><th>الحالة</th></tr>
@@ -1893,7 +1956,7 @@ function renderCmpList() {
           <span style="font-weight:700;font-size:var(--fs-lg)">${r.name}</span>
           ${catTag}${perfTag}${alertBadge}
         </div>
-        <div style="background:var(--bg);border-radius:var(--r-sm);height:5px;margin-bottom:6px;overflow:hidden">
+        <div class="prog-wrap">
           <div style="width:${barPct}%;height:100%;background:linear-gradient(90deg,${cs.color},${roiColor});border-radius:var(--r-sm)"></div>
         </div>
         <div style="display:flex;gap:var(--gap);font-size:.77rem;flex-wrap:wrap;color:var(--text2)">
