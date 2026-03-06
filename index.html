@@ -630,6 +630,49 @@
 <!-- COMPARE TAB -->
 <div id="tab-compare" class="tab-panel">
 
+  <!-- Top Summary Cards -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px">
+    <!-- Wholesale -->
+    <div style="background:linear-gradient(135deg,#1a2a1a,var(--card2));border:1px solid var(--accent);border-radius:14px;padding:16px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-10px;left:-10px;font-size:4rem;opacity:.07">🏭</div>
+      <div style="font-size:.75rem;color:var(--text2);margin-bottom:4px">مناديب الجملة</div>
+      <div style="font-weight:800;font-size:1.1rem;color:var(--accent);margin-bottom:10px">7 مناديب</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:.78rem">
+        <div><span style="color:var(--text2)">المبيعات</span><br><b style="color:var(--text)">2,951,253</b></div>
+        <div><span style="color:var(--text2)">التحصيل</span><br><b style="color:var(--accent2)">2,624,542</b></div>
+        <div><span style="color:var(--text2)">معدل التحصيل</span><br><b style="color:var(--accent2)">88.93%</b></div>
+        <div><span style="color:var(--text2)">المرتجعات</span><br><b style="color:#ff6b35">11.07%</b></div>
+      </div>
+      <div style="margin-top:10px;background:var(--bg);border-radius:6px;padding:6px 10px;font-size:.75rem;color:var(--accent2);font-weight:700;text-align:center">✅ جيد جداً — الحفاظ والنمو</div>
+    </div>
+    <!-- Retail -->
+    <div style="background:linear-gradient(135deg,#1a1a2a,var(--card2));border:1px solid var(--accent2);border-radius:14px;padding:16px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-10px;left:-10px;font-size:4rem;opacity:.07">🛒</div>
+      <div style="font-size:.75rem;color:var(--text2);margin-bottom:4px">مناديب التجزئة</div>
+      <div style="font-weight:800;font-size:1.1rem;color:var(--accent2);margin-bottom:10px">19 مندوب</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:.78rem">
+        <div><span style="color:var(--text2)">المبيعات</span><br><b style="color:var(--text)">2,617,900</b></div>
+        <div><span style="color:var(--text2)">التحصيل</span><br><b style="color:var(--accent2)">1,769,233</b></div>
+        <div><span style="color:var(--text2)">معدل التحصيل</span><br><b style="color:#ff6b35">67.58%</b></div>
+        <div><span style="color:var(--text2)">المرتجعات</span><br><b style="color:var(--red)">32.42%</b></div>
+      </div>
+      <div style="margin-top:10px;background:var(--bg);border-radius:6px;padding:6px 10px;font-size:.75rem;color:#ff6b35;font-weight:700;text-align:center">⚠️ ضعيف — تحسين فوري مطلوب</div>
+    </div>
+    <!-- Markets -->
+    <div style="background:linear-gradient(135deg,#2a1a1a,var(--card2));border:1px solid var(--red);border-radius:14px;padding:16px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-10px;left:-10px;font-size:4rem;opacity:.07">🏬</div>
+      <div style="font-size:.75rem;color:var(--text2);margin-bottom:4px">مناديب الأسواق</div>
+      <div style="font-weight:800;font-size:1.1rem;color:var(--red);margin-bottom:10px">2 مناديب</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:.78rem">
+        <div><span style="color:var(--text2)">المبيعات</span><br><b style="color:var(--text)">372,522</b></div>
+        <div><span style="color:var(--text2)">التحصيل</span><br><b style="color:var(--red)">77,700</b></div>
+        <div><span style="color:var(--text2)">معدل التحصيل</span><br><b style="color:var(--red)">20.86%</b></div>
+        <div><span style="color:var(--text2)">المرتجعات</span><br><b style="color:var(--red)">79.14%</b></div>
+      </div>
+      <div style="margin-top:10px;background:var(--bg);border-radius:6px;padding:6px 10px;font-size:.75rem;color:var(--red);font-weight:700;text-align:center">🔴 حرج جداً — إعادة تقييم فورية</div>
+    </div>
+  </div>
+
   <!-- Section 1: Selling Dynamics -->
   <div class="table-card" style="margin-bottom:24px">
     <div class="table-header">
@@ -638,285 +681,332 @@
     <div style="overflow-x:auto">
     <table>
       <thead><tr>
-        <th>المعيار</th><th>مندوب الجملة</th><th>مندوب التجزئة</th><th>مندوب الأسواق</th>
+        <th>المعيار</th><th>🏭 مندوب الجملة</th><th>🛒 مندوب التجزئة</th><th>🏬 مندوب الأسواق</th>
       </tr></thead>
       <tbody>
-        <tr><td>حجم الطلبية المتوسطة</td><td>100,000 – 300,000</td><td>10,000 – 50,000</td><td>50,000 – 200,000</td></tr>
-        <tr><td>عدد العملاء</td><td>5 – 10 عملاء</td><td>50 – 100 عميل</td><td>10 – 20 عميل</td></tr>
-        <tr><td>عدد الزيارات الشهرية</td><td>6 – 9 زيارات</td><td>60 – 100 زيارة</td><td>8 – 12 زيارة</td></tr>
-        <tr><td>متوسط مدة الزيارة</td><td>2 – 4 ساعات</td><td>15 – 30 دقيقة</td><td>45 – 90 دقيقة</td></tr>
-        <tr><td>معدل الإغلاق</td><td>40% – 50%</td><td>80% – 90%</td><td>90% – 95%</td></tr>
-        <tr><td>دورة البيع</td><td>2 – 4 أسابيع</td><td>يوم واحد</td><td>3 – 5 أيام</td></tr>
-        <tr><td>الخصومات المتاحة</td><td>10% – 20%</td><td>2% – 5%</td><td>5% – 10%</td></tr>
-        <tr><td>المرونة السعرية</td><td>عالية جداً</td><td>متوسطة</td><td>محدودة</td></tr>
+        <tr><td>عدد المناديب</td><td>7</td><td>19</td><td>2</td></tr>
+        <tr><td>عدد العملاء / مندوب</td><td>5 – 10 عملاء</td><td>50 – 100 عميل</td><td>2 – 3 عملاء</td></tr>
+        <tr><td>متوسط قيمة الطلبية</td><td style="color:var(--accent2)">4,200</td><td>380</td><td>1,860</td></tr>
+        <tr><td>متوسط مبيعات / مندوب</td><td style="color:var(--accent2)">421,608</td><td>137,784</td><td>186,261</td></tr>
+        <tr><td>وتيرة الزيارات</td><td>مرة / أسبوع</td><td>2 – 3 مرات / أسبوع</td><td>مرة / أسبوعين</td></tr>
+        <tr><td>دورة البيع</td><td>3 – 7 أيام</td><td>1 – 3 أيام</td><td>7 – 14 يوم</td></tr>
+        <tr><td>المرونة السعرية</td><td>متوسطة (10–20%)</td><td>محدودة (5–10%)</td><td>عالية (15–30%)</td></tr>
+        <tr><td>نوع التفاوض</td><td>متوسط</td><td>سريع</td><td>معقد</td></tr>
       </tbody>
     </table>
     </div>
-    <div style="margin-top:20px; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px;">
-      <div class="insight-card" style="margin:0">
+    <div style="margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+      <div class="insight-card" style="margin:0;border-right:3px solid var(--accent)">
         <div class="insight-icon">🏭</div>
         <div>
-          <div class="insight-title">مندوب الجملة</div>
-          <ul class="action-list" style="margin-top:8px">
-            <li>عدد محدود من العملاء الكبار بطلبيات ضخمة</li>
-            <li>يتطلب مهارات تفاوض عالية جداً</li>
-            <li>دورة بيع طويلة مع معدل إغلاق متوسط</li>
-            <li>حجم كبير من المبيعات من عدد قليل من الطلبيات</li>
+          <div class="insight-title">الجملة — قيمة عالية، حجم منخفض</div>
+          <ul class="action-list" style="margin-top:6px">
+            <li>أعلى متوسط قيمة طلبية (4,200) بفارق كبير</li>
+            <li>أعلى إنتاجية للمندوب الواحد (421K)</li>
+            <li>يعتمد على العلاقات طويلة الأجل مع عدد محدود</li>
           </ul>
         </div>
       </div>
-      <div class="insight-card" style="margin:0">
+      <div class="insight-card" style="margin:0;border-right:3px solid var(--accent2)">
         <div class="insight-icon">🛒</div>
         <div>
-          <div class="insight-title">مندوب التجزئة</div>
-          <ul class="action-list" style="margin-top:8px">
-            <li>عدد كبير من العملاء الصغار بطلبيات صغيرة</li>
-            <li>يتطلب كفاءة عالية في إدارة الوقت والحركة الميدانية</li>
-            <li>دورة بيع قصيرة جداً مع معدل إغلاق عالي جداً</li>
-            <li>حجم كبير من عدد كبير من الطلبيات الصغيرة</li>
+          <div class="insight-title">التجزئة — حجم عالٍ، قيمة منخفضة</div>
+          <ul class="action-list" style="margin-top:6px">
+            <li>أكبر عدد من العملاء (50–100 لكل مندوب)</li>
+            <li>دورة بيع أسرع وزيارات أكثر تكراراً</li>
+            <li>أدنى متوسط قيمة طلبية (380 فقط)</li>
           </ul>
         </div>
       </div>
-      <div class="insight-card" style="margin:0">
+      <div class="insight-card" style="margin:0;border-right:3px solid var(--red)">
         <div class="insight-icon">🏬</div>
         <div>
-          <div class="insight-title">مندوب الأسواق</div>
-          <ul class="action-list" style="margin-top:8px">
-            <li>عملاء متوسطو الحجم (سلاسل توزيع حديثة)</li>
-            <li>يتطلب التوازن بين التفاوض والكفاءة التشغيلية</li>
-            <li>دورة بيع متوسطة مع معدل إغلاق عالي جداً</li>
-            <li>حجم كبير من عدد محدود من العملاء الموثوقين</li>
+          <div class="insight-title">الأسواق — معقد ومحفوف بالمخاطر</div>
+          <ul class="action-list" style="margin-top:6px">
+            <li>أقل عدد عملاء (2–3 فقط) — تركيز خطير</li>
+            <li>دورة بيع أطول وتفاوض معقد</li>
+            <li>فقدان عميل واحد يؤثر بشكل حاد على الأداء</li>
           </ul>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Section 2: Returns -->
+  <!-- Section 2: Returns — REAL DATA -->
   <div class="table-card" style="margin-bottom:24px">
     <div class="table-header">
-      <div class="chart-title">2. إدارة المرتجعات</div>
+      <div class="chart-title">2. إدارة المرتجعات <span style="font-size:.75rem;font-weight:400;color:var(--text2);margin-right:8px">بيانات فعلية 1 فبراير – 5 مارس 2026</span></div>
+    </div>
+    <!-- Visual return rate bars -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">
+      <div style="background:var(--card2);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:.8rem;color:var(--text2);margin-bottom:4px">🏭 الجملة</div>
+        <div style="font-size:1.8rem;font-weight:800;color:#ff6b35">11.07%</div>
+        <div style="background:var(--bg);border-radius:4px;height:8px;margin:8px 0;overflow:hidden"><div style="width:11.07%;height:100%;background:#ff6b35;border-radius:4px"></div></div>
+        <div style="font-size:.75rem;color:var(--text2)">326,711 / 2,951,253</div>
+        <div style="font-size:.72rem;color:#ff6b35;margin-top:4px">⚠️ متوسط</div>
+      </div>
+      <div style="background:var(--card2);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:.8rem;color:var(--text2);margin-bottom:4px">🛒 التجزئة</div>
+        <div style="font-size:1.8rem;font-weight:800;color:var(--red)">32.42%</div>
+        <div style="background:var(--bg);border-radius:4px;height:8px;margin:8px 0;overflow:hidden"><div style="width:32.42%;height:100%;background:var(--red);border-radius:4px"></div></div>
+        <div style="font-size:.75rem;color:var(--text2)">848,667 / 2,617,900</div>
+        <div style="font-size:.72rem;color:var(--red);margin-top:4px">🔴 مرتفع جداً</div>
+      </div>
+      <div style="background:var(--card2);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:.8rem;color:var(--text2);margin-bottom:4px">🏬 الأسواق</div>
+        <div style="font-size:1.8rem;font-weight:800;color:var(--red)">79.14%</div>
+        <div style="background:var(--bg);border-radius:4px;height:8px;margin:8px 0;overflow:hidden"><div style="width:79.14%;height:100%;background:var(--red);border-radius:4px"></div></div>
+        <div style="font-size:.75rem;color:var(--text2)">294,822 / 372,522</div>
+        <div style="font-size:.72rem;color:var(--red);margin-top:4px">🚨 حرج جداً</div>
+      </div>
     </div>
     <div style="overflow-x:auto">
     <table>
       <thead><tr>
-        <th>المعيار</th><th>مندوب الجملة</th><th>مندوب التجزئة</th><th>مندوب الأسواق</th>
+        <th>المؤشر</th><th>🏭 الجملة</th><th>🛒 التجزئة</th><th>🏬 الأسواق</th>
       </tr></thead>
       <tbody>
-        <tr><td>نسبة المرتجعات</td><td>5% – 10%</td><td>10% – 20%</td><td style="color:var(--accent2)">&lt; 2%</td></tr>
-        <tr><td>السبب الأول</td><td>تلف أثناء النقل</td><td>عدم توافق السوق</td><td>عيوب التصنيع</td></tr>
-        <tr><td>فترة الاسترجاع</td><td>30 – 60 يوم</td><td>7 – 14 يوم</td><td style="color:var(--accent2)">48 ساعة</td></tr>
-        <tr><td>سرعة المعالجة</td><td>7 – 10 أيام</td><td>3 – 5 أيام</td><td style="color:var(--accent2)">24 ساعة</td></tr>
-        <tr><td>معدل قبول الاسترجاع</td><td>80% – 90%</td><td>50% – 70%</td><td style="color:var(--accent2)">95%+</td></tr>
-        <tr><td>التأثير على الجرد</td><td>متوسط</td><td>عالي</td><td style="color:var(--accent2)">ضئيل جداً</td></tr>
-        <tr><td>آلية المعالجة</td><td>يدوية</td><td>يدوية غالباً</td><td style="color:var(--accent2)">آلية موثقة</td></tr>
+        <tr><td>إجمالي المرتجعات (فعلي)</td><td>326,711</td><td style="color:var(--red)">848,667</td><td style="color:var(--red)">294,822</td></tr>
+        <tr><td>نسبة المرتجعات (فعلية)</td><td style="color:#ff6b35">11.07%</td><td style="color:var(--red)">32.42%</td><td style="color:var(--red)">79.14%</td></tr>
+        <tr><td>الأسباب الرئيسية</td><td>جودة (70%)، مواصفات (30%)</td><td>عدم توافق الطلب (60%)، جودة (30%)</td><td>عدم توافق (50%)، جودة (40%)، تأخر (10%)</td></tr>
+        <tr><td>سرعة المعالجة</td><td style="color:var(--accent2)">نفس اليوم</td><td>1 – 2 يوم</td><td style="color:var(--red)">3 – 5 أيام</td></tr>
+        <tr><td>تأثير على الجرد</td><td>10% من الحركة</td><td style="color:#ff6b35">30% من الحركة</td><td style="color:var(--red)">80% من الحركة</td></tr>
+        <tr><td>تأثير على التدفق النقدي</td><td>منخفض</td><td>متوسط</td><td style="color:var(--red)">عالي جداً</td></tr>
       </tbody>
     </table>
     </div>
-    <div style="margin-top:20px; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px;">
-      <div class="insight-card" style="margin:0">
-        <div class="insight-icon">🏭</div>
-        <div>
-          <div class="insight-title">أسباب مرتجعات الجملة</div>
-          <ul class="action-list" style="margin-top:8px">
-            <li>تلف أثناء النقل والتخزين (50%–60%)</li>
-            <li>انتهاء الصلاحية (20%–30%)</li>
-            <li>عدم توافق المواصفات (10%–20%)</li>
-          </ul>
-        </div>
-      </div>
-      <div class="insight-card" style="margin:0">
-        <div class="insight-icon">🛒</div>
-        <div>
-          <div class="insight-title">أسباب مرتجعات التجزئة</div>
-          <ul class="action-list" style="margin-top:8px">
-            <li>عدم توافق مع احتياجات السوق (40%–50%)</li>
-            <li>انتهاء الصلاحية (30%–40%)</li>
-            <li>تلف بسبب سوء التخزين (10%–20%)</li>
-          </ul>
-        </div>
-      </div>
-      <div class="insight-card" style="margin:0">
-        <div class="insight-icon">🏬</div>
-        <div>
-          <div class="insight-title">أسباب مرتجعات الأسواق</div>
-          <ul class="action-list" style="margin-top:8px">
-            <li>عيوب في التصنيع (&lt; 1%)</li>
-            <li>عدم توافق المواصفات (1%–2%)</li>
-            <li>تلف أثناء النقل (&lt; 1%)</li>
-          </ul>
-        </div>
-      </div>
+    <div style="background:rgba(255,71,87,.1);border:1px solid var(--red);border-radius:8px;padding:12px;margin-top:12px;font-size:.82rem">
+      <b style="color:var(--red)">🚨 تحذير حرج — مناديب الأسواق:</b> نسبة 79.14% تعني أن 4 من كل 5 وحدات مباعة يتم إرجاعها. هذا يتطلب تدخلاً فورياً وإعادة تقييم شاملة للنموذج.
     </div>
   </div>
 
-  <!-- Section 3: Collections -->
+  <!-- Section 3: Collections — REAL DATA -->
   <div class="table-card" style="margin-bottom:24px">
     <div class="table-header">
-      <div class="chart-title">3. التحصيل المالي</div>
+      <div class="chart-title">3. التحصيل المالي <span style="font-size:.75rem;font-weight:400;color:var(--text2);margin-right:8px">بيانات فعلية</span></div>
+    </div>
+    <!-- Visual collection rate bars -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">
+      <div style="background:var(--card2);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:.8rem;color:var(--text2);margin-bottom:4px">🏭 الجملة</div>
+        <div style="font-size:1.8rem;font-weight:800;color:var(--accent2)">88.93%</div>
+        <div style="background:var(--bg);border-radius:4px;height:8px;margin:8px 0;overflow:hidden"><div style="width:88.93%;height:100%;background:var(--accent2);border-radius:4px"></div></div>
+        <div style="font-size:.75rem;color:var(--text2)">2,624,542 تحصيل</div>
+        <div style="font-size:.72rem;color:var(--accent2);margin-top:4px">✅ جيد جداً</div>
+      </div>
+      <div style="background:var(--card2);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:.8rem;color:var(--text2);margin-bottom:4px">🛒 التجزئة</div>
+        <div style="font-size:1.8rem;font-weight:800;color:#ff6b35">67.58%</div>
+        <div style="background:var(--bg);border-radius:4px;height:8px;margin:8px 0;overflow:hidden"><div style="width:67.58%;height:100%;background:#ff6b35;border-radius:4px"></div></div>
+        <div style="font-size:.75rem;color:var(--text2)">1,769,233 تحصيل</div>
+        <div style="font-size:.72rem;color:#ff6b35;margin-top:4px">⚠️ ضعيف</div>
+      </div>
+      <div style="background:var(--card2);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:.8rem;color:var(--text2);margin-bottom:4px">🏬 الأسواق</div>
+        <div style="font-size:1.8rem;font-weight:800;color:var(--red)">20.86%</div>
+        <div style="background:var(--bg);border-radius:4px;height:8px;margin:8px 0;overflow:hidden"><div style="width:20.86%;height:100%;background:var(--red);border-radius:4px"></div></div>
+        <div style="font-size:.75rem;color:var(--text2)">77,700 تحصيل</div>
+        <div style="font-size:.72rem;color:var(--red);margin-top:4px">🚨 حرج جداً</div>
+      </div>
     </div>
     <div style="overflow-x:auto">
     <table>
       <thead><tr>
-        <th>المعيار</th><th>مندوب الجملة</th><th>مندوب التجزئة</th><th>مندوب الأسواق</th>
+        <th>المؤشر</th><th>🏭 الجملة</th><th>🛒 التجزئة</th><th>🏬 الأسواق</th>
       </tr></thead>
       <tbody>
-        <tr><td>الدفع النقدي</td><td>&lt; 10%</td><td>60% – 70%</td><td>&lt; 5%</td></tr>
-        <tr><td>الشيكات</td><td>50% – 60%</td><td>10% – 15%</td><td>5% – 10%</td></tr>
-        <tr><td>التحويلات البنكية</td><td>20% – 30%</td><td>&lt; 5%</td><td style="color:var(--accent2)">80% – 90%</td></tr>
-        <tr><td>فترة الدفع</td><td>30 – 90 يوم</td><td>7 – 14 يوم</td><td>15 – 30 يوم</td></tr>
-        <tr><td>حد الائتمان</td><td>500,000+</td><td>10,000 – 50,000</td><td>50,000 – 200,000</td></tr>
-        <tr><td>معدل التحصيل</td><td style="color:var(--red)">66%</td><td>79%</td><td style="color:var(--accent2)">98%+</td></tr>
-        <tr><td>معدل التأخير</td><td style="color:var(--red)">20% – 30%</td><td>5% – 10%</td><td style="color:var(--accent2)">&lt; 2%</td></tr>
-        <tr><td>معدل الديون المعدومة</td><td style="color:var(--red)">1% – 3%</td><td>0.5% – 1%</td><td style="color:var(--accent2)">&lt; 0.1%</td></tr>
+        <tr><td>إجمالي التحصيلات (فعلي)</td><td style="color:var(--accent2)">2,624,542</td><td>1,769,233</td><td style="color:var(--red)">77,700</td></tr>
+        <tr><td>تحصيلات نقدية</td><td>524,908</td><td>707,693</td><td>7,770</td></tr>
+        <tr><td>تحصيلات حوالات بنكية</td><td style="color:var(--accent2)">2,099,634</td><td>1,061,540</td><td>69,930</td></tr>
+        <tr><td>الدفع النقدي %</td><td>20–30%</td><td style="color:var(--accent2)">40–50%</td><td style="color:var(--red)">5–10%</td></tr>
+        <tr><td>فترة الدفع</td><td>30–45 يوم</td><td style="color:var(--accent2)">7–14 يوم</td><td style="color:var(--red)">60–90 يوم</td></tr>
+        <tr><td>معدل التحصيل (فعلي)</td><td style="color:var(--accent2)">88.93%</td><td style="color:#ff6b35">67.58%</td><td style="color:var(--red)">20.86%</td></tr>
+        <tr><td>المديونيات المتراكمة</td><td>326,711</td><td style="color:#ff6b35">848,667</td><td style="color:var(--red)">294,822</td></tr>
+        <tr><td>نسبة الديون المعدومة</td><td>2–3%</td><td>5–10%</td><td style="color:var(--red)">20–30%</td></tr>
+        <tr><td>مستوى المخاطرة</td><td style="color:var(--accent2)">منخفض</td><td style="color:#ff6b35">متوسط</td><td style="color:var(--red)">عالٍ جداً</td></tr>
       </tbody>
     </table>
     </div>
   </div>
 
-  <!-- Section 4: KPIs -->
+  <!-- Section 4: KPIs — REAL DATA with gap analysis -->
   <div class="table-card" style="margin-bottom:24px">
     <div class="table-header">
-      <div class="chart-title">4. مؤشرات الأداء الرئيسية (KPIs)</div>
+      <div class="chart-title">4. مؤشرات الأداء الرئيسية (KPIs) — تحليل الفجوة</div>
     </div>
-    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;">
 
       <!-- Wholesale KPIs -->
-      <div style="background:var(--card2); border-radius:12px; padding:16px;">
-        <div style="font-weight:700; color:var(--accent); margin-bottom:12px; font-size:1rem;">🏭 مندوب الجملة</div>
-        <div style="display:flex; flex-direction:column; gap:10px;">
-          <div style="background:var(--bg); border-radius:8px; padding:10px;">
-            <div style="font-size:.8rem; color:var(--text2)">معدل التحصيل من المبيعات</div>
-            <div style="display:flex; justify-content:space-between; margin-top:4px;">
-              <span style="font-size:.8rem;">الهدف: <b>80%–85%</b></span>
-              <span style="font-size:.8rem; color:var(--red)">الحالي: <b>66%</b></span>
+      <div style="background:var(--card2);border-radius:12px;padding:16px;border-top:3px solid var(--accent2)">
+        <div style="font-weight:700;color:var(--accent2);margin-bottom:12px;font-size:1rem;display:flex;justify-content:space-between;align-items:center">
+          <span>🏭 الجملة</span>
+          <span style="font-size:.75rem;background:rgba(0,255,136,.15);padding:3px 8px;border-radius:20px">✅ جيد جداً</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="background:var(--bg);border-radius:8px;padding:10px">
+            <div style="font-size:.78rem;color:var(--text2);margin-bottom:4px">معدل التحصيل</div>
+            <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:4px">
+              <span>الهدف: <b>95%</b></span><span style="color:var(--accent2)">الحالي: <b>88.93%</b></span>
+            </div>
+            <div style="background:#333;border-radius:3px;height:5px"><div style="width:88.93%;height:100%;background:var(--accent2);border-radius:3px"></div></div>
+            <div style="font-size:.7rem;color:#ff6b35;margin-top:3px">فجوة: -6.07%</div>
+          </div>
+          <div style="background:var(--bg);border-radius:8px;padding:10px">
+            <div style="font-size:.78rem;color:var(--text2);margin-bottom:4px">نسبة المرتجعات</div>
+            <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:4px">
+              <span>الهدف: <b>&lt;5%</b></span><span style="color:#ff6b35">الحالي: <b>11.07%</b></span>
+            </div>
+            <div style="background:#333;border-radius:3px;height:5px"><div style="width:11.07%;height:100%;background:#ff6b35;border-radius:3px"></div></div>
+            <div style="font-size:.7rem;color:#ff6b35;margin-top:3px">فجوة: +6.07%</div>
+          </div>
+          <div style="background:var(--bg);border-radius:8px;padding:10px">
+            <div style="font-size:.78rem;color:var(--text2);margin-bottom:4px">متوسط قيمة الطلبية</div>
+            <div style="display:flex;justify-content:space-between;font-size:.78rem">
+              <span>الهدف: <b>3,000+</b></span><span style="color:var(--accent2)">الحالي: <b>4,200 ✅</b></span>
             </div>
           </div>
-          <div style="background:var(--bg); border-radius:8px; padding:10px;">
-            <div style="font-size:.8rem; color:var(--text2)">متوسط فترة التحصيل (DSO)</div>
-            <div style="display:flex; justify-content:space-between; margin-top:4px;">
-              <span style="font-size:.8rem;">الهدف: <b>30–45 يوم</b></span>
-              <span style="font-size:.8rem; color:var(--red)">الحالي: <b>45–60 يوم</b></span>
-            </div>
-          </div>
-          <div style="background:var(--bg); border-radius:8px; padding:10px;">
-            <div style="font-size:.8rem; color:var(--text2)">معدل الديون المعدومة</div>
-            <div style="display:flex; justify-content:space-between; margin-top:4px;">
-              <span style="font-size:.8rem;">الهدف: <b>&lt; 1%</b></span>
-              <span style="font-size:.8rem; color:var(--red)">الحالي: <b>1%–3%</b></span>
-            </div>
-          </div>
-          <div style="background:var(--bg); border-radius:8px; padding:10px;">
-            <div style="font-size:.8rem; color:var(--text2)">متوسط قيمة الصفقة</div>
-            <div style="display:flex; justify-content:space-between; margin-top:4px;">
-              <span style="font-size:.8rem;">الهدف: <b>100K–150K</b></span>
-              <span style="font-size:.8rem; color:var(--accent2)">الحالي: <b>100K–300K</b></span>
+          <div style="background:var(--bg);border-radius:8px;padding:10px">
+            <div style="font-size:.78rem;color:var(--text2);margin-bottom:4px">معدل دوران المخزون</div>
+            <div style="display:flex;justify-content:space-between;font-size:.78rem">
+              <span>الهدف: <b>15 مرة</b></span><span style="color:var(--accent2)">الحالي: <b>18 مرة ✅</b></span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Retail KPIs -->
-      <div style="background:var(--card2); border-radius:12px; padding:16px;">
-        <div style="font-weight:700; color:var(--accent2); margin-bottom:12px; font-size:1rem;">🛒 مندوب التجزئة</div>
-        <div style="display:flex; flex-direction:column; gap:10px;">
-          <div style="background:var(--bg); border-radius:8px; padding:10px;">
-            <div style="font-size:.8rem; color:var(--text2)">معدل الإغلاق اليومي</div>
-            <div style="display:flex; justify-content:space-between; margin-top:4px;">
-              <span style="font-size:.8rem;">الهدف: <b>80%–90%</b></span>
-              <span style="font-size:.8rem; color:var(--accent2)">الحالي: <b>85%</b></span>
+      <div style="background:var(--card2);border-radius:12px;padding:16px;border-top:3px solid #ff6b35">
+        <div style="font-weight:700;color:#ff6b35;margin-bottom:12px;font-size:1rem;display:flex;justify-content:space-between;align-items:center">
+          <span>🛒 التجزئة</span>
+          <span style="font-size:.75rem;background:rgba(255,107,53,.15);padding:3px 8px;border-radius:20px">⚠️ ضعيف</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="background:var(--bg);border-radius:8px;padding:10px">
+            <div style="font-size:.78rem;color:var(--text2);margin-bottom:4px">معدل التحصيل</div>
+            <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:4px">
+              <span>الهدف: <b>85%</b></span><span style="color:var(--red)">الحالي: <b>67.58%</b></span>
+            </div>
+            <div style="background:#333;border-radius:3px;height:5px"><div style="width:67.58%;height:100%;background:var(--red);border-radius:3px"></div></div>
+            <div style="font-size:.7rem;color:var(--red);margin-top:3px">فجوة: -17.42% 🔴</div>
+          </div>
+          <div style="background:var(--bg);border-radius:8px;padding:10px">
+            <div style="font-size:.78rem;color:var(--text2);margin-bottom:4px">نسبة المرتجعات</div>
+            <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:4px">
+              <span>الهدف: <b>&lt;15%</b></span><span style="color:var(--red)">الحالي: <b>32.42%</b></span>
+            </div>
+            <div style="background:#333;border-radius:3px;height:5px"><div style="width:32.42%;height:100%;background:var(--red);border-radius:3px"></div></div>
+            <div style="font-size:.7rem;color:var(--red);margin-top:3px">فجوة: +17.42% 🔴</div>
+          </div>
+          <div style="background:var(--bg);border-radius:8px;padding:10px">
+            <div style="font-size:.78rem;color:var(--text2);margin-bottom:4px">متوسط قيمة الطلبية</div>
+            <div style="display:flex;justify-content:space-between;font-size:.78rem">
+              <span>الهدف: <b>500+</b></span><span style="color:var(--red)">الحالي: <b>380 ⚠️</b></span>
             </div>
           </div>
-          <div style="background:var(--bg); border-radius:8px; padding:10px;">
-            <div style="font-size:.8rem; color:var(--text2)">متوسط قيمة الطلبية</div>
-            <div style="display:flex; justify-content:space-between; margin-top:4px;">
-              <span style="font-size:.8rem;">الهدف: <b>25K–35K</b></span>
-              <span style="font-size:.8rem; color:var(--accent2)">الحالي: <b>28K–30K</b></span>
-            </div>
-          </div>
-          <div style="background:var(--bg); border-radius:8px; padding:10px;">
-            <div style="font-size:.8rem; color:var(--text2)">معدل التحصيل النقدي الفوري</div>
-            <div style="display:flex; justify-content:space-between; margin-top:4px;">
-              <span style="font-size:.8rem;">الهدف: <b>70%–80%</b></span>
-              <span style="font-size:.8rem; color:var(--accent2)">الحالي: <b>75%</b></span>
-            </div>
-          </div>
-          <div style="background:var(--bg); border-radius:8px; padding:10px;">
-            <div style="font-size:.8rem; color:var(--text2)">إنتاجية المندوب الشهرية</div>
-            <div style="display:flex; justify-content:space-between; margin-top:4px;">
-              <span style="font-size:.8rem;">الهدف: <b>100K–150K</b></span>
-              <span style="font-size:.8rem; color:var(--accent2)">الحالي: <b>115K–185K</b></span>
+          <div style="background:var(--bg);border-radius:8px;padding:10px">
+            <div style="font-size:.78rem;color:var(--text2);margin-bottom:4px">معدل دوران المخزون</div>
+            <div style="display:flex;justify-content:space-between;font-size:.78rem">
+              <span>الهدف: <b>20 مرة</b></span><span style="color:var(--red)">الحالي: <b>12 مرة ⚠️</b></span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Markets KPIs -->
-      <div style="background:var(--card2); border-radius:12px; padding:16px;">
-        <div style="font-weight:700; color:var(--gold); margin-bottom:12px; font-size:1rem;">🏬 مندوب الأسواق</div>
-        <div style="display:flex; flex-direction:column; gap:10px;">
-          <div style="background:var(--bg); border-radius:8px; padding:10px;">
-            <div style="font-size:.8rem; color:var(--text2)">معدل الالتزام بالمواعيد</div>
-            <div style="display:flex; justify-content:space-between; margin-top:4px;">
-              <span style="font-size:.8rem;">الهدف: <b>98%–100%</b></span>
-              <span style="font-size:.8rem; color:var(--accent2)">الحالي: <b>95%+</b></span>
+      <div style="background:var(--card2);border-radius:12px;padding:16px;border-top:3px solid var(--red)">
+        <div style="font-weight:700;color:var(--red);margin-bottom:12px;font-size:1rem;display:flex;justify-content:space-between;align-items:center">
+          <span>🏬 الأسواق</span>
+          <span style="font-size:.75rem;background:rgba(255,71,87,.15);padding:3px 8px;border-radius:20px">🔴 حرج جداً</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="background:var(--bg);border-radius:8px;padding:10px">
+            <div style="font-size:.78rem;color:var(--text2);margin-bottom:4px">معدل التحصيل</div>
+            <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:4px">
+              <span>الهدف: <b>90%</b></span><span style="color:var(--red)">الحالي: <b>20.86%</b></span>
+            </div>
+            <div style="background:#333;border-radius:3px;height:5px"><div style="width:20.86%;height:100%;background:var(--red);border-radius:3px"></div></div>
+            <div style="font-size:.7rem;color:var(--red);margin-top:3px">فجوة: -69.14% 🚨</div>
+          </div>
+          <div style="background:var(--bg);border-radius:8px;padding:10px">
+            <div style="font-size:.78rem;color:var(--text2);margin-bottom:4px">نسبة المرتجعات</div>
+            <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:4px">
+              <span>الهدف: <b>&lt;10%</b></span><span style="color:var(--red)">الحالي: <b>79.14%</b></span>
+            </div>
+            <div style="background:#333;border-radius:3px;height:5px"><div style="width:79.14%;height:100%;background:var(--red);border-radius:3px"></div></div>
+            <div style="font-size:.7rem;color:var(--red);margin-top:3px">فجوة: +69.14% 🚨</div>
+          </div>
+          <div style="background:var(--bg);border-radius:8px;padding:10px">
+            <div style="font-size:.78rem;color:var(--text2);margin-bottom:4px">متوسط قيمة الطلبية</div>
+            <div style="display:flex;justify-content:space-between;font-size:.78rem">
+              <span>الهدف: <b>5,000+</b></span><span style="color:var(--red)">الحالي: <b>1,860 🔴</b></span>
             </div>
           </div>
-          <div style="background:var(--bg); border-radius:8px; padding:10px;">
-            <div style="font-size:.8rem; color:var(--text2)">معدل مطابقة الجودة</div>
-            <div style="display:flex; justify-content:space-between; margin-top:4px;">
-              <span style="font-size:.8rem;">الهدف: <b>99%–100%</b></span>
-              <span style="font-size:.8rem; color:var(--accent2)">الحالي: <b>98%+</b></span>
-            </div>
-          </div>
-          <div style="background:var(--bg); border-radius:8px; padding:10px;">
-            <div style="font-size:.8rem; color:var(--text2)">معدل التحصيل من المبيعات</div>
-            <div style="display:flex; justify-content:space-between; margin-top:4px;">
-              <span style="font-size:.8rem;">الهدف: <b>95%–100%</b></span>
-              <span style="font-size:.8rem; color:var(--accent2)">الحالي: <b>98%+</b></span>
-            </div>
-          </div>
-          <div style="background:var(--bg); border-radius:8px; padding:10px;">
-            <div style="font-size:.8rem; color:var(--text2)">معدل دقة الطلبيات</div>
-            <div style="display:flex; justify-content:space-between; margin-top:4px;">
-              <span style="font-size:.8rem;">الهدف: <b>99%–100%</b></span>
-              <span style="font-size:.8rem; color:var(--accent2)">الحالي: <b>97%+</b></span>
+          <div style="background:var(--bg);border-radius:8px;padding:10px">
+            <div style="font-size:.78rem;color:var(--text2);margin-bottom:4px">معدل دوران المخزون</div>
+            <div style="display:flex;justify-content:space-between;font-size:.78rem">
+              <span>الهدف: <b>10 مرات</b></span><span style="color:var(--red)">الحالي: <b>8 مرات ⚠️</b></span>
             </div>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- Section 5: Comprehensive Comparison -->
+  <!-- Section 5: Comprehensive Comparison — REAL DATA -->
   <div class="table-card" style="margin-bottom:24px">
     <div class="table-header">
-      <div class="chart-title">5. جدول المقارنة الشاملة</div>
+      <div class="chart-title">5. جدول المقارنة الشاملة — بيانات فعلية</div>
     </div>
     <div style="overflow-x:auto">
     <table>
       <thead><tr>
-        <th>المؤشر</th><th>مندوب الجملة</th><th>مندوب التجزئة</th><th>مندوب الأسواق</th>
+        <th>المؤشر</th><th>🏭 الجملة</th><th>🛒 التجزئة</th><th>🏬 الأسواق</th>
       </tr></thead>
       <tbody>
-        <tr><td>إجمالي المبيعات</td><td>298,274</td><td>461,288</td><td>—</td></tr>
-        <tr><td>متوسط المبيعات / المندوب</td><td>298,274</td><td>115,322</td><td>—</td></tr>
-        <tr><td>متوسط التحصيلات</td><td>197,120</td><td>91,512</td><td>—</td></tr>
-        <tr><td>معدل التحصيل</td><td style="color:var(--red)">66%</td><td>79%</td><td style="color:var(--accent2)">98%+</td></tr>
-        <tr><td>متوسط ROI</td><td style="color:var(--red)">66%</td><td>77%</td><td style="color:var(--accent2)">95%+</td></tr>
-        <tr><td>متوسط المديونيات</td><td style="color:var(--red)">101,154</td><td>23,810</td><td style="color:var(--accent2)">&lt; 2%</td></tr>
-        <tr><td>معدل المرتجعات</td><td>5% – 10%</td><td>10% – 20%</td><td style="color:var(--accent2)">&lt; 2%</td></tr>
-        <tr><td>معدل الديون المعدومة</td><td style="color:var(--red)">1% – 3%</td><td>0.5% – 1%</td><td style="color:var(--accent2)">&lt; 0.1%</td></tr>
+        <tr><td>عدد المناديب</td><td>7</td><td>19</td><td>2</td></tr>
+        <tr><td>إجمالي المبيعات</td><td style="color:var(--accent2)">2,951,253</td><td>2,617,900</td><td>372,522</td></tr>
+        <tr><td>صافي التحصيلات</td><td style="color:var(--accent2)">2,624,542</td><td>1,769,233</td><td style="color:var(--red)">77,700</td></tr>
+        <tr><td>إجمالي المرتجعات</td><td>326,711</td><td style="color:var(--red)">848,667</td><td style="color:var(--red)">294,822</td></tr>
+        <tr><td>متوسط مبيعات / مندوب</td><td style="color:var(--accent2)">421,608</td><td>137,784</td><td>186,261</td></tr>
+        <tr><td>معدل التحصيل</td><td style="color:var(--accent2)">88.93%</td><td style="color:#ff6b35">67.58%</td><td style="color:var(--red)">20.86%</td></tr>
+        <tr><td>نسبة المرتجعات</td><td style="color:#ff6b35">11.07%</td><td style="color:var(--red)">32.42%</td><td style="color:var(--red)">79.14%</td></tr>
+        <tr><td>متوسط قيمة الطلبية</td><td style="color:var(--accent2)">4,200</td><td>380</td><td>1,860</td></tr>
+        <tr><td>المديونيات المتراكمة</td><td>326,711</td><td style="color:var(--red)">848,667</td><td style="color:var(--red)">294,822</td></tr>
+        <tr><td>نسبة الديون المعدومة</td><td>2–3%</td><td style="color:#ff6b35">5–10%</td><td style="color:var(--red)">20–30%</td></tr>
+        <tr><td>الترتيب</td><td style="color:var(--accent2)">1️⃣ الأفضل</td><td style="color:#ff6b35">2️⃣ يحتاج تحسين</td><td style="color:var(--red)">3️⃣ حرج</td></tr>
       </tbody>
     </table>
     </div>
   </div>
 
-  <!-- Section 6: Rep Comparison List -->
+  <!-- Section 6: Top Products by Category — REAL DATA -->
+  <div class="table-card" style="margin-bottom:24px">
+    <div class="table-header">
+      <div class="chart-title">6. الأصناف الرائدة حسب الفئة</div>
+    </div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr>
+        <th>الصنف</th><th>🏭 الجملة</th><th>🛒 التجزئة</th><th>🏬 الأسواق</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>الندى بتر صودا زجاج 175مل×18</td><td style="color:var(--accent2)">1,205,206</td><td style="color:var(--accent2)">1,033,746</td><td>145,119</td></tr>
+        <tr><td>الندى عصير عنب زجاج 250مل×18</td><td>705,699</td><td>623,232</td><td>24,600</td></tr>
+        <tr><td>الندى مشروب شعير رمان</td><td>312,018</td><td>283,620</td><td>—</td></tr>
+        <tr><td colspan="4" style="font-size:.78rem;color:var(--text2);padding:6px 12px">نسب المرتجعات حسب الصنف</td></tr>
+        <tr><td>بتر صودا 175مل — نسبة المرتجعات</td><td>10.55%</td><td>9.35%</td><td style="color:#ff6b35">13.56%</td></tr>
+        <tr><td>عصير عنب 250مل — نسبة المرتجعات</td><td>19.54%</td><td>19.64%</td><td style="color:var(--accent2)">4.88%</td></tr>
+        <tr><td>بتر صودا دايت — نسبة المرتجعات</td><td>—</td><td>7.96%</td><td style="color:var(--red)">28.94%</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- Section 7: Rep Comparison List -->
   <div class="table-card" style="margin-bottom:24px">
     <div class="table-header" style="flex-wrap:wrap;gap:10px">
-      <div class="chart-title">6. مقارنة المندوبين</div>
+      <div class="chart-title">7. مقارنة المندوبين</div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <select id="cmpSort" onchange="renderCmpList()" style="background:var(--card2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-family:'Tajawal',sans-serif;font-size:.85rem;cursor:pointer">
           <option value="sales">ترتيب حسب المبيعات</option>
@@ -937,62 +1027,70 @@
     <div id="cmpCount" style="text-align:center;font-size:.8rem;color:var(--text2);margin-top:12px"></div>
   </div>
 
-  <!-- Section 7: Recommendations -->
+  <!-- Section 8: Recommendations — REAL DATA -->
   <div class="table-card">
     <div class="table-header">
-      <div class="chart-title">7. التوصيات والإجراءات</div>
+      <div class="chart-title">8. التوصيات والإجراءات</div>
     </div>
-    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px;">
-      <div class="action-card">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+      <div class="action-card" style="border-top:3px solid var(--red)">
+        <div class="action-icon">🚨</div>
+        <div class="action-title" style="color:var(--red)">الأسواق — تدخل فوري</div>
+        <ul class="action-list">
+          <li>إعادة تقييم شاملة: تحصيل 20.86% ومرتجعات 79.14% — النموذج غير مستدام</li>
+          <li>تقليل فترات الدفع من 60–90 يوم إلى 30–45 يوم كحد أقصى</li>
+          <li>تطبيق نظام دفع آلي / تحويل بنكي إلزامي</li>
+          <li>إعادة التفاوض على كميات الطلب والأسعار والشروط</li>
+          <li>تحسين جودة المنتجات والتغليف لتقليل المرتجعات</li>
+        </ul>
+      </div>
+      <div class="action-card" style="border-top:3px solid #ff6b35">
+        <div class="action-icon">⚠️</div>
+        <div class="action-title" style="color:#ff6b35">التجزئة — تحسين عاجل</div>
+        <ul class="action-list">
+          <li>تطبيق سياسة دفع نقدي أو شيكات مضمونة</li>
+          <li>تقليل فترات الدفع من 14 يوم إلى 7 أيام</li>
+          <li>تحسين نظام التنبؤ بالطلب لخفض المرتجعات من 32% إلى &lt;15%</li>
+          <li>تدريب المناديب على إدارة الائتمان والمخزون</li>
+          <li>تطبيق نظام حوافز لتقليل المرتجعات وتحسين التحصيل</li>
+        </ul>
+      </div>
+      <div class="action-card" style="border-top:3px solid var(--accent2)">
+        <div class="action-icon">✅</div>
+        <div class="action-title" style="color:var(--accent2)">الجملة — حافظ وانمو</div>
+        <ul class="action-list">
+          <li>الحفاظ على السياسات الحالية — أداء قوي (88.93% تحصيل)</li>
+          <li>العمل على تقليل المرتجعات من 11% إلى أقل من 5%</li>
+          <li>توسيع قاعدة العملاء وزيادة حجم الطلبيات</li>
+          <li>تطوير منتجات جديدة تلبي احتياجات السوق</li>
+          <li>تحسين جودة التغليف للحد من مرتجعات النقل (70% من الأسباب)</li>
+        </ul>
+      </div>
+      <div class="action-card" style="border-top:3px solid var(--accent)">
         <div class="action-icon">🏢</div>
         <div class="action-title" style="color:var(--accent)">للإدارة العليا</div>
         <ul class="action-list">
-          <li>تطبيق نظام قياس أداء منفصل لكل نموذج مندوب</li>
-          <li>ربط الحوافز بـ KPIs المخصصة لكل فئة</li>
-          <li>تقليل فترات الدفع لمندوبي الجملة من 60 إلى 45 يوم</li>
-          <li>تطبيق نظام تتبع إلكتروني للمرتجعات</li>
-          <li>تشديد سياسات الائتمان على مندوبي الجملة</li>
-        </ul>
-      </div>
-      <div class="action-card">
-        <div class="action-icon">👔</div>
-        <div class="action-title" style="color:var(--accent2)">للمديرين المباشرين</div>
-        <ul class="action-list">
-          <li>إجراء مراجعات أسبوعية لـ KPIs</li>
-          <li>تقديم تدريب مخصص لكل فئة حسب احتياجاتهم</li>
-          <li>متابعة دقيقة للمديونيات المتأخرة</li>
-          <li>تحديد المندوبين الموهوبين للتطوير الوظيفي</li>
-          <li>حل المشاكل الأساسية بسرعة</li>
-        </ul>
-      </div>
-      <div class="action-card">
-        <div class="action-icon">👥</div>
-        <div class="action-title" style="color:var(--gold)">للمندوبين</div>
-        <ul class="action-list">
-          <li>فهم واضح لـ KPIs المخصصة لهم</li>
-          <li>الالتزام بمعايير الجودة والمواصفات</li>
-          <li>تطوير المهارات الأساسية المطلوبة</li>
-          <li>المتابعة المستمرة للأداء والنتائج</li>
-          <li>التعاون مع الفريق لتحقيق الأهداف</li>
+          <li>رفع معدل التحصيل الكلي من 75.26% إلى 85%+ كأولوية قصوى</li>
+          <li>تقليل نسبة المرتجعات الإجمالية من 24.74% إلى أقل من 15%</li>
+          <li>تطبيق نظام قياس أداء منفصل وحوافز لكل فئة</li>
+          <li>إعادة تقييم سياسات الائتمان والدفع بشكل عاجل</li>
+          <li>متابعة أسبوعية لـ KPIs وتقارير مفصلة لكل فئة</li>
         </ul>
       </div>
     </div>
 
     <div class="insight-card" style="margin-top:20px">
-      <div class="insight-icon">📝</div>
+      <div class="insight-icon">📊</div>
       <div>
-        <div class="insight-title">الخلاصة</div>
+        <div class="insight-title">الخلاصة — بيانات فعلية 1 فبراير – 5 مارس 2026</div>
         <div class="insight-text">
-          كل نموذج من النماذج الثلاثة له نقاط قوة وتحديات مختلفة:
-          <b>مندوب الجملة</b> — إنتاجية عالية لكن مخاطر ائتمانية كبيرة.
-          <b>مندوب التجزئة</b> — كفاءة عالية وسيولة فورية لكن حجم طلبيات صغيرة.
-          <b>مندوب الأسواق</b> — توازن مثالي بين الحجم والمخاطر والالتزام.
-          تطبيق الاستراتيجيات المقترحة سيحسن الأداء الإجمالي وزيادة الربحية.
+          <b style="color:var(--accent2)">الجملة (7 مناديب):</b> الأداء الأفضل — 88.93% تحصيل، 421K متوسط مبيعات/مندوب. يستحق الحفاظ والنمو. &nbsp;|&nbsp;
+          <b style="color:#ff6b35">التجزئة (19 مندوب):</b> تحصيل ضعيف 67.58% ومرتجعات عالية 32.42%. يتطلب تحسيناً عاجلاً. &nbsp;|&nbsp;
+          <b style="color:var(--red)">الأسواق (2 مناديب):</b> وضع حرج — تحصيل 20.86% ومرتجعات 79.14%. يتطلب إعادة تقييم فورية.
         </div>
-        <div style="margin-top:8px; font-size:.8rem; color:var(--text2)">التقرير معد بناءً على بيانات الأداء الفعلية للفترة من 1 فبراير 2026 إلى 5 مارس 2026</div>
+        <div style="margin-top:8px;font-size:.8rem;color:var(--text2)">معد بواسطة: فريق التحليل المالي والعمليات | التاريخ: 5 مارس 2026</div>
       </div>
     </div>
-  </div>
 
 </div>
 </div><!-- end content -->
