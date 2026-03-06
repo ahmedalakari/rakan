@@ -33,6 +33,9 @@
     --sp-lg:  24px;
     --sp-xl:  32px;
 
+    /* alias so older inline styles using --radius still work */
+    --radius: var(--r-xl);
+
     /* radius scale */
     --r-sm:   6px;
     --r-md:   10px;
@@ -230,7 +233,8 @@
   }
   .chart-title { font-size: var(--fs-lg); font-weight: 700; color: var(--text); margin-bottom: 3px; }
   .chart-sub   { color: var(--muted); font-size: var(--fs-sm); margin-bottom: var(--sp-lg); }
-  .chart-wrap  { position: relative; height: 260px; }
+  .chart-wrap  { position: relative; height: 280px; }
+  .chart-wrap-lg { position: relative; height: 340px; }
 
   /* =============================================
      TABLE CARDS
@@ -506,7 +510,8 @@
     .header-meta .badge:not(:first-child) { display: none; }
     table { min-width: 420px; }
     th, td { padding: 8px 9px; font-size: 11px; }
-    .chart-wrap { height: 200px; }
+    .chart-wrap { height: 220px; }
+    .chart-wrap-lg { height: 260px; }
     .charts-row, .charts-row.three, .grid-2, .grid-3 { grid-template-columns: 1fr; }
     .table-card, .chart-card, .action-card, .insight-card { padding: var(--sp-md); }
     .filter-row input, .filter-row select { max-width: 100%; }
@@ -580,7 +585,7 @@
   }
 
   /* progress bar component */
-  .prog-wrap { background: var(--bg); border-radius: var(--r-sm); height: 7px; overflow: hidden; margin: var(--sp-xs) 0 var(--sp-xs); }
+  .prog-wrap { background: var(--bg); border-radius: var(--r-sm); height: 7px; overflow: hidden; margin: var(--sp-xs) 0 var(--sp-xs); position: relative; }
   .prog-fill  { height: 100%; border-radius: var(--r-sm); }
 
   /* table inside table-card — no extra wrapper needed */
@@ -775,7 +780,7 @@
   <div class="chart-card">
     <div class="chart-title">تحليل ROI لجميع المناديب</div>
     <div class="chart-sub">نسبة التحصيل من المبيعات — الخط الأحمر يمثل 80%</div>
-    <div class="chart-wrap" style="height:320px"><canvas id="allRepsChart"></canvas></div>
+    <div class="chart-wrap chart-wrap-lg" style="height:340px"><canvas id="allRepsChart"></canvas></div>
   </div>
 </div>
 
@@ -1232,7 +1237,7 @@
   <!-- ROI Bar Chart -->
   <div class="table-card" style="margin-top:var(--gap)">
     <div class="chart-title" style="margin-bottom:4px">معدل التحصيل لجميع المناديب النشطين</div>
-    <div class="chart-wrap" style="height:320px"><canvas id="repcmpChart"></canvas></div>
+    <div class="chart-wrap chart-wrap-lg" style="height:340px"><canvas id="repcmpChart"></canvas></div>
   </div>
 
   <!-- ===== KPIs per Category ===== -->
@@ -1247,9 +1252,8 @@
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">المستهدف</span><span style="font-weight:700;color:var(--accent)">80%</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">الفعلي</span><span style="font-weight:800;color:#ff6b35">69.12%</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">الفجوة</span><span style="font-weight:700;color:var(--red)">−10.88%</span></div>
-        <div class="prog-wrap">
-          <div style="width:80%;height:100%;background:rgba(0,212,255,.2);border-radius:var(--r-sm);position:absolute"></div>
-          <div style="width:69.12%;height:100%;background:var(--accent);border-radius:var(--r-sm);position:absolute"></div>
+        <div class="prog-wrap" style="background:rgba(0,212,255,.15)">
+          <div style="width:69.12%;height:100%;background:var(--accent);border-radius:var(--r-sm)"></div>
         </div>
         <div style="display:flex;justify-content:space-between;margin-top:4px"><span style="color:var(--text2)">متوسط ROI فعلي</span><span style="font-weight:700;color:#ff6b35">66.83%</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">مناديب أداء عالٍ ≥80%</span><span style="font-weight:700;color:var(--accent2)">8 / 23 (34.8%)</span></div>
@@ -1264,9 +1268,8 @@
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">المستهدف</span><span style="font-weight:700;color:var(--accent2)">90%</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">الفعلي</span><span style="font-weight:800;color:var(--accent2)">90.68%</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">الفجوة</span><span style="font-weight:700;color:var(--accent2)">+0.68% ✓</span></div>
-        <div class="prog-wrap">
-          <div style="width:90%;height:100%;background:rgba(0,255,136,.2);border-radius:var(--r-sm);position:absolute"></div>
-          <div style="width:90.68%;height:100%;background:var(--accent2);border-radius:var(--r-sm);position:absolute"></div>
+        <div class="prog-wrap" style="background:rgba(0,255,136,.15)">
+          <div style="width:90.68%;height:100%;background:var(--accent2);border-radius:var(--r-sm)"></div>
         </div>
         <div style="display:flex;justify-content:space-between;margin-top:4px"><span style="color:var(--text2)">متوسط ROI فعلي</span><span style="font-weight:700;color:var(--accent2)">102.71%</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">مناديب أداء عالٍ ≥80%</span><span style="font-weight:700;color:var(--accent2)">5 / 8 (62.5%)</span></div>
@@ -1281,9 +1284,8 @@
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">المستهدف</span><span style="font-weight:700;color:var(--accent)">70%</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">الفعلي</span><span style="font-weight:800;color:var(--red)">20.86%</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">الفجوة</span><span style="font-weight:700;color:var(--red)">−49.14% 🚨</span></div>
-        <div class="prog-wrap">
-          <div style="width:70%;height:100%;background:rgba(255,71,87,.2);border-radius:var(--r-sm);position:absolute"></div>
-          <div style="width:20.86%;height:100%;background:var(--red);border-radius:var(--r-sm);position:absolute"></div>
+        <div class="prog-wrap" style="background:rgba(255,71,87,.15)">
+          <div style="width:20.86%;height:100%;background:var(--red);border-radius:var(--r-sm)"></div>
         </div>
         <div style="display:flex;justify-content:space-between;margin-top:4px"><span style="color:var(--text2)">متوسط ROI فعلي</span><span style="font-weight:700;color:var(--red)">20.76%</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">مناديب أداء عالٍ ≥80%</span><span style="font-weight:700;color:var(--red)">0 / 2 (0%)</span></div>
@@ -2269,6 +2271,29 @@ function showTab(id) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
   event.target.classList.add('active');
+
+  // Lazy-init products charts on first visit
+  if (id === 'products' && !itemsInited) {
+    itemsInited = true;
+    requestAnimationFrame(() => { requestAnimationFrame(() => { initItemsPanels(); }); });
+    return;
+  }
+
+  // Lazy-init repcmp charts on first visit
+  if (id === 'repcmp' && !repcmpInited) {
+    repcmpInited = true;
+    requestAnimationFrame(() => { requestAnimationFrame(() => { initRepCmpPanels(); }); });
+    return;
+  }
+
+  // After any tab switch, resize all existing charts so they fill their containers
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      if (Chart.instances) {
+        Object.values(Chart.instances).forEach(c => { try { c.resize(); } catch(e) {} });
+      }
+    });
+  });
 }
 // ===== مقارنة مناديب tab =====
 function renderRepCmp() {
@@ -2396,11 +2421,14 @@ function initRepCmpPanels() {
       }
     });
   }
+
+  // Returns chart lives in this tab — init here
+  initReturnsChart();
 }
 
 // init on load
 renderRepCmp();
-initRepCmpPanels();
+let repcmpInited = false;
 
 // ===== بيانات الأصناف — مصدر: items_analysis.csv =====
 const itemsData = [
@@ -2614,12 +2642,13 @@ function initItemsPanels() {
 }
 
 renderItems();
-initItemsPanels();
+let itemsInited = false;
 
-// ===== رسم بياني المرتجعات =====
-(function() {
+// ===== رسم بياني المرتجعات — يُهيَّأ داخل initRepCmpPanels عند فتح التبويب =====
+function initReturnsChart() {
   const el = document.getElementById('returnsChart');
-  if (!el) return;
+  if (!el || el.dataset.inited) return;
+  el.dataset.inited = '1';
   new Chart(el, {
     type: 'bar',
     data: {
@@ -2650,7 +2679,7 @@ initItemsPanels();
       }
     }
   });
-})();
+}
 
 </script>
 </body>
