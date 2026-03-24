@@ -782,7 +782,7 @@
     .cat-chip, #custCatChips, #debtCatChips, .filter-row,
     .search-input, .filter-select,
     #custPagination, #debtDetailPagination,
-    #custRepFilter, #debtRepFilter,
+    #custRepFilter, #custCatRepFilter, #repRepFilter, #debtRepFilter,
     .header-meta { display: none !important; }
     .print-bar  { display: none !important; }
 
@@ -1404,6 +1404,44 @@
       <button class="print-btn" style="font-size:12px;padding:5px 12px;flex-shrink:0;margin-right:auto" onclick="printTable('repsTable','أداء المناديب التفصيلي الكامل')">🖨️ طباعة الجدول</button>
       </div>
       <div class="filter-row">
+        <select id="repRepFilter" class="filter-select" onchange="renderRepsTable()">
+          <option value="">👤 كل المناديب</option>
+          <option value="احمد ابو ضوة">احمد ابو ضوة</option>
+          <option value="احمد عبدالحميد">احمد عبدالحميد</option>
+          <option value="احمد عصام">احمد عصام</option>
+          <option value="احمد نوري">احمد نوري</option>
+          <option value="الادارية">الادارية</option>
+          <option value="جلال رحال">جلال رحال</option>
+          <option value="حسن الكردي">حسن الكردي</option>
+          <option value="حسين  الباروني">حسين  الباروني</option>
+          <option value="رضوان اسماعيل">رضوان اسماعيل</option>
+          <option value="زياد الحنش">زياد الحنش</option>
+          <option value="سند">سند</option>
+          <option value="سيف يونس">سيف يونس</option>
+          <option value="عبد الرؤوف نصر">عبد الرؤوف نصر</option>
+          <option value="عبد الله ابو فيس">عبد الله ابو فيس</option>
+          <option value="عبد المجيد الطير">عبد المجيد الطير</option>
+          <option value="عبدالرؤوف بريم">عبدالرؤوف بريم</option>
+          <option value="عصام التميمي">عصام التميمي</option>
+          <option value="علاء الكور">علاء الكور</option>
+          <option value="علي سليمان">علي سليمان</option>
+          <option value="علي غزيل">علي غزيل</option>
+          <option value="عمر النمروش">عمر النمروش</option>
+          <option value="فؤاد مسعود">فؤاد مسعود</option>
+          <option value="فراس المشبك">فراس المشبك</option>
+          <option value="مبروك رجب">مبروك رجب</option>
+          <option value="محمد الصادق">محمد الصادق</option>
+          <option value="محمد العباني">محمد العباني</option>
+          <option value="محمد العزابي">محمد العزابي</option>
+          <option value="محمد عبد القادر">محمد عبد القادر</option>
+          <option value="محمد عريبي">محمد عريبي</option>
+          <option value="محمود العزري">محمود العزري</option>
+          <option value="مصطفي بلقاسم">مصطفي بلقاسم</option>
+          <option value="معاد الشوشان">معاد الشوشان</option>
+          <option value="مندر الخويلدي">مندر الخويلدي</option>
+          <option value="هيتم الصادق">هيتم الصادق</option>
+          <option value="هيتم الصغير">هيتم الصغير</option>
+        </select>
         <input type="text" id="repSearch" class="search-input" placeholder="🔍 بحث..." oninput="renderRepsTable()">
         <select id="repCatFilter" class="filter-select" onchange="renderRepsTable()">
           <option value="">كل الفئات</option>
@@ -1522,48 +1560,54 @@
       <div class="chart-title">قائمة مقارنة المناديب — 35 مندوب</div>
       <button class="print-btn" style="font-size:12px;padding:5px 12px;flex-shrink:0;margin-right:auto" onclick="printTable('rcTable','قائمة مقارنة المناديب')">🖨️ طباعة الجدول</button>
 
-      <!-- بطاقات فلترة سريعة حسب التصنيف -->
-      <div id="catFilterBadges" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
-        <button onclick="setCatFilter('all')" id="badge-all"
-          style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:var(--text);padding:5px 14px;border-radius:var(--r-pill);font-family:'Cairo',sans-serif;font-size:var(--fs-sm);font-weight:700;cursor:pointer;transition:.2s">
-          الكل (35)
-        </button>
-        <button onclick="setCatFilter('جملة')" id="badge-جملة"
-          style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:var(--accent2);padding:5px 14px;border-radius:var(--r-pill);font-family:'Cairo',sans-serif;font-size:var(--fs-sm);font-weight:700;cursor:pointer;transition:.2s">
-          🏭 جملة (7)
-        </button>
-        <button onclick="setCatFilter('تجزئة')" id="badge-تجزئة"
-          style="background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.3);color:var(--accent);padding:5px 14px;border-radius:var(--r-pill);font-family:'Cairo',sans-serif;font-size:var(--fs-sm);font-weight:700;cursor:pointer;transition:.2s">
-          🛒 تجزئة (20)
-        </button>
-        <button onclick="setCatFilter('أسواق')" id="badge-أسواق"
-          style="background:rgba(255,71,87,0.1);border:1px solid rgba(255,71,87,0.3);color:var(--red);padding:5px 14px;border-radius:var(--r-pill);font-family:'Cairo',sans-serif;font-size:var(--fs-sm);font-weight:700;cursor:pointer;transition:.2s">
-          🏪 أسواق (2)
-        </button>
-        <button onclick="setCatFilter('مقاهي ومطاعم')" id="badge-مقاهي ومطاعم"
-          style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);color:var(--gold);padding:5px 14px;border-radius:var(--r-pill);font-family:'Cairo',sans-serif;font-size:var(--fs-sm);font-weight:700;cursor:pointer;transition:.2s">
-          ☕ مقاهي ومطاعم (4)
-        </button>
-        <button onclick="setCatFilter('مستقل')" id="badge-مستقل"
-          style="background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.3);color:var(--accent3);padding:5px 14px;border-radius:var(--r-pill);font-family:'Cairo',sans-serif;font-size:var(--fs-sm);font-weight:700;cursor:pointer;transition:.2s">
-          👤 مستقل (1)
-        </button>
-        <button onclick="setCatFilter('إدارية')" id="badge-إدارية"
-          style="background:rgba(138,165,192,0.1);border:1px solid rgba(138,165,192,0.3);color:var(--muted);padding:5px 14px;border-radius:var(--r-pill);font-family:'Cairo',sans-serif;font-size:var(--fs-sm);font-weight:700;cursor:pointer;transition:.2s">
-          🏢 إدارية (1)
-        </button>
-      </div>
-
       <div class="filter-row">
         <input id="rcSearch" oninput="renderRepCmp()" placeholder="🔍 بحث باسم المندوب..." class="search-input">
         <select id="rcCat" onchange="renderRepCmp()" class="filter-select">
-          <option value="all">كل الفئات</option>
+          <option value="all">📂 كل الفئات</option>
           <option value="جملة">🏭 جملة (7)</option>
           <option value="تجزئة">🛒 تجزئة (20)</option>
           <option value="أسواق">🏪 أسواق (2)</option>
           <option value="مقاهي ومطاعم">☕ مقاهي ومطاعم (4)</option>
           <option value="مستقل">👤 مستقل (1)</option>
           <option value="إدارية">🏢 إدارية (1)</option>
+        </select>
+        <select id="rcRep" onchange="renderRepCmp()" class="filter-select">
+          <option value="">👤 كل المناديب</option>
+          <option value="احمد ابو ضوة">احمد ابو ضوة</option>
+          <option value="احمد عبدالحميد">احمد عبدالحميد</option>
+          <option value="احمد عصام">احمد عصام</option>
+          <option value="احمد نوري">احمد نوري</option>
+          <option value="الادارية">الادارية</option>
+          <option value="جلال رحال">جلال رحال</option>
+          <option value="حسن الكردي">حسن الكردي</option>
+          <option value="حسين  الباروني">حسين  الباروني</option>
+          <option value="رضوان اسماعيل">رضوان اسماعيل</option>
+          <option value="زياد الحنش">زياد الحنش</option>
+          <option value="سند">سند</option>
+          <option value="سيف يونس">سيف يونس</option>
+          <option value="عبد الرؤوف نصر">عبد الرؤوف نصر</option>
+          <option value="عبد الله ابو فيس">عبد الله ابو فيس</option>
+          <option value="عبد المجيد الطير">عبد المجيد الطير</option>
+          <option value="عبدالرؤوف بريم">عبدالرؤوف بريم</option>
+          <option value="عصام التميمي">عصام التميمي</option>
+          <option value="علاء الكور">علاء الكور</option>
+          <option value="علي سليمان">علي سليمان</option>
+          <option value="علي غزيل">علي غزيل</option>
+          <option value="عمر النمروش">عمر النمروش</option>
+          <option value="فؤاد مسعود">فؤاد مسعود</option>
+          <option value="فراس المشبك">فراس المشبك</option>
+          <option value="مبروك رجب">مبروك رجب</option>
+          <option value="محمد الصادق">محمد الصادق</option>
+          <option value="محمد العباني">محمد العباني</option>
+          <option value="محمد العزابي">محمد العزابي</option>
+          <option value="محمد عبد القادر">محمد عبد القادر</option>
+          <option value="محمد عريبي">محمد عريبي</option>
+          <option value="محمود العزري">محمود العزري</option>
+          <option value="مصطفي بلقاسم">مصطفي بلقاسم</option>
+          <option value="معاد الشوشان">معاد الشوشان</option>
+          <option value="مندر الخويلدي">مندر الخويلدي</option>
+          <option value="هيتم الصادق">هيتم الصادق</option>
+          <option value="هيتم الصغير">هيتم الصغير</option>
         </select>
         <select id="rcSort" onchange="renderRepCmp()" class="filter-select">
           <option value="roi">ترتيب: ROI ↓</option>
@@ -2350,7 +2394,8 @@
 <div id="tab-debt" class="tab-panel">
 
   <div class="print-bar" style="display:flex;justify-content:flex-end;margin-bottom:12px">
-    <button class="print-btn" onclick="printCurrentTab()">🖨️ طباعة — 💰 المديونية</button>
+    <button class="print-btn" onclick="printBothDebtTables()">🖨️ طباعة الجداول (مناديب + تفصيلي)</button>
+    <button class="print-btn" onclick="printCurrentTab()" style="margin-right:8px">🖨️ طباعة التبويب كاملاً</button>
   </div>
 
   <!-- KPI Row -->
@@ -2437,7 +2482,7 @@
         <div class="chart-title">مديونية المناديب</div>
         <div class="chart-sub" id="debtRepCountLabel">ملخص ذمم كل مندوب — 35 مندوب</div>
       </div>
-      <button class="print-btn" style="font-size:12px;padding:5px 12px;flex-shrink:0" onclick="printTable('debtRepBody','مديونية المناديب')">🖨️ طباعة الجدول</button>
+
     </div>
     <div class="table-scroll">
       <table>
@@ -2464,7 +2509,7 @@
       <div>
         <div class="chart-title">المديونية التفصيلية — كشف العملاء</div>
         <div class="chart-sub">جميع العملاء مع مناديبهم وصافي مديونياتهم</div>
-      <button class="print-btn" style="font-size:12px;padding:5px 12px;flex-shrink:0;margin-right:auto" onclick="printTable('debtDetailBody','المديونية التفصيلية — كشف العملاء')">🖨️ طباعة الجدول</button>
+
       </div>
 
     </div>
@@ -2577,6 +2622,55 @@
           <div class="chart-sub" id="custCountLabel">عرض: 1,788 عميل</div>
         </div>
         <input type="text" id="custSearch" class="search-input" placeholder="🔍 ابحث باسم العميل..." oninput="applyFilters()" style="min-width:220px">
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+        <select id="custRepFilter" class="filter-select" onchange="applyFilters()">
+          <option value="">👤 كل المناديب</option>
+        <option value="احمد ابو ضوة">احمد ابو ضوة</option>
+        <option value="احمد عبدالحميد">احمد عبدالحميد</option>
+        <option value="احمد عصام">احمد عصام</option>
+        <option value="احمد نوري">احمد نوري</option>
+        <option value="الادارية">الادارية</option>
+        <option value="جلال رحال">جلال رحال</option>
+        <option value="حسن الكردي">حسن الكردي</option>
+        <option value="حسين  الباروني">حسين  الباروني</option>
+        <option value="رضوان اسماعيل">رضوان اسماعيل</option>
+        <option value="زياد الحنش">زياد الحنش</option>
+        <option value="سند">سند</option>
+        <option value="سيف يونس">سيف يونس</option>
+        <option value="عبد الرؤوف نصر">عبد الرؤوف نصر</option>
+        <option value="عبد الله ابو فيس">عبد الله ابو فيس</option>
+        <option value="عبد المجيد الطير">عبد المجيد الطير</option>
+        <option value="عبدالرؤوف بريم">عبدالرؤوف بريم</option>
+        <option value="عصام التميمي">عصام التميمي</option>
+        <option value="علاء الكور">علاء الكور</option>
+        <option value="علي سليمان">علي سليمان</option>
+        <option value="علي غزيل">علي غزيل</option>
+        <option value="عمر النمروش">عمر النمروش</option>
+        <option value="فؤاد مسعود">فؤاد مسعود</option>
+        <option value="فراس المشبك">فراس المشبك</option>
+        <option value="مبروك رجب">مبروك رجب</option>
+        <option value="محمد الصادق">محمد الصادق</option>
+        <option value="محمد العباني">محمد العباني</option>
+        <option value="محمد العزابي">محمد العزابي</option>
+        <option value="محمد عبد القادر">محمد عبد القادر</option>
+        <option value="محمد عريبي">محمد عريبي</option>
+        <option value="محمود العزري">محمود العزري</option>
+        <option value="مصطفي بلقاسم">مصطفي بلقاسم</option>
+        <option value="معاد الشوشان">معاد الشوشان</option>
+        <option value="مندر الخويلدي">مندر الخويلدي</option>
+        <option value="هيتم الصادق">هيتم الصادق</option>
+        <option value="هيتم الصغير">هيتم الصغير</option>
+        </select>
+        <select id="custCatRepFilter" class="filter-select" onchange="applyFilters()">
+          <option value="">📂 كل الفئات</option>
+          <option value="جملة">🏭 جملة</option>
+          <option value="تجزئة">🛒 تجزئة</option>
+          <option value="أسواق">🏪 أسواق</option>
+          <option value="مقاهي ومطاعم">☕ مقاهي ومطاعم</option>
+          <option value="مستقل">👤 مستقل</option>
+          <option value="إدارية">🏢 إدارية</option>
+        </select>
       </div>
       <div id="custCatChips" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
         <button class="cat-chip cat-chip-active" data-cat="all" onclick="setCustCat('all')">🔢 الكل <span class="chip-count" id="chip-all">0</span></button>
@@ -3174,10 +3268,12 @@ function renderRepsTable() {
   const cat  = document.getElementById('repCatFilter')?.value || '';
   const sort = document.getElementById('repSortFilter')?.value || 'sales';
   const view = document.getElementById('repViewMode')?.value || 'basic';
+  const repF = document.getElementById('repRepFilter')?.value || '';
 
   let data = [...repsData];
-  if (q)   data = data.filter(r => r.name.includes(q));
-  if (cat) data = data.filter(r => r.cat === cat);
+  if (repF) data = data.filter(r => r.name === repF);
+  if (q)    data = data.filter(r => r.name.includes(q));
+  if (cat)  data = data.filter(r => r.cat === cat);
 
   // هل يوجد فلترة نشطة؟
   const isFiltered = (q !== '') || (cat !== '');
@@ -3509,11 +3605,15 @@ function updateChipCounts() {
 }
 
 function applyFilters() {
-  const catF   = _custActiveCat || 'all';
-  const search = (document.getElementById('custSearch')?.value || '').trim().toLowerCase();
+  const catF    = _custActiveCat || 'all';
+  const search  = (document.getElementById('custSearch')?.value || '').trim().toLowerCase();
+  const repF    = document.getElementById('custRepFilter')?.value  || '';
+  const catRepF = document.getElementById('custCatRepFilter')?.value || '';
   filteredCust = custData.filter(r => {
     if (catF !== 'all' && r.cat !== catF) return false;
-    if (search && !r.n.toLowerCase().includes(search)) return false;
+    if (search && !r.n.toLowerCase().includes(search) && !r.rep?.toLowerCase().includes(search)) return false;
+    if (repF && r.rep !== repF) return false;
+    if (catRepF && repClassification[r.rep] !== catRepF) return false;
     return true;
   });
   filteredCust.sort((a,b) => custSortAsc ? a[custSortKey]-b[custSortKey] : b[custSortKey]-a[custSortKey]);
@@ -3845,22 +3945,6 @@ function showTab(id) {
 function setCatFilter(cat) {
   const sel = document.getElementById('rcCat');
   if (sel) sel.value = cat === 'all' ? 'all' : cat;
-
-  // تحديث مظهر الأزرار
-  const cats = ['all','جملة','تجزئة','أسواق','مقاهي ومطاعم','مستقل','إدارية'];
-  cats.forEach(c => {
-    const btn = document.getElementById('badge-' + c);
-    if (!btn) return;
-    if (c === cat) {
-      btn.style.opacity = '1';
-      btn.style.transform = 'scale(1.05)';
-      btn.style.boxShadow = '0 0 0 2px currentColor';
-    } else {
-      btn.style.opacity = '0.55';
-      btn.style.transform = 'scale(1)';
-      btn.style.boxShadow = 'none';
-    }
-  });
   renderRepCmp();
 }
 
@@ -3869,22 +3953,13 @@ function renderRepCmp() {
   const sort  = document.getElementById('rcSort')?.value   || 'roi';
   const level = document.getElementById('rcLevel')?.value  || 'all';
   const q     = (document.getElementById('rcSearch')?.value || '').trim();
-
-  // مزامنة الأزرار مع قيمة الـ select
-  const allCats = ['all','جملة','تجزئة','أسواق','مقاهي ومطاعم','مستقل','إدارية'];
-  allCats.forEach(c => {
-    const btn = document.getElementById('badge-' + c);
-    if (!btn) return;
-    const active = (c === cat) || (c === 'all' && cat === 'all');
-    btn.style.opacity = active ? '1' : '0.55';
-    btn.style.transform = active ? 'scale(1.05)' : 'scale(1)';
-    btn.style.boxShadow = active ? '0 0 0 2px currentColor' : 'none';
-  });
+  const repF  = document.getElementById('rcRep')?.value    || '';
 
   let data = repsData.filter(r => r.sales > 0).map(r => ({...r}));
 
-  if (cat   !== 'all') data = data.filter(r => r.cat === cat);
-  if (q) data = data.filter(r => r.name.includes(q));
+  if (cat  !== 'all') data = data.filter(r => r.cat === cat);
+  if (repF)           data = data.filter(r => r.name === repF);
+  if (q)              data = data.filter(r => r.name.includes(q));
   if (level === 'ممتاز') data = data.filter(r => r.roi >= 100);
   else if (level === 'جيد')     data = data.filter(r => r.roi >= 80 && r.roi < 100);
   else if (level === 'متوسط')   data = data.filter(r => r.roi >= 50 && r.roi < 80);
@@ -4880,6 +4955,85 @@ function initDebtCharts(){
   if(c2)new Chart(c2.getContext('2d'),{type:'bar',data:{labels:pd.map(r=>r.name),datasets:[{label:'نسبة السداد',data:pd.map(r=>Math.min(r.pct,100)),backgroundColor:pd.map(r=>r.pct>=70?'rgba(0,255,136,0.55)':r.pct>=50?'rgba(255,107,53,0.55)':'rgba(255,71,87,0.55)'),borderColor:pd.map(r=>r.pct>=70?'#00ff88':r.pct>=50?'#ff6b35':'#ff4757'),borderWidth:1,borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.raw.toFixed(1)+'%'}}},scales:{x:{min:0,max:100,grid:{color:'rgba(30,58,95,0.4)'},ticks:{color:'#8ba3b8',font:{family:'Cairo'},callback:v=>v+'%'}},y:{grid:{display:false},ticks:{color:'#e8f4f8',font:{family:'Cairo',size:11}}}}}});
 }
 // ── Print current active tab ──────────────────────────────────────────────
+function printBothDebtTables() {
+  // Expand both tables fully
+  const fmt = n => Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  const repBody = document.getElementById('debtRepBody');
+  const repSaved = repBody ? repBody.innerHTML : '';
+
+  const detailBody = document.getElementById('debtDetailBody');
+  const detailSaved = detailBody ? detailBody.innerHTML : '';
+
+  if (detailBody) {
+    detailBody.innerHTML = debtDetailFiltered.map((r,i) => {
+      const nc = r.net>50000?'#c0392b':r.net>10000?'#e67e22':r.net<0?'#27ae60':'#333';
+      const st = r.net<0?'دائن':r.net===0?'مسوّى':r.net>50000?'حرج':r.net>10000?'مرتفع':'عادي';
+      return '<tr><td style="text-align:center">'+(i+1)+'</td><td>'+r.code+'</td><td>'+r.name+'</td><td>'+r.rep+'</td><td>'+fmt(r.debit)+'</td><td>'+fmt(r.credit)+'</td><td style="font-weight:700;color:'+nc+'">'+fmt(r.net)+'</td><td>'+st+'</td></tr>';
+    }).join('');
+  }
+
+  // Build active filter label
+  const catF = document.getElementById('debtCatFilter')?.value || '';
+  const repF = document.getElementById('debtRepFilter')?.value || '';
+  const filterParts = [];
+  if (catF) filterParts.push('الفئة: ' + catF);
+  if (repF) filterParts.push('المندوب: ' + repF);
+  const filterLabel = filterParts.length ? ' | ' + filterParts.join(' | ') : '';
+
+  const styles = [...document.styleSheets].map(ss => {
+    try { return [...ss.cssRules].map(r => r.cssText).join('\n'); } catch(e) { return ''; }
+  }).join('\n');
+
+  const repTableHTML  = document.querySelector('#debtRepBody')?.closest('table')?.outerHTML || '';
+  const detTableHTML  = document.querySelector('#debtDetailBody')?.closest('table')?.outerHTML || '';
+
+  const printHTML = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>طباعة — 💰 المديونية</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+@page { size: A4 portrait; margin: 15mm 12mm; }
+* { margin:0; padding:0; box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body { font-family:'Cairo',sans-serif; direction:rtl; background:#fff; color:#111; font-size:10pt; }
+.print-page-header { background:#1a2a4a; color:#fff; padding:10pt 14pt; margin-bottom:12pt; border-radius:6pt; }
+.print-page-header h1 { font-size:13pt; font-weight:800; }
+.print-page-header p  { font-size:9pt; color:#aac; margin-top:3pt; }
+.section-title { font-size:11pt; font-weight:700; color:#1a2a4a; margin:12pt 0 6pt; border-bottom:2px solid #1a2a4a; padding-bottom:4pt; }
+table { width:100%; border-collapse:collapse; font-size:7.5pt; margin-bottom:14pt; }
+thead { display:table-header-group; }
+tr { page-break-inside:avoid; }
+th { background:#1a2a4a; color:#fff; padding:5pt; font-size:7.5pt; font-weight:700; text-align:right; border:1px solid #2a3a5a; }
+td { padding:4pt 5pt; border:1px solid #dde4f0; color:#111; font-size:7.5pt; }
+tr:nth-child(even) td { background:#f4f7ff; }
+</style>
+</head>
+<body onload="setTimeout(function(){window.print();},400)">
+<div class="print-page-header">
+  <h1>📊 لوحة التحليل الاستراتيجي — 💰 المديونية${filterLabel}</h1>
+  <p>تاريخ الطباعة: ${new Date().toLocaleDateString('ar-LY')}</p>
+</div>
+<div class="section-title">📋 مديونية المناديب</div>
+${repTableHTML}
+<div class="section-title">📋 المديونية التفصيلية — كشف العملاء</div>
+${detTableHTML}
+</body>
+</html>`;
+
+  const blob = new Blob([printHTML], {type:'text/html;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank', 'width=900,height=700');
+  if (!win) { try { window.print(); } catch(e) { alert('يرجى استخدام Ctrl+P للطباعة'); } }
+  else { setTimeout(() => URL.revokeObjectURL(url), 60000); }
+
+  // Restore
+  setTimeout(() => {
+    if (detailBody) { debtDetailFiltered = debtDetailData.slice(); renderDebtDetailTable(); }
+  }, 500);
+}
+
 function printCurrentTab() {
   const active = document.querySelector('.tab-panel.active');
   if (!active) return;
@@ -4929,6 +5083,37 @@ function printCurrentTab() {
   // Build printable HTML in new window
   const activeHTML = active.innerHTML;
   const title = tabTitles[tabId] || 'لوحة التحليل';
+
+  // Build active filters label per tab
+  const filterParts = [];
+  if (tabId === 'reps') {
+    const rf = document.getElementById('repRepFilter')?.value;
+    const cf = document.getElementById('repCatFilter')?.value;
+    if (rf) filterParts.push('المندوب: ' + rf);
+    else if (cf) filterParts.push('الفئة: ' + cf);
+    const sv = document.getElementById('repSearch')?.value?.trim();
+    if (sv) filterParts.push('بحث: ' + sv);
+  } else if (tabId === 'repcmp') {
+    const rf = document.getElementById('rcRep')?.value;
+    const cf = document.getElementById('rcCat')?.value;
+    const lv = document.getElementById('rcLevel')?.value;
+    if (rf) filterParts.push('المندوب: ' + rf);
+    else if (cf && cf !== 'all') filterParts.push('الفئة: ' + cf);
+    if (lv && lv !== 'all') filterParts.push('المستوى: ' + lv);
+  } else if (tabId === 'customers') {
+    const rf = document.getElementById('custRepFilter')?.value;
+    const cf = document.getElementById('custCatRepFilter')?.value;
+    const ac = document.getElementById('custCatChips')?.querySelector('.cat-chip-active')?.textContent?.trim();
+    if (rf) filterParts.push('المندوب: ' + rf);
+    if (cf) filterParts.push('فئة المندوب: ' + cf);
+    if (ac && !ac.startsWith('الكل')) filterParts.push('تصنيف: ' + ac);
+  } else if (tabId === 'debt') {
+    const cf = document.getElementById('debtCatFilter')?.value;
+    const rf = document.getElementById('debtRepFilter')?.value;
+    if (cf) filterParts.push('الفئة: ' + cf);
+    if (rf) filterParts.push('المندوب: ' + rf);
+  }
+  const filterLabel = filterParts.length ? ' | ' + filterParts.join(' | ') : '';
 
   // Get all styles from the page
   const styles = [...document.styleSheets].map(ss => {
@@ -5010,7 +5195,7 @@ tr:nth-child(even) td { background:#f4f7ff !important; }
 </head>
 <body onload="setTimeout(function(){window.print();},400)">
 <div class="print-page-header">
-  <h1>📊 لوحة التحليل الاستراتيجي الشامل — ${title}</h1>
+  <h1>📊 لوحة التحليل الاستراتيجي الشامل — ${title}${filterLabel}</h1>
   <p>الفترة: 1 يناير 2026 — 19 مارس 2026 &nbsp;|&nbsp; تاريخ الطباعة: ${new Date().toLocaleDateString('ar-LY')}</p>
 </div>
 ${activeHTML}
