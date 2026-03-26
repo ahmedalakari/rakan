@@ -5834,7 +5834,7 @@ function printCurrentTab() {
     const rf = document.getElementById('repRepFilter')?.value;
     const cf = document.getElementById('repCatFilter')?.value;
     if (rf) filterParts.push('المندوب: ' + rf);
-    else if (cf) filterParts.push('الفئة: ' + cf);
+    if (cf) filterParts.push('الفئة: ' + cf);
     const sv = document.getElementById('repSearch')?.value?.trim();
     if (sv) filterParts.push('بحث: ' + sv);
   } else if (tabId === 'repcmp') {
@@ -5842,7 +5842,7 @@ function printCurrentTab() {
     const cf = document.getElementById('rcCat')?.value;
     const lv = document.getElementById('rcLevel')?.value;
     if (rf) filterParts.push('المندوب: ' + rf);
-    else if (cf && cf !== 'all') filterParts.push('الفئة: ' + cf);
+    if (cf && cf !== 'all') filterParts.push('الفئة: ' + cf);
     if (lv && lv !== 'all') filterParts.push('المستوى: ' + lv);
   } else if (tabId === 'customers') {
     const rf = document.getElementById('custRepFilter')?.value;
@@ -5977,14 +5977,18 @@ function _getActiveFiltersLabel(tableId) {
 
   if (tableId === 'repsTable') {
     const q   = _txt('repSearch');
+    const rep = _val('repRepFilter');
     const cat = _val('repCatFilter');
+    if (rep) parts.push('المندوب: ' + rep);
     if (cat) parts.push('فئة: ' + cat);
     if (q)   parts.push('بحث: ' + q);
   }
 
   if (tableId === 'rcTable') {
     const q   = _txt('rcSearch');
+    const rep = _val('rcRep');
     const cat = _val('rcCat');
+    if (rep) parts.push('المندوب: ' + rep);
     if (cat) parts.push('فئة: ' + cat);
     if (q)   parts.push('بحث: ' + q);
   }
