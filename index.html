@@ -6,6 +6,7 @@
 <title>لوحة تحليل الأداء الاستراتيجي</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   /* =============================================
@@ -332,7 +333,7 @@
   .product-rank { font-family: 'Tajawal', sans-serif; font-size: 26px; font-weight: 900; color: rgba(0,212,255,0.2); min-width: 32px; text-align: center; }
   .product-rank.top { color: var(--gold); }
   .product-info { flex: 1; min-width: 0; }
-  .product-name  { font-size: var(--fs-sm); font-weight: 700; line-height: 1.4; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .product-name  { font-size: var(--fs-sm); font-weight: 700; line-height: 1.4; margin-bottom: 3px; word-break: break-word; }
   .product-sales { color: var(--accent); font-size: var(--fs-base); font-weight: 700; font-family: 'Tajawal', sans-serif; }
   .product-qty   { color: var(--muted); font-size: var(--fs-xs); margin-top: 2px; }
   .product-ns    { color: var(--accent2); font-size: var(--fs-sm); font-weight: 700; font-family: 'Tajawal', sans-serif; margin-top: 4px; }
@@ -487,7 +488,7 @@
   .rank-medal { font-size: 1rem; width: 22px; text-align: center; flex-shrink: 0; }
   .rank-info  { flex: 1; min-width: 0; }
   .rank-label { display: flex; justify-content: space-between; font-size: var(--fs-sm); margin-bottom: 3px; font-weight: 600; }
-  .rank-name  { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%; }
+  .rank-name  { word-break: break-word; max-width: 75%; line-height: 1.4; }
   .rank-bar   { background: var(--bg); border-radius: var(--r-sm); height: 5px; overflow: hidden; }
   .rank-bar-fill { height: 100%; border-radius: var(--r-sm); }
 
@@ -1093,6 +1094,198 @@
   transition: border-color .2s;
 }
 .csv-cancel-btn:hover { border-color: #00d4ff; color: #e8f4f8; }
+/* ── Google Sheets Live Sync ── */
+.gs-tab-bar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 18px;
+  background: #0d1b2e;
+  border-radius: 10px;
+  padding: 4px;
+}
+.gs-tab-btn {
+  flex: 1;
+  padding: 8px 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #8ba3b8;
+  font-family: 'Cairo', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+}
+.gs-tab-btn.active {
+  background: linear-gradient(135deg, rgba(0,212,255,.15), rgba(0,255,136,.1));
+  color: #00d4ff;
+  border: 1px solid rgba(0,212,255,.3);
+}
+.gs-panel { display: none; }
+.gs-panel.active { display: block; }
+.gs-url-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  background: #0d1b2e;
+  border-radius: 9px;
+  padding: 8px 12px;
+  border: 1px solid #1e3a5f;
+  transition: border-color .2s;
+}
+.gs-url-row:focus-within { border-color: rgba(0,212,255,.4); }
+.gs-url-label {
+  flex: 0 0 90px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #e8f4f8;
+  white-space: nowrap;
+}
+.gs-url-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #8ba3b8;
+  font-family: 'Cairo', sans-serif;
+  font-size: 11px;
+  outline: none;
+  direction: ltr;
+  text-align: left;
+}
+.gs-url-input::placeholder { color: #3a5570; font-size: 10px; }
+.gs-url-status { font-size: 14px; min-width: 18px; text-align: center; }
+.gs-interval-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 6px;
+  font-size: 12px;
+  color: #8ba3b8;
+}
+.gs-interval-select {
+  background: #0d1b2e;
+  border: 1px solid #1e3a5f;
+  color: #e8f4f8;
+  border-radius: 7px;
+  padding: 5px 10px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  flex: 1;
+}
+.gs-sync-btn {
+  background: linear-gradient(135deg, #00d4ff, #00ff88);
+  color: #0a0f1e;
+  border: none;
+  padding: 9px 22px;
+  border-radius: 999px;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  transition: opacity .2s;
+  white-space: nowrap;
+}
+.gs-sync-btn:hover { opacity: .85; }
+.gs-sync-btn:disabled { opacity: .4; cursor: not-allowed; }
+.gs-stop-btn {
+  background: rgba(255,71,87,.15);
+  color: #ff4757;
+  border: 1px solid rgba(255,71,87,.3);
+  padding: 9px 18px;
+  border-radius: 999px;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all .2s;
+  white-space: nowrap;
+  display: none;
+}
+.gs-stop-btn:hover { background: rgba(255,71,87,.25); }
+.gs-sheet-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+  background: #0d1b2e;
+  border-radius: 9px;
+  padding: 10px 12px;
+  border: 1px solid #1e3a5f;
+}
+.gs-sheet-select {
+  width: 100%;
+  background: #111827;
+  border: 1px solid #1e3a5f;
+  color: #e8f4f8;
+  border-radius: 7px;
+  padding: 5px 8px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 11px;
+  cursor: pointer;
+  outline: none;
+}
+.gs-sheet-select:disabled { opacity: .5; cursor: not-allowed; }
+.gs-sheet-select:focus { border-color: rgba(0,212,255,.5); }
+.gs-live-badge {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0,255,136,.08);
+  border: 1px solid rgba(0,255,136,.25);
+  color: #00ff88;
+  border-radius: 999px;
+  padding: 3px 12px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.gs-live-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #00ff88;
+  animation: gsPulse 1.4s ease-in-out infinite;
+}
+@keyframes gsPulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .4; transform: scale(.7); }
+}
+.gs-help-box {
+  background: rgba(0,212,255,.04);
+  border: 1px solid rgba(0,212,255,.15);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 11px;
+  color: #8ba3b8;
+  line-height: 1.8;
+  margin-top: 4px;
+}
+.gs-help-box b { color: #00d4ff; }
+.gs-help-box code {
+  background: rgba(0,212,255,.08);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: monospace;
+  font-size: 10px;
+  color: #00ff88;
+  direction: ltr;
+  display: inline-block;
+}
+/* live indicator in header */
+.gs-header-live {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: #00ff88;
+  font-weight: 700;
+}
+.gs-header-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #00ff88;
+  animation: gsPulse 1.4s ease-in-out infinite;
+}
 .csv-progress-msg {
   font-size: 12px;
   color: #00ff88;
@@ -1109,13 +1302,16 @@
 <div class="header">
   <div class="header-title">
     <h1>📊 لوحة التحليل الاستراتيجي الشامل</h1>
-    <p id="header-period">الفترة: 1 يناير 2026 — 19 مارس 2026 &nbsp;|&nbsp; Manus AI</p>
+    <p id="header-period">الفترة: 1 يناير 2026 — 19 مارس 2026 &nbsp;|&nbsp; إعداد المحاسب أحمد العكاري</p>
   </div>
   <div class="header-meta">
     <span class="badge">🟢 بيانات محدّثة</span>
     <span class="badge" id="repCountBadge">35 مندوباً</span>
-    <button class="csv-loader-btn" onclick="openCsvModal()">📂 تحديث CSV</button>
-    <button class="print-btn print-btn-header" onclick="printCurrentTab()">🖨️ طباعة التبويب</button>
+    <div class="gs-header-live" id="gsHeaderLive">
+      <span class="gs-header-dot"></span>
+      <span id="gsHeaderLastSync">مزامنة حية</span>
+    </div>
+    <button class="csv-loader-btn" onclick="openCsvModal()">📂 تحديث البيانات</button>
   </div>
 </div>
 
@@ -1127,6 +1323,11 @@
   <button class="nav-btn" onclick="showTab('customers')">🏪 العملاء</button>
   <button class="nav-btn" onclick="showTab('products')">📦 الأصناف</button>
   <button class="nav-btn" onclick="showTab('plan')">🎯 خطة العمل</button>
+  <button id="labelToggleBtn" onclick="toggleDataLabels()" style="
+    margin-right:auto;margin-left:8px;padding:6px 14px;border-radius:20px;border:1.5px solid rgba(0,212,255,0.35);
+    background:rgba(0,212,255,0.08);color:#8ba3b8;font-family:'Cairo',sans-serif;font-size:12px;
+    font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:6px
+  ">🔢 أرقام الرسوم</button>
 </div>
 
 
@@ -1602,6 +1803,7 @@
           <option value="collections">عرض: التحصيلات</option>
           <option value="returns">عرض: المرتجعات</option>
           <option value="debt">عرض: المديونية</option>
+          <option value="profile">👥 بيانات التصنيف</option>
         </select>
       </div>
     </div>
@@ -3482,6 +3684,7 @@ function renderRepsTable() {
       collections: ['#','المندوب','الفئة','المبيعات','صافي المبيعات','إجمالي التحصيل','حوالات','كاش','عمليات التحصيل','نسبة التحصيل','الفجوة','الأداء'],
       returns:     ['#','المندوب','الفئة','المبيعات','صافي المبيعات','المرتجعات','كمية المرتجع','نسبة المرتجع','الأداء'],
       debt:        ['#','المندوب','الفئة','المبيعات','صافي المبيعات','إجمالي المدين','إجمالي الدائن','صافي الديون','نسبة السداد','الأداء'],
+      profile:     ['#','المندوب','الفئة','المنطقة','الهاتف','الكود','الهدف الشهري','المبيعات','نسبة تحقيق الهدف','ملاحظات'],
     };
     head.innerHTML = '<tr>' + (headers[view]||headers.basic).map(h=>`<th>${h}</th>`).join('') + '</tr>';
 
@@ -3539,6 +3742,37 @@ function renderRepsTable() {
           <td style="color:${debtColor(r.debtNet)};font-weight:800">${fmtN(r.debtNet)}</td>
           <td style="color:${r.debtPct>=70?'var(--accent2)':r.debtPct>=40?'#ff6b35':'var(--red)'};font-weight:700">${r.debtPct.toFixed(1)}%</td>
           <td>${tag(r)}</td>`;
+      } else if (view === 'profile') {
+        // وضع بيانات التصنيف — يعرض الحقول الإضافية من ملف تصنيف المناديب
+        const targetPct = (r.target && r.target > 0) ? (r.sales / r.target * 100) : 0;
+        const tColor = targetPct >= 100 ? 'var(--accent2)' : targetPct >= 80 ? 'var(--gold)' : targetPct >= 50 ? '#ff6b35' : 'var(--red)';
+        const hasProfileData = r.phone || r.target || r.area || r.code || r.notes;
+        cells = `${num}
+          <td>
+            <b>${r.name}</b>
+            ${!hasProfileData ? '<span style="font-size:10px;color:var(--muted);margin-right:4px">⚪ لا توجد بيانات تصنيف</span>' : ''}
+          </td>
+          ${catCell}
+          <td style="color:var(--text2)">${r.area || '<span style="color:var(--muted)">—</span>'}</td>
+          <td>
+            ${r.phone
+              ? `<a href="tel:${r.phone}" style="color:var(--accent);text-decoration:none;font-size:12px">📞 ${r.phone}</a>`
+              : '<span style="color:var(--muted)">—</span>'}
+          </td>
+          <td style="color:var(--text2);font-size:11px">${r.code || '—'}</td>
+          <td style="color:var(--gold);font-weight:700">${r.target > 0 ? fmtN(r.target) : '<span style="color:var(--muted)">لم يُحدد</span>'}</td>
+          <td style="color:var(--accent);font-weight:700">${fmtN(r.sales)}</td>
+          <td>
+            ${r.target > 0
+              ? `<div style="display:flex;align-items:center;gap:6px">
+                  <span style="color:${tColor};font-weight:800;min-width:42px">${targetPct.toFixed(1)}%</span>
+                  <div style="flex:1;background:var(--surface2);border-radius:3px;height:6px;min-width:50px">
+                    <div style="width:${Math.min(targetPct,100).toFixed(0)}%;height:100%;background:${tColor};border-radius:3px;transition:width 0.3s"></div>
+                  </div>
+                </div>`
+              : '<span style="color:var(--muted);font-size:11px">—</span>'}
+          </td>
+          <td style="color:var(--muted);font-size:11px;max-width:180px;word-break:break-word;line-height:1.4" title="${r.notes || ''}">${r.notes || '—'}</td>`;
       }
       return `<tr>${cells}</tr>`;
     }).join('');
@@ -3717,7 +3951,7 @@ function renderCustTable() {
     return `<tr>
       <td style="text-align:center;color:var(--text2);font-size:11px">${st+i+1}</td>
       <td style="min-width:180px">
-        <div style="font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px" title="${r.n}">${r.n.length>32?r.n.substring(0,32)+'…':r.n}</div>
+        <div style="font-weight:600;font-size:12px;word-break:break-word;line-height:1.4" title="${r.n}">${r.n}</div>
       </td>
       <td style="text-align:center;color:var(--text2)">${r.inv}</td>
       <td style="font-weight:700;color:var(--accent)">${fmt2(r.s)}</td>
@@ -3825,6 +4059,22 @@ function sortCust(key) {
 }
 
 // ══════════════════════════════════════════════════════════
+//  متغيرات عرض الأرقام على الرسوم — يجب تعريفها قبل rebuildCharts
+// ══════════════════════════════════════════════════════════
+var _showDataLabels = false;   // var لضمان الرفع (hoisting)
+
+function _fmtLabel(n) {
+  n = Number(n || 0);
+  if (n === 0) return '';
+  // إظهار الرقم كاملاً بدون تقريب أو اختصار
+  if (Number.isInteger(n)) return n.toLocaleString('en-US');
+  // إذا كان نسبة مئوية (أقل من 100 وله كسر) اعرضها مع خانتين عشريتين
+  if (Math.abs(n) <= 100 && !Number.isInteger(n)) return n.toFixed(2) + '%';
+  // أرقام كبيرة مع كسر — اعرض بفواصل مع خانتين
+  return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+// ══════════════════════════════════════════════════════════
 //  rebuildCharts() — يُعاد استدعاؤها بعد تحديث البيانات من CSV
 // ══════════════════════════════════════════════════════════
 const _chartRegistry = {};
@@ -3845,33 +4095,40 @@ function registerChart(id, instance) {
 function rebuildCharts() {
   // Destroy any existing Chart instances on all canvases
   document.querySelectorAll('canvas').forEach(canvas => {
-    const existing = Chart.getChart(canvas);
-    if (existing) existing.destroy();
+    try { const existing = Chart.getChart(canvas); if (existing) existing.destroy(); } catch(e) {}
   });
 
-  updateChipCounts();
-  renderCustTable();
+  // Safety: ensure all data arrays are valid
+  if (!Array.isArray(repsData))     { console.warn('repsData is not array'); return; }
+  if (!Array.isArray(custData))     { console.warn('custData is not array'); return; }
+  if (!Array.isArray(productsData)) { console.warn('productsData is not array'); return; }
+  if (!Array.isArray(itemsData))    { console.warn('itemsData is not array'); return; }
+
+  try { updateChipCounts(); } catch(e) { console.warn(e); }
+  try { renderCustTable();  } catch(e) { console.warn(e); }
 
 // Customer classification doughnut
-(function(){ const _el_custClassChart = document.getElementById('custClassChart'); if (!_el_custClassChart) return; registerChart('custClassChart', new Chart(_el_custClassChart, {
-  type: 'doughnut',
-  data: {
-    labels: ['ممتاز','جيد','متوسط','مخاطرة','مخاطرة عالية'],
-    datasets: [{
-      data: ['ممتاز','جيد','متوسط','مخاطرة','مخاطرة عالية'].map(cat => custData.filter(c=>c.cat===cat).length),
-      backgroundColor: ['rgba(0,255,136,0.8)','rgba(0,212,255,0.8)','rgba(255,215,0,0.8)','rgba(255,107,53,0.8)','rgba(255,71,87,0.85)'],
-      borderColor: ['#00ff88','#00d4ff','#ffd700','#ff6b35','#ff4757'],
-      borderWidth: 2
-    }]
-  },
-  options: {
-    responsive:true, maintainAspectRatio:false,
-    plugins: {
-      legend: { position:'right', labels:{ color:'#8ba3b8', padding:12, font:{size:12} } },
-      tooltip: { callbacks: { label: ctx => `${ctx.label}: ${ctx.raw} (${(ctx.raw/custData.length*100).toFixed(1)}%)` } }
+(function(){
+  _rebuildChart('custClassChart', {
+    type: 'doughnut',
+    data: {
+      labels: ['ممتاز','جيد','متوسط','مخاطرة','مخاطرة عالية'],
+      datasets: [{
+        data: ['ممتاز','جيد','متوسط','مخاطرة','مخاطرة عالية'].map(cat => custData.filter(c=>c.cat===cat).length),
+        backgroundColor: ['rgba(0,255,136,0.8)','rgba(0,212,255,0.8)','rgba(255,215,0,0.8)','rgba(255,107,53,0.8)','rgba(255,71,87,0.85)'],
+        borderColor: ['#00ff88','#00d4ff','#ffd700','#ff6b35','#ff4757'],
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins: {
+        legend: { position:'right', labels:{ color:'#8ba3b8', padding:12, font:{size:12} } },
+        tooltip: { callbacks: { label: ctx => `${ctx.label}: ${ctx.raw} (${custData.length>0?(ctx.raw/custData.length*100).toFixed(1):0}%)` } }
+      }
     }
-  }
-}));})();
+  });
+})();
 
 // Top 15 gap horizontal bar
 (function() {
@@ -3881,7 +4138,7 @@ function rebuildCharts() {
   _rebuildChart('custDebtChart', {
     type:'bar',
     data:{
-      labels: topDebtors.map(d => d.n.length>22 ? d.n.substring(0,22)+'…' : d.n),
+      labels: topDebtors.map(d => d.n),
       fullLabels: topDebtors.map(d => d.n),
       datasets:[{ label:'الفجوة', data:topDebtors.map(d=>d.gap),
         backgroundColor:topDebtors.map(d=>catColors[d.cat]||'rgba(0,212,255,0.7)'), borderRadius:4 }]
@@ -3897,33 +4154,29 @@ function rebuildCharts() {
   });
 })();
 
-(function(){ const _el_paymentPie = document.getElementById('paymentPie'); if (!_el_paymentPie) return; registerChart('paymentPie', new Chart(_el_paymentPie, {
-  type: 'doughnut',
-  data: {
-    labels: (function(){
-      const totalBank = repsData.reduce((s,r)=>s+(r.colBank||0),0);
-      const totalCash = repsData.reduce((s,r)=>s+(r.colCash||0),0);
-      const total = totalBank + totalCash;
-      const bPct = total>0?(totalBank/total*100).toFixed(1):0;
-      const cPct = total>0?(totalCash/total*100).toFixed(1):0;
-      return [`حوالات مصرفية ${bPct}%`, `نقدي كاش ${cPct}%`];
-    })(),
-    datasets: [{ data: (function(){
-      const totalBank = repsData.reduce((s,r)=>s+(r.colBank||0),0);
-      const totalCash = repsData.reduce((s,r)=>s+(r.colCash||0),0);
-      return [totalBank, totalCash];
-    })(), backgroundColor: ['#7c6fffcc','#ffd700cc'], borderWidth: 2, borderColor: '#111827' }]
-  },
-  options: { responsive: true, maintainAspectRatio: false, cutout: '65%',
-    plugins: { legend: { position: 'bottom', labels: { padding: 8, font: { size: 10 } } } } }
-}));})();
+(function(){
+  const totalBank = repsData.reduce((s,r)=>s+(r.colBank||0),0);
+  const totalCash = repsData.reduce((s,r)=>s+(r.colCash||0),0);
+  const total = totalBank + totalCash;
+  const bPct = total>0?(totalBank/total*100).toFixed(1):0;
+  const cPct = total>0?(totalCash/total*100).toFixed(1):0;
+  _rebuildChart('paymentPie', {
+    type: 'doughnut',
+    data: {
+      labels: [`حوالات مصرفية ${bPct}%`, `نقدي كاش ${cPct}%`],
+      datasets: [{ data: [totalBank, totalCash], backgroundColor: ['#7c6fffcc','#ffd700cc'], borderWidth: 2, borderColor: '#111827' }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, cutout: '65%',
+      plugins: { legend: { position: 'bottom', labels: { padding: 8, font: { size: 10 } } } } }
+  });
+})();
 
 // ---- Charts ----
 Chart.defaults.font.family = "'Cairo', sans-serif";
 Chart.defaults.color = '#8ba3b8';
 
 // Top 10 reps chart
-const top10 = [...repsData].sort((a,b) => b.sales - a.sales).slice(0,10);
+const top10 = Array.isArray(repsData) ? [...repsData].sort((a,b) => b.sales - a.sales).slice(0,10) : [];
 (function(){ const _el_repChart = document.getElementById('repChart'); if (!_el_repChart) return; registerChart('repChart', new Chart(_el_repChart, {
   type: 'bar',
   data: {
@@ -3960,7 +4213,7 @@ const roiBands = [
 (function(){ const _el_productChart = document.getElementById('productChart'); if (!_el_productChart) return; registerChart('productChart', new Chart(_el_productChart, {
   type: 'bar',
   data: {
-    labels: productsData.slice(0,8).map(p => p.name.substring(0,18)+'…'),
+    labels: productsData.slice(0,8).map(p => p.name),
     datasets: [{ label: 'صافي المبيعات', data: productsData.slice(0,8).map(p=>p.ns), backgroundColor: ['#00d4ff','#00c8f0','#00bcdc','#00b0c8','#00a4b4','#0098a0','#008c8c','#007070'].map(c=>c+'bb'), borderRadius: 6 }]
   },
   options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
@@ -3997,8 +4250,6 @@ const roiBands = [
 
 // ---- Monthly Performance Chart ----
 (function() {
-  const el = document.getElementById('monthlyChart');
-  if (!el) return;
   // Use _monthlyStats if available (set by CSV loader), otherwise use defaults
   const ms = window._monthlyStats || {
     labels:   ['يناير 2026', 'فبراير 2026', 'مارس 2026'],
@@ -4007,7 +4258,7 @@ const roiBands = [
     net:      [3051.50, 5374585.12, 3028826.22],
     col:      [88796, 4578896.79, 2075172.50]
   };
-  registerChart('monthlyChart', new Chart(el, {
+  _rebuildChart('monthlyChart', {
     type: 'bar',
     data: {
       labels: ms.labels,
@@ -4026,7 +4277,7 @@ const roiBands = [
         y: { grid: { color: 'rgba(30,58,95,0.5)' }, ticks: { callback: v => { const n=Number(v); return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?Math.round(n/1e3)+'K':n.toLocaleString('en-US'); }, color: '#8aa5c0' } }
       }
     }
-  }));
+  });
 })();
 
 // ---- Category Sales Chart ----
@@ -4058,7 +4309,7 @@ const roiBands = [
     }
   });
 })();
-const sortedByRoi = [...repsData].filter(r=>r.sales>0).sort((a,b)=>b.roi-a.roi);
+const sortedByRoi = Array.isArray(repsData) ? [...repsData].filter(r=>r.sales>0).sort((a,b)=>b.roi-a.roi) : [];
 (function(){ const _el_allRepsChart = document.getElementById('allRepsChart'); if (!_el_allRepsChart) return; registerChart('allRepsChart', new Chart(_el_allRepsChart, {
   type: 'bar',
   data: {
@@ -4090,7 +4341,7 @@ const sortedByRoi = [...repsData].filter(r=>r.sales>0).sort((a,b)=>b.roi-a.roi);
 }));})();
 
 // أعلى 10 مناديب — مبيعات vs تحصيلات
-const top10reps = [...repsData].sort((a,b)=>b.sales-a.sales).slice(0,10);
+const top10reps = Array.isArray(repsData) ? [...repsData].sort((a,b)=>b.sales-a.sales).slice(0,10) : [];
 _rebuildChart('repSalesColChart', {
   type: 'bar',
   data: {
@@ -4111,20 +4362,21 @@ _rebuildChart('repSalesColChart', {
 
 // رسم المرتجعات — أعلى 10 حسب نسبة المرتجع
 const topRetReps = [...repsData].filter(r=>r.sales>10000).sort((a,b)=>b.retPct-a.retPct).slice(0,10);
+const _fmtRetChart = n => Number(n||0).toLocaleString('en-US',{maximumFractionDigits:0});
 _rebuildChart('repReturnsChart', {
   type:'bar',
   data:{
-    labels: topRetReps.map(r=>r.name),
+    labels: Array.isArray(topRetReps) ? topRetReps.map(r=>r.name) : [],
     datasets:[{
       label:'نسبة المرتجعات %',
-      data: topRetReps.map(r=>r.retPct),
-      backgroundColor: topRetReps.map(r=>r.retPct>=20?'rgba(255,71,87,0.85)':r.retPct>=10?'rgba(255,107,53,0.8)':'rgba(255,215,0,0.75)'),
+      data: Array.isArray(topRetReps) ? topRetReps.map(r=>r.retPct) : [],
+      backgroundColor: Array.isArray(topRetReps) ? topRetReps.map(r=>r.retPct>=20?'rgba(255,71,87,0.85)':r.retPct>=10?'rgba(255,107,53,0.8)':'rgba(255,215,0,0.75)') : [],
       borderRadius:5
     }]
   },
   options:{
     responsive:true, maintainAspectRatio:false,
-    plugins:{ legend:{display:false}, tooltip:{ callbacks:{ afterLabel: ctx => `مبيعات: ${fmt(topRetReps[ctx.dataIndex].sales)} | مرتجعات: ${fmt(topRetReps[ctx.dataIndex].returns)}` } } },
+    plugins:{ legend:{display:false}, tooltip:{ callbacks:{ afterLabel: ctx => { const r=topRetReps[ctx.dataIndex]; return r?`مبيعات: ${_fmtRetChart(r.sales)} | مرتجعات: ${_fmtRetChart(r.returns||0)}`:''; } } } },
     scales:{
       x:{ grid:{color:'rgba(30,58,95,0.5)'}, ticks:{font:{size:11},color:'#a0b8cc'} },
       y:{ grid:{color:'rgba(30,58,95,0.5)'}, ticks:{callback:v=>v+'%',color:'#a0b8cc'} }
@@ -4139,20 +4391,21 @@ _rebuildChart('repReturnsChart', {
   if (typeof initRepCmpPanels === 'function') initRepCmpPanels();
 
   // Items charts
-  (function() {
-    const fmt = n => Number(n||0).toLocaleString('en-US',{maximumFractionDigits:0});
+  try { (function() {
+    const fmt   = n => Number(n||0).toLocaleString('en-US',{maximumFractionDigits:0});
     const fmtK2 = n => { n=Number(n||0); return n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?Math.round(n/1e3)+'K':fmt(n); };
+    const _safeArr = a => Array.isArray(a) ? a : [];
 
     // صافي مبيعات + مرتجعات + مبيعات أفضل 10
-    const top10ns = [...itemsData].sort((a,b)=>b.ns-a.ns).slice(0,10);
-        _rebuildChart('itemsSalesRetNsChart', {
+    const top10ns = _safeArr(itemsData).sort((a,b)=>b.ns-a.ns).slice(0,10);
+    _rebuildChart('itemsSalesRetNsChart', {
       type:'bar',
       data:{
-        labels: (typeof top10ns!=='undefined'?top10ns:top10s||[]).map(d=>d.name),
+        labels: top10ns.map(d=>d.name),
         datasets:[
-          { label:'💰 صافي المبيعات',   data:(typeof top10ns!=='undefined'?top10ns:top10s||[]).map(d=>d.ns),     backgroundColor:'rgba(0,255,136,0.85)', borderRadius:4 },
-          { label:'↩️ المرتجعات',       data:(typeof top10ns!=='undefined'?top10ns:top10s||[]).map(d=>d.retVal), backgroundColor:'rgba(255,71,87,0.75)', borderRadius:4 },
-          { label:'📦 إجمالي المبيعات', data:(typeof top10ns!=='undefined'?top10ns:top10s||[]).map(d=>d.sales),  backgroundColor:'rgba(0,212,255,0.35)', borderRadius:4 }
+          { label:'💰 صافي المبيعات',   data:top10ns.map(d=>d.ns),     backgroundColor:'rgba(0,255,136,0.85)', borderRadius:4 },
+          { label:'↩️ المرتجعات',       data:top10ns.map(d=>d.retVal), backgroundColor:'rgba(255,71,87,0.75)', borderRadius:4 },
+          { label:'📦 إجمالي المبيعات', data:top10ns.map(d=>d.sales),  backgroundColor:'rgba(0,212,255,0.35)', borderRadius:4 }
         ]},
       options:{
         indexAxis:'y', responsive:true, maintainAspectRatio:false,
@@ -4166,21 +4419,21 @@ _rebuildChart('repReturnsChart', {
         },
         scales:{
           x:{ grid:{color:'rgba(30,58,95,0.5)'}, ticks:{color:'#a0b8cc', font:{size:11}, callback:v=>{const n=Number(v||0);return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?Math.round(n/1e3)+'K':n.toLocaleString();}} },
-          y:{ grid:{display:false}, ticks:{color:'#a0b8cc', font:{size:11}, autoSkip:false}, afterFit:s=>{s.width=Math.max(s.width,280);} }
+          y:{ grid:{display:false}, ticks:{color:'#a0b8cc', font:{size:11}, autoSkip:false}, afterFit:s=>{s.width=Math.max(s.width,340);} }
         }
       }
     });
 
     // كميات أفضل 10
-    const top10nq = [...itemsData].sort((a,b)=>b.nqty-a.nqty).slice(0,10);
-        _rebuildChart('itemsQtyChart', {
+    const top10nq = _safeArr(itemsData).sort((a,b)=>b.nqty-a.nqty).slice(0,10);
+    _rebuildChart('itemsQtyChart', {
       type:'bar',
       data:{
-        labels: (typeof top10nq!=='undefined'?top10nq:[]).map(d=>d.name),
+        labels: top10nq.map(d=>d.name),
         datasets:[
-          { label:'✅ صافي الكمية',    data:(typeof top10nq!=='undefined'?top10nq:[]).map(d=>d.nqty),   backgroundColor:'rgba(0,255,136,0.85)', borderRadius:4 },
-          { label:'📦 إجمالي الكمية', data:(typeof top10nq!=='undefined'?top10nq:[]).map(d=>d.qty),    backgroundColor:'rgba(0,212,255,0.4)',  borderRadius:4 },
-          { label:'🔄 المرتجعات',      data:(typeof top10nq!=='undefined'?top10nq:[]).map(d=>d.retQty), backgroundColor:'rgba(255,71,87,0.75)', borderRadius:4 }
+          { label:'✅ صافي الكمية',    data:top10nq.map(d=>d.nqty),   backgroundColor:'rgba(0,255,136,0.85)', borderRadius:4 },
+          { label:'📦 إجمالي الكمية', data:top10nq.map(d=>d.qty),    backgroundColor:'rgba(0,212,255,0.4)',  borderRadius:4 },
+          { label:'🔄 المرتجعات',      data:top10nq.map(d=>d.retQty), backgroundColor:'rgba(255,71,87,0.75)', borderRadius:4 }
         ]},
       options:{
         indexAxis:'y', responsive:true, maintainAspectRatio:false,
@@ -4194,21 +4447,21 @@ _rebuildChart('repReturnsChart', {
         },
         scales:{
           x:{ grid:{color:'rgba(30,58,95,0.5)'}, ticks:{color:'#a0b8cc', font:{size:11}, callback:v=>Number(v||0).toLocaleString('en-US')} },
-          y:{ grid:{display:false}, ticks:{color:'#a0b8cc', font:{size:11}, autoSkip:false}, afterFit:s=>{s.width=Math.max(s.width,280);} }
+          y:{ grid:{display:false}, ticks:{color:'#a0b8cc', font:{size:11}, autoSkip:false}, afterFit:s=>{s.width=Math.max(s.width,340);} }
         }
       }
     });
 
     // نسبة المرتجعات
-    const topRetItems = [...itemsData].filter(d=>d.sales>1000).sort((a,b)=>b.retPct-a.retPct).slice(0,12);
-        _rebuildChart('itemsMarginChart', {
+    const topRetItems = _safeArr(itemsData).filter(d=>d.sales>1000).sort((a,b)=>b.retPct-a.retPct).slice(0,12);
+    _rebuildChart('itemsMarginChart', {
       type:'bar',
       data:{
-        labels: (typeof topRet!=='undefined'?topRet:(typeof topRetItems!=='undefined'?topRetItems:[])).map(d=>d.name),
+        labels: topRetItems.map(d=>d.name),
         datasets:[{
           label:'نسبة المرتجعات %',
-          data:(typeof topRet!=='undefined'?topRet:(typeof topRetItems!=='undefined'?topRetItems:[])).map(d=>d.retPct),
-          backgroundColor:(typeof topRet!=='undefined'?topRet:(typeof topRetItems!=='undefined'?topRetItems:[])).map(d=>d.retPct>=30?'rgba(255,71,87,0.85)':d.retPct>=15?'rgba(255,107,53,0.8)':'rgba(255,215,0,0.75)'),
+          data: topRetItems.map(d=>d.retPct),
+          backgroundColor: topRetItems.map(d=>d.retPct>=30?'rgba(255,71,87,0.85)':d.retPct>=15?'rgba(255,107,53,0.8)':'rgba(255,215,0,0.75)'),
           borderRadius:4
         }]},
       options:{
@@ -4223,20 +4476,20 @@ _rebuildChart('repReturnsChart', {
         },
         scales:{
           x:{ grid:{color:'rgba(30,58,95,0.5)'}, ticks:{color:'#a0b8cc', font:{size:11}, callback:v=>v+'%'}, max:105 },
-          y:{ grid:{display:false}, ticks:{color:'#a0b8cc', font:{size:11}, autoSkip:false}, afterFit:s=>{s.width=Math.max(s.width,280);} }
+          y:{ grid:{display:false}, ticks:{color:'#a0b8cc', font:{size:11}, autoSkip:false}, afterFit:s=>{s.width=Math.max(s.width,340);} }
         }
       }
     });
 
     // أفقي: صافي مقابل مبيعات
-        _rebuildChart('itemsSalesChart', {
+    _rebuildChart('itemsSalesChart', {
       type:'bar',
       data:{
-        labels: (typeof top10ns!=='undefined'?top10ns:top10s||[]).map(d=>d.name),
+        labels: top10ns.map(d=>d.name),
         datasets:[
-          { label:'💰 صافي المبيعات',   data:(typeof top10ns!=='undefined'?top10ns:top10s||[]).map(d=>d.ns),     backgroundColor:'rgba(0,255,136,0.85)', borderRadius:4 },
-          { label:'↩️ المرتجعات',       data:(typeof top10ns!=='undefined'?top10ns:top10s||[]).map(d=>d.retVal), backgroundColor:'rgba(255,71,87,0.75)', borderRadius:4 },
-          { label:'📦 إجمالي المبيعات', data:(typeof top10ns!=='undefined'?top10ns:top10s||[]).map(d=>d.sales),  backgroundColor:'rgba(0,212,255,0.35)', borderRadius:4 }
+          { label:'💰 صافي المبيعات',   data:top10ns.map(d=>d.ns),     backgroundColor:'rgba(0,255,136,0.85)', borderRadius:4 },
+          { label:'↩️ المرتجعات',       data:top10ns.map(d=>d.retVal), backgroundColor:'rgba(255,71,87,0.75)', borderRadius:4 },
+          { label:'📦 إجمالي المبيعات', data:top10ns.map(d=>d.sales),  backgroundColor:'rgba(0,212,255,0.35)', borderRadius:4 }
         ]},
       options:{
         indexAxis:'y', responsive:true, maintainAspectRatio:false,
@@ -4250,19 +4503,20 @@ _rebuildChart('repReturnsChart', {
         },
         scales:{
           x:{ grid:{color:'rgba(30,58,95,0.5)'}, ticks:{color:'#a0b8cc', font:{size:11}, callback:v=>{const n=Number(v||0);return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?Math.round(n/1e3)+'K':n.toLocaleString();}} },
-          y:{ grid:{display:false}, ticks:{color:'#a0b8cc', font:{size:11}, autoSkip:false}, afterFit:s=>{s.width=Math.max(s.width,280);} }
+          y:{ grid:{display:false}, ticks:{color:'#a0b8cc', font:{size:11}, autoSkip:false}, afterFit:s=>{s.width=Math.max(s.width,340);} }
         }
       }
     });
 
     // productBubble
-    if (productsData.length) {
+    const _prodData = _safeArr(productsData);
+    if (_prodData.length) {
       _rebuildChart('productBubble', {
         type:'bar', data:{
-          labels: productsData.map(p=>p.name.substring(0,18)+'…'),
+          labels: _prodData.map(p=>p.name),
           datasets:[
-            { label:'💰 صافي المبيعات', data:productsData.map(p=>p.ns||p.sales*(1-p.retPct/100)), backgroundColor:'rgba(0,255,136,0.75)', borderRadius:4 },
-            { type:'line', label:'📦 صافي الكمية', data:productsData.map(p=>p.nqty||p.qty),
+            { label:'💰 صافي المبيعات', data:_prodData.map(p=>p.ns||p.sales*(1-(p.retPct||0)/100)), backgroundColor:'rgba(0,255,136,0.75)', borderRadius:4 },
+            { type:'line', label:'📦 صافي الكمية', data:_prodData.map(p=>p.nqty||p.qty||0),
               borderColor:'#ffd700', backgroundColor:'rgba(255,215,0,0.15)',
               yAxisID:'y1', tension:0.3, pointRadius:3 }
           ]},
@@ -4271,11 +4525,11 @@ _rebuildChart('repReturnsChart', {
           scales:{
             x:{grid:{color:'rgba(30,58,95,0.5)'},ticks:{font:{size:11},color:'#a0b8cc',maxRotation:45}},
             y:{position:'right',grid:{color:'rgba(30,58,95,0.5)'},ticks:{callback:v=>fmtK2(v),color:'#a0b8cc',font:{size:10}}},
-            y1:{position:'left',grid:{display:false},ticks:{callback:v=>v.toLocaleString(),color:'#ffd700',font:{size:10}}}
+            y1:{position:'left',grid:{display:false},ticks:{callback:v=>Number(v||0).toLocaleString(),color:'#ffd700',font:{size:10}}}
           }}
       });
     }
-  })();
+  })(); } catch(e) { console.warn('Items charts error:', e); }
 
   // Debt charts
   if (typeof initDebtCharts === 'function') {
@@ -4436,7 +4690,9 @@ function renderRepCmp() {
 }
 
 function initRepCmpPanels() {
-  const active = repsData.filter(r => r.sales > 0);
+  const _safeReps = Array.isArray(repsData) ? repsData : [];
+  const _fmtCmp = n => Number(n||0).toLocaleString('en-US',{maximumFractionDigits:0});
+  const active = _safeReps.filter(r => r.sales > 0);
   if (!active.length) return;
   const sorted = [...active].sort((a,b) => b.roi - a.roi);
   const top5 = sorted.slice(0, 5);
@@ -4488,10 +4744,10 @@ function initRepCmpPanels() {
   };
   const cats2     = ['جملة','تجزئة','أسواق','مقاهي ومطاعم','مستقل'];
   const colors2   = cats2.map(c => catColors2[c]);
-  const sales2    = cats2.map(c => repsData.filter(r=>r.cat===c).reduce((s,r)=>s+r.sales,0));
-  const returns2  = cats2.map(c => repsData.filter(r=>r.cat===c).reduce((s,r)=>s+r.returns,0));
-  const ns2       = cats2.map(c => repsData.filter(r=>r.cat===c).reduce((s,r)=>s+r.netSales,0));
-  const cols2     = cats2.map(c => repsData.filter(r=>r.cat===c).reduce((s,r)=>s+r.col,0));
+  const sales2    = cats2.map(c => _safeReps.filter(r=>r.cat===c).reduce((s,r)=>s+r.sales,0));
+  const returns2  = cats2.map(c => _safeReps.filter(r=>r.cat===c).reduce((s,r)=>s+r.returns,0));
+  const ns2       = cats2.map(c => _safeReps.filter(r=>r.cat===c).reduce((s,r)=>s+r.netSales,0));
+  const cols2     = cats2.map(c => _safeReps.filter(r=>r.cat===c).reduce((s,r)=>s+r.col,0));
   _rebuildChart('catSalesChart2', {
     type: 'bar',
     data: {
@@ -4514,7 +4770,7 @@ function initRepCmpPanels() {
   });
 
   // ── allRepsChart2: ROI لجميع المناديب ──
-  const sortedByRoi2 = [...repsData].filter(r=>r.sales>0).sort((a,b)=>b.roi-a.roi);
+  const sortedByRoi2 = [..._safeReps].filter(r=>r.sales>0).sort((a,b)=>b.roi-a.roi);
   _rebuildChart('allRepsChart2', {
     type: 'bar',
     data: {
@@ -4552,7 +4808,7 @@ function initRepCmpPanels() {
   });
 
   // ── repSalesColChart2: أعلى 10 مبيعات vs تحصيلات ──
-  const top10reps2 = [...repsData].filter(r=>r.sales>0).sort((a,b)=>b.sales-a.sales).slice(0,10);
+  const top10reps2 = [..._safeReps].filter(r=>r.sales>0).sort((a,b)=>b.sales-a.sales).slice(0,10);
   _rebuildChart('repSalesColChart2', {
     type: 'bar',
     data: {
@@ -4574,7 +4830,7 @@ function initRepCmpPanels() {
   });
 
   // ── repReturnsChart2: أعلى 10 نسبة مرتجعات ──
-  const topRetReps2 = [...repsData].filter(r=>r.sales>10000).sort((a,b)=>b.retPct-a.retPct).slice(0,10);
+  const topRetReps2 = [..._safeReps].filter(r=>r.sales>10000).sort((a,b)=>b.retPct-a.retPct).slice(0,10);
   _rebuildChart('repReturnsChart2', {
     type: 'bar',
     data: {
@@ -4590,7 +4846,7 @@ function initRepCmpPanels() {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        tooltip: { callbacks: { afterLabel: ctx => `مبيعات: ${fmt(topRetReps2[ctx.dataIndex].sales)} | مرتجعات: ${fmt(topRetReps2[ctx.dataIndex].returns)}` } }
+        tooltip: { callbacks: { afterLabel: ctx => { const r=topRetReps2[ctx.dataIndex]; return r?`مبيعات: ${_fmtCmp(r.sales)} | مرتجعات: ${_fmtCmp(r.returns||0)}`:''; } } }
       },
       scales: {
         x: { grid: { color: 'rgba(30,58,95,0.5)' }, ticks: { font:{size:11}, color: '#8aa5c0' } },
@@ -4914,7 +5170,7 @@ function renderItems() {
     const retColor = retPct>=30?'var(--red)':retPct>=15?'#ff6b35':'var(--accent2)';
     const barW = Math.min((d.ns/maxNs)*100,100).toFixed(1);
     const num  = i<3 ? medals[i] : '<span style="color:var(--text2)">'+(i+1)+'</span>';
-    const sn   = d.name.length>34 ? d.name.substring(0,34)+'\u2026' : d.name;
+    const sn   = d.name;
     return '<tr title="'+d.name+'">'
      +'<td style="text-align:center">'+num+'</td>'
      +'<td style="min-width:200px"><div style="font-weight:600;font-size:12px">'+sn+'</div>'
@@ -4945,7 +5201,7 @@ function renderItems() {
       const parts = [];
       if (catF)  parts.push('فئة: '+catF);
       if (repF)  parts.push('مندوب: '+repF);
-      if (custF) parts.push('عميل: '+custF.substring(0,20)+(custF.length>20?'\u2026':''));
+      if (custF) parts.push('عميل: '+custF.substring(0,35)+(custF.length>35?'\u2026':''));
       if (q)     parts.push('بحث: '+q);
       sm.innerHTML = '<span style="background:rgba(0,212,255,0.12);border:1px solid rgba(0,212,255,0.3);'
         +'padding:6px 14px;border-radius:8px;display:inline-flex;gap:14px;flex-wrap:wrap;align-items:center">'
@@ -4971,7 +5227,7 @@ function initItemsPanels() {
   const topItemsEl = document.getElementById('topItems');
   if (topItemsEl) topItemsEl.innerHTML = byNS.map((d,i)=>{
     const medals=['🥇','🥈','🥉','4️⃣','5️⃣'];
-    const short = d.name.length>26?d.name.substring(0,26)+'…':d.name;
+    const short = d.name;
     return `<div class="rank-row">
       <span style="font-size:var(--fs-lg);width:22px">${medals[i]}</span>
       <div style="flex:1">
@@ -4993,7 +5249,7 @@ function initItemsPanels() {
   const topRetValEl = document.getElementById('topRetVal');
   if (topRetValEl) topRetValEl.innerHTML = byRV.map((d,i)=>{
     const medals=['🔴','🟠','🟡','4️⃣','5️⃣'];
-    const short = d.name.length>26?d.name.substring(0,26)+'…':d.name;
+    const short = d.name;
     return `<div class="rank-row">
       <span style="font-size:var(--fs-lg);width:22px">${medals[i]}</span>
       <div style="flex:1">
@@ -5014,7 +5270,7 @@ function initItemsPanels() {
   const topMarginEl = document.getElementById('topMargin');
   if (topMarginEl) topMarginEl.innerHTML = byRP.map((d,i)=>{
     const medals=['🔴','🟠','🟡','4️⃣','5️⃣'];
-    const short = d.name.length>26?d.name.substring(0,26)+'…':d.name;
+    const short = d.name;
     return `<div class="rank-row">
       <span style="font-size:var(--fs-lg);width:22px">${medals[i]}</span>
       <div style="flex:1">
@@ -5036,7 +5292,7 @@ function initItemsPanels() {
   const topRetQtyEl = document.getElementById('topRetQty');
   if (topRetQtyEl) topRetQtyEl.innerHTML = byRQ.map((d,i)=>{
     const medals=['🔴','🟠','🟡','4️⃣','5️⃣'];
-    const short = d.name.length>26?d.name.substring(0,26)+'…':d.name;
+    const short = d.name;
     return `<div class="rank-row">
       <span style="font-size:var(--fs-lg);width:22px">${medals[i]}</span>
       <div style="flex:1">
@@ -5057,7 +5313,7 @@ function initItemsPanels() {
   const maxBotNS = botNS[botNS.length-1].ns || 1;
   const topNetSalesEl = document.getElementById('topNetSales');
   if (topNetSalesEl) topNetSalesEl.innerHTML = botNS.map((d,i)=>{
-    const short = d.name.length>26?d.name.substring(0,26)+'…':d.name;
+    const short = d.name;
     return `<div class="rank-row">
       <span style="font-size:var(--fs-md);width:22px;color:var(--muted)">${i+1}.</span>
       <div style="flex:1">
@@ -5079,7 +5335,7 @@ function initItemsPanels() {
   const topColEl = document.getElementById('topCol');
   if (topColEl) topColEl.innerHTML = byNQ.map((d,i)=>{
     const medals=['🥇','🥈','🥉','4️⃣','5️⃣'];
-    const short = d.name.length>26?d.name.substring(0,26)+'…':d.name;
+    const short = d.name;
     return `<div class="rank-row">
       <span style="font-size:var(--fs-lg);width:22px">${medals[i]}</span>
       <div style="flex:1">
@@ -5095,16 +5351,19 @@ function initItemsPanels() {
     </div>`;
   }).join('');
 
+  const _safeItems = Array.isArray(itemsData) ? itemsData : [];
+  const _safeProd  = Array.isArray(productsData) ? productsData : [];
+
   // ── رسم: صافي / مرتجعات / مبيعات — أعلى 10 بصافي المبيعات ──
-  const top10ns = [...itemsData].sort((a,b)=>b.ns-a.ns).slice(0,10);
-      _rebuildChart('itemsSalesRetNsChart', {
+  const top10ns = [..._safeItems].sort((a,b)=>b.ns-a.ns).slice(0,10);
+  _rebuildChart('itemsSalesRetNsChart', {
     type:'bar',
     data:{
-      labels: (typeof top10ns!=='undefined'?top10ns:top10s||[]).map(d=>d.name),
+      labels: top10ns.map(d=>d.name),
       datasets:[
-        { label:'💰 صافي المبيعات',   data:(typeof top10ns!=='undefined'?top10ns:top10s||[]).map(d=>d.ns),     backgroundColor:'rgba(0,255,136,0.85)', borderRadius:4 },
-        { label:'↩️ المرتجعات',       data:(typeof top10ns!=='undefined'?top10ns:top10s||[]).map(d=>d.retVal), backgroundColor:'rgba(255,71,87,0.75)', borderRadius:4 },
-        { label:'📦 إجمالي المبيعات', data:(typeof top10ns!=='undefined'?top10ns:top10s||[]).map(d=>d.sales),  backgroundColor:'rgba(0,212,255,0.35)', borderRadius:4 }
+        { label:'💰 صافي المبيعات',   data:top10ns.map(d=>d.ns),     backgroundColor:'rgba(0,255,136,0.85)', borderRadius:4 },
+        { label:'↩️ المرتجعات',       data:top10ns.map(d=>d.retVal), backgroundColor:'rgba(255,71,87,0.75)', borderRadius:4 },
+        { label:'📦 إجمالي المبيعات', data:top10ns.map(d=>d.sales),  backgroundColor:'rgba(0,212,255,0.35)', borderRadius:4 }
       ]},
     options:{
       indexAxis:'y', responsive:true, maintainAspectRatio:false,
@@ -5118,21 +5377,21 @@ function initItemsPanels() {
       },
       scales:{
         x:{ grid:{color:'rgba(30,58,95,0.5)'}, ticks:{color:'#a0b8cc', font:{size:11}, callback:v=>{const n=Number(v||0);return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?Math.round(n/1e3)+'K':n.toLocaleString();}} },
-        y:{ grid:{display:false}, ticks:{color:'#a0b8cc', font:{size:11}, autoSkip:false}, afterFit:s=>{s.width=Math.max(s.width,280);} }
+        y:{ grid:{display:false}, ticks:{color:'#a0b8cc', font:{size:11}, autoSkip:false}, afterFit:s=>{s.width=Math.max(s.width,340);} }
       }
     }
   });
 
   // ── رسم: كميات — أعلى 10 بصافي الكمية ──
-  const top10nq = [...itemsData].sort((a,b)=>b.nqty-a.nqty).slice(0,10);
-      _rebuildChart('itemsQtyChart', {
+  const top10nq = [..._safeItems].sort((a,b)=>b.nqty-a.nqty).slice(0,10);
+  _rebuildChart('itemsQtyChart', {
     type:'bar',
     data:{
-      labels: (typeof top10nq!=='undefined'?top10nq:[]).map(d=>d.name),
+      labels: top10nq.map(d=>d.name),
       datasets:[
-        { label:'✅ صافي الكمية',    data:(typeof top10nq!=='undefined'?top10nq:[]).map(d=>d.nqty),   backgroundColor:'rgba(0,255,136,0.85)', borderRadius:4 },
-        { label:'📦 إجمالي الكمية', data:(typeof top10nq!=='undefined'?top10nq:[]).map(d=>d.qty),    backgroundColor:'rgba(0,212,255,0.4)',  borderRadius:4 },
-        { label:'🔄 المرتجعات',      data:(typeof top10nq!=='undefined'?top10nq:[]).map(d=>d.retQty), backgroundColor:'rgba(255,71,87,0.75)', borderRadius:4 }
+        { label:'✅ صافي الكمية',    data:top10nq.map(d=>d.nqty),   backgroundColor:'rgba(0,255,136,0.85)', borderRadius:4 },
+        { label:'📦 إجمالي الكمية', data:top10nq.map(d=>d.qty),    backgroundColor:'rgba(0,212,255,0.4)',  borderRadius:4 },
+        { label:'🔄 المرتجعات',      data:top10nq.map(d=>d.retQty), backgroundColor:'rgba(255,71,87,0.75)', borderRadius:4 }
       ]},
     options:{
       indexAxis:'y', responsive:true, maintainAspectRatio:false,
@@ -5146,21 +5405,21 @@ function initItemsPanels() {
       },
       scales:{
         x:{ grid:{color:'rgba(30,58,95,0.5)'}, ticks:{color:'#a0b8cc', font:{size:11}, callback:v=>Number(v||0).toLocaleString('en-US')} },
-        y:{ grid:{display:false}, ticks:{color:'#a0b8cc', font:{size:11}, autoSkip:false}, afterFit:s=>{s.width=Math.max(s.width,280);} }
+        y:{ grid:{display:false}, ticks:{color:'#a0b8cc', font:{size:11}, autoSkip:false}, afterFit:s=>{s.width=Math.max(s.width,340);} }
       }
     }
   });
 
   // ── رسم: نسبة المرتجعات — أعلى 12 ──
-  const topRet = [...itemsData].filter(d=>d.sales>1000).sort((a,b)=>b.retPct-a.retPct).slice(0,12);
-      _rebuildChart('itemsMarginChart', {
+  const topRet = [..._safeItems].filter(d=>d.sales>1000).sort((a,b)=>b.retPct-a.retPct).slice(0,12);
+  _rebuildChart('itemsMarginChart', {
     type:'bar',
     data:{
-      labels: (typeof topRet!=='undefined'?topRet:(typeof topRetItems!=='undefined'?topRetItems:[])).map(d=>d.name),
+      labels: topRet.map(d=>d.name),
       datasets:[{
         label:'نسبة المرتجعات %',
-        data:(typeof topRet!=='undefined'?topRet:(typeof topRetItems!=='undefined'?topRetItems:[])).map(d=>d.retPct),
-        backgroundColor:(typeof topRet!=='undefined'?topRet:(typeof topRetItems!=='undefined'?topRetItems:[])).map(d=>d.retPct>=30?'rgba(255,71,87,0.85)':d.retPct>=15?'rgba(255,107,53,0.8)':'rgba(255,215,0,0.75)'),
+        data: topRet.map(d=>d.retPct),
+        backgroundColor: topRet.map(d=>d.retPct>=30?'rgba(255,71,87,0.85)':d.retPct>=15?'rgba(255,107,53,0.8)':'rgba(255,215,0,0.75)'),
         borderRadius:4
       }]},
     options:{
@@ -5175,20 +5434,20 @@ function initItemsPanels() {
       },
       scales:{
         x:{ grid:{color:'rgba(30,58,95,0.5)'}, ticks:{color:'#a0b8cc', font:{size:11}, callback:v=>v+'%'}, max:105 },
-        y:{ grid:{display:false}, ticks:{color:'#a0b8cc', font:{size:11}, autoSkip:false}, afterFit:s=>{s.width=Math.max(s.width,280);} }
+        y:{ grid:{display:false}, ticks:{color:'#a0b8cc', font:{size:11}, autoSkip:false}, afterFit:s=>{s.width=Math.max(s.width,340);} }
       }
     }
   });
 
   // ── رسم: صافي مقابل مبيعات أفقي — أعلى 10 بصافي المبيعات ──
-      _rebuildChart('itemsSalesChart', {
+  _rebuildChart('itemsSalesChart', {
     type:'bar',
     data:{
-      labels: (typeof top10ns!=='undefined'?top10ns:top10s||[]).map(d=>d.name),
+      labels: top10ns.map(d=>d.name),
       datasets:[
-        { label:'💰 صافي المبيعات',   data:(typeof top10ns!=='undefined'?top10ns:top10s||[]).map(d=>d.ns),     backgroundColor:'rgba(0,255,136,0.85)', borderRadius:4 },
-        { label:'↩️ المرتجعات',       data:(typeof top10ns!=='undefined'?top10ns:top10s||[]).map(d=>d.retVal), backgroundColor:'rgba(255,71,87,0.75)', borderRadius:4 },
-        { label:'📦 إجمالي المبيعات', data:(typeof top10ns!=='undefined'?top10ns:top10s||[]).map(d=>d.sales),  backgroundColor:'rgba(0,212,255,0.35)', borderRadius:4 }
+        { label:'💰 صافي المبيعات',   data:top10ns.map(d=>d.ns),     backgroundColor:'rgba(0,255,136,0.85)', borderRadius:4 },
+        { label:'↩️ المرتجعات',       data:top10ns.map(d=>d.retVal), backgroundColor:'rgba(255,71,87,0.75)', borderRadius:4 },
+        { label:'📦 إجمالي المبيعات', data:top10ns.map(d=>d.sales),  backgroundColor:'rgba(0,212,255,0.35)', borderRadius:4 }
       ]},
     options:{
       indexAxis:'y', responsive:true, maintainAspectRatio:false,
@@ -5202,31 +5461,33 @@ function initItemsPanels() {
       },
       scales:{
         x:{ grid:{color:'rgba(30,58,95,0.5)'}, ticks:{color:'#a0b8cc', font:{size:11}, callback:v=>{const n=Number(v||0);return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?Math.round(n/1e3)+'K':n.toLocaleString();}} },
-        y:{ grid:{display:false}, ticks:{color:'#a0b8cc', font:{size:11}, autoSkip:false}, afterFit:s=>{s.width=Math.max(s.width,280);} }
+        y:{ grid:{display:false}, ticks:{color:'#a0b8cc', font:{size:11}, autoSkip:false}, afterFit:s=>{s.width=Math.max(s.width,340);} }
       }
     }
   });
 
   // ── رسم productBubble: صافي المبيعات والكميات الصافية ──
-  _rebuildChart('productBubble', {
-    type: 'bar',
-    data: {
-      labels: productsData.map(p=>p.name.substring(0,18)+'…'),
-      datasets: [
-        { label: 'صافي المبيعات (دينار)', data: productsData.map(p=>p.ns||p.sales*(1-p.retPct/100)), backgroundColor: 'rgba(0,255,136,0.7)', borderRadius: 4, yAxisID: 'y' },
-        { type: 'line', label: 'صافي الكمية (وحدة)', data: productsData.map(p=>p.nqty||p.qty), borderColor: '#ffd700', backgroundColor: 'rgba(255,215,0,0.15)', tension: 0.4, yAxisID: 'y1', pointRadius: 4, pointBackgroundColor: '#ffd700' }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom', labels: { color: '#8ba3b8', padding: 14 } } },
-      scales: {
-        x: { grid: { color: 'rgba(30,58,95,0.5)' }, ticks: { font:{size:11}, color: '#8aa5c0' } },
-        y: { position: 'right', grid: { color: 'rgba(30,58,95,0.5)' }, ticks: { callback: v => { const n=Number(v||0); return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?Math.round(n/1e3)+'K':n.toLocaleString('en-US'); }, color: '#8aa5c0', font:{size:10} } },
-        y1: { position: 'left', grid: { display: false }, ticks: { callback: v=>v.toLocaleString(), color: '#ffd700', font:{size:10} } }
+  if (_safeProd.length) {
+    _rebuildChart('productBubble', {
+      type: 'bar',
+      data: {
+        labels: _safeProd.map(p=>p.name),
+        datasets: [
+          { label: 'صافي المبيعات (دينار)', data: _safeProd.map(p=>p.ns||p.sales*(1-(p.retPct||0)/100)), backgroundColor: 'rgba(0,255,136,0.7)', borderRadius: 4, yAxisID: 'y' },
+          { type: 'line', label: 'صافي الكمية (وحدة)', data: _safeProd.map(p=>p.nqty||p.qty||0), borderColor: '#ffd700', backgroundColor: 'rgba(255,215,0,0.15)', tension: 0.4, yAxisID: 'y1', pointRadius: 4, pointBackgroundColor: '#ffd700' }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { color: '#8ba3b8', padding: 14 } } },
+        scales: {
+          x: { grid: { color: 'rgba(30,58,95,0.5)' }, ticks: { font:{size:11}, color: '#8aa5c0' } },
+          y: { position: 'right', grid: { color: 'rgba(30,58,95,0.5)' }, ticks: { callback: v => { const n=Number(v||0); return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?Math.round(n/1e3)+'K':n.toLocaleString('en-US'); }, color: '#8aa5c0', font:{size:10} } },
+          y1: { position: 'left', grid: { display: false }, ticks: { callback: v=>Number(v||0).toLocaleString(), color: '#ffd700', font:{size:10} } }
+        }
       }
-    }
-  });
+    });
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => { try { renderItems(); } catch(e){} });
@@ -5410,7 +5671,7 @@ function renderDebtDetailTable(){
   body.innerHTML=page.map((r,i)=>{
     const nc=r.net>50000?'var(--red)':r.net>10000?'#ff6b35':r.net<0?'var(--accent2)':'var(--text)';
     const st=r.net<0?'<span class="tag tag-green">دائن</span>':r.net===0?'<span class="tag tag-blue">مسوّى</span>':r.net>50000?'<span class="tag tag-red">حرج</span>':r.net>10000?'<span class="tag tag-orange">مرتفع</span>':'<span class="tag" style="background:rgba(0,212,255,.1);color:var(--accent)">عادي</span>';
-    return `<tr><td style="color:var(--text2);text-align:center">${st2+i+1}</td><td style="color:var(--text2);font-size:11px">${r.code}</td><td style="max-width:250px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><b>${r.name}</b></td><td style="color:var(--accent);font-weight:600">${r.rep}</td><td style="text-align:right;color:var(--text2)">${fmt(r.debit)}</td><td style="text-align:right;color:var(--accent2)">${fmt(r.credit)}</td><td style="text-align:right;font-weight:700;color:${nc}">${fmt(r.net)}</td><td>${st}</td></tr>`;
+    return `<tr><td style="color:var(--text2);text-align:center">${st2+i+1}</td><td style="color:var(--text2);font-size:11px">${r.code}</td><td style="max-width:280px;word-break:break-word;line-height:1.4"><b>${r.name}</b></td><td style="color:var(--accent);font-weight:600">${r.rep}</td><td style="text-align:right;color:var(--text2)">${fmt(r.debit)}</td><td style="text-align:right;color:var(--accent2)">${fmt(r.credit)}</td><td style="text-align:right;font-weight:700;color:${nc}">${fmt(r.net)}</td><td>${st}</td></tr>`;
   }).join('');
   if(pg){
     let h='';const bs=(a)=>`style="padding:5px 10px;border-radius:6px;border:1px solid var(--border);cursor:pointer;font-family:'Cairo',sans-serif;font-size:12px;${a?'background:var(--accent);color:#000;font-weight:700':'background:var(--surface2);color:var(--text2)'}"`; 
@@ -5708,6 +5969,56 @@ ${activeHTML}
 }
 
 // ── Print individual table ────────────────────────────────────────────────
+// ── Helper: collect active filters for a given table and return readable label ──
+function _getActiveFiltersLabel(tableId) {
+  const parts = [];
+  const _val = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const _txt = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+
+  if (tableId === 'repsTable') {
+    const q   = _txt('repSearch');
+    const cat = _val('repCatFilter');
+    if (cat) parts.push('فئة: ' + cat);
+    if (q)   parts.push('بحث: ' + q);
+  }
+
+  if (tableId === 'rcTable') {
+    const q   = _txt('rcSearch');
+    const cat = _val('rcCat');
+    if (cat) parts.push('فئة: ' + cat);
+    if (q)   parts.push('بحث: ' + q);
+  }
+
+  if (tableId === 'custTable' || tableId === 'custBody') {
+    const q      = _txt('custSearch');
+    const rep    = _val('custRepFilter');
+    const catRep = _val('custCatRepFilter');
+    const catCust = (typeof _custActiveCat !== 'undefined' && _custActiveCat !== 'all') ? _custActiveCat : '';
+    if (catCust) parts.push('تصنيف العميل: ' + catCust);
+    if (rep)     parts.push('المندوب: ' + rep);
+    if (catRep)  parts.push('فئة المندوب: ' + catRep);
+    if (q)       parts.push('بحث: ' + q);
+  }
+
+  if (tableId === 'itemsTable') {
+    const q      = _txt('itemSearch');
+    const repCat = _val('itemRepCat');
+    const rep    = _val('itemRepFilter');
+    const sort   = _val('itemSort');
+    if (repCat) parts.push('فئة: ' + repCat);
+    if (rep)    parts.push('المندوب: ' + rep);
+    if (q)      parts.push('بحث: ' + q);
+    if (sort)   parts.push('ترتيب: ' + (document.querySelector('#itemSort option:checked')?.text || sort));
+  }
+
+  if (tableId === 'debtDetailBody') {
+    const rep = _val('debtRepFilter');
+    if (rep) parts.push('المندوب: ' + rep);
+  }
+
+  return parts.length ? parts.join(' &nbsp;|&nbsp; ') : 'الكل (بدون فلتر)';
+}
+
 function printTable(tableId, title) {
   // For paginated tables, expand all rows first
   let restoreFn = null;
@@ -5739,6 +6050,9 @@ function printTable(tableId, title) {
     restoreFn = () => { custPage = savedPage; renderCustTable(); };
   }
 
+  // Collect active filters label BEFORE any DOM changes
+  const filtersLabel = _getActiveFiltersLabel(tableId);
+
   // Get table element (handle both table id and tbody id)
   let tableEl = document.getElementById(tableId);
   if (!tableEl) { if (restoreFn) restoreFn(); return; }
@@ -5748,13 +6062,12 @@ function printTable(tableId, title) {
     tableEl = tableEl.closest('table');
   }
   if (!tableEl || tableEl.tagName !== 'TABLE') {
-    // try finding table inside the element
     tableEl = tableEl ? tableEl.closest('table') || tableEl.querySelector('table') : null;
   }
   if (!tableEl) { if (restoreFn) restoreFn(); return; }
 
   const tableHTML = tableEl.outerHTML;
-  const rowCount = tableEl.querySelectorAll('tbody tr').length;
+  const rowCount  = tableEl.querySelectorAll('tbody tr').length;
   const printDate = new Date().toLocaleDateString('ar-LY');
 
   const html = '<!DOCTYPE html><html lang="ar" dir="rtl"><head>'
@@ -5765,9 +6078,12 @@ function printTable(tableId, title) {
     + '@page{size:A4 landscape;margin:8mm 6mm}'
     + '*{margin:0;padding:0;box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
     + 'body{font-family:"Cairo",sans-serif;direction:rtl;background:#fff;color:#111;font-size:7.5pt}'
-    + '.ph{background:#1a2a4a;color:#fff;padding:6pt 10pt;margin-bottom:8pt;border-radius:4pt;display:flex;justify-content:space-between;align-items:center}'
-    + '.ph h1{font-size:11pt;font-weight:800}'
-    + '.ph p{font-size:7pt;color:#aac}'
+    + '.ph{background:#1a2a4a;color:#fff;padding:6pt 10pt;margin-bottom:4pt;border-radius:4pt}'
+    + '.ph-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:3pt}'
+    + '.ph h1{font-size:11pt;font-weight:800;margin:0}'
+    + '.ph .meta{font-size:7pt;color:#aac;white-space:nowrap}'
+    + '.ph .filter-bar{font-size:7.5pt;color:#cce4ff;background:rgba(0,0,0,0.25);padding:3pt 7pt;border-radius:3pt;margin-top:2pt}'
+    + '.ph .filter-bar strong{color:#fff;margin-left:4pt}'
     + 'table{width:100%;border-collapse:collapse;font-size:7pt;table-layout:auto}'
     + 'thead{display:table-header-group}'
     + 'tr{page-break-inside:avoid}'
@@ -5786,13 +6102,16 @@ function printTable(tableId, title) {
     + 'button{display:none!important}'
     + '</style>'
     + '</head><body>'
-    + '<div class="ph"><h1>🖨️ ' + title + '</h1><p>' + rowCount + ' سجل &nbsp;|&nbsp; ' + printDate + '</p></div>'
+    + '<div class="ph">'
+    +   '<div class="ph-top"><h1>🖨️ ' + title + '</h1><span class="meta">' + rowCount + ' سجل &nbsp;|&nbsp; ' + printDate + '</span></div>'
+    +   '<div class="filter-bar"><strong>🔍 الفلتر المستخدم:</strong> ' + filtersLabel + '</div>'
+    + '</div>'
     + tableHTML
     + '</body></html>';
 
   const blob = new Blob([html], {type:'text/html;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const win = window.open(url, '_blank', 'width=1100,height=750');
+  const url  = URL.createObjectURL(blob);
+  const win  = window.open(url, '_blank', 'width=1100,height=750');
   if (win) {
     win.onload = function(){ win.print(); };
     setTimeout(() => URL.revokeObjectURL(url), 120000);
@@ -6037,7 +6356,7 @@ function updateKPIs() {
     setEl('prod-kpi-qty-ret-sub',  retQtyPct + '% من الكمية 🔴');
     setEl('prod-kpi-items-count',  itemsData.length.toString());
     if (topRetItem) {
-      const shortName = topRetItem.name.length > 18 ? topRetItem.name.substring(0,18)+'…' : topRetItem.name;
+      const shortName = topRetItem.name;
       setEl('prod-kpi-top-ret-item',     shortName);
       setEl('prod-kpi-top-ret-item-sub', topRetItem.retPct.toFixed(1) + '% مرتجعات');
     }
@@ -6158,7 +6477,7 @@ function updateAllStaticPanels() {
   if (hdr && window._monthlyStats?.labels?.length) {
     const first = window._monthlyStats.labels[0];
     const last  = window._monthlyStats.labels[window._monthlyStats.labels.length-1];
-    hdr.innerHTML = 'الفترة: ' + first + ' — ' + last + ' &nbsp;|&nbsp; Manus AI';
+    hdr.innerHTML = 'الفترة: ' + first + ' — ' + last + ' &nbsp;|&nbsp; إعداد المحاسب أحمد العكاري';
   }
 
   // ── 2. Category panels (جملة/تجزئة/مقاهي/أسواق/مستقل) ─────────
@@ -6283,6 +6602,31 @@ function _fmtM(n) { n=Number(n||0); return n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?
 function _pctCol(p) { return p>=80?'var(--accent2)':p>=60?'#ff6b35':'var(--red)'; }
 function _retCol(p) { return p>=20?'var(--red)':p>=10?'#ff6b35':'var(--text2)'; }
 
+// ── إظهار/إخفاء الأرقام على الرسوم البيانية ─────────────────────────
+function toggleDataLabels() {
+  _showDataLabels = !_showDataLabels;
+  const btn = document.getElementById('labelToggleBtn');
+  if (btn) {
+    btn.style.background    = _showDataLabels ? 'rgba(0,212,255,0.22)' : 'rgba(0,212,255,0.08)';
+    btn.style.color         = _showDataLabels ? '#00d4ff' : '#8ba3b8';
+    btn.style.borderColor   = _showDataLabels ? 'rgba(0,212,255,0.7)' : 'rgba(0,212,255,0.35)';
+    btn.textContent         = _showDataLabels ? '🔢 إخفاء الأرقام' : '🔢 أرقام الرسوم';
+  }
+  // إعادة رسم كل الرسوم البيانية
+  try { rebuildCharts(); } catch(e) {}
+  try { renderRepsTable(); } catch(e) {}
+  try { renderRepCmp(); } catch(e) {}
+  try { applyFilters(); } catch(e) {}
+  try { renderItems(); } catch(e) {}
+  setTimeout(() => {
+    try {
+      _debtChartsInit = false;
+      initDebtCharts();
+      updateDebtTabFiltered(debtRepsData, debtDetailData);
+    } catch(e) {}
+  }, 100);
+}
+
 // ── دالة تدمير وإعادة رسم مخطط ──────────────────────────────────────
 function _rebuildChart(canvasId, config) {
   const el = document.getElementById(canvasId);
@@ -6310,7 +6654,20 @@ function _rebuildChart(canvasId, config) {
         grid: { display: false },
         ticks: {
           color: '#a0b8cc', font: { size: 11, family: "'Cairo',sans-serif" },
-          autoSkip: false, maxRotation: 0
+          autoSkip: false, maxRotation: 0,
+          callback: function(val, index) {
+            // عرض الاسم كاملاً مع كسر السطر إذا كان طويلاً
+            const label = this.getLabelForValue(val);
+            if (typeof label !== 'string') return label;
+            if (label.length <= 28) return label;
+            // كسر عند الفراغ الأقرب لمنتصف النص
+            const mid = Math.floor(label.length / 2);
+            const spaceIdx = label.lastIndexOf(' ', mid + 8);
+            if (spaceIdx > 4) {
+              return [label.substring(0, spaceIdx), label.substring(spaceIdx + 1)];
+            }
+            return [label.substring(0, 28), label.substring(28)];
+          }
         }
       }
     } : {
@@ -6388,6 +6745,102 @@ function _rebuildChart(canvasId, config) {
   if (config.options.responsive === undefined) config.options.responsive = true;
   if (config.options.maintainAspectRatio === undefined) config.options.maintainAspectRatio = false;
 
+  // ── تطبيق Data Labels إذا كان الخيار مفعلاً ──────────────────────
+  const isLineChart = config.type === 'line';
+  const isPieOrDoughnut = config.type === 'doughnut' || config.type === 'pie';
+
+  if (_showDataLabels && typeof ChartDataLabels !== 'undefined') {
+    if (!config.options.plugins) config.options.plugins = {};
+
+    const isHBar = config.options?.indexAxis === 'y';
+
+    // ── زيادة هامش الرسمة لإفساح المجال للأرقام ──────────────────
+    if (!config.options.layout) config.options.layout = {};
+    if (!config.options.layout.padding) config.options.layout.padding = {};
+    if (isPieOrDoughnut) {
+      config.options.layout.padding = 20;
+    } else if (isHBar) {
+      // أشرطة أفقية — مساحة على اليمين للأرقام
+      config.options.layout.padding = { right: 130, left: 8, top: 8, bottom: 8 };
+    } else {
+      // أعمدة عمودية — مساحة فوق للأرقام
+      config.options.layout.padding = { top: 36, right: 8, bottom: 8, left: 8 };
+    }
+
+    config.options.plugins.datalabels = {
+      display: function(ctx) {
+        const v = Number(ctx.dataset.data[ctx.dataIndex] || 0);
+        return Math.abs(v) > 0;
+      },
+      // ── لون النص واضح ──────────────────────────────────────────
+      color: '#ffffff',
+      // ── خلفية واضحة لكل رقم ────────────────────────────────────
+      backgroundColor: function(ctx) {
+        if (isPieOrDoughnut) return 'rgba(0,0,0,0.55)';
+        const v = Number(ctx.dataset.data[ctx.dataIndex] || 0);
+        return v < 0 ? 'rgba(180,30,30,0.88)' : 'rgba(15,25,55,0.88)';
+      },
+      borderRadius: 5,
+      borderWidth: 1,
+      borderColor: function(ctx) {
+        if (isPieOrDoughnut) return 'transparent';
+        const v = Number(ctx.dataset.data[ctx.dataIndex] || 0);
+        return v < 0 ? 'rgba(255,80,80,0.6)' : 'rgba(0,212,255,0.45)';
+      },
+      padding: { top: 4, bottom: 4, left: 7, right: 7 },
+      font: { family: "'Cairo',sans-serif", size: 11, weight: '800' },
+      // ── تنسيق الرقم ────────────────────────────────────────────
+      formatter: function(value, ctx) {
+        const n = Number(value || 0);
+        if (n === 0) return null;
+        const lbl = (ctx.dataset.label || '').toLowerCase();
+        const isPercent = lbl.includes('%') || lbl.includes('نسبة') || lbl.includes('roi') || lbl.includes('pct')
+                        || (config.options?.scales?.y?.ticks?.callback?.toString().includes('%') && Math.abs(n) <= 200)
+                        || (config.options?.scales?.x?.ticks?.callback?.toString().includes('%') && Math.abs(n) <= 200);
+        if (isPercent) return n.toFixed(2) + '%';
+        if (Number.isInteger(n)) return n.toLocaleString('en-US');
+        return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      },
+      // ── موضع الرقم ─────────────────────────────────────────────
+      anchor: function(ctx) {
+        if (isPieOrDoughnut) return 'center';
+        if (isHBar) return 'end';
+        const v = Number(ctx.dataset.data[ctx.dataIndex] || 0);
+        return v >= 0 ? 'end' : 'start';
+      },
+      align: function(ctx) {
+        if (isPieOrDoughnut) return 'center';
+        if (isHBar) return 'end';     // خارج الشريط الأفقي على اليمين
+        const v = Number(ctx.dataset.data[ctx.dataIndex] || 0);
+        return v >= 0 ? 'end' : 'start'; // فوق العمود العمودي
+      },
+      rotation: function(ctx) {
+        // تدوير للأعمدة العمودية المزدحمة فقط
+        if (isPieOrDoughnut || isHBar) return 0;
+        const ds = ctx.chart.data.datasets;
+        const labels = ctx.chart.data.labels || [];
+        // إذا كان عدد التسميات كثيراً أو عدة datasets: دوِّر 90°
+        if (labels.length > 6 || ds.length > 2) return -90;
+        return 0;
+      },
+      offset: function(ctx) {
+        if (isPieOrDoughnut) return 0;
+        if (isHBar) return 6;
+        return 4;
+      },
+      clip: false,
+      clamp: true,
+      textStrokeColor: 'rgba(0,0,0,0.6)',
+      textStrokeWidth: 1,
+    };
+    config.plugins = [ChartDataLabels];
+  } else {
+    // إيقاف datalabels تماماً عند الإغلاق
+    if (!config.options.plugins) config.options.plugins = {};
+    config.options.plugins.datalabels = { display: false };
+    config.plugins = typeof ChartDataLabels !== 'undefined' ? [ChartDataLabels] : [];
+  }
+
   new Chart(el, config);
 }
 
@@ -6429,7 +6882,7 @@ function updateRepsTabFiltered(data) {
     type:'bar',
     data:{
       labels: sortedByRoi.map(r=>r.name),
-      fullLabels: sortedByRoi.map(r=>r.name),
+      fullLabels: sortedByRoi.map(r=>r.name),  // tooltip يعرض الاسم كاملاً
       datasets:[{
         label:'ROI %',
         data: sortedByRoi.map(r=>r.roi),
@@ -6665,7 +7118,7 @@ function updateCustomersTabFiltered(filtered) {
   _rebuildChart('custDebtChart', {
     type:'bar',
     data:{
-      labels:topGap.map(d=>d.n.length>18?d.n.substring(0,18)+'…':d.n),
+      labels:topGap.map(d=>d.n),
       datasets:[{label:'الفجوة',data:topGap.map(d=>d.g),
         backgroundColor:topGap.map(d=>catColors2[d.cat]||'rgba(0,212,255,0.7)'),borderRadius:4}]
     },
@@ -6705,21 +7158,21 @@ function updateProductsTabFiltered(data) {
   _s('prod-kpi-qty-ret-sub') && (_s('prod-kpi-qty-ret-sub').textContent = rqPct.toFixed(2)+'% من الكمية 🔴');
   _s('prod-kpi-items-count') && (_s('prod-kpi-items-count').textContent = data.length.toString());
   if (topRet) {
-    const sn = topRet.name.length>18?topRet.name.substring(0,18)+'…':topRet.name;
+    const sn = topRet.name;
     _s('prod-kpi-top-ret-item') && (_s('prod-kpi-top-ret-item').textContent = sn);
     _s('prod-kpi-top-ret-item-sub') && (_s('prod-kpi-top-ret-item-sub').textContent = topRet.retPct.toFixed(1)+'% مرتجعات');
   }
 
   // Chart: صافي مبيعات vs كميات
   const top10s = [...data].sort((a,b)=>b.ns-a.ns).slice(0,10);
-      _rebuildChart('itemsSalesRetNsChart', {
+  _rebuildChart('itemsSalesRetNsChart', {
     type:'bar',
     data:{
-      labels: (typeof top10ns!=='undefined'?top10ns:top10s||[]).map(d=>d.name),
+      labels: top10s.map(d=>d.name),
       datasets:[
-        { label:'💰 صافي المبيعات',   data:(typeof top10ns!=='undefined'?top10ns:top10s||[]).map(d=>d.ns),     backgroundColor:'rgba(0,255,136,0.85)', borderRadius:4 },
-        { label:'↩️ المرتجعات',       data:(typeof top10ns!=='undefined'?top10ns:top10s||[]).map(d=>d.retVal), backgroundColor:'rgba(255,71,87,0.75)', borderRadius:4 },
-        { label:'📦 إجمالي المبيعات', data:(typeof top10ns!=='undefined'?top10ns:top10s||[]).map(d=>d.sales),  backgroundColor:'rgba(0,212,255,0.35)', borderRadius:4 }
+        { label:'💰 صافي المبيعات',   data:top10s.map(d=>d.ns),     backgroundColor:'rgba(0,255,136,0.85)', borderRadius:4 },
+        { label:'↩️ المرتجعات',       data:top10s.map(d=>d.retVal), backgroundColor:'rgba(255,71,87,0.75)', borderRadius:4 },
+        { label:'📦 إجمالي المبيعات', data:top10s.map(d=>d.sales),  backgroundColor:'rgba(0,212,255,0.35)', borderRadius:4 }
       ]},
     options:{
       indexAxis:'y', responsive:true, maintainAspectRatio:false,
@@ -6733,21 +7186,21 @@ function updateProductsTabFiltered(data) {
       },
       scales:{
         x:{ grid:{color:'rgba(30,58,95,0.5)'}, ticks:{color:'#a0b8cc', font:{size:11}, callback:v=>{const n=Number(v||0);return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?Math.round(n/1e3)+'K':n.toLocaleString();}} },
-        y:{ grid:{display:false}, ticks:{color:'#a0b8cc', font:{size:11}, autoSkip:false}, afterFit:s=>{s.width=Math.max(s.width,280);} }
+        y:{ grid:{display:false}, ticks:{color:'#a0b8cc', font:{size:11}, autoSkip:false}, afterFit:s=>{s.width=Math.max(s.width,340);} }
       }
     }
   });
 
-  // Chart: نسبة المرتجعات
+  // Chart: نسبة المرتجعات — top12ret هي مصفوفة وليس عنصراً واحداً
   const top12ret = [...data].filter(i=>i.sales>0).sort((a,b)=>b.retPct-a.retPct).slice(0,12);
-      _rebuildChart('itemsMarginChart', {
+  _rebuildChart('itemsMarginChart', {
     type:'bar',
     data:{
-      labels: (typeof topRet!=='undefined'?topRet:(typeof topRetItems!=='undefined'?topRetItems:[])).map(d=>d.name),
+      labels: top12ret.map(d=>d.name),
       datasets:[{
         label:'نسبة المرتجعات %',
-        data:(typeof topRet!=='undefined'?topRet:(typeof topRetItems!=='undefined'?topRetItems:[])).map(d=>d.retPct),
-        backgroundColor:(typeof topRet!=='undefined'?topRet:(typeof topRetItems!=='undefined'?topRetItems:[])).map(d=>d.retPct>=30?'rgba(255,71,87,0.85)':d.retPct>=15?'rgba(255,107,53,0.8)':'rgba(255,215,0,0.75)'),
+        data: top12ret.map(d=>d.retPct),
+        backgroundColor: top12ret.map(d=>d.retPct>=30?'rgba(255,71,87,0.85)':d.retPct>=15?'rgba(255,107,53,0.8)':'rgba(255,215,0,0.75)'),
         borderRadius:4
       }]},
     options:{
@@ -6762,7 +7215,7 @@ function updateProductsTabFiltered(data) {
       },
       scales:{
         x:{ grid:{color:'rgba(30,58,95,0.5)'}, ticks:{color:'#a0b8cc', font:{size:11}, callback:v=>v+'%'}, max:105 },
-        y:{ grid:{display:false}, ticks:{color:'#a0b8cc', font:{size:11}, autoSkip:false}, afterFit:s=>{s.width=Math.max(s.width,280);} }
+        y:{ grid:{display:false}, ticks:{color:'#a0b8cc', font:{size:11}, autoSkip:false}, afterFit:s=>{s.width=Math.max(s.width,340);} }
       }
     }
   });
@@ -6920,110 +7373,478 @@ function updateSectionTitle(elId, baseTitle, filters) {
 //  CSV LOADER — يحدّث اللوحة من ملفات CSV مباشرة
 // ============================================================
 
-// ============================================================
-//  XLSX CLASSIFICATION LOADER
-// ============================================================
+// ══════════════════════════════════════════════════
+//  Google Sheets OAuth Integration
+// ══════════════════════════════════════════════════
 
-let xlsxClassificationFile = null;
+// ── Google OAuth 2.0 config ──────────────────────
+// يستخدم Google Identity Services (GSI) — لا يحتاج backend
+// Client ID مسجّل في Google Cloud Console
+// تُضاف نطاقات spreadsheets.readonly فقط
+const _GS_CLIENT_ID   = ''; // أضف هنا Client ID من Google Cloud Console
+const _GS_SCOPE       = 'https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/drive.readonly';
+const _GS_LS_KEY      = 'dashboard_gs_config_v2';
 
-function setXlsxFile(input) {
-  xlsxClassificationFile = input.files[0] || null;
-  const statusEl = document.getElementById('csvStatus_تصنيف');
-  if (statusEl) statusEl.textContent = xlsxClassificationFile ? '✅' : '⬜';
-}
+let _gsToken        = null;   // access token الحالي
+let _gsTokenExpiry  = 0;      // وقت انتهاء التوكن
+let _gsSheets       = {};     // { مبيعات: {id,gid}, تحصيل:{id,gid}, ... }
+let _gsUserEmail    = '';
+let _gsUserName     = '';
+let _gsConnected    = false;
+let _gsDriveFiles   = [];     // قائمة الشيتات المتاحة
 
-// خريطة توحيد أسماء التصنيفات الواردة من الملف
-function normalizeCat(raw) {
-  const s = (raw || '').trim();
-  if (!s) return 'تجزئة';
-  if (s.includes('اسواق') || s.includes('أسواق')) return 'أسواق';
-  if (s.includes('جملة'))   return 'جملة';
-  if (s.includes('مقاهي') || s.includes('مطاعم')) return 'مقاهي ومطاعم';
-  if (s.includes('ادارية') || s.includes('إدارية')) return 'إدارية';
-  if (s.includes('مستقل')) return 'مستقل';
-  if (s.includes('اخرى')  || s.includes('أخرى'))  return 'أخرى';
-  return s; // نُبقي القيمة كما هي لو لم تُعرف
-}
+// ── تحميل الإعدادات المحفوظة ────────────────────
+(function _gsLoadConfig() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(_GS_LS_KEY) || '{}');
+    if (saved.sheets)    _gsSheets    = saved.sheets;
+    if (saved.email)     _gsUserEmail = saved.email;
+    if (saved.name)      _gsUserName  = saved.name;
+    if (saved.connected) _gsConnected = true;
+  } catch(e) {}
+})();
 
-async function applyClassificationXlsx(msgEl) {
-  if (!xlsxClassificationFile) return 0;
-  msgEl.textContent = '⏳ قراءة ملف التصنيف...';
-
-  const data = await new Promise((res, rej) => {
-    const reader = new FileReader();
-    reader.onload = e => res(e.target.result);
-    reader.onerror = rej;
-    reader.readAsArrayBuffer(xlsxClassificationFile);
+// ── تهيئة مكتبة GSI عند تحميل الصفحة ───────────
+function _gsInitGSI() {
+  if (!window.google?.accounts?.oauth2) return;
+  window._gsTokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: _GS_CLIENT_ID || 'REPLACE_WITH_YOUR_CLIENT_ID',
+    scope:     _GS_SCOPE,
+    callback:  _gsHandleToken,
   });
+}
 
-  const wb = XLSX.read(data, { type: 'array' });
-  const ws = wb.Sheets[wb.SheetNames[0]];
-  const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+function _gsHandleToken(response) {
+  if (response.error) {
+    _gsShowMsg('❌ فشل تسجيل الدخول: ' + response.error, 'error');
+    return;
+  }
+  _gsToken       = response.access_token;
+  _gsTokenExpiry = Date.now() + (response.expires_in - 60) * 1000;
+  _gsConnected   = true;
+  _gsShowMsg('⏳ جارٍ جلب معلومات الحساب...', 'info');
+  _gsFetchUserInfo().then(() => {
+    _gsLoadDriveSheets().then(() => {
+      _gsSaveConfig();
+      _gsRenderConnected();
+    });
+  });
+}
 
-  // ابحث عن صف الرأس (يحتوي على "المندوب" و"تصنيف")
-  let headerRow = -1;
-  let iName = -1, iCat = -1;
-  for (let i = 0; i < rows.length; i++) {
-    const row = rows[i].map(c => String(c).trim());
-    const ni = row.findIndex(c => c === 'المندوب');
-    const ci = row.findIndex(c => c === 'تصنيف');
-    if (ni >= 0 && ci >= 0) { headerRow = i; iName = ni; iCat = ci; break; }
+async function _gsFetchUserInfo() {
+  try {
+    const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: 'Bearer ' + _gsToken }
+    });
+    const d = await r.json();
+    _gsUserEmail = d.email || '';
+    _gsUserName  = d.name  || '';
+  } catch(e) {}
+}
+
+async function _gsLoadDriveSheets() {
+  try {
+    _gsShowMsg('⏳ جارٍ تحميل قائمة الشيتات...', 'info');
+    const r = await fetch(
+      'https://www.googleapis.com/drive/v3/files?q=mimeType%3D%22application%2Fvnd.google-apps.spreadsheet%22&fields=files(id,name)&pageSize=50&orderBy=modifiedTime+desc',
+      { headers: { Authorization: 'Bearer ' + _gsToken } }
+    );
+    const d = await r.json();
+    _gsDriveFiles = d.files || [];
+    _gsRenderSheetSelectors();
+  } catch(e) {
+    _gsShowMsg('⚠️ تعذّر تحميل قائمة الشيتات: ' + e.message, 'warn');
+  }
+}
+
+async function _gsLoadSheetsInFile(fileId, selectEl) {
+  if (!fileId) return;
+  selectEl.innerHTML = '<option value="">⏳ جارٍ التحميل...</option>';
+  selectEl.disabled = true;
+  try {
+    const r = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${fileId}?fields=sheets.properties`,
+      { headers: { Authorization: 'Bearer ' + _gsToken } }
+    );
+    const d = await r.json();
+    const sheets = d.sheets || [];
+    selectEl.innerHTML = '<option value="">— اختر الورقة —</option>';
+    sheets.forEach(s => {
+      const o = document.createElement('option');
+      o.value = s.properties.sheetId;
+      o.textContent = s.properties.title;
+      selectEl.appendChild(o);
+    });
+    selectEl.disabled = false;
+  } catch(e) {
+    selectEl.innerHTML = '<option value="">❌ فشل التحميل</option>';
+    selectEl.disabled = false;
+  }
+}
+
+function _gsRenderSheetSelectors() {
+  const keys = ['مبيعات','تحصيل','مديونية','تصنيف'];
+  for (const key of keys) {
+    const fileEl  = document.getElementById('gsFile_'  + key);
+    const sheetEl = document.getElementById('gsSheet_' + key);
+    if (!fileEl || !sheetEl) continue;
+
+    // بناء قائمة الملفات
+    fileEl.innerHTML = '<option value="">— اختر الشيت —</option>';
+    _gsDriveFiles.forEach(f => {
+      const o = document.createElement('option');
+      o.value = f.id; o.textContent = f.name;
+      if (_gsSheets[key]?.id === f.id) o.selected = true;
+      fileEl.appendChild(o);
+    });
+
+    // إذا كان هناك اختيار محفوظ، أعد تحميل الأوراق
+    if (_gsSheets[key]?.id) {
+      _gsLoadSheetsInFile(_gsSheets[key].id, sheetEl).then(() => {
+        if (_gsSheets[key]?.gid !== undefined) {
+          sheetEl.value = String(_gsSheets[key].gid);
+        }
+      });
+    }
+  }
+}
+
+function _gsOnFileChange(key) {
+  const fileEl  = document.getElementById('gsFile_'  + key);
+  const sheetEl = document.getElementById('gsSheet_' + key);
+  if (!fileEl || !sheetEl) return;
+  const id = fileEl.value;
+  if (!_gsSheets[key]) _gsSheets[key] = {};
+  _gsSheets[key].id  = id;
+  _gsSheets[key].gid = null;
+  sheetEl.innerHTML = '<option value="">— اختر الورقة —</option>';
+  if (id) _gsLoadSheetsInFile(id, sheetEl);
+}
+
+function _gsOnSheetChange(key) {
+  const sheetEl = document.getElementById('gsSheet_' + key);
+  if (!sheetEl) return;
+  if (!_gsSheets[key]) _gsSheets[key] = {};
+  _gsSheets[key].gid = sheetEl.value !== '' ? parseInt(sheetEl.value) : null;
+  _gsSaveConfig();
+  _gsUpdateRowStatus(key);
+}
+
+function _gsUpdateRowStatus(key) {
+  const st = document.getElementById('gsStatus_' + key);
+  if (!st) return;
+  const cfg = _gsSheets[key];
+  st.textContent = (cfg?.id && cfg?.gid !== null) ? '✅' : '⬜';
+}
+
+function _gsRenderConnected() {
+  // إخفاء زر الاتصال وإظهار لوحة الاختيار
+  const loginBox   = document.getElementById('gsLoginBox');
+  const configBox  = document.getElementById('gsConfigBox');
+  const userInfo   = document.getElementById('gsUserInfo');
+  if (loginBox)  loginBox.style.display  = 'none';
+  if (configBox) configBox.style.display = 'block';
+  if (userInfo)  userInfo.innerHTML =
+    `<span style="color:var(--accent2);font-weight:700">✅ ${_gsUserName || _gsUserEmail}</span>
+     <span style="color:var(--text2);font-size:11px">${_gsUserEmail}</span>
+     <button onclick="gsDisconnect()" style="background:rgba(255,71,87,.15);color:#ff4757;border:1px solid rgba(255,71,87,.3);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:'Cairo',sans-serif">قطع الاتصال</button>`;
+  _gsShowMsg('', 'clear');
+  // أيقونة في الهيدر
+  const hdr = document.getElementById('gsHeaderLive');
+  if (hdr) { hdr.style.display = 'flex'; hdr.querySelector('#gsHeaderLastSync').textContent = _gsUserEmail; }
+}
+
+function _gsRenderDisconnected() {
+  const loginBox  = document.getElementById('gsLoginBox');
+  const configBox = document.getElementById('gsConfigBox');
+  const userInfo  = document.getElementById('gsUserInfo');
+  if (loginBox)  loginBox.style.display  = 'block';
+  if (configBox) configBox.style.display = 'none';
+  if (userInfo)  userInfo.innerHTML = '';
+  const hdr = document.getElementById('gsHeaderLive');
+  if (hdr) hdr.style.display = 'none';
+}
+
+function _gsSaveConfig() {
+  try {
+    localStorage.setItem(_GS_LS_KEY, JSON.stringify({
+      sheets:    _gsSheets,
+      email:     _gsUserEmail,
+      name:      _gsUserName,
+      connected: _gsConnected
+    }));
+  } catch(e) {}
+}
+
+function _gsShowMsg(text, type) {
+  const el = document.getElementById('gsSyncMsg');
+  if (!el) return;
+  el.textContent = text;
+  el.style.color = type === 'error' ? 'var(--red)' : type === 'warn' ? 'var(--gold)' : type === 'clear' ? '' : 'var(--accent2)';
+}
+
+// ── تسجيل الدخول ─────────────────────────────────
+function gsConnect() {
+  if (!_GS_CLIENT_ID) {
+    _gsShowMsg('⚠️ يرجى إضافة Google Client ID في إعدادات اللوحة', 'warn');
+    document.getElementById('gsClientIdBox').style.display = 'block';
+    return;
+  }
+  if (!window._gsTokenClient) _gsInitGSI();
+  if (!window._gsTokenClient) {
+    _gsShowMsg('⏳ جارٍ تحميل مكتبة Google...', 'info');
+    return;
+  }
+  _gsTokenClient.requestAccessToken({ prompt: 'consent' });
+}
+
+function gsSaveClientId() {
+  const el = document.getElementById('gsClientIdInput');
+  if (!el || !el.value.trim()) return;
+  // حفظ الـ Client ID في المتغير (مؤقت — يختفي عند إعادة التحميل)
+  window._GS_CLIENT_ID_OVERRIDE = el.value.trim();
+  Object.defineProperty(window, '_GS_CLIENT_ID', { get: () => window._GS_CLIENT_ID_OVERRIDE });
+  document.getElementById('gsClientIdBox').style.display = 'none';
+  _gsShowMsg('✅ تم حفظ Client ID — اضغط "تسجيل الدخول" مجدداً', 'info');
+}
+
+function gsDisconnect() {
+  if (_gsToken && window.google?.accounts?.oauth2) {
+    google.accounts.oauth2.revoke(_gsToken);
+  }
+  _gsToken = null; _gsConnected = false;
+  _gsUserEmail = ''; _gsUserName = '';
+  try { localStorage.removeItem(_GS_LS_KEY); } catch(e) {}
+  _gsRenderDisconnected();
+  _gsShowMsg('', 'clear');
+}
+
+// ── جلب CSV من شيت محدد ──────────────────────────
+async function _gsFetchSheetCSV(key) {
+  const cfg = _gsSheets[key];
+  if (!cfg?.id) return null;
+  // تحديث التوكن إذا انتهت صلاحيته
+  if (Date.now() > _gsTokenExpiry) {
+    _gsToken = null;
+    _gsShowMsg('⚠️ انتهت جلسة الربط — يرجى تسجيل الدخول مجدداً', 'warn');
+    _gsRenderDisconnected();
+    return null;
+  }
+  const gid = cfg.gid !== null ? cfg.gid : 0;
+  const url = `https://docs.google.com/spreadsheets/d/${cfg.id}/export?format=csv&gid=${gid}`;
+  const r = await fetch(url, { headers: { Authorization: 'Bearer ' + _gsToken } });
+  if (!r.ok) throw new Error(`${key}: ${r.status} ${r.statusText}`);
+  return await r.text();
+}
+
+// ── جلب وتحديث البيانات ──────────────────────────
+async function gsFetchAndUpdate() {
+  const btn = document.getElementById('gsFetchBtn');
+  const keys = ['مبيعات','تحصيل','مديونية','تصنيف'];
+  const configured = keys.filter(k => _gsSheets[k]?.id && _gsSheets[k]?.gid !== null);
+
+  if (!configured.length) {
+    _gsShowMsg('⚠️ اختر شيتاً وورقة لملف واحد على الأقل', 'warn');
+    return;
+  }
+  if (!_gsToken) {
+    _gsShowMsg('⚠️ يرجى تسجيل الدخول أولاً', 'warn');
+    return;
   }
 
-  if (headerRow === -1) {
-    msgEl.textContent = '⚠️ لم يُعثر على أعمدة "المندوب" و"تصنيف" في الملف';
-    return 0;
-  }
+  if (btn) btn.disabled = true;
+  _gsShowMsg('⏳ جارٍ جلب البيانات...', 'info');
 
-  let updated = 0, added = 0;
-  const dataRows = rows.slice(headerRow + 1);
-
-  for (const row of dataRows) {
-    const name = String(row[iName] || '').trim();
-    const cat  = normalizeCat(String(row[iCat] || ''));
-    if (!name || name === 'فارغ') continue;
-
-    const oldCat = repClassification[name];
-    repClassification[name] = cat;
-
-    if (oldCat === undefined) {
-      // مندوب جديد — أضفه لـ repsData بقيم صفرية ليظهر في اللوحة
-      const exists = repsData.some(r => r.name === name);
-      if (!exists) {
-        repsData.push({
-          name, cat, invoices: 0, customers: 0, sales: 0, items: 0, qty: 0,
-          returns: 0, retQty: 0, col: 0, colOps: 0, colBank: 0, colCash: 0,
-          netSales: 0, roi: 0, retPct: 0, avgInvoice: 0, gap: 0,
-          debtTotal: 0, debtPaid: 0, debtNet: 0, debtPct: 0
-        });
-        added++;
-      } else {
-        // موجود في repsData لكن لم يكن مصنّفاً
-        const rep = repsData.find(r => r.name === name);
-        if (rep) rep.cat = cat;
-        updated++;
+  const results = {};
+  for (const key of configured) {
+    try {
+      _gsShowMsg('⏳ جلب: ' + key + '...', 'info');
+      const st = document.getElementById('gsStatus_' + key);
+      if (st) st.textContent = '⏳';
+      const text = await _gsFetchSheetCSV(key);
+      if (text) {
+        results[key] = text;
+        if (st) st.textContent = '✅';
       }
-    } else if (oldCat !== cat) {
-      // تحديث تصنيف موجود
-      const rep = repsData.find(r => r.name === name);
-      if (rep) rep.cat = cat;
-      updated++;
+    } catch(e) {
+      const st = document.getElementById('gsStatus_' + key);
+      if (st) st.textContent = '❌';
+      _gsShowMsg('❌ خطأ في جلب ' + key + ': ' + e.message, 'error');
+      if (btn) btn.disabled = false;
+      return;
     }
   }
 
-  console.log(`✅ تصنيف المناديب: ${updated} محدَّث، ${added} مضاف جديد`);
-  return { updated, added };
+  if (!Object.keys(results).length) {
+    _gsShowMsg('⚠️ لم يتم جلب أي بيانات', 'warn');
+    if (btn) btn.disabled = false;
+    return;
+  }
+
+  // تطبيق البيانات
+  _gsShowMsg('⏳ تطبيق البيانات على اللوحة...', 'info');
+  try {
+    for (const [key, text] of Object.entries(results)) {
+      const blob = new Blob(['﻿' + text], { type: 'text/csv' });
+      csvFiles[key] = new File([blob], key + '.csv', { type: 'text/csv' });
+    }
+    for (const key of keys) {
+      if (!(key in results)) csvFiles[key] = null;
+    }
+    await applyCsvData(true);
+    const now = new Date().toLocaleTimeString('ar');
+    _gsShowMsg('✅ تم تحديث اللوحة — ' + now, 'info');
+    _gsSaveConfig();
+    // تحديث وقت آخر مزامنة في الهيدر
+    const hdr = document.getElementById('gsHeaderLastSync');
+    if (hdr) hdr.textContent = _gsUserEmail + ' | آخر تحديث: ' + now;
+  } catch(e) {
+    _gsShowMsg('❌ خطأ في المعالجة: ' + e.message, 'error');
+  }
+  if (btn) btn.disabled = false;
 }
+
+// ── الطريقة 1: نشر CSV عام ───────────────────────
+const _gsPubUrls  = { مبيعات: '', تحصيل: '', مديونية: '', تصنيف: '' };
+const _gsPubLS    = 'dashboard_gs_pub_v1';
+
+// تحميل الروابط المحفوظة
+(function _gsPubLoad() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(_gsPubLS) || '{}');
+    for (const [k,v] of Object.entries(saved)) {
+      if (_gsPubUrls.hasOwnProperty(k) && v) _gsPubUrls[k] = v;
+    }
+  } catch(e) {}
+})();
+
+function gsPubUrlChanged(key) {
+  const el = document.getElementById('gsPubUrl_' + key);
+  const st = document.getElementById('gsPubStatus_' + key);
+  if (!el || !st) return;
+  const val = el.value.trim();
+  _gsPubUrls[key] = val;
+  st.textContent = val
+    ? (val.includes('docs.google.com') ? '✅' : '⚠️')
+    : '⬜';
+  // حفظ تلقائي
+  try { localStorage.setItem(_gsPubLS, JSON.stringify(_gsPubUrls)); } catch(e) {}
+}
+
+async function gsPubFetchAndUpdate() {
+  const btn = document.getElementById('gsPubFetchBtn');
+  const msg = document.getElementById('gsPubMsg');
+  const keys = ['مبيعات','تحصيل','مديونية','تصنيف'];
+  const active = keys.filter(k => _gsPubUrls[k]?.trim());
+
+  if (!active.length) {
+    if (msg) { msg.textContent = '⚠️ أدخل رابط نشر واحد على الأقل'; msg.style.color = 'var(--gold)'; }
+    return;
+  }
+  if (btn) btn.disabled = true;
+  if (msg) { msg.textContent = '⏳ جارٍ جلب البيانات...'; msg.style.color = 'var(--accent2)'; }
+
+  const results = {};
+  for (const key of active) {
+    const st = document.getElementById('gsPubStatus_' + key);
+    if (st) st.textContent = '⏳';
+    try {
+      if (msg) msg.textContent = '⏳ جلب: ' + key + '...';
+      // تحويل رابط /edit أو /view إلى رابط pub
+      let url = _gsPubUrls[key].trim();
+      if (url.includes('/edit') || url.includes('/view')) {
+        url = url.replace(/\/(edit|view).*/, '/pub?output=csv');
+      }
+      url += (url.includes('?') ? '&' : '?') + '_t=' + Date.now();
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(r.status + ' ' + r.statusText);
+      const text = await r.text();
+      if (!text.trim()) throw new Error('الملف فارغ');
+      results[key] = text;
+      if (st) st.textContent = '✅';
+    } catch(e) {
+      if (st) st.textContent = '❌';
+      if (msg) { msg.textContent = '❌ خطأ في جلب ' + key + ': ' + e.message; msg.style.color = 'var(--red)'; }
+      if (btn) btn.disabled = false;
+      return;
+    }
+  }
+
+  if (msg) msg.textContent = '⏳ تطبيق البيانات على اللوحة...';
+  try {
+    for (const [key, text] of Object.entries(results)) {
+      const blob = new Blob([text], { type: 'text/csv' });
+      csvFiles[key] = new File([blob], key + '.csv', { type: 'text/csv' });
+    }
+    for (const key of keys) if (!(key in results)) csvFiles[key] = null;
+    await applyCsvData(true);
+    const now = new Date().toLocaleTimeString('ar');
+    if (msg) { msg.textContent = '✅ تم تحديث اللوحة — ' + now; msg.style.color = 'var(--accent2)'; }
+    // تحديث الهيدر
+    const hdr = document.getElementById('gsHeaderLive');
+    const hdrTxt = document.getElementById('gsHeaderLastSync');
+    if (hdr) hdr.style.display = 'flex';
+    if (hdrTxt) hdrTxt.textContent = 'آخر تحديث: ' + now;
+  } catch(e) {
+    if (msg) { msg.textContent = '❌ خطأ في المعالجة: ' + e.message; msg.style.color = 'var(--red)'; }
+  }
+  if (btn) btn.disabled = false;
+}
+
+// تعبئة حقول الروابط عند فتح التبويب
+function _gsPubPopulate() {
+  for (const key of ['مبيعات','تحصيل','مديونية','تصنيف']) {
+    const el = document.getElementById('gsPubUrl_' + key);
+    if (el && _gsPubUrls[key]) { el.value = _gsPubUrls[key]; gsPubUrlChanged(key); }
+  }
+}
+
+// ── تهيئة عند فتح تبويب GS ──────────────────────
+function gsPopulateFields() {
+  _gsPubPopulate(); // تعبئة حقول الطريقة الأولى
+  if (_gsConnected && _gsToken && Date.now() < _gsTokenExpiry) {
+    _gsRenderConnected();
+    _gsRenderSheetSelectors();
+  } else if (_gsConnected) {
+    // محاولة استعادة الاتصال تلقائياً
+    _gsRenderDisconnected();
+  } else {
+    _gsRenderDisconnected();
+  }
+  // استعادة الإعدادات المحفوظة في العناصر
+  setTimeout(() => {
+    const keys = ['مبيعات','تحصيل','مديونية','تصنيف'];
+    for (const key of keys) _gsUpdateRowStatus(key);
+  }, 300);
+}
+
+function switchDataTab(tab, btn) {
+  document.querySelectorAll('.gs-tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.gs-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+  if (tab === 'gs') gsPopulateFields();
+}
+
+// تحميل GSI عند جاهزية الصفحة
+document.addEventListener('DOMContentLoaded', () => {
+  const s = document.createElement('script');
+  s.src = 'https://accounts.google.com/gsi/client';
+  s.async = true; s.defer = true;
+  s.onload = _gsInitGSI;
+  document.head.appendChild(s);
+});
+
+// ══════════════════════════════════════════════════
 
 function openCsvModal() {
   document.getElementById('csvModalOverlay').classList.add('open');
+  // تعبئة حقول GS إن كانت الروابط محفوظة
+  setTimeout(gsPopulateFields, 50);
 }
 function closeCsvModal() {
   document.getElementById('csvModalOverlay').classList.remove('open');
   document.getElementById('csvProgressMsg').textContent = '';
-  xlsxClassificationFile = null;
-  const s = document.getElementById('csvStatus_تصنيف');
-  if (s) s.textContent = '⬜';
 }
 
 function parseCSVContent(text) {
@@ -7059,32 +7880,81 @@ function readFileAsText(file) {
   });
 }
 
+// قراءة ملف تصنيف المناديب (يدعم xlsx و csv)
+// يُعيد مصفوفة من الصفوف [[col0,col1,...], ...]
+function parseTasneefFile(file) {
+  return new Promise((resolve, reject) => {
+    const isXlsx = /\.xlsx?$/i.test(file.name);
+    const reader = new FileReader();
+    if (isXlsx) {
+      reader.onload = e => {
+        try {
+          const wb = XLSX.read(e.target.result, { type: 'array' });
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          // تحويل الشيت إلى مصفوفة مع الخلايا الفارغة
+          const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+          resolve(raw);
+        } catch(err) { reject(err); }
+      };
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(file);
+    } else {
+      // CSV
+      reader.onload = e => {
+        try { resolve(parseCSVContent(e.target.result)); }
+        catch(err) { reject(err); }
+      };
+      reader.onerror = reject;
+      reader.readAsText(file, 'windows-1256');
+    }
+  });
+}
+
+// تطبيع أسماء الفئات (يُصلح الأخطاء الشائعة)
+function normalizeCat(c) {
+  const s = (c||'').toString().trim();
+  const map = {
+    'اسواق':'أسواق','الاسواق':'أسواق','أسواق':'أسواق',
+    'ادارية':'إدارية','الادارية':'إدارية','إدارية':'إدارية',
+    'تجزئة':'تجزئة','الجملة':'جملة','جملة':'جملة',
+    'مقاهي ومطاعم':'مقاهي ومطاعم','مقاهي':'مقاهي ومطاعم',
+    'مطاعم':'مقاهي ومطاعم','مستقل':'مستقل',
+  };
+  return map[s] || s;
+}
+
 function cleanNum(s) {
   if (!s) return 0;
   return parseFloat(String(s).replace(/,/g, '').replace(/ لنا| علينا/g, '').trim()) || 0;
 }
 
-const csvFiles = { 'مبيعات': null, 'تحصيل': null, 'مديونية': null };
+const csvFiles = { 'مبيعات': null, 'تحصيل': null, 'مديونية': null, 'تصنيف': null };
 
 function setCsvFile(type, input) {
   csvFiles[type] = input.files[0] || null;
   const statusEl = document.getElementById('csvStatus_' + type);
   if (statusEl) statusEl.textContent = csvFiles[type] ? '✅' : '⬜';
+  // show hint when classification file selected
+  if (type === 'تصنيف') {
+    const info = document.getElementById('csvClassifInfo');
+    if (info) info.style.display = csvFiles[type] ? 'block' : 'none';
+  }
 }
 
-async function applyCsvData() {
+async function applyCsvData(fromGS) {
   const hasMabee3at  = !!csvFiles['مبيعات'];
   const hasTahseel   = !!csvFiles['تحصيل'];
   const hasMadiooniya= !!csvFiles['مديونية'];
+  const hasTasneef   = !!csvFiles['تصنيف'];
   
-  if (!hasMabee3at && !hasTahseel && !hasMadiooniya) {
+  if (!hasMabee3at && !hasTahseel && !hasMadiooniya && !hasTasneef) {
     document.getElementById('csvProgressMsg').textContent = '⚠️ يرجى رفع ملف واحد على الأقل';
     return;
   }
   
   const btn = document.getElementById('csvApplyBtn');
-  btn.disabled = true;
-  const msg = document.getElementById('csvProgressMsg');
+  if (btn) btn.disabled = true;
+  const msg = document.getElementById(fromGS ? 'gsSyncMsg' : 'csvProgressMsg');
   
   try {
     msg.textContent = '⏳ جارٍ قراءة الملفات...';
@@ -7114,45 +7984,85 @@ async function applyCsvData() {
       debtHeaders = parsed[0];
       debtRows = parsed.slice(1).filter(r => r.length > 2);
     }
-    
-    // ─── تحصيل: يُعالَج دائماً بغضّ النظر عن وجود مبيعات ───
-    const repColMap  = {};
-    const custColMap = {};
-    if (hasTahseel && colRows.length > 0) {
-      console.log('📋 أعمدة ملف التحصيل:', colHeaders);
-      const iColRep    = colHeaders.findIndex(h => h.trim() === 'المندوب');
-      const iColCred   = colHeaders.findIndex(h => ['دائن','الدائن','مبلغ التحصيل','المبلغ'].includes(h.trim()));
-      const iColAcc    = colHeaders.findIndex(h => ['الحساب المقابل','الحساب','اسم الحساب المقابل'].includes(h.trim()));
-      const iColCustNm = colHeaders.findIndex(h => ['اسم الحساب','اسم العميل','العميل','الزبون','اسم الزبون'].includes(h.trim()));
-      const iColBayan  = colHeaders.findIndex(h => ['البيان','الوصف','البيان/الوصف'].includes(h.trim()));
-      console.log('🔍 مؤشرات الأعمدة — المندوب:', iColRep, '| دائن:', iColCred, '| اسم الحساب:', iColCustNm);
-      if (iColCred === -1) {
-        console.warn('⚠️ لم يُعثر على عمود المبلغ في ملف التحصيل. الأعمدة المتاحة:', colHeaders.join(', '));
-      }
-      for (const row of colRows) {
-        const rep    = iColRep    >= 0 ? (row[iColRep]    || '').trim() : '';
-        const cred   = iColCred   >= 0 ? cleanNum(row[iColCred]) : 0;
-        const acc    = iColAcc    >= 0 ? (row[iColAcc]    || '').trim() : '';
-        const custNm = iColCustNm >= 0 ? (row[iColCustNm] || '').trim() : '';
-        const bayan  = iColBayan  >= 0 ? (row[iColBayan]  || '').trim() : '';
-        if (!rep || cred <= 0) continue;
-        if (!repColMap[rep]) repColMap[rep] = { total: 0, ops: 0, bank: 0, cash: 0 };
-        repColMap[rep].total += cred;
-        repColMap[rep].ops   += 1;
-        const isBank = acc.includes('مصرف') || acc.includes('بنك') ||
-                       bayan.includes('صك') || bayan.includes('شيك') || bayan.includes('حوالة') ||
-                       bayan.includes('ايداع') || bayan.includes('إيداع');
-        if (isBank) repColMap[rep].bank += cred;
-        else        repColMap[rep].cash += cred;
-        if (custNm) {
-          if (!custColMap[custNm]) custColMap[custNm] = { total: 0, ops: 0 };
-          custColMap[custNm].total += cred;
-          custColMap[custNm].ops   += 1;
-        }
-      }
-      console.log('✅ بيانات التحصيل:', Object.keys(repColMap).length, 'مندوب،', Object.keys(custColMap).length, 'عميل');
-    }
 
+    // ══ تحليل ملف تصنيف المناديب — يُقرأ مبكراً ليُطبَّق على بيانات المبيعات لاحقاً ══
+    let newRepsAdded = 0, repsUpdated = 0;
+    // tasneefMap: name → { cat, phone, target, notes, area, code }
+    const tasneefMap = {};
+    if (hasTasneef) {
+      msg.textContent = '⏳ تحليل ملف تصنيف المناديب...';
+      try {
+        // يدعم xlsx وcsv — parseTasneefFile تكتشف النوع تلقائياً
+        const rawRows = await parseTasneefFile(csvFiles['تصنيف']);
+
+        // البحث عن صف الرؤوس (الصف الذي يحتوي على "المندوب")
+        let headerRowIdx = -1;
+        let headers = [];
+        for (let i = 0; i < Math.min(rawRows.length, 10); i++) {
+          const rowStr = rawRows[i].map(c => String(c||'').trim());
+          if (rowStr.some(c => c === 'المندوب' || c.includes('مندوب'))) {
+            headerRowIdx = i;
+            headers = rowStr;
+            break;
+          }
+        }
+        // إذا لم يجد رؤوس، جرّب الصف الأول
+        if (headerRowIdx < 0 && rawRows.length > 0) {
+          headerRowIdx = 0;
+          headers = rawRows[0].map(c => String(c||'').trim());
+        }
+
+        const rows = rawRows.slice(headerRowIdx + 1).filter(r =>
+          r.some(c => c !== null && c !== undefined && String(c).trim() !== '')
+        );
+
+        // اكتشاف الأعمدة تلقائياً
+        const iName   = headers.findIndex(h => h.includes('مندوب') || h === 'الاسم' || h.includes('اسم'));
+        const iCat    = headers.findIndex(h => h.includes('فئة') || h.includes('تصنيف') || h.includes('نوع') || h.includes('قسم'));
+        const iPhoneT = headers.findIndex(h => h.includes('هاتف') || h.includes('جوال') || h.includes('موبايل') || (h.includes('رقم') && !h.includes('مندوب')));
+        const iTarget = headers.findIndex(h => h.includes('هدف') || h === 'target');
+        const iNotes  = headers.findIndex(h => h.includes('ملاحظ') || h === 'notes' || h.includes('تعليق'));
+        const iArea   = headers.findIndex(h => h.includes('منطقة') || h === 'zone' || h === 'area');
+        const iCode   = headers.findIndex(h => h.includes('كود') || h === 'code' || h === 'رمز');
+
+        const validCats = new Set(['تجزئة','جملة','أسواق','مقاهي ومطاعم','مستقل','إدارية']);
+
+        if (iName >= 0) {
+          for (const row of rows) {
+            const name = String(row[iName] || '').trim();
+            if (!name || name === 'فارغ' || name === 'nan') continue;
+
+            const rawCat = iCat >= 0 ? String(row[iCat] || '').trim() : '';
+            // تطبيع اسم الفئة (يُصحح الكتابة الخاطئة تلقائياً)
+            let cat = normalizeCat(rawCat);
+            // إذا كانت الفئة تساوي الاسم (خطأ بيانات)، استخدم التصنيف المعروف أو مستقل
+            if (cat === name) cat = repClassification[name] || 'مستقل';
+
+            // بناء كائن البيانات الإضافية
+            const extra = {};
+            if (iPhoneT >= 0 && row[iPhoneT]) extra.phone  = String(row[iPhoneT]).trim();
+            if (iTarget >= 0 && row[iTarget] && cleanNum(row[iTarget]) > 0) extra.target = cleanNum(row[iTarget]);
+            if (iNotes  >= 0 && row[iNotes])  extra.notes  = String(row[iNotes]).trim();
+            if (iArea   >= 0 && row[iArea])   extra.area   = String(row[iArea]).trim();
+            if (iCode   >= 0 && row[iCode])   extra.code   = String(row[iCode]).trim();
+
+            const finalCat = validCats.has(cat) ? cat : (repClassification[name] || 'تجزئة');
+            tasneefMap[name] = { cat: finalCat, ...extra };
+
+            // تحديث repClassification فوراً
+            if (validCats.has(cat)) repClassification[name] = cat;
+          }
+          msg.textContent = `✅ تم قراءة ${Object.keys(tasneefMap).length} مندوب من ملف التصنيف`;
+          await new Promise(r => setTimeout(r, 500));
+        } else {
+          msg.textContent = '⚠️ لم يُعثر على عمود "المندوب" في ملف التصنيف';
+          await new Promise(r => setTimeout(r, 2000));
+        }
+      } catch(xlsxErr) {
+        msg.textContent = '❌ خطأ في قراءة ملف التصنيف: ' + xlsxErr.message;
+        await new Promise(r => setTimeout(r, 2500));
+      }
+    }
     if (hasMabee3at && salesRows.length > 0) {
       msg.textContent = '⏳ حساب الإجماليات...';
 
@@ -7255,6 +8165,40 @@ async function applyCsvData() {
         }
       }
       
+      // تحصيل
+      const repColMap  = {};
+      const custColMap = {};
+      if (hasTahseel && colRows.length > 0) {
+        const iColRep    = colHeaders.indexOf('المندوب');
+        const iColCred   = colHeaders.indexOf('دائن');
+        const iColAcc    = colHeaders.indexOf('الحساب المقابل');
+        const iColCustNm = colHeaders.indexOf('اسم الحساب');
+        const iColBayan  = colHeaders.indexOf('البيان');
+        for (const row of colRows) {
+          const rep    = (row[iColRep]    || '').trim();
+          const cred   = cleanNum(row[iColCred]);
+          const acc    = (row[iColAcc]    || '').trim();
+          const custNm = (row[iColCustNm] || '').trim();
+          const bayan  = (row[iColBayan]  || '').trim();
+          if (!rep || cred <= 0) continue;
+          if (!repColMap[rep]) repColMap[rep] = { total: 0, ops: 0, bank: 0, cash: 0 };
+          repColMap[rep].total += cred;
+          repColMap[rep].ops   += 1;
+          // Bank detection: مصرف/بنك in account name, or صك/شيك/حوالة in بيان
+          const isBank = acc.includes('مصرف') || acc.includes('بنك') ||
+                         bayan.includes('صك') || bayan.includes('شيك') || bayan.includes('حوالة') ||
+                         bayan.includes('ايداع') || bayan.includes('إيداع');
+          if (isBank) repColMap[rep].bank += cred;
+          else        repColMap[rep].cash += cred;
+          // Track customer collections
+          if (custNm) {
+            if (!custColMap[custNm]) custColMap[custNm] = { total: 0, ops: 0 };
+            custColMap[custNm].total += cred;
+            custColMap[custNm].ops   += 1;
+          }
+        }
+      }
+      
       // مديونية
       const repDebtMap = {};
       if (hasMadiooniya && debtRows.length > 0) {
@@ -7273,6 +8217,18 @@ async function applyCsvData() {
       }
       
       msg.textContent = '⏳ بناء بيانات المناديب...';
+
+      // إضافة المناديب الجدد من tasneefMap الذين لا يوجدون في repMap
+      if (hasTasneef) {
+        for (const [tName, tData] of Object.entries(tasneefMap)) {
+          if (!repMap[tName]) {
+            repMap[tName] = { invoices: new Set(), customers: new Set(), items: new Set(),
+              sales: 0, qty: 0, returns: 0, retQty: 0 };
+            newRepsAdded++;
+          }
+        }
+      }
+
       const newRepsData = Object.entries(repMap).map(([name, d]) => {
         const invoices  = d.invoices.size;
         const customers = d.customers.size;
@@ -7295,9 +8251,19 @@ async function applyCsvData() {
         const debtPaid  = repDebtMap[name] ? repDebtMap[name].paid  : 0;
         const debtNet   = debtTotal - debtPaid;
         const debtPct   = debtTotal > 0 ? (debtPaid / debtTotal * 100) : 0;
+        // دمج البيانات الإضافية من ملف التصنيف (هاتف، هدف، منطقة، ملاحظات)
+        const tInfo = tasneefMap[name] || {};
+        if (hasTasneef && repsData.find(r => r.name === name)) repsUpdated++;
         return { name, cat, invoices, customers, sales, items, qty, returns, retQty, col, colOps, colBank, colCash,
           netSales, roi: +roi.toFixed(2), retPct: +retPct.toFixed(2), avgInvoice: +avgInvoice.toFixed(2),
-          gap, debtTotal, debtPaid, debtNet, debtPct: +debtPct.toFixed(2) };
+          gap, debtTotal, debtPaid, debtNet, debtPct: +debtPct.toFixed(2),
+          // حقول إضافية من ملف التصنيف
+          phone:  tInfo.phone  || '',
+          target: tInfo.target || 0,
+          notes:  tInfo.notes  || '',
+          area:   tInfo.area   || '',
+          code:   tInfo.code   || ''
+        };
       }).sort((a, b) => b.netSales - a.netSales);
       
       msg.textContent = '⏳ بناء بيانات العملاء...';
@@ -7341,6 +8307,75 @@ async function applyCsvData() {
       
       const newAllCusts = [...allCustSet].sort((a,b) => a.localeCompare(b, 'ar'));
       
+      // ── تحديث بيانات المديونية من ملف مديونية.csv ──────────────────────
+      if (hasMadiooniya && debtRows.length > 0) {
+        const iDRepN   = debtHeaders.indexOf('المندوب');
+        const iDCustN  = debtHeaders.findIndex(h => h.includes('العميل') || h.includes('الزبون') || h.includes('اسم'));
+        const iDCode   = debtHeaders.findIndex(h => h === 'كود' || h.includes('رقم الحساب') || h.includes('كود'));
+        const iDDebit  = debtHeaders.findIndex(h => h.includes('مدين') || h === 'مجموع مدين');
+        const iDCredit = debtHeaders.findIndex(h => h.includes('دائن') || h === 'مجموع دائن');
+        const iDNet    = debtHeaders.findIndex(h => h.includes('صافي') || h.includes('رصيد') || h === 'صافي');
+
+        // نبني debtRepsData جديداً
+        const newDebtRepMap = {};
+        const newDebtDetailArr = [];
+
+        for (const row of debtRows) {
+          const repN  = iDRepN  >= 0 ? (row[iDRepN]  || '').trim() : '';
+          const custN = iDCustN >= 0 ? (row[iDCustN] || '').trim() : '';
+          const code  = iDCode  >= 0 ? (row[iDCode]  || '').trim() : '';
+          const deb   = iDDebit  >= 0 ? cleanNum(row[iDDebit])  : 0;
+          const cred  = iDCredit >= 0 ? cleanNum(row[iDCredit]) : 0;
+          const net   = iDNet    >= 0 ? cleanNum(row[iDNet])    : (deb - cred);
+
+          if (!repN && !custN) continue;
+
+          // تجميع بيانات المناديب
+          if (repN) {
+            if (!newDebtRepMap[repN]) newDebtRepMap[repN] = { debit: 0, credit: 0, customers: new Set() };
+            newDebtRepMap[repN].debit  += deb;
+            newDebtRepMap[repN].credit += cred;
+            if (custN) newDebtRepMap[repN].customers.add(custN);
+          }
+
+          // تفاصيل العملاء
+          if (custN && (deb > 0 || cred > 0)) {
+            newDebtDetailArr.push({
+              code:   code || (custN.substring(0, 8)),
+              name:   custN,
+              rep:    repN || 'غير محدد',
+              debit:  deb,
+              credit: cred,
+              net:    net !== 0 ? net : (deb - cred)
+            });
+          }
+        }
+
+        // بناء مصفوفة debtRepsData الجديدة
+        const newDebtRepsArr = Object.entries(newDebtRepMap).map(([name, d]) => {
+          const net = d.debit - d.credit;
+          const pct = d.debit > 0 ? +(d.credit / d.debit * 100).toFixed(2) : 0;
+          return { name, debit: d.debit, credit: d.credit, net, pct, customers: d.customers.size };
+        }).sort((a, b) => b.net - a.net);
+
+        // إضافة الفئة من repsData للتوافق
+        newDebtRepsArr.forEach(r => {
+          const rep = newRepsData.find(x => x.name === r.name);
+          r.cat = rep ? rep.cat : (repClassification[r.name] || 'غير محدد');
+          r.repCat = r.cat;
+        });
+
+        if (newDebtRepsArr.length > 0) {
+          debtRepsData.length = 0;
+          debtRepsData.push(...newDebtRepsArr);
+        }
+        if (newDebtDetailArr.length > 0) {
+          debtDetailData.length = 0;
+          debtDetailData.push(...newDebtDetailArr.sort((a, b) => b.net - a.net));
+          debtDetailFiltered = debtDetailData.slice();
+        }
+      }
+
       // Update global arrays
       repsData.length = 0;     repsData.push(...newRepsData);
       custData.length = 0;     custData.push(...newCustData);
@@ -7360,75 +8395,180 @@ async function applyCsvData() {
       // Update rep count badge
       const badge = document.getElementById('repCountBadge');
       if (badge) badge.textContent = newRepsData.length + ' مندوباً';
-    } else if (!hasMabee3at && hasTahseel) {
-      // ─── تحصيل فقط بدون مبيعات: نحدّث repsData الموجودة بقيم التحصيل ───
-      msg.textContent = '⏳ تحديث بيانات التحصيل على المناديب الموجودين...';
-      for (const rep of repsData) {
-        const c = repColMap[rep.name];
-        if (c) {
-          rep.col     = c.total;
-          rep.colOps  = c.ops;
-          rep.colBank = c.bank;
-          rep.colCash = c.cash;
-          const ns = rep.netSales || (rep.sales - rep.returns);
-          rep.roi = ns > 0 ? +(c.total / ns * 100).toFixed(2) : 0;
-          rep.gap = ns - c.total;
+
+    // ── إذا رُفع ملف التصنيف فقط (بدون مبيعات) — تحديث الفئات على الداتا الحالية ──
+    } else if (hasTasneef && Object.keys(tasneefMap).length > 0) {
+      msg.textContent = '⏳ تحديث تصنيفات المناديب على البيانات الحالية...';
+      for (const [name, tData] of Object.entries(tasneefMap)) {
+        const existing = repsData.find(r => r.name === name);
+        if (existing) {
+          if (tData.cat) existing.cat = tData.cat;
+          if (tData.phone  !== undefined) existing.phone  = tData.phone;
+          if (tData.target !== undefined) existing.target = tData.target;
+          if (tData.notes  !== undefined) existing.notes  = tData.notes;
+          if (tData.area   !== undefined) existing.area   = tData.area;
+          if (tData.code   !== undefined) existing.code   = tData.code;
+          repsUpdated++;
+        } else {
+          // مندوب جديد من ملف التصنيف — يُضاف بقيم صفرية
+          repsData.push({
+            name, cat: tData.cat || 'تجزئة',
+            phone: tData.phone || '', target: tData.target || 0,
+            notes: tData.notes || '', area: tData.area || '', code: tData.code || '',
+            invoices:0, customers:0, sales:0, items:0, qty:0,
+            returns:0, retQty:0, col:0, colOps:0, colBank:0, colCash:0,
+            netSales:0, roi:0, retPct:0, avgInvoice:0,
+            gap:0, debtTotal:0, debtPaid:0, debtNet:0, debtPct:0
+          });
+          newRepsAdded++;
         }
       }
-      for (const cust of custData) {
-        const c = custColMap[cust.n];
-        if (c) {
-          cust.c    = c.total;
-          cust.cops = c.ops;
-          const ns  = cust.ns || 0;
-          cust.cp   = ns > 0 ? +(c.total / ns * 100).toFixed(2) : 0;
-          cust.g    = ns - c.total;
-        }
-      }
+      const badge2 = document.getElementById('repCountBadge');
+      if (badge2) badge2.textContent = repsData.length + ' مندوباً';
     }
     
     msg.textContent = '⏳ إعادة رسم اللوحة...';
 
-    // 0. Apply classification xlsx if provided
-    if (xlsxClassificationFile) {
-      const res = await applyClassificationXlsx(msg);
-      if (res && (res.updated > 0 || res.added > 0)) {
-        msg.textContent = `⏳ تحديث التصنيفات: ${res.updated} تعديل، ${res.added} مندوب جديد...`;
+    // ═══════════════════════════════════════════════════════════════
+    //  تسلسل التحديث الشامل — يُغطي كل أقسام ولوحة وجداول ورسوم
+    // ═══════════════════════════════════════════════════════════════
+
+    // ── 1. KPIs الرئيسية + الجدول الشهري + اللوحات الثابتة ──────────
+    try { updateKPIs(); } catch(e) { console.warn('updateKPIs:', e); }
+
+    // ── 2. تحديث شريط العنوان (الفترة الزمنية) ───────────────────────
+    try {
+      if (window._monthlyStats?.labels?.length) {
+        const hdr = document.getElementById('header-period');
+        if (hdr) {
+          const lbls = window._monthlyStats.labels;
+          hdr.innerHTML = 'الفترة: ' + lbls[0] + ' — ' + lbls[lbls.length-1]
+                        + ' &nbsp;|&nbsp; إعداد المحاسب أحمد العكاري';
+        }
       }
-    }
+    } catch(e) {}
 
-    // 1. Update KPI numbers
-    updateKPIs();
+    // ── 3. إعادة بناء جميع الرسوم البيانية (تدمر القديمة أولاً) ────────
+    try { rebuildCharts(); } catch(e) { console.warn('rebuildCharts:', e); }
 
-    // 2. Rebuild all charts (destroys old ones first)
-    rebuildCharts();
+    // ── 4. قسم المناديب — جدول + KPIs + مخططات ─────────────────────
+    try {
+      if (typeof renderRepsTable === 'function') {
+        renderRepsTable(); // يستدعي updateRepsTabFiltered داخلياً
+      }
+    } catch(e) { console.warn('renderRepsTable:', e); }
 
-    // 3. Re-render tables
-    try { if (typeof renderRepsTable  === 'function') renderRepsTable();  } catch(e) {}
-    try { if (typeof renderRepCmp     === 'function') renderRepCmp();     } catch(e) {}
-    try { if (typeof renderItems      === 'function') renderItems();      } catch(e) {}
-    try { if (typeof initRepCmpPanels === 'function') initRepCmpPanels(); } catch(e) {}
+    // ── 5. قسم مقارنة المناديب — جدول + KPIs + مخططات ──────────────
+    try {
+      if (typeof renderRepCmp === 'function') {
+        renderRepCmp(); // يستدعي updateRepcmpTabFiltered داخلياً
+      }
+    } catch(e) { console.warn('renderRepCmp:', e); }
 
-    // 4. Re-render debt tab if it was opened
+    // ── 6. لوحات التفاصيل (مقارنة المناديب) ──────────────────────────
+    try {
+      if (typeof initRepCmpPanels === 'function') initRepCmpPanels();
+    } catch(e) { console.warn('initRepCmpPanels:', e); }
+
+    // ── 7. قسم العملاء — جدول + عدادات + فلاتر ───────────────────────
+    try {
+      if (typeof updateChipCounts === 'function') updateChipCounts();
+      if (typeof applyFilters === 'function') {
+        applyFilters(); // يستدعي renderCustTable و updateCustomersTabFiltered داخلياً
+      }
+    } catch(e) { console.warn('applyFilters:', e); }
+
+    // ── 8. قسم الأصناف/المنتجات — جدول + KPIs + مخططات ─────────────
+    try {
+      if (typeof renderItems === 'function') {
+        renderItems(); // يستدعي updateProductsTabFiltered داخلياً
+      }
+    } catch(e) { console.warn('renderItems:', e); }
+
+    // ── 9. لوحات تفاصيل الأصناف ──────────────────────────────────────
+    try {
+      if (typeof initItemsPanels === 'function') initItemsPanels();
+    } catch(e) { console.warn('initItemsPanels:', e); }
+
+    // ── 10. تحديث dropdowns المناديب في كل الأقسام ───────────────────
+    try {
+      const repNames = [...new Set(repsData.map(r => r.name))].sort();
+      // قسم العملاء
+      const custRepSel = document.getElementById('custRepFilter');
+      if (custRepSel) {
+        const curVal = custRepSel.value;
+        custRepSel.innerHTML = '<option value="">👤 كل المناديب</option>';
+        repNames.forEach(n => {
+          const o = document.createElement('option');
+          o.value = n; o.textContent = n;
+          custRepSel.appendChild(o);
+        });
+        custRepSel.value = repNames.includes(curVal) ? curVal : '';
+      }
+      // قسم الأصناف
+      if (typeof resetItemFilters === 'function') resetItemFilters();
+      // قسم المناديب — فلتر تصنيف
+      const repCatSel = document.getElementById('repCatFilter');
+      if (repCatSel) {
+        const curCat = repCatSel.value;
+        const cats = [...new Set(repsData.map(r => r.cat))].filter(Boolean).sort();
+        // أعد بناء القائمة فقط إذا تغيرت الفئات
+        const existingCats = [...repCatSel.options].slice(1).map(o => o.value);
+        if (JSON.stringify(cats) !== JSON.stringify(existingCats)) {
+          repCatSel.innerHTML = '<option value="">🏷 كل الفئات</option>';
+          cats.forEach(c => {
+            const o = document.createElement('option');
+            o.value = c; o.textContent = c;
+            repCatSel.appendChild(o);
+          });
+          repCatSel.value = cats.includes(curCat) ? curCat : '';
+        }
+      }
+    } catch(e) { console.warn('dropdowns:', e); }
+
+    // ── 11. قسم المديونية — جدول المناديب + تفاصيل العملاء + مخططات ──
     setTimeout(() => {
       try {
+        // إعادة تعيين فلتر المديونية
+        debtDetailFiltered = debtDetailData.slice();
+        if (typeof initDebtRepFilter === 'function') initDebtRepFilter();
+        // إعادة رسم الجداول
         if (typeof renderDebtRepsTable === 'function') {
-          renderDebtRepsTable(typeof debtRepsData !== 'undefined' ? debtRepsData : []);
+          renderDebtRepsTable(debtRepsData);
         }
         if (typeof renderDebtDetailTable === 'function') renderDebtDetailTable();
+        // إعادة رسم مخططات المديونية (إجبار إعادة الرسم)
+        _debtChartsInit = false;
         if (typeof initDebtCharts === 'function') initDebtCharts();
-      } catch(e) {}
-    }, 200);
+        // تحديث KPIs قسم المديونية
+        if (typeof updateDebtTabFiltered === 'function') {
+          updateDebtTabFiltered(debtRepsData, debtDetailData);
+        }
+      } catch(e) { console.warn('debt section:', e); }
+    }, 250);
+
+    // ── 12. تحديث ملصق الفترة في شريط التنقل ────────────────────────
+    try {
+      const badge = document.getElementById('repCountBadge');
+      if (badge) badge.textContent = repsData.length + ' مندوباً';
+    } catch(e) {}
     
-    const totalFiles = [hasMabee3at, hasTahseel, hasMadiooniya, !!xlsxClassificationFile].filter(Boolean).length;
-    msg.textContent = '✅ تم تحديث اللوحة بنجاح! (' + totalFiles + ' ملف)';
-    setTimeout(() => closeCsvModal(), 2000);
+    const totalFiles = [hasMabee3at, hasTahseel, hasMadiooniya, hasTasneef].filter(Boolean).length;
+    let successMsg = '✅ تم تحديث اللوحة بنجاح! (' + totalFiles + ' ملف)';
+    if (hasTasneef) {
+      const parts = [];
+      if (newRepsAdded > 0) parts.push('مندوب جديد: ' + newRepsAdded);
+      if (repsUpdated > 0)  parts.push('محدَّث: ' + repsUpdated);
+      if (parts.length)     successMsg += ' — ' + parts.join('، ');
+    }
+    msg.textContent = successMsg;
+    if (!fromGS) setTimeout(() => closeCsvModal(), 2500);
     
   } catch(err) {
-    msg.textContent = '❌ خطأ: ' + err.message;
+    if (msg) msg.textContent = '❌ خطأ: ' + err.message;
     console.error('CSV Loader Error:', err);
   } finally {
-    btn.disabled = false;
+    if (btn) btn.disabled = false;
   }
 }
 
@@ -7437,42 +8577,210 @@ async function applyCsvData() {
 
 <!-- ======= CSV LOADER MODAL ======= -->
 <div class="csv-modal-overlay" id="csvModalOverlay" onclick="if(event.target===this)closeCsvModal()">
-  <div class="csv-modal">
-    <h2>📂 تحديث البيانات من CSV</h2>
-    <p class="subtitle">
-      ارفع ملفات CSV المحدّثة لتحديث اللوحة تلقائياً.<br>
-      يمكن رفع ملف واحد أو أكثر — الملفات الفارغة تُبقي البيانات كما هي.
-    </p>
-    
-    <div class="csv-file-row">
-      <span class="csv-file-label">📦 مبيعات.csv</span>
-      <input class="csv-file-input" type="file" accept=".csv" onchange="setCsvFile('مبيعات', this)">
-      <span class="csv-file-status" id="csvStatus_مبيعات">⬜</span>
+  <div class="csv-modal" style="width:560px;max-height:92vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h2 style="margin:0">📊 تحديث البيانات</h2>
+      <div class="gs-live-badge" id="gsLiveBadge">
+        <span class="gs-live-dot"></span>
+        <span id="gsLiveLabel">مزامنة حية</span>
+      </div>
     </div>
-    
-    <div class="csv-file-row">
-      <span class="csv-file-label">💳 تحصيل.csv</span>
-      <input class="csv-file-input" type="file" accept=".csv" onchange="setCsvFile('تحصيل', this)">
-      <span class="csv-file-status" id="csvStatus_تحصيل">⬜</span>
+
+    <!-- Tab bar -->
+    <div class="gs-tab-bar">
+      <button class="gs-tab-btn active" onclick="switchDataTab('csv', this)">📂 رفع ملفات CSV</button>
+      <button class="gs-tab-btn" onclick="switchDataTab('gs', this)">🔗 Google Sheets مباشر</button>
     </div>
-    
-    <div class="csv-file-row">
-      <span class="csv-file-label">💰 مديونية.csv</span>
-      <input class="csv-file-input" type="file" accept=".csv" onchange="setCsvFile('مديونية', this)">
-      <span class="csv-file-status" id="csvStatus_مديونية">⬜</span>
+
+    <!-- CSV Panel -->
+    <div class="gs-panel active" id="panel-csv">
+      <p class="subtitle" style="margin-bottom:14px">
+        ارفع ملفات CSV المحدّثة — الملفات الفارغة تُبقي البيانات كما هي.
+      </p>
+      <div class="csv-file-row">
+        <span class="csv-file-label">📦 مبيعات</span>
+        <input class="csv-file-input" type="file" accept=".csv" onchange="setCsvFile('مبيعات', this)">
+        <span class="csv-file-status" id="csvStatus_مبيعات">⬜</span>
+      </div>
+      <div class="csv-file-row">
+        <span class="csv-file-label">💳 تحصيل</span>
+        <input class="csv-file-input" type="file" accept=".csv" onchange="setCsvFile('تحصيل', this)">
+        <span class="csv-file-status" id="csvStatus_تحصيل">⬜</span>
+      </div>
+      <div class="csv-file-row">
+        <span class="csv-file-label">💰 مديونية</span>
+        <input class="csv-file-input" type="file" accept=".csv" onchange="setCsvFile('مديونية', this)">
+        <span class="csv-file-status" id="csvStatus_مديونية">⬜</span>
+      </div>
+      <div class="csv-file-row" style="border-top:1px solid var(--border);margin-top:8px;padding-top:10px">
+        <span class="csv-file-label" style="color:var(--gold)">👥 تصنيف</span>
+        <input class="csv-file-input" type="file" accept=".csv,.xlsx,.xls" onchange="setCsvFile('تصنيف', this)">
+        <span class="csv-file-status" id="csvStatus_تصنيف">⬜</span>
+      </div>
+      <div id="csvClassifInfo" style="font-size:11px;color:var(--muted);margin:4px 0 8px 0;padding:6px 10px;background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.15);border-radius:8px;display:none;line-height:1.7">
+        📋 أعمدة التصنيف: <b style="color:var(--text)">المندوب</b> — <b style="color:var(--text)">الفئة</b> — هاتف — هدف — منطقة — ملاحظات (اختيارية)
+      </div>
+      <div class="csv-modal-actions">
+        <button class="csv-cancel-btn" onclick="closeCsvModal()">إلغاء</button>
+        <button class="csv-apply-btn" id="csvApplyBtn" onclick="applyCsvData()">✅ تطبيق التحديث</button>
+      </div>
     </div>
-    
-    <div class="csv-file-row" style="border-top:1px solid rgba(255,215,0,0.2);margin-top:10px;padding-top:10px">
-      <span class="csv-file-label" style="color:var(--gold)">🏷️ تصنيف المناديب.xlsx</span>
-      <input class="csv-file-input" type="file" accept=".xlsx,.xls" onchange="setXlsxFile(this)">
-      <span class="csv-file-status" id="csvStatus_تصنيف">⬜</span>
-    </div>
-    
-    <div class="csv-modal-actions">
-      <button class="csv-cancel-btn" onclick="closeCsvModal()">إلغاء</button>
-      <button class="csv-apply-btn" id="csvApplyBtn" onclick="applyCsvData()">✅ تطبيق التحديث</button>
-    </div>
-    
+
+    <!-- Google Sheets Panel -->
+    <div class="gs-panel" id="panel-gs">
+
+      <!-- ── طريقة 1: نشر CSV عام (بدون تسجيل دخول) ── -->
+      <div style="background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.2);border-radius:12px;padding:14px 16px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span style="font-size:15px">🔗</span>
+          <b style="color:var(--accent);font-size:13px">الطريقة 1 — رابط نشر CSV (بدون تسجيل دخول)</b>
+        </div>
+        <div class="gs-help-box" style="margin-bottom:12px">
+          <b>خطوات الحصول على الرابط:</b><br>
+          1. افتح الـ Google Sheet ← <b>ملف</b> ← <b>مشاركة</b> ← <b>نشر على الويب</b><br>
+          2. اختر الورقة المطلوبة ← <b>قيم مفصولة بفواصل (CSV)</b> ← <b>نشر</b><br>
+          3. انسخ الرابط والصقه أدناه<br>
+          <span style="color:#8ba3b8">مثال: </span><code>…/pub?gid=0&single=true&output=csv</code>
+        </div>
+        <div class="gs-url-row">
+          <span class="gs-url-label">📦 مبيعات</span>
+          <input class="gs-url-input" id="gsPubUrl_مبيعات" placeholder="https://docs.google.com/spreadsheets/d/…/pub?output=csv&gid=0" oninput="gsPubUrlChanged('مبيعات')">
+          <span class="gs-url-status" id="gsPubStatus_مبيعات">⬜</span>
+        </div>
+        <div class="gs-url-row">
+          <span class="gs-url-label">💳 تحصيل</span>
+          <input class="gs-url-input" id="gsPubUrl_تحصيل" placeholder="https://docs.google.com/spreadsheets/d/…/pub?output=csv&gid=…" oninput="gsPubUrlChanged('تحصيل')">
+          <span class="gs-url-status" id="gsPubStatus_تحصيل">⬜</span>
+        </div>
+        <div class="gs-url-row">
+          <span class="gs-url-label">💰 مديونية</span>
+          <input class="gs-url-input" id="gsPubUrl_مديونية" placeholder="https://docs.google.com/spreadsheets/d/…/pub?output=csv&gid=…" oninput="gsPubUrlChanged('مديونية')">
+          <span class="gs-url-status" id="gsPubStatus_مديونية">⬜</span>
+        </div>
+        <div class="gs-url-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:4px">
+          <span class="gs-url-label" style="color:var(--gold)">👥 تصنيف</span>
+          <input class="gs-url-input" id="gsPubUrl_تصنيف" placeholder="https://docs.google.com/spreadsheets/d/…/pub?output=csv&gid=…" oninput="gsPubUrlChanged('تصنيف')">
+          <span class="gs-url-status" id="gsPubStatus_تصنيف">⬜</span>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:12px">
+          <button class="gs-sync-btn" id="gsPubFetchBtn" onclick="gsPubFetchAndUpdate()">🔄 تحديث من الروابط</button>
+        </div>
+        <div class="csv-progress-msg" id="gsPubMsg" style="margin-top:8px"></div>
+      </div>
+
+      <!-- فاصل -->
+      <div style="display:flex;align-items:center;gap:10px;margin:6px 0 14px">
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+        <span style="color:var(--text2);font-size:12px;white-space:nowrap">أو</span>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+
+      <!-- ── طريقة 2: OAuth بحساب Google ── -->
+      <div style="background:rgba(0,255,136,0.04);border:1px solid rgba(0,255,136,0.2);border-radius:12px;padding:14px 16px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span style="font-size:15px">🔐</span>
+          <b style="color:var(--accent2);font-size:13px">الطريقة 2 — تسجيل الدخول بحساب Google (شيتات خاصة)</b>
+        </div>
+
+      <!-- معلومات المستخدم بعد الاتصال -->
+      <div id="gsUserInfo" style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;min-height:24px"></div>
+
+      <!-- صندوق تسجيل الدخول -->
+      <div id="gsLoginBox">
+        <p class="subtitle" style="margin-bottom:12px">
+          سجّل الدخول بحساب Google للوصول الآمن إلى الشيتات الخاصة بك دون نشرها.
+        </p>
+        <button onclick="gsConnect()" style="width:100%;padding:11px;background:white;color:#333;border:none;border-radius:10px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.3)">
+          <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.2l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.5 2.7 13.5l7.9 6.1C12.4 13.3 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 6.9-10.1 6.9-17z"/><path fill="#FBBC05" d="M10.6 28.4c-.5-1.4-.8-2.9-.8-4.4s.3-3 .8-4.4L2.7 13.5C1 17 0 20.9 0 25s1 8 2.7 11.5l7.9-6.1z"/><path fill="#34A853" d="M24 49c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.2 1.5-5 2.3-8.4 2.3-6.3 0-11.6-3.8-13.5-9.3l-7.9 6.1C6.6 43.5 14.6 49 24 49z"/></svg>
+          تسجيل الدخول بـ Google
+        </button>
+
+        <!-- حقل Client ID إذا لم يكن مُضمَّناً -->
+        <div id="gsClientIdBox" style="display:none;margin-top:12px">
+          <div class="gs-help-box" style="margin-bottom:8px">
+            <b>مطلوب: Google Cloud Client ID</b><br>
+            أنشئ مشروعاً في <a href="https://console.cloud.google.com" target="_blank" style="color:var(--accent)">Google Cloud Console</a>،
+            فعّل <b>Google Sheets API</b> + <b>Google Drive API</b>،
+            أنشئ <b>OAuth 2.0 Client ID</b> من نوع <b>Web application</b>،
+            أضف <code>http://localhost</code> و <code>*</code> في Authorized JavaScript origins.
+          </div>
+          <div style="display:flex;gap:8px">
+            <input id="gsClientIdInput" type="text" placeholder="xxxx.apps.googleusercontent.com"
+              style="flex:1;background:#0d1b2e;border:1px solid #1e3a5f;color:#e8f4f8;border-radius:8px;padding:7px 10px;font-size:11px;font-family:'Cairo',sans-serif;direction:ltr">
+            <button onclick="gsSaveClientId()" style="background:var(--accent);color:#000;border:none;border-radius:8px;padding:7px 14px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer">حفظ</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- لوحة اختيار الشيتات (تظهر بعد الاتصال) -->
+      <div id="gsConfigBox" style="display:none">
+        <p class="subtitle" style="margin-bottom:10px">اختر الشيت والورقة لكل ملف بيانات:</p>
+
+        <!-- مبيعات -->
+        <div class="gs-sheet-row">
+          <span class="gs-url-label">📦 مبيعات</span>
+          <div style="flex:1;display:flex;flex-direction:column;gap:4px">
+            <select class="gs-sheet-select" id="gsFile_مبيعات" onchange="_gsOnFileChange('مبيعات')">
+              <option value="">— اختر الشيت —</option>
+            </select>
+            <select class="gs-sheet-select" id="gsSheet_مبيعات" onchange="_gsOnSheetChange('مبيعات')">
+              <option value="">— اختر الورقة —</option>
+            </select>
+          </div>
+          <span class="gs-url-status" id="gsStatus_مبيعات">⬜</span>
+        </div>
+
+        <!-- تحصيل -->
+        <div class="gs-sheet-row">
+          <span class="gs-url-label">💳 تحصيل</span>
+          <div style="flex:1;display:flex;flex-direction:column;gap:4px">
+            <select class="gs-sheet-select" id="gsFile_تحصيل" onchange="_gsOnFileChange('تحصيل')">
+              <option value="">— اختر الشيت —</option>
+            </select>
+            <select class="gs-sheet-select" id="gsSheet_تحصيل" onchange="_gsOnSheetChange('تحصيل')">
+              <option value="">— اختر الورقة —</option>
+            </select>
+          </div>
+          <span class="gs-url-status" id="gsStatus_تحصيل">⬜</span>
+        </div>
+
+        <!-- مديونية -->
+        <div class="gs-sheet-row">
+          <span class="gs-url-label">💰 مديونية</span>
+          <div style="flex:1;display:flex;flex-direction:column;gap:4px">
+            <select class="gs-sheet-select" id="gsFile_مديونية" onchange="_gsOnFileChange('مديونية')">
+              <option value="">— اختر الشيت —</option>
+            </select>
+            <select class="gs-sheet-select" id="gsSheet_مديونية" onchange="_gsOnSheetChange('مديونية')">
+              <option value="">— اختر الورقة —</option>
+            </select>
+          </div>
+          <span class="gs-url-status" id="gsStatus_مديونية">⬜</span>
+        </div>
+
+        <!-- تصنيف -->
+        <div class="gs-sheet-row" style="border-top:1px solid var(--border);margin-top:6px;padding-top:8px">
+          <span class="gs-url-label" style="color:var(--gold)">👥 تصنيف</span>
+          <div style="flex:1;display:flex;flex-direction:column;gap:4px">
+            <select class="gs-sheet-select" id="gsFile_تصنيف" onchange="_gsOnFileChange('تصنيف')">
+              <option value="">— اختر الشيت —</option>
+            </select>
+            <select class="gs-sheet-select" id="gsSheet_تصنيف" onchange="_gsOnSheetChange('تصنيف')">
+              <option value="">— اختر الورقة —</option>
+            </select>
+          </div>
+          <span class="gs-url-status" id="gsStatus_تصنيف">⬜</span>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;margin-top:14px">
+          <button class="gs-sync-btn" id="gsFetchBtn" onclick="gsFetchAndUpdate()">🔄 تحديث من حساب Google</button>
+        </div>
+      </div><!-- end gsConfigBox -->
+
+      <div class="csv-progress-msg" id="gsSyncMsg" style="margin-top:8px"></div>
+      </div><!-- end OAuth section -->
+    </div><!-- end panel-gs -->
+
     <div class="csv-progress-msg" id="csvProgressMsg"></div>
   </div>
 </div>
