@@ -1295,6 +1295,184 @@
   font-weight: 600;
 }
 
+/* ══════════════════════════════════════════════
+   DATE FILTER BAR  — Design System
+══════════════════════════════════════════════ */
+#df-wrap {
+  padding: 0 var(--content-pad,24px);
+  margin-bottom: 4px;
+}
+#df-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color .25s, box-shadow .25s;
+}
+#df-bar:focus-within {
+  border-color: rgba(0,212,255,.5);
+  box-shadow: 0 0 0 3px rgba(0,212,255,.08);
+}
+
+/* Icon section */
+.df-icon-section {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 14px;
+  height: 46px;
+  background: rgba(0,212,255,.06);
+  border-left: 1px solid var(--border);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.df-icon-section span:first-child { font-size: 17px; }
+.df-icon-section .df-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: .3px;
+}
+
+/* Date inputs section */
+.df-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  border-left: 1px solid var(--border);
+  height: 46px;
+  flex-shrink: 0;
+}
+.df-lbl {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.df-arrow { color: var(--muted); font-size: 14px; line-height:1; }
+
+input.df-d {
+  background: var(--surface2);
+  border: 1.5px solid transparent;
+  border-radius: 7px;
+  color: var(--text);
+  font-family: 'Cairo', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 9px;
+  width: 132px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color .2s, background .2s;
+  direction: ltr;
+}
+input.df-d:hover  { background: rgba(0,212,255,.06); border-color: rgba(0,212,255,.3); }
+input.df-d:focus  { border-color: var(--accent); background: rgba(0,212,255,.06); }
+input.df-d::-webkit-calendar-picker-indicator {
+  filter: invert(.55) sepia(1) hue-rotate(170deg) saturate(4) brightness(.9);
+  cursor: pointer;
+  padding: 0 2px;
+}
+input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,255,.07); }
+
+/* Chips section */
+.df-chips {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 12px;
+  height: 46px;
+  border-left: 1px solid var(--border);
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+.df-chip {
+  padding: 4px 11px;
+  border-radius: 20px;
+  border: 1.5px solid transparent;
+  background: rgba(255,255,255,.04);
+  color: var(--muted);
+  font-family: 'Cairo', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .18s;
+  line-height: 1.5;
+}
+.df-chip:hover { border-color: rgba(0,212,255,.35); color: var(--accent); background: rgba(0,212,255,.08); }
+.df-chip.df-on  { border-color: var(--accent); background: rgba(0,212,255,.16); color: var(--accent); }
+
+/* Status + spinner section */
+.df-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  height: 46px;
+  border-left: 1px solid var(--border);
+  flex-shrink: 0;
+  min-width: 0;
+}
+#df-status {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent2);
+  white-space: nowrap;
+  background: rgba(0,255,136,.09);
+  border: 1px solid rgba(0,255,136,.22);
+  border-radius: 20px;
+  padding: 3px 10px 3px 6px;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#df-status .df-st-dot { font-size: 9px; }
+#df-reset {
+  display: none;
+  background: none;
+  border: 1.5px solid rgba(255,71,87,.35);
+  color: var(--red);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .18s;
+  flex-shrink: 0;
+}
+#df-reset:hover { background: rgba(255,71,87,.1); border-color: var(--red); }
+
+@keyframes _dfSpin { to { transform: rotate(360deg); } }
+#df-spin {
+  display: none;
+  width: 14px; height: 14px;
+  border: 2px solid rgba(0,212,255,.25);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: _dfSpin .55s linear infinite;
+  flex-shrink: 0;
+}
+
+/* Responsive: collapse date labels on small screens */
+@media (max-width: 640px) {
+  .df-lbl { display: none; }
+  .df-inputs { padding: 0 8px; gap: 5px; }
+  input.df-d { width: 115px; }
+  .df-chips { padding: 0 8px; gap: 4px; }
+}
+
 </style>
 </head>
 <body>
@@ -1330,6 +1508,52 @@
   ">🔢 أرقام الرسوم</button>
 </div>
 
+<div id="df-wrap">
+  <div id="df-bar" role="search" aria-label="فلترة البيانات حسب التاريخ">
+
+    <!-- Icon + title -->
+    <div class="df-icon-section">
+      <span>📅</span>
+      <span class="df-title">فلترة بالتاريخ</span>
+    </div>
+
+    <!-- Date inputs -->
+    <div class="df-inputs">
+      <span class="df-lbl">من</span>
+      <input type="date" id="dfFrom" class="df-d"
+        placeholder="YYYY-MM-DD"
+        onchange="dfChange()"
+        onfocus="this.classList.add('df-active')"
+        onblur="this.classList.remove('df-active')"
+        aria-label="من تاريخ">
+      <span class="df-arrow">←</span>
+      <span class="df-lbl">إلى</span>
+      <input type="date" id="dfTo" class="df-d"
+        placeholder="YYYY-MM-DD"
+        onchange="dfChange()"
+        onfocus="this.classList.add('df-active')"
+        onblur="this.classList.remove('df-active')"
+        aria-label="إلى تاريخ">
+    </div>
+
+    <!-- Quick chips -->
+    <div class="df-chips">
+      <button class="df-chip df-on" id="dfc-all"   onclick="dfQuick('all')">🗓 الكل</button>
+      <button class="df-chip"       id="dfc-m1"    onclick="dfQuick('m1')">شهر</button>
+      <button class="df-chip"       id="dfc-m3"    onclick="dfQuick('m3')">3 أشهر</button>
+      <button class="df-chip"       id="dfc-m6"    onclick="dfQuick('m6')">6 أشهر</button>
+      <button class="df-chip"       id="dfc-yr"    onclick="dfQuick('yr')">هذه السنة</button>
+    </div>
+
+    <!-- Status + reset + spinner -->
+    <div class="df-right">
+      <div id="df-spin"></div>
+      <div id="df-status"><span class="df-st-dot">●</span><span id="df-st-txt">—</span></div>
+      <button id="df-reset" onclick="dfQuick('all')" title="إزالة الفلتر">✕ إزالة الفلتر</button>
+    </div>
+
+  </div>
+</div>
 
 
 <div id="tab-overview" class="tab-panel active">
@@ -7945,6 +8169,241 @@ function setCsvFile(type, input) {
   }
 }
 
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║   محرك فلتر التاريخ الرئيسي  —  df* namespace                  ║
+// ╚══════════════════════════════════════════════════════════════════╝
+(function(){
+'use strict';
+
+// ── tiny helpers ─────────────────────────────────────────────────
+const _d  = s => s ? String(s).trim().substring(0,10) : '';
+const _fmt = d => d ? d.toISOString().substring(0,10) : '';
+const _now = () => new Date();
+
+// ── set active chip ───────────────────────────────────────────────
+function _chip(id) {
+  ['all','m1','m3','m6','yr'].forEach(k => {
+    const b = document.getElementById('dfc-'+k);
+    if (b) b.classList.toggle('df-on', k===id);
+  });
+}
+
+// ── init min/max from data ────────────────────────────────────────
+window.dfInitRange = function() {
+  const sr=window._dfSR||[], sh=window._dfSH||[];
+  const cr=window._dfCR||[], ch=window._dfCH||[];
+  const is=sh.indexOf('التاريخ'), ic=ch.indexOf('التاريخ');
+  let mn='',mx='';
+  const scan=(rows,i)=>{if(i<0)return;for(const r of rows){const d=_d(r[i]||'');if(!d||d.length<7)continue;if(!mn||d<mn)mn=d;if(!mx||d>mx)mx=d;}};
+  scan(sr,is); scan(cr,ic);
+  if(!mn)return;
+  window._dfMin=mn; window._dfMax=mx;
+  const fr=document.getElementById('dfFrom'), to=document.getElementById('dfTo');
+  if(fr){fr.min=mn;fr.max=mx;} if(to){to.min=mn;to.max=mx;}
+};
+
+// ── quick range presets ───────────────────────────────────────────
+window.dfQuick = function(range) {
+  _chip(range);
+  const fr=document.getElementById('dfFrom'), to=document.getElementById('dfTo');
+  if(!fr||!to) return;
+  const mx=window._dfMax||'', t=_now();
+  if(range==='all')     { fr.value=''; to.value=''; }
+  else if(range==='m1') { fr.value=_fmt(new Date(t.getFullYear(),t.getMonth()-1,1)); to.value=_fmt(new Date(t.getFullYear(),t.getMonth(),0)); }
+  else if(range==='m3') { fr.value=_fmt(new Date(t.getFullYear(),t.getMonth()-2,1)); to.value=mx||_fmt(t); }
+  else if(range==='m6') { fr.value=_fmt(new Date(t.getFullYear(),t.getMonth()-5,1)); to.value=mx||_fmt(t); }
+  else if(range==='yr') { fr.value=t.getFullYear()+'-01-01'; to.value=mx||_fmt(t); }
+  _run();
+};
+
+// ── user typed / changed date inputs ─────────────────────────────
+window.dfChange = function() { _chip(''); _run(); };
+
+// ── core filter + rebuild ─────────────────────────────────────────
+function _run() {
+  const from=(document.getElementById('dfFrom')?.value||'').trim();
+  const to  =(document.getElementById('dfTo')?.value  ||'').trim();
+  if(!window._dfSR&&!window._dfCR) return;
+
+  const spin=document.getElementById('df-spin');
+  if(spin) spin.style.display='block';
+
+  requestAnimationFrame(()=>setTimeout(()=>{
+    const sr=window._dfSR||[], sh=window._dfSH||[];
+    const cr=window._dfCR||[], ch=window._dfCH||[];
+
+    const ok=d=>{ if(!d)return true; if(from&&d<from)return false; if(to&&d>to)return false; return true; };
+    const is=sh.indexOf('التاريخ'), ic=ch.indexOf('التاريخ');
+
+    const fS=(!from&&!to)?sr:sr.filter(r=>ok(_d(r[is]||'')));
+    const fC=(!from&&!to)?cr:cr.filter(r=>ok(_d(r[ic]||'')));
+
+    _monthly(fS,sh,fC,ch);
+    _agg(fS,sh,fC,ch);
+    _status(from,to,fS.length,sr.length);
+    _ui();
+    if(spin) spin.style.display='none';
+  },0));
+}
+
+// ── rebuild _monthlyStats ─────────────────────────────────────────
+function _monthly(sr,sh,cr,ch) {
+  const id=sh.indexOf('التاريخ'),it=sh.indexOf('النوع'),ia=sh.indexOf('الاجمالي الصافي');
+  const mm={};
+  for(const r of sr){
+    const m=_d(r[id]||'').substring(0,7); if(!m||m.length<7)continue;
+    const t=(r[it]||'').trim(),v=cleanNum(r[ia]);
+    if(!mm[m])mm[m]={sales:0,returns:0};
+    if(t==='مبيع')mm[m].sales+=v; if(t==='مرتجع مبيع')mm[m].returns+=v;
+  }
+  const id2=ch.indexOf('التاريخ'),ic=ch.indexOf('دائن');
+  const cm={};
+  for(const r of cr){
+    const m=_d(r[id2]||'').substring(0,7); const v=cleanNum(r[ic]);
+    if(!m||v<=0)continue; cm[m]=(cm[m]||0)+v;
+  }
+  const s=Object.keys(mm).sort();
+  const N=['','يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  if(s.length) window._monthlyStats={
+    labels:s.map(m=>{const[y,mo]=m.split('-');return(N[+mo]||m)+' '+y;}),
+    sales:s.map(m=>mm[m].sales), returns:s.map(m=>mm[m].returns),
+    net:s.map(m=>mm[m].sales-mm[m].returns), col:s.map(m=>cm[m]||0)
+  };
+}
+
+// ── rebuild all aggregates ────────────────────────────────────────
+function _agg(sr,sh,cr,ch) {
+  const iI=sh.indexOf('رقم الفاتورة'),iT=sh.indexOf('النوع'),
+        iM=sh.indexOf('المادة'),iQ=sh.indexOf('الكمية الخارجة'),
+        iA=sh.indexOf('الاجمالي الصافي'),iC=sh.indexOf('اسم الزبون'),
+        iR=sh.indexOf('المندوب');
+  const rM={},cuM={},itM={},csSet=new Set();
+
+  for(const row of sr){
+    const rep=(row[iR]||'').trim(); if(!rep)continue;
+    const typ=(row[iT]||'').trim(),inv=(row[iI]||'').trim(),
+          cus=(row[iC]||'').trim(),mat=(row[iM]||'').trim(),
+          qty=cleanNum(row[iQ]),amt=cleanNum(row[iA]);
+    const iS=typ==='مبيع',iRet=typ==='مرتجع مبيع';
+    if(!rM[rep])rM[rep]={I:new Set(),C:new Set(),M:new Set(),s:0,q:0,r:0,rq:0};
+    const rv=rM[rep];
+    if(inv)rv.I.add(inv); if(cus)rv.C.add(cus); if(mat)rv.M.add(mat);
+    if(iS){rv.s+=amt;rv.q+=qty;} if(iRet){rv.r+=amt;rv.rq+=qty;}
+    if(cus){
+      csSet.add(cus);
+      if(!cuM[cus])cuM[cus]={I:new Set(),M:new Set(),rep,s:0,q:0,r:0};
+      const cv=cuM[cus];
+      if(inv)cv.I.add(inv); if(mat)cv.M.add(mat);
+      if(iS){cv.s+=amt;cv.q+=qty;} if(iRet)cv.r+=amt;
+    }
+    if(mat){
+      if(!itM[mat])itM[mat]={I:new Set(),C:new Set(),R:new Set(),s:0,q:0,r:0,rq:0};
+      const iv=itM[mat];
+      if(inv)iv.I.add(inv); if(cus)iv.C.add(cus); if(rep)iv.R.add(rep);
+      if(iS){iv.s+=amt;iv.q+=qty;} if(iRet){iv.r+=amt;iv.rq+=qty;}
+    }
+  }
+
+  // col maps
+  const rcM={},ccM={};
+  if(cr.length){
+    const iCR=ch.indexOf('المندوب'),iCred=ch.indexOf('دائن'),
+          iAcc=ch.indexOf('الحساب المقابل'),iAccN=ch.indexOf('اسم الحساب'),
+          iBay=ch.indexOf('البيان'),iNtp=ch.indexOf('النوع');
+    for(const row of cr){
+      const rep=(row[iCR]||'').trim(),cred=cleanNum(row[iCred]);
+      if(!rep||cred<=0)continue;
+      const acc=(row[iAcc]||'').trim(),acn=(iAccN>=0?(row[iAccN]||''):'').trim(),
+            bay=(row[iBay]||'').trim(),ntp=(iNtp>=0?(row[iNtp]||''):'').trim();
+      if(!rcM[rep])rcM[rep]={t:0,o:0,b:0,c:0};
+      rcM[rep].t+=cred; rcM[rep].o+=1;
+      const isCash=ntp.includes('مقبوضات الصندوق')||acn.includes('خزينة')||acc.includes('خزينة');
+      const isBank=!isCash&&(acn.includes('مصرف')||acn.includes('بنك')||acc.includes('مصرف')||acc.includes('بنك')||
+        bay.includes('حوالة')||bay.includes('حولة')||bay.includes('صك')||bay.includes('ايداع')||bay.includes('إيداع')||bay.includes('مرجعي')||bay.includes('عملية'));
+      if(isCash)rcM[rep].c+=cred; else rcM[rep].b+=cred;
+      const cust=acn||(iAccN>=0?(row[iAccN]||'').trim():'');
+      if(cust){if(!ccM[cust])ccM[cust]={t:0,o:0};ccM[cust].t+=cred;ccM[cust].o+=1;}
+    }
+  }
+
+  // repsData
+  const nR=Object.entries(rM).map(([name,d])=>{
+    const sales=d.s,ret=d.r,ns=sales-ret,col=rcM[name]?.t||0;
+    const ex=repsData.find(r=>r.name===name)||{};
+    const cat=ex.cat||(window.repClassification?.[name])||'تجزئة';
+    return{name,cat,invoices:d.I.size,customers:d.C.size,sales,items:d.M.size,qty:d.q,
+      returns:ret,retQty:d.rq,col,colOps:rcM[name]?.o||0,colBank:rcM[name]?.b||0,colCash:rcM[name]?.c||0,
+      netSales:ns,roi:ns>0?+(col/ns*100).toFixed(2):0,retPct:sales>0?+(ret/sales*100).toFixed(2):0,
+      avgInvoice:d.I.size>0?+(sales/d.I.size).toFixed(2):0,gap:ns-col,
+      debtTotal:ex.debtTotal||0,debtPaid:ex.debtPaid||0,debtNet:ex.debtNet||0,debtPct:ex.debtPct||0,
+      phone:ex.phone||'',target:ex.target||0,notes:ex.notes||'',area:ex.area||'',code:ex.code||''};
+  }).sort((a,b)=>b.netSales-a.netSales);
+
+  const nC=Object.entries(cuM).map(([name,d])=>{
+    const s=d.s,ret=d.r,ns=s-ret,rp=s>0?+(ret/s*100).toFixed(2):0;
+    const col=ccM[name]?.t||0,cops=ccM[name]?.o||0,cp=ns>0?+(col/ns*100).toFixed(2):0,gap=ns-col;
+    let cat; if(gap>100000)cat='مخاطرة عالية'; else if(gap>50000)cat='مخاطرة'; else if(gap>20000)cat='متوسط'; else if(cp>=80)cat='ممتاز'; else cat='جيد';
+    return{n:name,inv:d.I.size,s,itm:d.M.size,qty:d.q,ret,c:col,cops,ns,cp,rp,g:gap,cat,rep:d.rep||''};
+  }).sort((a,b)=>b.s-a.s);
+
+  const nI=Object.entries(itM).map(([name,d])=>{
+    const sales=d.s,qty=d.q,ns=sales-d.r,nqty=qty-d.rq,retPct=sales>0?+(d.r/sales*100).toFixed(2):0;
+    return{name,sales,qty,inv:d.I.size,cust:d.C.size,reps:d.R.size,retVal:d.r,retQty:d.rq,ns,nqty,retPct,avgP:qty>0?+(sales/qty).toFixed(2):0,turn:d.I.size};
+  }).sort((a,b)=>b.sales-a.sales);
+
+  repsData.length=0;repsData.push(...nR);
+  custData.length=0;custData.push(...nC);
+  itemsData.length=0;itemsData.push(...nI);
+  productsData.length=0;productsData.push(...nI.map(i=>({name:i.name,sales:i.sales,qty:i.qty,ns:i.ns,nqty:i.nqty,retPct:i.retPct,retVal:i.retVal,retQty:i.retQty})));
+  const bg=document.getElementById('repCountBadge'); if(bg)bg.textContent=nR.length+' مندوباً';
+}
+
+// ── status bar update ─────────────────────────────────────────────
+function _status(from,to,filtered,total) {
+  const st=document.getElementById('df-status'), tx=document.getElementById('df-st-txt'), rs=document.getElementById('df-reset');
+  const active=!!(from||to);
+  if(st){ st.style.display=active?'flex':'none'; }
+  if(rs){ rs.style.display=active?'block':'none'; }
+  if(active&&tx){
+    const pct=total>0?Math.round(filtered/total*100):100;
+    const fromLbl=from||'…', toLbl=to||'…';
+    tx.textContent=fromLbl+' ← '+toLbl+'  ·  '+pct+'% ('+filtered.toLocaleString('en-US')+' سجل)';
+  }
+}
+
+// ── refresh all UI ────────────────────────────────────────────────
+function _ui(){
+  try{updateKPIs();}catch(e){}
+  try{rebuildCharts();}catch(e){}
+  try{if(typeof renderRepsTable==='function')renderRepsTable();}catch(e){}
+  try{if(typeof updateRepsTabFiltered==='function')updateRepsTabFiltered(repsData);}catch(e){}
+  try{if(typeof renderRepCmp==='function')renderRepCmp();}catch(e){}
+  try{if(typeof updateRepcmpTabFiltered==='function')updateRepcmpTabFiltered(repsData);}catch(e){}
+  try{if(typeof initRepCmpPanels==='function')initRepCmpPanels();}catch(e){}
+  try{if(typeof updateChipCounts==='function')updateChipCounts();if(typeof applyFilters==='function')applyFilters();if(typeof updateCustomersTabFiltered==='function')updateCustomersTabFiltered(custData);}catch(e){}
+  try{if(typeof renderItems==='function')renderItems();if(typeof initItemsPanels==='function')initItemsPanels();if(typeof updateProductsTabFiltered==='function')updateProductsTabFiltered(itemsData);}catch(e){}
+  try{
+    const rn=[...new Set(repsData.map(r=>r.name))].sort();
+    const rc=[...new Set(repsData.map(r=>r.cat))].filter(Boolean).sort();
+    const rs=(id,ph,opts)=>{const el=document.getElementById(id);if(!el)return;const cur=el.value;el.innerHTML=`<option value="">${ph}</option>`;opts.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;el.appendChild(o);});el.value=opts.includes(cur)?cur:'';};
+    rs('repRepFilter','👤 كل المناديب',rn);rs('custRepFilter','👤 كل المناديب',rn);
+    rs('rcRep','كل المناديب',rn);rs('debtRepFilter','👤 كل المناديب',rn);rs('itemRepFilter','👤 كل المناديب',rn);
+    rs('repCatFilter','🏷 كل الفئات',rc);rs('custCatRepFilter','📂 كل الفئات',rc);
+    rs('itemRepCat','📂 كل الفئات',rc);rs('debtCatFilter','📂 كل الفئات',rc);
+    const rcEl=document.getElementById('rcCat');if(rcEl){const cur=rcEl.value;rcEl.innerHTML='<option value="all">كل الفئات</option>';rc.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;rcEl.appendChild(o);});rcEl.value=(rc.includes(cur)||cur==='all')?cur:'all';}
+    if(typeof resetItemFilters==='function')resetItemFilters();
+  }catch(e){}
+  setTimeout(()=>{
+    try{if(typeof renderDebtRepsTable==='function')renderDebtRepsTable(debtRepsData);}catch(e){}
+    try{if(typeof renderDebtDetailTable==='function')renderDebtDetailTable();}catch(e){}
+    try{window._debtChartsInit=false;if(typeof initDebtCharts==='function')initDebtCharts();}catch(e){}
+    try{if(typeof updateDebtTabFiltered==='function')updateDebtTabFiltered(debtRepsData,debtDetailData);}catch(e){}
+  },200);
+}
+
+})();
+
 async function applyCsvData(fromGS) {
   const hasMabee3at  = !!csvFiles['مبيعات'];
   const hasTahseel   = !!csvFiles['تحصيل'];
@@ -8379,6 +8838,11 @@ async function applyCsvData(fromGS) {
           debtDetailFiltered = debtDetailData.slice();
         }
       }
+
+      // ── حفظ الصفوف الخام للفلترة بالتاريخ ─────────────────────────
+      window._dfSR = salesRows.slice();   window._dfSH = salesHeaders.slice();
+      window._dfCR = colRows.slice();     window._dfCH = colHeaders.slice();
+      dfInitRange();  // تحديث حدود التاريخ في الحقول
 
       // Update global arrays
       repsData.length = 0;     repsData.push(...newRepsData);
