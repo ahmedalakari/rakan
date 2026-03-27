@@ -1106,11 +1106,13 @@ TYPE html>
     color: #000;
   }
 
+
   @media print {
+  
     /* ── Page setup ── */
     @page {
       size: A4 portrait;
-      margin: 15mm 12mm 15mm 12mm;
+      margin: 15mm 12mm 20mm 12mm;
     }
     @page :first { margin-top: 10mm; }
 
@@ -1259,6 +1261,7 @@ TYPE html>
     .page-break-before { page-break-before: always; }
     .page-break-after  { page-break-after: always; }
 
+
     /* ── Plan tab special layout ── */
     #tab-plan .grid-auto {
       display: grid !important;
@@ -1370,17 +1373,7 @@ TYPE html>
 .dashboard-footer__divider { display: none; }
 
 @media print {
-  .dashboard-footer {
-    background: #1a2a4a !important;
-    border-top: 1pt solid #2a3a5a !important;
-    margin-top: 10pt !important;
-    padding: 5pt 16pt !important;
-    page-break-inside: avoid !important;
-  }
-  .dashboard-footer__ar  { color: #ffffff !important; font-size: 8pt !important; }
-  .dashboard-footer__en  { color: #e0e8f0 !important; font-size: 7.5pt !important; }
-  .dashboard-footer__phone { color: #c0ccd8 !important; font-size: 8pt !important; }
-  .dashboard-footer__sep { color: #4a6a8a !important; }
+  .dashboard-footer { display: none !important; }
 }
 
 /* ---- CSV LOADER STYLES ---- */
@@ -1940,9 +1933,79 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
   .df-month-sel { max-width: 120px; font-size: 11px; }
 }
 
+
+
+  /* ── ذيل الطباعة ── */
+  #printFooter { display: none !important; }
+  @media print {
+    #printFooter {
+      display: flex !important;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1a2a4a !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      border-top: 2pt solid #00d4ff;
+      padding: 5pt 16pt;
+      align-items: center;
+      justify-content: space-between;
+      font-family: 'Cairo','Segoe UI',Arial,sans-serif;
+      font-size: 7.5pt;
+      color: #cce4ff !important;
+      z-index: 9999;
+    }
+    #printFooter .pf-ar  { text-align: right; direction: rtl; }
+    #printFooter .pf-en  { text-align: left;  direction: ltr; }
+    #printFooter .pf-tel { color: #00d4ff !important; font-weight: 700; letter-spacing: 0.5pt; }
+    @page { margin-bottom: 18mm; }
+  }
+
+  /* ── تنبيه لا توجد بيانات ── */
+  #df-nodata-alert {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255,71,87,0.08);
+    border: 1px solid rgba(255,71,87,0.3);
+    color: #ff6b6b;
+    border-radius: 20px;
+    padding: 2px 9px 2px 7px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: opacity .3s;
+  }
+  #df-nodata-alert.show { display: flex; }
 </style>
 </head>
 <body>
+
+<script>
+// ── Early stubs: تضمن عمل أزرار HTML قبل تحميل الـ script الرئيسي ──
+(function(){
+  var fns = [
+    'openCsvModal','closeCsvModal','showTab','mobileShowTab','closeSidebar',
+    'toggleSidebar','switchDataTab','dfQuick','dfSetToday','dfChange',
+    'dfMonthPick','toggleAutoSync','toggleDataLabels','headerQuickSync',
+    'gsConnectDirect','gsDisconnectDirect','gsDirectFetchAndUpdate',
+    'gsPubFetchAndAndUpdate','gsPubTestLinks','sortCust','setCustCat',
+    'clearTabFilter','applyCsvData','printCurrentTab','printTable',
+    'printBothDebtTables','_closeStartupLoader','_startupApply',
+    '_startupPickAll','toggleOdAutoSync','odFetchAndUpdate','odTestLinks'
+  ];
+  fns.forEach(function(fn){
+    if (!window[fn]) window[fn] = function(){ /* stub — wait for main script */ };
+  });
+  // openCsvModal و closeCsvModal لهما منطق مبكر
+  window.openCsvModal  = function(){ document.getElementById('csvModalOverlay')?.classList.add('open'); };
+  window.closeCsvModal = function(){ document.getElementById('csvModalOverlay')?.classList.remove('open'); try{ document.getElementById('csvProgressMsg').textContent=''; }catch(e){} };
+})();
+</script>
+
 
 <div id="sticky-top">
 <div class="header">
@@ -2027,6 +2090,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
       <div id="df-status"><span class="df-st-dot">●</span><span id="df-st-txt">—</span></div>
       <button id="labelToggleBtn" onclick="toggleDataLabels()" title="إظهار/إخفاء أرقام الرسوم">🔢 أرقام الرسوم</button>
       <button id="df-today" onclick="dfSetToday()" title="عرض بيانات اليوم الحالي">📅 اليوم</button>
+      <div id="df-nodata-alert">⚠️ لا توجد بيانات</div>
       <button id="df-reset" onclick="dfQuick('all')" title="إزالة الفلتر">✕ إزالة الفلتر</button>
     </div>
 
@@ -2368,6 +2432,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
 </div>
 
 <!-- REPS TAB -->
+
 <div id="tab-reps" class="tab-panel">
 
   <div class="print-bar" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
@@ -2519,6 +2584,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
 </div>
 
 <!-- ====== TAB: مقارنة مناديب ====== -->
+
 <div id="tab-repcmp" class="tab-panel">
 
   <div class="print-bar" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
@@ -3402,14 +3468,10 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
   <div class="chart-card" style="margin-bottom:var(--gap)">
     <div style="height:clamp(154px,35.0vw,280px)"><canvas id="returnsChart"></canvas></div>
   </div>
-
-
-
-
-
 </div><!-- end tab-repcmp -->
 
 <!-- DEBT TAB -->
+
 <div id="tab-debt" class="tab-panel">
 
   <div class="print-bar" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
@@ -3558,11 +3620,11 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
       <div style="height:clamp(280px,48vw,380px)"><canvas id="debtPctChart"></canvas></div>
     </div>
   </div>
-
 </div><!-- end tab-debt -->
 
 
 <!-- CUSTOMERS TAB -->
+
 <div id="tab-customers" class="tab-panel">
 
   <div class="print-bar" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
@@ -3773,6 +3835,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
 
 <!-- ACTIONS TAB -->
 <!-- PRODUCTS TAB -->
+
 <div id="tab-products" class="tab-panel">
 
   <div class="print-bar" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
@@ -4026,11 +4089,10 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
     <div style="height:clamp(380px,56vw,500px)"><canvas id="itemsSalesChart"></canvas></div>
   </div>
 
-
-
 </div>
 
 <!-- PLAN TAB -->
+
 <div id="tab-plan" class="tab-panel">
 
   <div class="print-bar" style="display:flex;justify-content:flex-end;margin-bottom:12px">
@@ -8451,6 +8513,13 @@ tr:nth-child(even) td { background:#f4f7ff !important; }
 </div>
 ${activeHTML}
 
+<footer style="width:100%;padding:6pt 14pt;background:#1a2a4a;-webkit-print-color-adjust:exact;print-color-adjust:exact;border-top:2.5pt solid #00d4ff;display:flex;justify-content:space-between;align-items:center;font-family:Cairo,Arial,sans-serif;font-size:8pt;position:fixed;bottom:0;left:0;right:0;">
+  <span style="color:#fff;font-weight:700">جميع الحقوق محفوظة © 2026 — المحاسب أحمد العكاري</span>
+  <span style="color:#00d4ff;font-weight:700">0915528970 | ​هاتف / Phone</span>
+  <span style="color:#cce4ff">All Rights Reserved © 2026 — Accountant Ahmed Al-Aakari</span>
+</footer>
+<style>@page{margin-bottom:18mm}</style>
+
 </body>
 </html>`;
 
@@ -8496,6 +8565,7 @@ ${activeHTML}
   let _printImgs = [];
 
   window.addEventListener('beforeprint', function() {
+    // تحويل الرسوم البيانية لصور
     _printImgs = [];
     document.querySelectorAll('canvas').forEach((canvas, i) => {
       try {
@@ -8512,13 +8582,51 @@ ${activeHTML}
         _printImgs.push({ canvas, img });
       } catch(e) {}
     });
+    // إضافة ذيل الطباعة داخل التبويب النشط
+    if (!document.getElementById('_pf_el')) {
+      var pf = document.createElement('div');
+      pf.id = '_pf_el';
+      // نمط الذيل
+      var st = document.createElement('style');
+      st.id = '_pf_st';
+      st.textContent =
+        '#_pf_el{' +
+          'width:100%;margin-top:20pt;padding:6pt 14pt;' +
+          'background:#1a2a4a!important;' +
+          '-webkit-print-color-adjust:exact!important;' +
+          'print-color-adjust:exact!important;' +
+          'border-top:2pt solid #00d4ff;' +
+          'display:flex!important;' +
+          'justify-content:space-between;align-items:center;' +
+          'font-family:Cairo,Arial,sans-serif;font-size:8pt;' +
+          'page-break-inside:avoid;' +
+        '}' +
+        '#_pf_el .a{color:#fff!important;font-weight:700}' +
+        '#_pf_el .b{color:#00d4ff!important;font-weight:700}' +
+        '#_pf_el .c{color:#cce4ff!important}';
+      document.head.appendChild(st);
+      pf.innerHTML =
+        '<span class="a">جميع الحقوق محفوظة © 2026 — المحاسب أحمد العكاري</span>' +
+        '<span class="b">0915528970  |  ‫هاتف / Phone</span>' +
+        '<span class="c">All Rights Reserved © 2026 — Accountant Ahmed Al-Aakari</span>';
+      // أضفه في نهاية التبويب النشط
+      var activeTab = document.querySelector('.tab-panel.active');
+      if (activeTab) activeTab.appendChild(pf);
+      else document.body.appendChild(pf);
+    }
   });
 
   window.addEventListener('afterprint', function() {
+    // استعادة الرسوم البيانية
     _printImgs.forEach(({ canvas, img }) => {
       try { canvas.style.display = ''; img.remove(); } catch(e) {}
     });
     _printImgs = [];
+    // إزالة ذيل الطباعة
+    var pf = document.getElementById('_pf_el');
+    if (pf) pf.remove();
+    var st = document.getElementById('_pf_st');
+    if (st) st.remove();
   });
 })();
 
@@ -9198,7 +9306,31 @@ function updateMonthlyTable() {
 
 function renderMonthlySection() {
   const ms = window._monthlyStats;
-  if (!ms || !ms.labels || ms.labels.length === 0) return;
+  if (!ms || !ms.labels || ms.labels.length === 0) {
+    // تصفير البطاقات الشهرية
+    const cardsGrid = document.getElementById('monthly-cards-grid');
+    if (cardsGrid) cardsGrid.innerHTML = '';
+    // تصفير جدول المقارنة
+    const thead2 = document.getElementById('monthly-table-head');
+    const tbody2 = document.getElementById('monthlyTableBody');
+    if (thead2) thead2.innerHTML = '';
+    if (tbody2) tbody2.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:20px">—</td></tr>';
+    // تصفير KPIs
+    ['tbl-sales-total','tbl-net-total','tbl-col-total','tbl-gap-total','tbl-roi-total'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '0';
+    });
+    // تصفير العنوان الفرعي
+    const subEl = document.getElementById('monthly-section-sub');
+    if (subEl) subEl.textContent = '';
+    // إخفاء جدول المقارنة وإظهار رسالة
+    const tblCard = document.getElementById('monthly-table-card');
+    if (tblCard) tblCard.style.display = 'none';
+    return;
+  }
+  // إظهار جدول المقارنة عند وجود بيانات
+  const tblCardShow = document.getElementById('monthly-table-card');
+  if (tblCardShow) tblCardShow.style.display = '';
 
   const fmt2    = typeof _fmt2  === 'function' ? _fmt2  : n => Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
   const fmtM    = typeof _fmtM  === 'function' ? _fmtM  : n => { n=Number(n||0); return n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?Math.round(n/1e3)+'K':n.toLocaleString('en-US',{maximumFractionDigits:0}); };
@@ -10683,7 +10815,20 @@ let _gsTokenClient   = null;
   try {
     const s = JSON.parse(localStorage.getItem(_GS_LS_DIRECT) || '{}');
     if (s.sheets)    _gsDirectSheets    = { ..._gsDirectSheets, ...s.sheets };
-    if (s.email)     { _gsDirectConnected = true; }
+    if (s.email) {
+      _gsDirectConnected = true;
+      // أظهر بيانات المستخدم المحفوظة فوراً
+      setTimeout(() => {
+        const nameEl  = document.getElementById('gsDirectName');
+        const emailEl = document.getElementById('gsDirectEmail');
+        if (nameEl  && s.name)  nameEl.textContent  = s.name;
+        if (emailEl && s.email) emailEl.textContent = s.email;
+        const disc = document.getElementById('gsOAuthDisconnected');
+        const conn = document.getElementById('gsOAuthConnected');
+        if (disc) disc.style.display = 'none';
+        if (conn) conn.style.display = '';
+      }, 300);
+    }
   } catch(e) {}
 })();
 
@@ -10736,7 +10881,7 @@ function _gsDirectHandleToken(resp) {
     if (emailEl) emailEl.textContent = user.email || '';
 
     // حفظ البريد
-    try { const s = JSON.parse(localStorage.getItem(_GS_LS_DIRECT)||'{}'); s.email = user.email; localStorage.setItem(_GS_LS_DIRECT, JSON.stringify(s)); } catch(e) {}
+    try { const s = JSON.parse(localStorage.getItem(_GS_LS_DIRECT)||'{}'); s.email = user.email; s.name = user.name||''; s.picture = user.picture||''; localStorage.setItem(_GS_LS_DIRECT, JSON.stringify(s)); } catch(e) {}
 
     // تحديث قائمة الشيتات
     _gsDirectFiles = drive.files || [];
@@ -11241,12 +11386,26 @@ window.dfInitRange = function() {
 };
 
 
-// تحميل GSI عند جاهزية الصفحة
+// تحميل GSI عند جاهزية الصفحة + اتصال تلقائي إذا كان هناك حساب محفوظ
 document.addEventListener('DOMContentLoaded', () => {
   const s = document.createElement('script');
   s.src = 'https://accounts.google.com/gsi/client';
   s.async = true; s.defer = true;
-  s.onload = _gsInitGSI;
+  s.onload = () => {
+    _gsInitGSI();
+    // محاولة اتصال صامت تلقائي إذا كان البريد محفوظاً
+    try {
+      const saved = JSON.parse(localStorage.getItem(_GS_LS_DIRECT) || '{}');
+      if (saved.email && _gsTokenClient) {
+        // طلب token بدون نافذة (prompt: none) — صامت تماماً
+        setTimeout(() => {
+          try {
+            _gsTokenClient.requestAccessToken({ prompt: '', hint: saved.email });
+          } catch(e) {}
+        }, 800);
+      }
+    } catch(e) {}
+  };
   document.head.appendChild(s);
 });
 
@@ -11519,12 +11678,12 @@ async function _runAutoSync() {
 }
 // ══════════════════════════════════════════════════
 
-function openCsvModal() {
+window.openCsvModal = function openCsvModal() {
   document.getElementById('csvModalOverlay').classList.add('open');
   // تعبئة حقول GS إن كانت الروابط محفوظة
   setTimeout(gsPopulateFields, 50);
-}
-function closeCsvModal() {
+};
+window.closeCsvModal = function closeCsvModal() {
   document.getElementById('csvModalOverlay').classList.remove('open');
   document.getElementById('csvProgressMsg').textContent = '';
 }
@@ -11774,6 +11933,7 @@ window.dfMonthPick = function(val) {
   if(!fr||!to) return;
   if(!val || val==='all') {
     fr.value=''; to.value='';
+    _setNoDataAlert(false);
     _run();
     return;
   }
@@ -11819,6 +11979,8 @@ window.dfChange = function() { _syncMonthSel(
 ); _run(); };
 
 // ── core filter + rebuild ─────────────────────────────────────────
+
+
 function _run() {
   const from=(document.getElementById('dfFrom')?.value||'').trim();
   const to  =(document.getElementById('dfTo')?.value  ||'').trim();
@@ -11869,6 +12031,7 @@ function _run() {
     const fS=(!from&&!to)?sr:sr.filter(r=>ok(_d(r[is]||'')));
     const fC=(!from&&!to)?cr:cr.filter(r=>ok(_d(r[ic]||'')));
 
+    _setNoDataAlert((from||to) && fS.length===0 && fC.length===0);
     _monthly(fS,sh,fC,ch);
     _agg(fS,sh,fC,ch);
     _status(from,to,fS.length,sr.length);
@@ -12002,6 +12165,12 @@ function _status(from,to,filtered,total) {
     tx.textContent=fromLbl+' ← '+toLbl+'  ·  '+pct+'% ('+filtered.toLocaleString('en-US')+' '+unit+')';
   }
 }
+
+// ── تحديث تنبيه لا توجد بيانات بشكل مستقل ──────────────────────
+window._setNoDataAlert = function(show) {
+  const nd = document.getElementById('df-nodata-alert');
+  if (nd) nd.classList.toggle('show', !!show);
+};
 
 // ── refresh all UI ────────────────────────────────────────────────
 function _ui(){
@@ -12254,7 +12423,7 @@ window._dfUI = function() { try { _ui(); } catch(e) { console.warn('_dfUI:', e);
 
     // ── إزالة الفلتر: استعادة كاملة ──
     if (!from && !to) {
-
+      _setNoDataAlert(false);
       repsData.length=0;     repsData.push(...snap.repsData.map(r=>({...r})));
       custData.length=0;     custData.push(...snap.custData.map(c=>({...c})));
       productsData.length=0; productsData.push(...snap.productsData.map(p=>({...p})));
@@ -12281,6 +12450,7 @@ window._dfUI = function() { try { _ui(); } catch(e) { console.warn('_dfUI:', e);
     const dfMin = window._dfMin || (snap.months.length ? snap.months[0] + '-01' : '');
     const rangeOutside = (from && dfMax && from > dfMax) || (to && dfMin && to < dfMin);
     if (rangeOutside) {
+      _setNoDataAlert(true);
       repsData.length=0; custData.length=0; productsData.length=0; itemsData.length=0;
       window._monthlyStats = { labels:[], sales:[], returns:[], net:[], col:[] };
       topDebtors.length=0;
@@ -12334,7 +12504,7 @@ window._dfUI = function() { try { _ui(); } catch(e) { console.warn('_dfUI:', e);
     }
 
     if (wS <= 0) {
-      // لا توجد بيانات في النطاق المحدد
+      _setNoDataAlert(true);
       repsData.length=0; custData.length=0; productsData.length=0; itemsData.length=0;
       window._monthlyStats = { labels:[], sales:[], returns:[], net:[], col:[] };
       topDebtors.length=0;
@@ -12342,6 +12512,7 @@ window._dfUI = function() { try { _ui(); } catch(e) { console.warn('_dfUI:', e);
       return;
     }
 
+    _setNoDataAlert(false);
     _applySnapData(wS, wC, filtLabels, filtSales, filtRet, filtNet, filtCol, snap);
     _refreshAllUI();
   };
@@ -13801,376 +13972,12 @@ function exportAgingCSV() {
   a.download='قاعدة_بيانات_العملاء.csv'; a.click();
 }
 
-
-
-// ══════════════════════════════════════════════════════════════
-//  ☁️  OneDrive SYNC ENGINE — Service Worker Proxy
-//  يجلب الملفات عبر نافذة مؤقتة تتجاوز CORS
-// --------------------------------------------------------------
-
-const _odLS        = 'dashboard_od_urls_v1';
-const _odDataCache = {};
-let   _odAutoSyncTimer = null, _odAutoSyncActive = false, _odAutoSyncInterval = 5 * 60 * 1000;
-const _odUrls = { 'مبيعات': '', 'تحصيل': '', 'مديونية': '', 'تصنيف': '' };
-
-document.addEventListener('DOMContentLoaded', () => {
-  try {
-    const saved = JSON.parse(localStorage.getItem(_odLS) || '{}');
-    Object.keys(_odUrls).forEach(k => { if (saved[k]) _odUrls[k] = saved[k]; });
-  } catch(e) {}
-});
-
-// ── تحويل رابط المشاركة → رابط تنزيل مباشر ─────────────────
-function _odToDownloadUrl(u) {
-  u = u.trim();
-  if (u.includes('onedrive.live.com/download')) return u;
-  if (u.includes('.sharepoint.com')) {
-    return u + (u.includes('?') ? '&' : '?') + 'download=1';
-  }
-  if (u.includes('onedrive.live.com')) {
-    try {
-      const p   = new URL(u);
-      const rid = p.searchParams.get('resid');
-      const ak  = p.searchParams.get('authkey') || p.searchParams.get('redeem') || p.searchParams.get('e');
-      if (rid) return 'https://onedrive.live.com/download?resid=' + encodeURIComponent(rid) + (ak ? '&authkey=' + encodeURIComponent(ak) : '');
-    } catch(e) {}
-  }
-  return u; // 1drv.ms أو غيره — يبقى كما هو
-}
-
-// ── جلب ملف عبر fetch مع cache-bust ──────────────────────────
-async function _odFetchFileGraph(key, shareUrl) {
-  const dlUrl = _odToDownloadUrl(shareUrl);
-  const bust  = (dlUrl.includes('?') ? '&' : '?') + '_cb=' + Date.now();
-
-  // ── محاولة 1: مباشرة (قد تنجح لو الملف عام بالكامل) ────────
-  const tryDirect = () => fetch(dlUrl + bust, {
-    cache: 'no-store', redirect: 'follow',
-    headers: { 'Accept': '*/*' }
-  }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); });
-
-  // ── محاولة 2: corsproxy.io ────────────────────────────────────
-  const tryProxy1 = () => fetch('https://corsproxy.io/?' + encodeURIComponent(dlUrl + bust), {
-    cache: 'no-store', redirect: 'follow'
-  }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); });
-
-  // ── محاولة 3: allorigins ─────────────────────────────────────
-  const tryProxy2 = () => fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(dlUrl + bust), {
-    cache: 'no-store'
-  }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); });
-
-  // ── محاولة 4: corsproxy.org ──────────────────────────────────
-  const tryProxy3 = () => fetch('https://corsproxy.org/?' + encodeURIComponent(dlUrl + bust), {
-    cache: 'no-store', redirect: 'follow'
-  }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); });
-
-  // ── سباق بين الأربعة ─────────────────────────────────────────
-  const isValid = ab => ab && ab.byteLength > 100;
-  let lastErr = '';
-  for (const fn of [tryDirect, tryProxy1, tryProxy2, tryProxy3]) {
-    try {
-      const ab = await fn();
-      if (!isValid(ab)) continue;
-      const unchanged = (_odDataCache[key] === ab.byteLength);
-      _odDataCache[key] = ab.byteLength;
-      _odDataCache[key + '_unchanged'] = unchanged;
-      return _odAbToFile(key, ab);
-    } catch(e) { lastErr = e.message; }
-  }
-
-  // ── آخر محاولة: نافذة تنزيل مع input[type=file] hint ─────────
-  throw new Error('تعذّر جلب ' + key + ': ' + lastErr + 
-    '\n💡 الحل: افتح الرابط في المتصفح وحمّل الملف يدوياً');
-}
-
-// ── تحويل ArrayBuffer → File ─────────────────────────────────
-function _odAbToFile(key, ab) {
-  const bytes = new Uint8Array(ab.slice(0, 4));
-  const isXlsx = bytes[0] === 0x50 && bytes[1] === 0x4B;
-  if (isXlsx) {
-    if (typeof XLSX === 'undefined') throw new Error('SheetJS غير محمّل');
-    const wb  = XLSX.read(ab, { type: 'array' });
-    const csv = XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]]);
-    return new File([csv], key + '.csv', { type: 'text/csv' });
-  }
-  let text;
-  try {
-    text = new TextDecoder('utf-8', { fatal: true }).decode(ab);
-    if (!/[\u0600-\u06FF]/.test(text) && ab.byteLength > 200) throw 0;
-  } catch(e) {
-    text = new TextDecoder('windows-1256', { fatal: false }).decode(ab);
-  }
-  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
-  return new File([text], key + '.csv', { type: 'text/csv' });
-}
-
-// ── واجهة ─────────────────────────────────────────────────────
-function _odSetMsg(txt, clr) {
-  const el = document.getElementById('odMsg');
-  if (el) { el.textContent = txt; el.style.color = clr || '#4da6ff'; }
-}
-
-function odUrlChanged(key) {
-  const el = document.getElementById('odUrl_' + key);
-  const st = document.getElementById('odStatus_' + key);
-  if (!el) return;
-  _odUrls[key] = el.value.trim();
-  if (st) st.textContent = _odUrls[key] ? '✅' : '⬜';
-  try { localStorage.setItem(_odLS, JSON.stringify(_odUrls)); } catch(e) {}
-}
-
-function _odPopulate() {
-  Object.keys(_odUrls).forEach(key => {
-    const el = document.getElementById('odUrl_' + key);
-    if (el && _odUrls[key]) { el.value = _odUrls[key]; odUrlChanged(key); }
-  });
-}
-
-async function odTestLinks() {
-  const active = Object.keys(_odUrls).filter(k => _odUrls[k]?.trim());
-  if (!active.length) { _odSetMsg('⚠️ أدخل رابطاً واحداً على الأقل', 'var(--gold)'); return; }
-  _odSetMsg('⚡ جارٍ الاختبار...', '#4da6ff');
-  active.forEach(k => { const s = document.getElementById('odStatus_'+k); if(s) s.textContent='⚡'; });
-  const res = await Promise.all(active.map(async k => {
-    try { await _odFetchFileGraph(k, _odUrls[k]); return { k, ok: true }; }
-    catch(e) { return { k, ok: false, err: e.message.split('\n')[0] }; }
-  }));
-  const allOk = res.every(r => r.ok);
-  res.forEach(r => {
-    const s = document.getElementById('odStatus_'+r.k); if(s) s.textContent = r.ok ? '✅' : '❌';
-  });
-  _odSetMsg(
-    res.map(r => (r.ok?'✅':'❌')+' '+r.k+(r.ok?'':': '+r.err)).join('  |  ') +
-    (allOk ? ' — اضغط مزامنة ✅' : ''),
-    allOk ? 'var(--accent2)' : 'var(--red)'
-  );
-}
-
-async function odFetchAndUpdate() {
-  const btn  = document.getElementById('odFetchBtn');
-  const keys = ['مبيعات','تحصيل','مديونية','تصنيف'];
-  const active = keys.filter(k => _odUrls[k]?.trim());
-  if (!active.length) { _odSetMsg('⚠️ أدخل رابطاً على الأقل', 'var(--gold)'); return; }
-  if (btn) btn.disabled = true;
-  const rc = document.getElementById('odReportCard');
-  if (rc) rc.style.display = 'none';
-  _odSetMsg('⚡ جارٍ جلب الملفات...', '#4da6ff');
-  active.forEach(k => { const s=document.getElementById('odStatus_'+k); if(s) s.textContent='⚡'; });
-
-  const settled = await Promise.allSettled(active.map(k => _odFetchFileGraph(k, _odUrls[k])));
-  const results = {};
-  let err = false;
-  settled.forEach((r, i) => {
-    const k = active[i];
-    const s = document.getElementById('odStatus_'+k);
-    if (r.status === 'fulfilled') { results[k] = r.value; if(s) s.textContent='✅'; }
-    else { err = true; if(s) s.textContent='❌'; _odSetMsg('❌ '+r.reason?.message?.split('\n')[0], 'var(--red)'); }
-  });
-  if (err && !Object.keys(results).length) { if(btn) btn.disabled=false; return; }
-
-  const noChange = Object.keys(results).every(k => _odDataCache[k+'_unchanged']);
-  if (!noChange) {
-    keys.forEach(k => { csvFiles[k] = results[k] || null; });
-    try {
-      _odSetMsg('⚡ جارٍ تطبيق البيانات...', '#4da6ff');
-      await applyCsvData('pub');
-      _odSetMsg('✅ تمت المزامنة — ' + new Date().toLocaleTimeString('ar'), 'var(--accent2)');
-    } catch(e) { _odSetMsg('❌ خطأ: ' + e.message, 'var(--red)'); }
-  } else {
-    _odSetMsg('✅ لا تغييرات — البيانات محدّثة', 'var(--accent2)');
-  }
-  if (btn) btn.disabled = false;
-}
-
-function toggleOdAutoSync() {
-  if (_odAutoSyncActive) {
-    _odAutoSyncActive = false;
-    if (_odAutoSyncTimer) { clearTimeout(_odAutoSyncTimer); _odAutoSyncTimer = null; }
-    try { localStorage.removeItem('_odAutoSyncInterval'); } catch(e) {}
-    const btn = document.getElementById('odAutoSyncBtn');
-    if (btn) { btn.textContent='🔄 تلقائي'; btn.style.background='rgba(0,120,212,0.1)'; btn.style.borderColor='rgba(0,120,212,0.3)'; }
-  } else {
-    const c = prompt('فترة المزامنة:\n1=30ث  2=دقيقة  3=دقيقتان  4=5د  5=10د', '4');
-    if (!c) return;
-    const m = {'1':.5,'2':1,'3':2,'4':5,'5':10}[c.trim()] || parseFloat(c);
-    if (!m || m < .25) return;
-    _odAutoSyncInterval = Math.round(m * 60000);
-    _odAutoSyncActive   = true;
-    try { localStorage.setItem('_odAutoSyncInterval', _odAutoSyncInterval); } catch(e) {}
-    const btn = document.getElementById('odAutoSyncBtn');
-    if (btn) { btn.style.background='rgba(0,120,212,0.25)'; btn.style.borderColor='rgba(0,120,212,0.6)'; }
-    _odRunAutoSync();
-  }
-}
-
-async function _odRunAutoSync() {
-  if (!_odAutoSyncActive) return;
-  await odFetchAndUpdate();
-  if (!_odAutoSyncActive) return;
-  const btn = document.getElementById('odAutoSyncBtn');
-  let rem = Math.floor(_odAutoSyncInterval / 1000);
-  const cd = setInterval(() => {
-    rem--;
-    if (btn) btn.textContent = rem > 60
-      ? '⏱ ' + Math.floor(rem/60) + 'د' + (rem%60 > 0 ? rem%60+'ث':'')
-      : '⏱ ' + rem + 'ث';
-    if (rem <= 0) clearInterval(cd);
-  }, 1000);
-  _odAutoSyncTimer = setTimeout(_odRunAutoSync, _odAutoSyncInterval);
-}
-
-const _origSwitchDataTab = switchDataTab;
-switchDataTab = function(tab, btn) {
-  _origSwitchDataTab(tab, btn);
-  if (tab === 'od') _odPopulate();
-};
-// --------------------------------------------------------------
-//  نهاية OneDrive Engine
-// --------------------------------------------------------------
-
 </script>
 
-<!-- ═══════════════════════════════════════════════════════
-     قاعدة بيانات العملاء الكاملة مع أعمار الذمم
-════════════════════════════════════════════════════════ -->
-<div id="tab-aging" class="tab-panel">
-
-  <!-- ── print section title ── -->
-  <div class="print-section-title" style="display:none">📊 لوحة التحليل الاستراتيجي — ⏳ أعمار الذمم</div>
-
-  <!-- ── شريط العنوان + أزرار ── -->
-  <div class="print-bar" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--gap);flex-wrap:wrap;gap:8px;min-width:0">
-    <div id="tab-filter-label-aging" style="font-size:13px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:8px;flex-wrap:wrap"></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <button onclick="exportAgingCSV()" style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:var(--accent2);padding:7px 16px;border-radius:var(--r-pill);font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer">⬇️ تصدير CSV</button>
-      <button class="print-btn" onclick="printCurrentTab()">🖨️ طباعة — ⏳ أعمار الذمم</button>
-    </div>
+    <div class="csv-progress-msg" id="csvProgressMsg"></div>
   </div>
+</div>
 
-  <!-- ── البطاقات الخمس (تحت أزرار الطباعة مباشرة — فوق الجدول) ── -->
-  <div class="ag-kpi-grid">
-    <div class="kpi-card blue">
-      <div class="kpi-icon">🏪</div>
-      <div class="kpi-label">إجمالي العملاء</div>
-      <div class="kpi-value" id="ag-total-custs">—</div>
-      <div class="kpi-sub">عميل في كشف الذمم</div>
-    </div>
-    <div class="kpi-card red">
-      <div class="kpi-icon">⏰</div>
-      <div class="kpi-label">ذمة 0–30 يوم</div>
-      <div class="kpi-value" id="ag-age30">—</div>
-      <div class="kpi-sub">حديثة الاستحقاق</div>
-    </div>
-    <div class="kpi-card orange">
-      <div class="kpi-icon">⌛</div>
-      <div class="kpi-label">ذمة 31–60 يوم</div>
-      <div class="kpi-value" id="ag-age60">—</div>
-      <div class="kpi-sub">متوسطة الأعمار</div>
-    </div>
-    <div class="kpi-card gold">
-      <div class="kpi-icon">⚠️</div>
-      <div class="kpi-label">ذمة أكثر من 60</div>
-      <div class="kpi-value" id="ag-age-old">—</div>
-      <div class="kpi-sub">تحتاج متابعة عاجلة</div>
-    </div>
-    <div class="kpi-card green">
-      <div class="kpi-icon">💰</div>
-      <div class="kpi-label">إجمالي الديون</div>
-      <div class="kpi-value" id="ag-total-debt">—</div>
-      <div class="kpi-sub">صافي المديونية</div>
-    </div>
-  </div>
-
-  <!-- ── table-card: العنوان + الفلاتر + الجدول في بطاقة واحدة ── -->
-  <div class="table-card" style="padding:0;overflow:hidden">
-
-    <!-- header الجدول: عنوان + بحث + فلاتر -->
-    <div style="padding:var(--sp-md);border-bottom:1px solid var(--border)">
-
-      <!-- السطر الأول: عنوان + بحث -->
-      <div class="ag-header-row">
-        <div>
-          <div class="chart-title">⏳ أعمار الذمم التجارية</div>
-          <div class="chart-sub" id="agCount">تحليل الذمم حسب الفترة الزمنية</div>
-        </div>
-        <input type="text" id="agSearch" class="search-input ag-search"
-          placeholder="🔍 بحث باسم العميل أو المندوب..."
-          oninput="renderAgingTable()">
-      </div>
-
-      <!-- السطر الثاني: الفلاتر -->
-      <div class="ag-filters">
-        <select id="agRepCatFilter" class="filter-select" onchange="onAgRepCatChange()">
-          <option value="">📂 كل فئات المناديب</option>
-          <option value="جملة">🏭 جملة</option>
-          <option value="تجزئة">🛒 تجزئة</option>
-          <option value="أسواق">🏪 أسواق</option>
-          <option value="مقاهي ومطاعم">☕ مقاهي ومطاعم</option>
-          <option value="إدارية">🏢 إدارية</option>
-        </select>
-        <select id="agRepFilter" class="filter-select" onchange="setRepCatFromRep(this.value,'agRepCatFilter'); renderAgingTable();">
-          <option value="">👤 كل المناديب</option>
-        </select>
-        <select id="agCatFilter" class="filter-select" onchange="renderAgingTable()">
-          <option value="">📂 كل الفئات</option>
-        </select>
-        <select id="agDebtFilter" class="filter-select" onchange="renderAgingTable()">
-          <option value="">💰 كل العملاء</option>
-          <option value="has_debt">لديهم ديون فقط</option>
-          <option value="age30">ذمة 0–30 يوم</option>
-          <option value="age60">ذمة 31–60 يوم</option>
-          <option value="age_old">ذمة أكثر من 60 يوم</option>
-        </select>
-        <select id="agSortBy" class="filter-select" onchange="renderAgingTable()">
-          <option value="debt_net">↕ صافي الدين</option>
-          <option value="age30">↕ ذمة 30 يوم</option>
-          <option value="age60">↕ ذمة 60 يوم</option>
-          <option value="age_old">↕ ذمة أكثر من 60</option>
-          <option value="sales">↕ المبيعات</option>
-          <option value="name">↕ الاسم</option>
-        </select>
-        <button class="print-btn ag-print-btn" style="font-size:12px;padding:5px 12px"
-          onclick="printTable('agingTable','أعمار الذمم التجارية')">🖨️ طباعة</button>
-      </div>
-    </div>
-
-    <!-- الجدول -->
-    <div class="table-scroll" style="overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%">
-      <table id="agingTable">
-        <thead>
-          <tr>
-            <th style="width:36px;text-align:center;padding:10px 6px">#</th>
-            <th style="padding:10px 12px">اسم العميل</th>
-            <th style="padding:10px 12px">المندوب</th>
-            <th style="text-align:right;color:var(--accent);padding:10px 12px">المبيعات</th>
-            <th style="text-align:right;color:var(--red);padding:10px 12px">المرتجعات</th>
-            <th style="text-align:right;color:var(--accent2);padding:10px 12px">صافي المبيعات</th>
-            <th style="text-align:right;color:var(--accent2);padding:10px 12px">التحصيلات</th>
-            <th style="text-align:right;background:rgba(255,71,87,.07);color:var(--red);padding:10px 12px">ذمة 0–30</th>
-            <th style="text-align:right;background:rgba(255,215,0,.06);color:var(--gold);padding:10px 12px">ذمة 31–60</th>
-            <th style="text-align:right;background:rgba(255,107,53,.06);color:#ff6b35;padding:10px 12px">ذمة +60</th>
-            <th style="text-align:right;color:var(--red);padding:10px 12px">صافي الدين</th>
-            <th style="text-align:center;padding:10px 12px">التصنيف</th>
-          </tr>
-        </thead>
-        <tbody id="agingTbody">
-          <tr>
-            <td colspan="12" style="text-align:center;color:var(--muted);padding:50px 20px">
-              ⏳ جارٍ تحميل البيانات...
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- ترقيم الصفحات -->
-    <div id="agingPagination" style="display:flex;justify-content:center;gap:6px;padding:14px 16px;flex-wrap:wrap;border-top:1px solid var(--border)"></div>
-  </div>
-
-</div><!-- end tab-aging -->
-
-
-<!-- ======= CSV LOADER MODAL ======= -->
 <div class="csv-modal-overlay" id="csvModalOverlay" onclick="if(event.target===this)closeCsvModal()">
   <div class="csv-modal" style="width:560px;max-height:92vh;overflow-y:auto">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
@@ -14185,7 +13992,6 @@ switchDataTab = function(tab, btn) {
     <div class="gs-tab-bar">
       <button class="gs-tab-btn active" onclick="switchDataTab('csv', this)">📂 رفع ملفات CSV</button>
       <button class="gs-tab-btn" onclick="switchDataTab('gs', this)">🔗 Google Sheets مباشر</button>
-      <button class="gs-tab-btn" onclick="switchDataTab('od', this)">☁️ OneDrive / SharePoint</button>
     </div>
 
     <!-- CSV Panel -->
@@ -14360,55 +14166,14 @@ switchDataTab = function(tab, btn) {
         </div><!-- end panel-gs -->
 
     <!-- OneDrive / SharePoint Panel -->
-    <div class="gs-panel" id="panel-od">
-      <div style="background:rgba(0,120,212,0.08);border:1px solid rgba(0,120,212,0.3);border-radius:12px;padding:14px 16px;margin-bottom:14px">
-
-        <!-- حقول الروابط -->
-        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">الصق روابط المشاركة من OneDrive — تأكد أن الإذن "أي شخص لديه الرابط"</div>
-        <div class="gs-url-row">
-          <span class="gs-url-label">📦 مبيعات</span>
-          <input class="gs-url-input" id="odUrl_مبيعات" placeholder="https://1drv.ms/x/…" oninput="odUrlChanged('مبيعات')">
-          <span class="gs-url-status" id="odStatus_مبيعات">⬜</span>
-        </div>
-        <div class="gs-url-row">
-          <span class="gs-url-label">💳 تحصيل</span>
-          <input class="gs-url-input" id="odUrl_تحصيل" placeholder="https://1drv.ms/x/…" oninput="odUrlChanged('تحصيل')">
-          <span class="gs-url-status" id="odStatus_تحصيل">⬜</span>
-        </div>
-        <div class="gs-url-row">
-          <span class="gs-url-label">💰 مديونية</span>
-          <input class="gs-url-input" id="odUrl_مديونية" placeholder="https://1drv.ms/x/…" oninput="odUrlChanged('مديونية')">
-          <span class="gs-url-status" id="odStatus_مديونية">⬜</span>
-        </div>
-        <div class="gs-url-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:6px">
-          <span class="gs-url-label" style="color:var(--gold)">👥 تصنيف</span>
-          <input class="gs-url-input" id="odUrl_تصنيف" placeholder="https://1drv.ms/x/…" oninput="odUrlChanged('تصنيف')">
-          <span class="gs-url-status" id="odStatus_تصنيف">⬜</span>
-        </div>
-
-        <!-- أزرار -->
-        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center">
-          <button onclick="odTestLinks()" style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.35);color:#ffd700;padding:9px 18px;border-radius:999px;font-family:'Cairo',sans-serif;font-weight:700;font-size:13px;cursor:pointer">🧪 اختبار</button>
-          <button class="gs-sync-btn" id="odAutoSyncBtn" onclick="toggleOdAutoSync()" style="background:rgba(0,120,212,0.1);border:1px solid rgba(0,120,212,0.3);color:#4da6ff;">🔄 تلقائي</button>
-          <button class="gs-sync-btn" id="odFetchBtn" onclick="odFetchAndUpdate()" style="background:rgba(0,120,212,0.2);border:1px solid rgba(0,120,212,0.5);color:#4da6ff;font-weight:700;">⚡ مزامنة الآن</button>
-        </div>
-        <div class="csv-progress-msg" id="odMsg" style="margin-top:8px"></div>
-
-        <!-- بطاقة تقرير المزامنة -->
-        <div id="odReportCard" style="display:none;margin-top:10px;padding:10px 14px;border-radius:10px;background:rgba(0,120,212,0.06);border:1px solid rgba(0,120,212,0.2);font-family:'Cairo',sans-serif;font-size:12px;direction:rtl;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-            <span id="odReportIcon" style="font-size:16px">✅</span>
-            <span id="odReportTitle" style="font-weight:700;color:#4da6ff">تم التحديث بنجاح</span>
-            <span id="odReportTime" style="color:var(--muted);margin-right:auto;font-size:11px"></span>
-          </div>
-          <div id="odReportStats" style="display:flex;gap:14px;flex-wrap:wrap;color:var(--text2);font-size:11px;"></div>
-        </div>
-      </div>
-    </div><!-- end panel-od -->
 
     <div class="csv-progress-msg" id="csvProgressMsg"></div>
   </div>
+
 </div>
+
+
+  <!-- ذيل الطباعة -->
 
 </div><!-- end main-area -->
 </div><!-- end app-shell -->
