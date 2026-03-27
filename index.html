@@ -58,7 +58,7 @@ TYPE html>
     --content-max: 1400px;
     --content-pad: clamp(16px, 4vw, 40px);
     --gap:    20px;
-    --header-h: 64px;
+    --header-h: 44px;
   }
 
   /* =============================================
@@ -81,31 +81,34 @@ TYPE html>
   /* =============================================
      HEADER
   ============================================= */
+  /* ── sticky-top: يجمع header + df-wrap ويخفيهما عند السكرول ── */
+  #sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
   .header {
     background: linear-gradient(135deg, #0d1b2e 0%, #0a1628 100%);
     border-bottom: 1px solid var(--border);
-    padding: var(--sp-lg) var(--content-pad);
+    padding: 8px var(--content-pad);
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: var(--sp-sm);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    gap: 8px;
+    position: static;
     backdrop-filter: blur(20px);
-    min-height: var(--header-h, 64px);
   }
   .header-title h1 {
     font-family: 'Tajawal', sans-serif;
-    font-size: clamp(16px, 2.5vw, 22px);
-    font-weight: 900;
+    font-size: clamp(14px, 2vw, 18px);
+    font-weight: 800;
     background: linear-gradient(90deg, var(--accent), var(--accent2));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  .header-title p { color: var(--muted); font-size: var(--fs-sm); margin-top: 3px; }
+  .header-title p { color: var(--muted); font-size: 11px; margin-top: 1px; }
   .header-meta { display: flex; gap: var(--sp-sm); align-items: center; flex-wrap: wrap; }
   .badge {
     background: rgba(0,212,255,0.1);
@@ -141,13 +144,14 @@ TYPE html>
     gap: 3px;
     padding: 20px 10px 14px;
     position: sticky;
-    top: var(--header-h, 64px);
-    height: calc(100vh - var(--header-h, 64px));
+    top: var(--header-h, 52px);
+    height: calc(100vh - var(--header-h, 52px));
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: rgba(30,58,95,0.6) transparent;
     flex-shrink: 0;
     z-index: 90;
+
     transition: width 0.25s, min-width 0.25s, transform 0.25s;
   }
   .nav::-webkit-scrollbar { width: 3px; }
@@ -234,22 +238,6 @@ TYPE html>
     flex-shrink: 0;
   }
 
-  /* ── label toggle at bottom ── */
-  #labelToggleBtn {
-    border: 1px solid rgba(0,212,255,0.2) !important;
-    background: rgba(0,212,255,0.04) !important;
-    color: rgba(139,163,184,0.85) !important;
-    margin-bottom: 2px;
-  }
-  #labelToggleBtn:hover {
-    background: rgba(0,212,255,0.1) !important;
-    color: var(--accent) !important;
-  }
-  #labelToggleBtn.lbl-on {
-    background: rgba(0,212,255,0.15) !important;
-    color: var(--accent) !important;
-    border-color: rgba(0,212,255,0.4) !important;
-  }
 
   /* ── spacer ── */
   .nav-spacer { flex: 1; min-height: 8px; }
@@ -331,7 +319,6 @@ TYPE html>
     }
     .nav-group-label { display: none; }
     .nav-divider { margin: 4px 4px; }
-    #labelToggleBtn { padding: 8px 4px 6px; flex-direction: column; gap: 3px; }
   }
 
   /* ── Mobile (≤ 600px): hide sidebar, show bottom tab bar ── */
@@ -1725,9 +1712,7 @@ TYPE html>
 ══════════════════════════════════════════════ */
 #df-wrap {
   padding: 6px var(--content-pad,24px);
-  position: sticky;
-  top: var(--header-h, 64px);
-  z-index: 85;
+
   background: var(--bg);
   border-bottom: 1px solid rgba(30,58,95,0.45);
   backdrop-filter: blur(12px);
@@ -1889,6 +1874,47 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
   flex-shrink: 0;
 }
 #df-reset:hover { background: rgba(255,71,87,.1); border-color: var(--red); }
+#df-today {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: 1.5px solid rgba(0,212,255,.4);
+  color: var(--accent);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .18s;
+  flex-shrink: 0;
+}
+#df-today:hover { background: rgba(0,212,255,.1); border-color: var(--accent); }
+#labelToggleBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: 1.5px solid rgba(255,215,0,.4);
+  color: var(--gold, #ffd700);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .18s;
+  flex-shrink: 0;
+}
+#labelToggleBtn:hover { background: rgba(255,215,0,.1); border-color: var(--gold, #ffd700); }
+#labelToggleBtn.active {
+  background: rgba(255,215,0,.15);
+  border-color: var(--gold, #ffd700);
+  color: var(--gold, #ffd700);
+}
 
 @keyframes _dfSpin { to { transform: rotate(360deg); } }
 #df-spin {
@@ -1918,6 +1944,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
 </head>
 <body>
 
+<div id="sticky-top">
 <div class="header">
   <div class="header-title">
     <h1>📊 لوحة التحليل الاستراتيجي الشامل</h1>
@@ -1998,12 +2025,15 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
     <div class="df-right">
       <div id="df-spin"></div>
       <div id="df-status"><span class="df-st-dot">●</span><span id="df-st-txt">—</span></div>
+      <button id="labelToggleBtn" onclick="toggleDataLabels()" title="إظهار/إخفاء أرقام الرسوم">🔢 أرقام الرسوم</button>
+      <button id="df-today" onclick="dfSetToday()" title="عرض بيانات اليوم الحالي">📅 اليوم</button>
       <button id="df-reset" onclick="dfQuick('all')" title="إزالة الفلتر">✕ إزالة الفلتر</button>
     </div>
 
   </div>
 </div>
 
+</div><!-- /#sticky-top -->
 
 
 <!-- Mobile sidebar overlay -->
@@ -2093,9 +2123,6 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
   <div class="nav-spacer"></div>
   <div class="nav-divider"></div>
 
-  <button id="labelToggleBtn" onclick="toggleDataLabels()" class="nav-btn">
-    <span class="nav-icon">🔢</span><span class="nav-label">أرقام الرسوم</span>
-  </button>
 
 </nav>
 
@@ -5179,6 +5206,12 @@ repsData.forEach(r => {
   r.roi    = r.netSales > 0 ? +(r.col / r.netSales * 100).toFixed(2) : 0;
   r.retPct = r.sales    > 0 ? +(r.returns / r.sales * 100).toFixed(2) : 0;
 });
+
+// ══ آخر تاريخ فعلي للبيانات — يُحدَّث تلقائياً عند توليد اللوحة ══
+// ⚠️  هذا المتغير يجب أن يُحدَّث عند كل تحديث للبيانات
+// يُحسب تلقائياً: آخر تاريخ في ملف CSV عند بناء اللوحة من Python
+// آخر تاريخ فعلي للبيانات المضمّنة في اللوحة
+window._dataActualMax = '2026-03-19';
 
 // ══ ضبط _monthlyStats الافتراضي فوراً (قبل DOMContentLoaded) ══
 window._monthlyStats = window._monthlyStats || {
@@ -10634,7 +10667,7 @@ function updateSectionTitle(elId, baseTitle, filters) {
 // المستخدم يضغط زر واحد فقط — لا إعدادات مطلوبة
 // ═════════════════════════════════════════════════════════════
 
-const _GS_CLIENT_ID  = '749645819219-k7s0u0bnfs8s4n0t3lgk4l6f3q7q9r1j.apps.googleusercontent.com';
+const _GS_CLIENT_ID  = '191503304260-l3i0g101u2r2v1be55nt5ung7kthvku9.apps.googleusercontent.com';
 const _GS_SCOPE      = 'https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/drive.readonly';
 const _GS_LS_DIRECT  = 'dashboard_gs_direct_v1';
 
@@ -11728,6 +11761,8 @@ window.dfInitRange = function() {
   const scan=(rows,i)=>{if(i<0)return;for(const r of rows){const d=_d(r[i]||'');if(!d||d.length<7)continue;if(!mn||d<mn)mn=d;if(!mx||d>mx)mx=d;}};
   scan(sr,is); scan(cr,ic);
   if(!mn)return;
+  // استخدم آخر تاريخ فعلي للبيانات دائماً (يتجاوز التواريخ الوهمية في _dfSR)
+  if(window._dataActualMax) mx = window._dataActualMax;
   window._dfMin=mn; window._dfMax=mx;
   const fr=document.getElementById('dfFrom'), to=document.getElementById('dfTo');
   if(fr){fr.min=mn;fr.max=mx;} if(to){to.min=mn;to.max=mx;}
@@ -11762,6 +11797,18 @@ window.dfQuick = function(range) {
   else if(range==='m6') { fr.value=_fmt(new Date(t.getFullYear(),t.getMonth()-5,1)); to.value=mx||_fmt(t); }
   else if(range==='yr') { fr.value=t.getFullYear()+'-01-01'; to.value=mx||_fmt(t); }
   _syncMonthSel(fr.value, to.value);
+  _run();
+};
+
+// ── today shortcut ────────────────────────────────────────────────
+window.dfSetToday = function() {
+  const today = _fmt(new Date());
+  const fr = document.getElementById('dfFrom');
+  const to = document.getElementById('dfTo');
+  if (!fr || !to) return;
+  fr.value = today;
+  to.value = today;
+  _syncMonthSel(today, today);
   _run();
 };
 
@@ -12207,6 +12254,7 @@ window._dfUI = function() { try { _ui(); } catch(e) { console.warn('_dfUI:', e);
 
     // ── إزالة الفلتر: استعادة كاملة ──
     if (!from && !to) {
+
       repsData.length=0;     repsData.push(...snap.repsData.map(r=>({...r})));
       custData.length=0;     custData.push(...snap.custData.map(c=>({...c})));
       productsData.length=0; productsData.push(...snap.productsData.map(p=>({...p})));
@@ -12223,6 +12271,29 @@ window._dfUI = function() { try { _ui(); } catch(e) { console.warn('_dfUI:', e);
     }
 
     // ── تطبيق الفلتر: حساب الأوزان اليومية الدقيقة ──
+
+    // ✅ تحقق مبكر: هل النطاق المحدد يقع خارج نطاق البيانات الفعلية؟
+    const dfMax = window._dfMax || (snap.months.length ? (() => {
+      const last = snap.months[snap.months.length - 1];
+      const [ly, lm] = last.split('-').map(Number);
+      return new Date(ly, lm, 0).toISOString().substring(0, 10);
+    })() : '');
+    const dfMin = window._dfMin || (snap.months.length ? snap.months[0] + '-01' : '');
+    const rangeOutside = (from && dfMax && from > dfMax) || (to && dfMin && to < dfMin);
+    if (rangeOutside) {
+      repsData.length=0; custData.length=0; productsData.length=0; itemsData.length=0;
+      window._monthlyStats = { labels:[], sales:[], returns:[], net:[], col:[] };
+      topDebtors.length=0;
+      // ── تصفير تبويب المديونية ──
+      _lastDebtRepsFiltered = [];
+      debtDetailFiltered = [];
+      if (typeof renderDebtRepsTable === 'function') renderDebtRepsTable([]);
+      if (typeof renderDebtDetailTable === 'function') renderDebtDetailTable();
+      if (typeof updateDebtTabFiltered === 'function') updateDebtTabFiltered([], []);
+      _refreshAllUI();
+      return;
+    }
+
     const totalS = snap.msSales.reduce((s,v)=>s+v,0) || 1;
     const totalC = snap.msCol.reduce((s,v)=>s+v,0)   || 1;
     let wS = 0, wC = 0;
@@ -12279,7 +12350,8 @@ window._dfUI = function() { try { _ui(); } catch(e) { console.warn('_dfUI:', e);
   document.addEventListener('DOMContentLoaded', function() {
     const mnDate = months[0] + '-01';
     const [mxY, mxM] = months[months.length-1].split('-').map(Number);
-    const mxDate = new Date(mxY, mxM, 0).toISOString().substring(0,10);
+    // استخدم آخر تاريخ فعلي للبيانات، وإلا نهاية الشهر الأخير
+    const mxDate = window._dataActualMax || new Date(mxY, mxM, 0).toISOString().substring(0,10);
     window._dfMin = mnDate; window._dfMax = mxDate;
     const frEl = document.getElementById('dfFrom'), toEl = document.getElementById('dfTo');
     if (frEl) { frEl.min = mnDate; frEl.max = mxDate; }
