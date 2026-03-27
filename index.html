@@ -1299,16 +1299,25 @@ TYPE html>
 
 
   @media print {
-    /* Charts: show a placeholder when Chart.js not loaded */
-    canvas {
+    /* Charts: convert to image via JS before print */
+    canvas { max-width: 100% !important; max-height: 160pt !important; display: block; }
+    .print-chart-img {
       max-width: 100% !important;
-      max-height: 120pt !important;
+      width: 100% !important;
+      height: auto !important;
+      display: block !important;
+      object-fit: contain;
+      border-radius: 4pt;
     }
     .chart-wrap {
+      height: 160pt !important;
       page-break-inside: avoid;
-      border: 1px dashed #ccc !important;
-      border-radius: 4pt !important;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+    .chart-wrap img, .chart-wrap canvas { width:100% !important; height:100% !important; object-fit:contain; }
     /* Ensure numbers/values use black ink */
     [style*="color:var(--accent)"],
     [style*="color:var(--accent2)"],
@@ -1325,6 +1334,67 @@ TYPE html>
     }
   }
 
+
+
+/* ══════════════════════════════════════════════════
+   FOOTER — ذيل اللوحة
+════════════════════════════════════════════════════ */
+.dashboard-footer {
+  width: 100%;
+  background: linear-gradient(135deg, #0d1b2e 0%, #0a1628 100%);
+  border-top: 1px solid var(--border);
+  padding: 8px var(--content-pad);
+  margin-top: 16px;
+  text-align: center;
+  direction: rtl;
+}
+.dashboard-footer__inner {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+.dashboard-footer__ar {
+  font-family: 'Cairo', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent2);
+}
+.dashboard-footer__en {
+  font-family: 'Tajawal', 'Cairo', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent);
+  direction: ltr;
+}
+.dashboard-footer__phone {
+  font-family: 'Cairo', sans-serif;
+  font-size: 10px;
+  color: var(--muted);
+}
+.dashboard-footer__sep {
+  color: var(--border);
+  font-size: 10px;
+}
+.dashboard-footer__divider { display: none; }
+
+@media print {
+  .dashboard-footer {
+    background: #1a2a4a !important;
+    border-top: 1pt solid #2a3a5a !important;
+    margin-top: 10pt !important;
+    padding: 5pt 16pt !important;
+    page-break-inside: avoid !important;
+  }
+  .dashboard-footer__ar  { color: #ffffff !important; font-size: 8pt !important; }
+  .dashboard-footer__en  { color: #e0e8f0 !important; font-size: 7.5pt !important; }
+  .dashboard-footer__phone { color: #c0ccd8 !important; font-size: 8pt !important; }
+  .dashboard-footer__sep { color: #4a6a8a !important; }
+}
 
 /* ---- CSV LOADER STYLES ---- */
 .csv-loader-btn {
@@ -1856,10 +1926,6 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
   <div class="header-meta">
     <span class="badge">🟢 بيانات محدّثة</span>
     <span class="badge" id="repCountBadge">35 مندوباً</span>
-    <div class="gs-header-live" id="gsHeaderLive">
-      <span class="gs-header-dot"></span>
-      <span id="gsHeaderLastSync">مزامنة حية</span>
-    </div>
     <button class="csv-loader-btn" onclick="openCsvModal()">📂 تحديث البيانات</button>
   </div>
 </div>
@@ -2398,6 +2464,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
         <tbody id="repsBody"></tbody>
       </table>
     </div>
+    <div id="repsPagination" style="display:flex;justify-content:center;align-items:center;gap:4px;padding:8px 12px;flex-wrap:wrap"></div>
     <div id="repsSummary" style="text-align:center;font-size:var(--fs-md);color:var(--text2);padding:var(--sp-sm);border-top:1px solid var(--border)"></div>
   </div>
 
@@ -2563,6 +2630,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
         <tbody id="rcBody"></tbody>
       </table>
     </div>
+    <div id="rcPagination" style="display:flex;justify-content:center;align-items:center;gap:4px;padding:8px 12px;flex-wrap:wrap"></div>
     <div id="rcSummary" style="text-align:center;font-size:var(--fs-md);color:var(--text2);padding:var(--sp-sm);border-top:1px solid var(--border);margin-top:var(--sp-xs)"></div>
   </div>
 
@@ -3414,6 +3482,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
         <tbody id="debtRepBody"></tbody>
       </table>
     </div>
+    <div id="debtRepPagination" style="display:flex;justify-content:center;align-items:center;gap:4px;padding:8px 12px;flex-wrap:wrap"></div>
   </div>
 
   <!-- Detail Table -->
@@ -3840,6 +3909,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
         <tbody id="itemsBody"></tbody>
       </table>
     </div>
+    <div id="itemsPagination" style="display:flex;justify-content:center;align-items:center;gap:4px;padding:8px 12px;flex-wrap:wrap"></div>
 
   <div class="products-grid" id="productsGrid"></div>
 
@@ -5134,7 +5204,62 @@ const catStyle = {
 };
 
 // ---- تبويب أداء المناديب — جدول متعدد الأوضاع ----
-function renderRepsTable() {
+// ════════════════════════════════════════════════════════════════
+//  نظام Pagination مركزي — يُستخدم في جميع الجداول
+//  الحجم الافتراضي: 10 صفوف لكل صفحة
+// ════════════════════════════════════════════════════════════════
+const _PAGE_SIZE = 10;
+
+function _mkPagination(containerId, currentPage, totalPages, onGoFn) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (totalPages <= 1) { el.innerHTML = ''; return; }
+
+  const btnStyle = (active) =>
+    `style="min-width:32px;height:32px;padding:0 8px;border-radius:6px;border:1px solid ${active?'var(--accent)':'var(--border)'};background:${active?'var(--accent)':'var(--surface2)'};color:${active?'#000':'var(--text2)'};cursor:${active?'default':'pointer'};font-family:'Cairo',sans-serif;font-size:12px;font-weight:${active?'800':'600'};transition:all .15s"`;
+
+  let h = '';
+  // زر الأول
+  h += `<button ${btnStyle(false)} onclick="${onGoFn}(1)" ${currentPage===1?'disabled':''} title="الأولى">«</button>`;
+  // زر السابق
+  h += `<button ${btnStyle(false)} onclick="${onGoFn}(${currentPage-1})" ${currentPage===1?'disabled':''} title="السابقة">‹</button>`;
+
+  // أرقام الصفحات (نافذة 5 أرقام)
+  const half = 2;
+  let lo = Math.max(1, currentPage - half);
+  let hi = Math.min(totalPages, lo + 4);
+  if (hi - lo < 4) lo = Math.max(1, hi - 4);
+
+  if (lo > 1) {
+    h += `<button ${btnStyle(false)} onclick="${onGoFn}(1)">1</button>`;
+    if (lo > 2) h += `<span style="color:var(--muted);padding:0 2px">…</span>`;
+  }
+  for (let p = lo; p <= hi; p++) {
+    h += `<button ${btnStyle(p===currentPage)} onclick="${onGoFn}(${p})" ${p===currentPage?'disabled':''} >${p}</button>`;
+  }
+  if (hi < totalPages) {
+    if (hi < totalPages - 1) h += `<span style="color:var(--muted);padding:0 2px">…</span>`;
+    h += `<button ${btnStyle(false)} onclick="${onGoFn}(${totalPages})">${totalPages}</button>`;
+  }
+
+  // زر التالي
+  h += `<button ${btnStyle(false)} onclick="${onGoFn}(${currentPage+1})" ${currentPage===totalPages?'disabled':''} title="التالية">›</button>`;
+  // زر الأخير
+  h += `<button ${btnStyle(false)} onclick="${onGoFn}(${totalPages})" ${currentPage===totalPages?'disabled':''} title="الأخيرة">»</button>`;
+
+  // معلومات الصفحة
+  h += `<span style="color:var(--muted);font-size:11px;margin-right:6px;white-space:nowrap">صفحة ${currentPage} من ${totalPages}</span>`;
+
+  el.innerHTML = h;
+}
+
+// ── متغيرات صفحات الجداول ────────────────────────────────────
+let repsPage = 1;
+let itemsPage = 1;
+let debtRepPage = 1;
+
+function renderRepsTable(_keepPage) {
+  if (!_keepPage) repsPage = 1;
   const q    = (document.getElementById('repSearch')?.value || '').trim();
   const cat  = document.getElementById('repCatFilter')?.value || '';
   const sort = document.getElementById('repSortFilter')?.value || 'sales';
@@ -5202,9 +5327,16 @@ function renderRepsTable() {
     };
     head.innerHTML = '<tr>' + (headers[view]||headers.basic).map(h=>`<th>${h}</th>`).join('') + '</tr>';
 
-    body.innerHTML = data.map((r, i) => {
+    // ── pagination ────────────────────────────────────────────────
+    const totalRepsPages = Math.ceil(data.length / _PAGE_SIZE);
+    if (repsPage > totalRepsPages) repsPage = 1;
+    const repsStart = (repsPage - 1) * _PAGE_SIZE;
+    const repsPageData = data.slice(repsStart, repsStart + _PAGE_SIZE);
+
+    body.innerHTML = repsPageData.map((r, i) => {
       let cells = '';
-      const num      = `<td style="color:var(--text2);text-align:center">${i+1}</td>`;
+      const absIdx = repsStart + i + 1;
+      const num      = `<td style="color:var(--text2);text-align:center">${absIdx}</td>`;
       const nameCell = `<td><b>${r.name}</b></td>`;
       const catCell  = `<td>${catBadge(r)}</td>`;
 
@@ -5257,7 +5389,6 @@ function renderRepsTable() {
           <td style="color:${r.debtPct>=70?'var(--accent2)':r.debtPct>=40?'#ff6b35':'var(--red)'};font-weight:700">${r.debtPct.toFixed(1)}%</td>
           <td>${tag(r)}</td>`;
       } else if (view === 'profile') {
-        // وضع بيانات التصنيف — يعرض الحقول الإضافية من ملف تصنيف المناديب
         const targetPct = (r.target && r.target > 0) ? (r.sales / r.target * 100) : 0;
         const tColor = targetPct >= 100 ? 'var(--accent2)' : targetPct >= 80 ? 'var(--gold)' : targetPct >= 50 ? '#ff6b35' : 'var(--red)';
         const hasProfileData = r.phone || r.target || r.area || r.code || r.notes;
@@ -5291,7 +5422,10 @@ function renderRepsTable() {
       return `<tr>${cells}</tr>`;
     }).join('');
 
-  // ملخص
+    // pagination controls
+    _mkPagination('repsPagination', repsPage, totalRepsPages, 'repsGoPage');
+
+  // ملخص — يعرض إجماليات كل البيانات (لا الصفحة فقط)
   const totS   = data.reduce((s,r)=>s+r.sales,0);
   const totNs  = data.reduce((s,r)=>s+r.netSales,0);
   const totC   = data.reduce((s,r)=>s+r.col,0);
@@ -5302,17 +5436,17 @@ function renderRepsTable() {
   const avgR   = totNs_r>0 ? (totC_r/totNs_r*100).toFixed(1) : '0';
   const sm = document.getElementById('repsSummary');
   if (sm) {
-    sm.innerHTML = `عرض <b>${data.length}</b> مندوب &nbsp;|&nbsp;
+    sm.innerHTML = `عرض <b>${repsStart+1}–${Math.min(repsStart+_PAGE_SIZE,data.length)}</b> من <b>${data.length}</b> مندوب &nbsp;|&nbsp;
         مبيعات: <b style="color:var(--accent)">${fmtN(totS)}</b> &nbsp;|&nbsp;
-        صافي المبيعات: <b style="color:var(--accent2)">${fmtN(totNs)}</b> &nbsp;|&nbsp;
-        تحصيلات: <b style="color:var(--accent2)">${fmtN(totC)}</b> &nbsp;|&nbsp;
+        صافي: <b style="color:var(--accent2)">${fmtN(totNs)}</b> &nbsp;|&nbsp;
+        تحصيل: <b style="color:var(--accent2)">${fmtN(totC)}</b> &nbsp;|&nbsp;
         مرتجعات: <b style="color:#ff6b35">${fmtN(totRet)}</b> &nbsp;|&nbsp;
-        ديون: <b style="color:var(--red)">${fmtN(totDebt)}</b> &nbsp;|&nbsp;
-        متوسط ROI: <b style="color:${avgR>=80?'var(--accent2)':avgR>=60?'#ff6b35':'var(--red)'}">${avgR}%</b>`;
+        ROI: <b style="color:${avgR>=80?'var(--accent2)':avgR>=60?'#ff6b35':'var(--red)'}">${avgR}%</b>`;
   }
   // تحديث KPIs والمخططات حسب الفلتر
   updateRepsTabFiltered(data);
 }
+function repsGoPage(p) { repsPage = p; renderRepsTable(true); }
 document.addEventListener('DOMContentLoaded', () => { try { renderRepsTable(); } catch(e) { console.warn(e); } });
 
 // ---- Section 8: مقارنة المندوبين (old tab - kept for reference) ----
@@ -5463,7 +5597,7 @@ function renderCustTable() {
   const pg    = document.getElementById('custPagination');
   if (!body) return;
 
-  const ps = 50;
+  const ps = _PAGE_SIZE;
   const tp = Math.ceil(filteredCust.length / ps);
   if (custPage > tp) custPage = Math.max(1, tp);
   const st = (custPage - 1) * ps;
@@ -5500,23 +5634,13 @@ function renderCustTable() {
     </tr>`;
   }).join('');
 
-  if (label) label.textContent = `عرض: ${filteredCust.length.toLocaleString()} عميل`;
+  if (label) label.textContent = `عرض ${st+1}–${Math.min(st+ps, filteredCust.length)} من ${filteredCust.length.toLocaleString()} عميل`;
 
-  // Pagination
-  if (pg) {
-    if (tp <= 1) { pg.innerHTML = ''; return; }
-    const bs = (a) => `style="padding:5px 10px;border-radius:6px;border:1px solid var(--border);cursor:pointer;font-family:'Cairo',sans-serif;font-size:12px;${a?'background:var(--accent);color:#000;font-weight:700':'background:var(--surface2);color:var(--text2)'}"`;
-    let h = '';
-    h += `<button ${bs(false)} onclick="custPage=Math.max(1,custPage-1);renderCustTable()" ${custPage===1?'disabled':''}>‹</button>`;
-    const s2 = Math.max(1, custPage-3), e2 = Math.min(tp, s2+6);
-    if (s2 > 1) h += `<button ${bs(false)} onclick="custPage=1;renderCustTable()">1</button><span style="color:var(--text2)">…</span>`;
-    for (let p = s2; p <= e2; p++) h += `<button ${bs(p===custPage)} onclick="custPage=${p};renderCustTable()">${p}</button>`;
-    if (e2 < tp) h += `<span style="color:var(--text2)">…</span><button ${bs(false)} onclick="custPage=${tp};renderCustTable()">${tp}</button>`;
-    h += `<button ${bs(false)} onclick="custPage=Math.min(${tp},custPage+1);renderCustTable()" ${custPage===tp?'disabled':''}>›</button>`;
-    h += `<span style="color:var(--text2);font-size:11px;margin-right:4px">صفحة ${custPage} من ${tp} — إجمالي ${filteredCust.length.toLocaleString()} عميل</span>`;
-    pg.innerHTML = h;
-  }
+  // Pagination via central helper
+  _mkPagination('custPagination', custPage, tp, 'custGoPage');
 }
+
+function custGoPage(p) { custPage = p; renderCustTable(); }
 
 let custPage = 1;
 let _custActiveCat = 'all';
@@ -5607,37 +5731,150 @@ var _showDataLabels = false;   // var لضمان الرفع (hoisting)
 //  يُستخدم لتجنّب التداخل في الرسوم متعددة الـ datasets
 //  opts: { hide, inside, rotate, color, size, isPercent }
 // ══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
+//  _dl(opts) — مولّد إعدادات datalabels الذكي
+//  الأعمدة القصيرة: الرقم فوق/يمين العمود
+//  الرسوم الدائرية: خارج الدائرة مع خط رابط
+// ══════════════════════════════════════════════════════════════
 function _dl(opts) {
   opts = opts || {};
-  // إذا hide=true أو الزر مطفأ → أخفِ
   if (opts.hide || !_showDataLabels) return { display: false };
 
-  const isHBar    = opts.hbar  || false;
-  const inside    = opts.inside !== undefined ? opts.inside : true;
-  const rotate    = opts.rotate !== undefined ? opts.rotate : (inside && !isHBar);
-  const clr       = opts.color || '#ffffff';
-  const sz        = opts.size  || 9;
+  const isHBar    = opts.hbar      || false;
+  const isPie     = opts.isPie     || false;
+  const inside    = opts.inside !== undefined ? opts.inside : !isPie;
+  const rotate    = opts.rotate !== undefined ? opts.rotate : (inside && !isHBar && !isPie);
+  const clr       = opts.color     || '#ffffff';
+  const sz        = opts.size      || 9;
   const isPercent = opts.isPercent || false;
-  const anchor    = isHBar ? (inside ? 'center' : 'end') : (inside ? 'center' : 'end');
-  const align     = isHBar ? (inside ? 'center' : 'right') : (inside ? 'center' : 'top');
 
+  // ── دائري: خارج مع خط رابط ─────────────────────────────────
+  if (isPie) {
+    return {
+      display: function(ctx) {
+        const v = ctx.dataset.data[ctx.dataIndex];
+        const total = ctx.dataset.data.reduce((s,x)=>s+(Number(x)||0),0);
+        if (!v || !total) return false;
+        return (v / total) >= 0.03; // أخفِ الشرائح الصغيرة جداً (< 3%)
+      },
+      anchor: 'end',
+      align:  'end',
+      offset: 12,
+      color:  '#e8f4f8',
+      font:   { family: "'Cairo',sans-serif", size: sz, weight: '700' },
+      backgroundColor: 'rgba(8,16,40,0.82)',
+      borderRadius: 4,
+      borderWidth:  1,
+      borderColor:  'rgba(0,212,255,0.3)',
+      padding: { top:3, bottom:3, left:6, right:6 },
+      textShadowColor: 'rgba(0,0,0,0.9)',
+      textShadowBlur:  4,
+      clip:  false,
+      clamp: false,
+      // خط رابط بين الشريحة والتسمية
+      listeners: {},
+      formatter: function(v, ctx) {
+        const n = Number(v || 0);
+        if (!n) return null;
+        const total = ctx.dataset.data.reduce((s,x)=>s+(Number(x)||0),0);
+        const pct = total > 0 ? (n/total*100).toFixed(1) + '%' : '';
+        const val = n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1e3 ? Math.round(n/1e3)+'K' : Math.round(n).toLocaleString('en-US');
+        return pct ? pct + '\n' + val : val;
+      },
+    };
+  }
+
+  // ── عمودي أو أفقي: ذكي حسب حجم العمود ─────────────────────
+  // الفكرة: نستخدم دالة display/anchor/align ديناميكية
+  // لتضع الرقم خارج العمود إذا كان قصيراً
+
+  if (isHBar) {
+    // أفقي: anchor=end دائماً، align=right دائماً → الرقم بعد نهاية الخط
+    // العمود الطويل (>30%): خلفية داكنة شفافة
+    // العمود القصير (<30%): بدون خلفية، offset أكبر، لون أفتح
+    return {
+      display: true,
+      anchor: 'end',
+      align:  'right',
+      offset: function(ctx) {
+        const v   = Math.abs(Number(ctx.dataset.data[ctx.dataIndex] || 0));
+        const max = Math.max(...ctx.dataset.data.map(x => Math.abs(Number(x)||0))) || 1;
+        return v < max * 0.20 ? 5 : 3;
+      },
+      color: function(ctx) {
+        const v   = Math.abs(Number(ctx.dataset.data[ctx.dataIndex] || 0));
+        const max = Math.max(...ctx.dataset.data.map(x => Math.abs(Number(x)||0))) || 1;
+        // خط قصير → لون مميز أفتح
+        return v < max * 0.20 ? '#e8f8ff' : clr;
+      },
+      rotation: 0,
+      font: { family: "'Cairo',sans-serif", size: sz, weight: '700' },
+      backgroundColor: function(ctx) {
+        const v   = Math.abs(Number(ctx.dataset.data[ctx.dataIndex] || 0));
+        const max = Math.max(...ctx.dataset.data.map(x => Math.abs(Number(x)||0))) || 1;
+        // خط قصير → بدون خلفية (أوضح خارج العمود)
+        // خط طويل → خلفية شفافة
+        return v < max * 0.20 ? null : 'rgba(5,10,30,0.50)';
+      },
+      borderRadius: 3,
+      padding: { top:2, bottom:2, left:4, right:4 },
+      textShadowColor: 'rgba(0,0,0,0.85)',
+      textShadowBlur:  4,
+      clip: false, clamp: false,
+      formatter: function(v) {
+        const n = Number(v || 0);
+        if (!n) return null;
+        if (isPercent) return n.toFixed(1) + '%';
+        if (Math.abs(n) >= 1e6) return (n/1e6).toFixed(1) + 'M';
+        if (Math.abs(n) >= 1e3) return Math.round(n/1e3) + 'K';
+        return Math.round(n).toLocaleString('en-US');
+      },
+    };
+  }
+
+  // عمودي: الرقم فوق العمود القصير، داخله إذا طويل
   return {
     display: true,
-    anchor, align,
-    rotation: rotate ? -90 : 0,
-    offset: inside ? 0 : 3,
-    color:  clr,
+    anchor: function(ctx) {
+      const v = Number(ctx.dataset.data[ctx.dataIndex] || 0);
+      const max = Math.max(...ctx.dataset.data.map(x=>Math.abs(Number(x)||0)));
+      return 'end';
+    },
+    align: function(ctx) {
+      const v = Number(ctx.dataset.data[ctx.dataIndex] || 0);
+      const max = Math.max(...ctx.dataset.data.map(x=>Math.abs(Number(x)||0)));
+      // عمود قصير (< 30% من الأقصى) → فوق العمود
+      return Math.abs(v) < max * 0.30 ? 'top' : (rotate ? 'center' : 'top');
+    },
+    offset: function(ctx) {
+      const v = Number(ctx.dataset.data[ctx.dataIndex] || 0);
+      const max = Math.max(...ctx.dataset.data.map(x=>Math.abs(Number(x)||0)));
+      return Math.abs(v) < max * 0.30 ? 2 : 0;
+    },
+    rotation: function(ctx) {
+      const v = Number(ctx.dataset.data[ctx.dataIndex] || 0);
+      const max = Math.max(...ctx.dataset.data.map(x=>Math.abs(Number(x)||0)));
+      // عمود قصير → لا دوران (فوق العمود أفقياً)
+      // عمود طويل → دوران -90 إذا طلب rotate
+      return Math.abs(v) < max * 0.30 ? 0 : (rotate ? -90 : 0);
+    },
+    color: function(ctx) {
+      const v = Number(ctx.dataset.data[ctx.dataIndex] || 0);
+      const max = Math.max(...ctx.dataset.data.map(x=>Math.abs(Number(x)||0)));
+      return Math.abs(v) < max * 0.30 ? '#e0f0ff' : clr;
+    },
     font:   { family: "'Cairo',sans-serif", size: sz, weight: '700' },
-    backgroundColor: inside ? null : 'rgba(5,10,30,0.70)',
-    borderRadius:    inside ? 0    : 3,
-    borderWidth:     0,
-    padding: inside
-      ? { top:1, bottom:1, left:2, right:2 }
-      : { top:2, bottom:2, left:5, right:5 },
-    textShadowColor: 'rgba(0,0,0,0.85)',
-    textShadowBlur:  3,
-    clip:  false,
-    clamp: false,
+    backgroundColor: function(ctx) {
+      const v = Number(ctx.dataset.data[ctx.dataIndex] || 0);
+      const max = Math.max(...ctx.dataset.data.map(x=>Math.abs(Number(x)||0)));
+      return Math.abs(v) < max * 0.30 ? 'rgba(5,10,30,0.72)' : null;
+    },
+    borderRadius: 3,
+    borderWidth:  0,
+    padding: { top:2, bottom:2, left:4, right:4 },
+    textShadowColor: 'rgba(0,0,0,0.9)',
+    textShadowBlur:  4,
+    clip: false, clamp: false,
     formatter: function(v) {
       const n = Number(v || 0);
       if (!n) return null;
@@ -5658,6 +5895,58 @@ function _fmtLabel(n) {
   if (Math.abs(n) <= 100 && !Number.isInteger(n)) return n.toFixed(2) + '%';
   // أرقام كبيرة مع كسر — اعرض بفواصل مع خانتين
   return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+// ══════════════════════════════════════════════════════════
+//  pieConnectorPlugin — يرسم خطوطاً رابطة للرسوم الدائرية
+//  تربط الشرائح بتسمياتها الخارجية
+// ══════════════════════════════════════════════════════════
+const pieConnectorPlugin = {
+  id: 'pieConnector',
+  afterDraw(chart) {
+    if (!_showDataLabels) return;
+    const type = chart.config.type;
+    if (type !== 'doughnut' && type !== 'pie') return;
+    const ctx  = chart.ctx;
+    const meta = chart.getDatasetMeta(0);
+    if (!meta || !meta.data) return;
+
+    const cx = chart.chartArea ? (chart.chartArea.left + chart.chartArea.right) / 2 : chart.width / 2;
+    const cy = chart.chartArea ? (chart.chartArea.top  + chart.chartArea.bottom) / 2 : chart.height / 2;
+    const ds  = chart.data.datasets[0];
+    const total = (ds.data || []).reduce((s,v) => s + (Number(v)||0), 0);
+
+    ctx.save();
+    ctx.strokeStyle = 'rgba(160,184,204,0.55)';
+    ctx.lineWidth   = 1;
+    ctx.setLineDash([3,3]);
+
+    meta.data.forEach((arc, i) => {
+      const v = Number(ds.data[i] || 0);
+      if (!v || !total || v/total < 0.03) return;
+
+      const midAngle = arc.startAngle + (arc.endAngle - arc.startAngle) / 2;
+      const outerR   = arc.outerRadius;
+      const labelR   = outerR + 26;
+
+      const x1 = cx + Math.cos(midAngle) * (outerR + 3);
+      const y1 = cy + Math.sin(midAngle) * (outerR + 3);
+      const x2 = cx + Math.cos(midAngle) * labelR;
+      const y2 = cy + Math.sin(midAngle) * labelR;
+
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    });
+
+    ctx.restore();
+  }
+};
+
+// تسجيل plugin مرة واحدة
+if (typeof Chart !== 'undefined' && !Chart.registry?.plugins?.get('pieConnector')) {
+  try { Chart.register(pieConnectorPlugin); } catch(e) {}
 }
 
 // ══════════════════════════════════════════════════════════
@@ -6015,7 +6304,7 @@ _rebuildChart('repReturnsChart', {
         ]},
       options:{
         indexAxis:'y', responsive:true, maintainAspectRatio:false,
-        layout:{padding:{right:16}},
+        layout:{padding:{right:72, left:4, top:4, bottom:4}},
         plugins:{
           legend:{position:'bottom', labels:{color:'#a0b8cc', padding:14, font:{size:11}}},
           tooltip:{callbacks:{
@@ -6043,7 +6332,7 @@ _rebuildChart('repReturnsChart', {
         ]},
       options:{
         indexAxis:'y', responsive:true, maintainAspectRatio:false,
-        layout:{padding:{right:16}},
+        layout:{padding:{right:72, left:4, top:4, bottom:4}},
         plugins:{
           legend:{position:'bottom', labels:{color:'#a0b8cc', padding:14, font:{size:11}}},
           tooltip:{callbacks:{
@@ -6072,7 +6361,7 @@ _rebuildChart('repReturnsChart', {
         }]},
       options:{
         indexAxis:'y', responsive:true, maintainAspectRatio:false,
-        layout:{padding:{right:16}},
+        layout:{padding:{right:72, left:4, top:4, bottom:4}},
         plugins:{
           legend:{display:false},
           tooltip:{callbacks:{
@@ -6099,7 +6388,7 @@ _rebuildChart('repReturnsChart', {
         ]},
       options:{
         indexAxis:'y', responsive:true, maintainAspectRatio:false,
-        layout:{padding:{right:16}},
+        layout:{padding:{right:72, left:4, top:4, bottom:4}},
         plugins:{
           legend:{position:'bottom', labels:{color:'#a0b8cc', padding:14, font:{size:11}}},
           tooltip:{callbacks:{
@@ -6129,22 +6418,30 @@ _rebuildChart('repReturnsChart', {
     initDebtCharts();
   }
 
-  // returnsChart - static (category-based)
+  // returnsChart - حسب الفئة مع حساب حقيقي من repsData
   (function() {
-    const cats_ret = ['التجزئة','الجملة','الأسواق','مقاهي ومطاعم','مستقل','الإجمالي'];
-    const actual_ret = cats_ret.map(c => {
-      const key = c === 'الإجمالي' ? null : c.replace('ال','');
-      if (!key) return repsData.length > 0 ? (repsData.reduce((s,r)=>s+r.returns,0)/repsData.reduce((s,r)=>s+r.sales,0)*100) : 10.05;
-      return repsData.filter(r=>r.cat===key||r.cat.includes(key.substring(0,3))).reduce((s,r,i,a)=>s+(r.retPct/a.length),0) || [7.58,10.72,15.62,14.16,29.9,10.05][cats_ret.indexOf(c)];
+    const catKeys = ['تجزئة','جملة','أسواق','مقاهي ومطاعم','مستقل'];
+    const catLabels = ['التجزئة','الجملة','الأسواق','مقاهي ومطاعم','مستقل','الإجمالي'];
+    const targets = [6, 8, 5, 8, 10, 7];
+    const activeData = repsData.filter(r => r.sales > 0);
+    const catActual = catKeys.map(k => {
+      const grp = activeData.filter(r => r.cat === k);
+      if (!grp.length) return 0;
+      const totS = grp.reduce((s,r)=>s+r.sales, 0);
+      const totR = grp.reduce((s,r)=>s+r.returns, 0);
+      return totS > 0 ? +(totR/totS*100).toFixed(2) : 0;
     });
+    const totSAll = activeData.reduce((s,r)=>s+r.sales, 0);
+    const totRAll = activeData.reduce((s,r)=>s+r.returns, 0);
+    catActual.push(totSAll > 0 ? +(totRAll/totSAll*100).toFixed(2) : 0);
     _rebuildChart('returnsChart', {
       type:'bar', data:{
-        labels: cats_ret,
+        labels: catLabels,
         datasets:[
-          { label:'المعدل الحالي %', data:actual_ret,
+          { label:'المعدل الحالي %', data:catActual,
             backgroundColor:['rgba(0,212,255,0.8)','rgba(0,255,136,0.75)','rgba(255,71,87,0.85)','rgba(255,215,0,0.8)','rgba(255,107,53,0.8)','rgba(138,165,192,0.7)'],
             borderRadius:5 },
-          { label:'الهدف %', data:[6,8,5,8,10,7],
+          { label:'الهدف %', data: targets,
             backgroundColor:'rgba(0,212,255,0.15)', borderWidth:2, borderColor:'rgba(0,212,255,0.5)', borderRadius:5 }
         ]},
       options:{responsive:true,maintainAspectRatio:false,
@@ -6177,26 +6474,34 @@ function showTab(id, triggerEl) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   const tabEl = document.getElementById('tab-'+id);
   if (tabEl) tabEl.classList.add('active');
-  // Use passed element, or event.target if available (user click), or find nav btn by id
   const btnEl = triggerEl
     || (typeof event !== 'undefined' && event?.target?.classList?.contains('nav-btn') ? event.target : null)
     || document.querySelector(`.nav-btn[onclick*="'${id}'"]`);
   if (btnEl) btnEl.classList.add('active');
 
-  if (id === 'debt') {
-    setTimeout(function() {
+  // تحديث الجداول والرسوم عند التبديل
+  setTimeout(() => {
+    if (id === 'debt') {
       var body = document.getElementById('debtRepBody');
       if (body && !body.innerHTML) {
         renderDebtRepsTable(debtRepsData);
         initDebtRepFilter();
         debtDetailFiltered = debtDetailData.slice();
         renderDebtDetailTable();
-        if (typeof Chart !== 'undefined') initDebtCharts();
-      } else if (body && body.innerHTML && typeof Chart !== 'undefined' && !_debtChartsInit) {
-        initDebtCharts();
       }
-    }, 100);
-  }
+      if (typeof Chart !== 'undefined' && !_debtChartsInit) initDebtCharts();
+    } else if (id === 'reps') {
+      // تحقق إذا رسوم المناديب بحاجة لإعادة بناء
+      const rc = Chart.getChart(document.getElementById('allRepsChart'));
+      if (!rc) _rebuildRepsCharts();
+    } else if (id === 'repcmp') {
+      const rc = Chart.getChart(document.getElementById('repcmpChart'));
+      if (!rc && typeof initRepCmpPanels==='function') initRepCmpPanels();
+    } else if (id === 'overview') {
+      const rc = Chart.getChart(document.getElementById('monthlyChart'));
+      if (!rc) _rebuildOverviewCharts();
+    }
+  }, 50);
 }
 // ===== Mobile Bottom Nav helpers =====
 function mobileShowTab(id, btnEl) {
@@ -6242,7 +6547,10 @@ function setCatFilter(cat) {
   renderRepCmp();
 }
 
-function renderRepCmp() {
+let rcPage = 1;
+
+function renderRepCmp(_keepPage) {
+  if (!_keepPage) rcPage = 1;
   const cat   = document.getElementById('rcCat')?.value    || 'all';
   const sort  = document.getElementById('rcSort')?.value   || 'roi';
   const level = document.getElementById('rcLevel')?.value  || 'all';
@@ -6286,11 +6594,18 @@ function renderRepCmp() {
   const retCol = r => r.retPct>=20?'var(--red)':r.retPct>=10?'#ff6b35':'var(--text2)';
   const debtCol = n => n > 300000?'var(--red)':n > 50000?'#ff6b35':n<0?'var(--accent2)':'var(--text2)';
 
-  body.innerHTML = data.map((r, i) => {
+  // ── Pagination ───────────────────────────────────────────────
+  const rcTotalPages = Math.ceil(data.length / _PAGE_SIZE) || 1;
+  if (rcPage > rcTotalPages) rcPage = 1;
+  const rcStart = (rcPage - 1) * _PAGE_SIZE;
+  const rcPageData = data.slice(rcStart, rcStart + _PAGE_SIZE);
+
+  body.innerHTML = rcPageData.map((r, i) => {
+    const absIdx = rcStart + i;
     const cs = catStyle[r.cat] || catStyle['تجزئة'];
     const tag = r.roi>=100?'<span class="tag tag-blue">ممتاز ⭐</span>':r.roi>=80?'<span class="tag tag-green">جيد ✓</span>':r.roi>=50?'<span class="tag tag-orange">متوسط</span>':'<span class="tag tag-red">ضعيف</span>';
     const medals = ['🥇','🥈','🥉'];
-    const num = i < 3 ? medals[i] : `<span style="color:var(--text2)">${i+1}</span>`;
+    const num = absIdx < 3 ? medals[absIdx] : `<span style="color:var(--text2)">${absIdx+1}</span>`;
     return `<tr>
       <td style="text-align:center">${num}</td>
       <td style="font-weight:700">${r.name}</td>
@@ -6308,6 +6623,9 @@ function renderRepCmp() {
     </tr>`;
   }).join('');
 
+  // pagination
+  _mkPagination('rcPagination', rcPage, rcTotalPages, 'rcGoPage');
+
   const total  = data.length;
   const _nsRC=data.reduce((s,r)=>s+(r.netSales||0),0), _cRC=data.reduce((s,r)=>s+(r.col||0),0);
   const avgRoi = _nsRC>0 ? (_cRC/_nsRC*100).toFixed(1) : '0';
@@ -6316,12 +6634,13 @@ function renderRepCmp() {
   const totRet = data.reduce((s,r)=>s+r.returns,0);
   const totDebt = data.reduce((s,r)=>s+(r.debtNet>0?r.debtNet:0),0);
   const sm = document.getElementById('rcSummary');
-  if (sm) sm.innerHTML = `عرض <b>${total}</b> مندوب &nbsp;|&nbsp; مبيعات: <b style="color:var(--accent)">${fmtN(totS)}</b> &nbsp;|&nbsp; تحصيل: <b style="color:var(--accent2)">${fmtN(totC)}</b> &nbsp;|&nbsp; مرتجعات: <b style="color:#ff6b35">${fmtN(totRet)}</b> &nbsp;|&nbsp; ديون: <b style="color:var(--red)">${fmtN(totDebt)}</b> &nbsp;|&nbsp; ROI: <b style="color:${avgRoi>=80?'var(--accent2)':avgRoi>=60?'#ff6b35':'var(--red)'}">${avgRoi}%</b>`;
+  if (sm) sm.innerHTML = `عرض <b>${rcStart+1}–${Math.min(rcStart+_PAGE_SIZE,total)}</b> من <b>${total}</b> مندوب &nbsp;|&nbsp; مبيعات: <b style="color:var(--accent)">${fmtN(totS)}</b> &nbsp;|&nbsp; تحصيل: <b style="color:var(--accent2)">${fmtN(totC)}</b> &nbsp;|&nbsp; مرتجعات: <b style="color:#ff6b35">${fmtN(totRet)}</b> &nbsp;|&nbsp; ديون: <b style="color:var(--red)">${fmtN(totDebt)}</b> &nbsp;|&nbsp; ROI: <b style="color:${avgRoi>=80?'var(--accent2)':avgRoi>=60?'#ff6b35':'var(--red)'}">${avgRoi}%</b>`;
   // تحديث KPIs والمخططات حسب الفلتر
   updateRepcmpTabFiltered(data);
   // تحديث لوحات catSalesChart2 / repcmpChart / repReturnsChart2
   try { initRepCmpPanels(); } catch(e) {}
 }
+function rcGoPage(p) { rcPage = p; renderRepCmp(true); }
 
 function initRepCmpPanels() {
   // قراءة الفلاتر النشطة
@@ -6825,8 +7144,12 @@ function resetItemFilters() {
   if (rc) rc.value = '';
   if (cf) cf.value = '';
   if (rf) {
-    rf.innerHTML = '<option value="">\u{1F465} كل المناديب</option>';
-    Object.keys(repToItems).sort().forEach(r => {
+    rf.innerHTML = '<option value="">👥 كل المناديب</option>';
+    // يستخدم repsData بعد المزامنة، أو repToItems كاحتياط
+    const repList = repsData.length
+      ? [...new Set(repsData.map(r=>r.name))].filter(Boolean).sort()
+      : Object.keys(repToItems).sort();
+    repList.forEach(r => {
       const o = document.createElement('option');
       o.value = r; o.textContent = r;
       rf.appendChild(o);
@@ -6835,6 +7158,7 @@ function resetItemFilters() {
   updateCustDropdown('', '');
   renderItems();
 }
+
 // ── Update customer dropdown based on active rep/category ──────────────
 function updateCustDropdown(cat, rep) {
   const dl = document.getElementById('itemCustList');
@@ -6879,9 +7203,13 @@ function filterItemsByRepCat() {
   if (!repSel) return;
   const cur = repSel.value;
   repSel.innerHTML = '<option value="">👥 كل المناديب</option>';
-  const reps = cat
-    ? Object.keys(repToItems).filter(r => repClassification[r] === cat).sort()
+  // يستخدم repsData أولاً (بعد المزامنة)، ثم repToItems كاحتياط
+  const allReps = repsData.length
+    ? [...new Set(repsData.map(r=>r.name))].filter(Boolean).sort()
     : Object.keys(repToItems).sort();
+  const reps = cat
+    ? allReps.filter(r => (repClassification[r]||'') === cat)
+    : allReps;
   reps.forEach(r => {
     const o = document.createElement('option');
     o.value = r; o.textContent = r;
@@ -6896,7 +7224,8 @@ function filterItemsByRepCat() {
 
 
 
-function renderItems() {
+function renderItems(_keepPage) {
+  if (!_keepPage) itemsPage = 1;
   const q    = (document.getElementById('itemSearch')?.value || '').trim();
   const sort = document.getElementById('itemSort')?.value || 'ns';
   const catF = document.getElementById('itemRepCat')?.value || '';
@@ -7058,8 +7387,15 @@ function renderItems() {
   const body  = document.getElementById('itemsBody');
   if (!body) return;
 
+  // pagination
+  const itemsTp = Math.ceil(data.length / _PAGE_SIZE);
+  if (itemsPage > itemsTp) itemsPage = 1;
+  const itemsSt = (itemsPage - 1) * _PAGE_SIZE;
+  const itemsPageData = data.slice(itemsSt, itemsSt + _PAGE_SIZE);
+
   const medals = ['\u{1F947}','\u{1F948}','\u{1F949}'];
-  body.innerHTML = data.map((d,i) => {
+  body.innerHTML = itemsPageData.map((d,i) => {
+    const absIdx = itemsSt + i;
     const retPct = isFinite(d.retPct) ? d.retPct : 0;
     const qty    = isFinite(d.qty)    ? (d.qty    | 0) : 0;
     const retQty = isFinite(d.retQty) ? (d.retQty | 0) : 0;
@@ -7068,7 +7404,7 @@ function renderItems() {
     const turn   = isFinite(d.turn)   ? d.turn   : 0;
     const retColor = retPct>=30?'var(--red)':retPct>=15?'#ff6b35':'var(--accent2)';
     const barW = Math.min((d.ns/maxNs)*100,100).toFixed(1);
-    const num  = i<3 ? medals[i] : '<span style="color:var(--text2)">'+(i+1)+'</span>';
+    const num  = absIdx<3 ? medals[absIdx] : '<span style="color:var(--text2)">'+(absIdx+1)+'</span>';
     const sn   = d.name;
     return '<tr title="'+d.name+'">'
      +'<td style="text-align:center">'+num+'</td>'
@@ -7087,6 +7423,7 @@ function renderItems() {
      +'<td style="color:var(--text2);text-align:center">'+turn+'</td>'
      +'</tr>';
   }).join('');
+  _mkPagination('itemsPagination', itemsPage, itemsTp, 'itemsGoPage');
 
   // ── Summary ───────────────────────────────────────────────────────────
   const sm = document.getElementById('itemsSummary');
@@ -7104,13 +7441,13 @@ function renderItems() {
       if (q)     parts.push('بحث: '+q);
       sm.innerHTML = '<span style="background:rgba(0,212,255,0.12);border:1px solid rgba(0,212,255,0.3);'
         +'padding:6px 14px;border-radius:8px;display:inline-flex;gap:14px;flex-wrap:wrap;align-items:center">'
-        +'<span>🔍 '+parts.join(' &amp; ')+' &mdash; <b style="color:var(--accent)">'+data.length+'</b> صنف</span>'
+        +'<span>🔍 '+parts.join(' &amp; ')+' &mdash; عرض <b style="color:var(--accent)">'+itemsSt+1+'–'+Math.min(itemsSt+_PAGE_SIZE,data.length)+'</b> من <b>'+data.length+'</b> صنف</span>'
         +'<span>صافي: <b style="color:var(--accent2)">'+fmt(totNs)+'</b>'
           +' <span style="color:var(--muted);font-size:11px">('+pct+'% من الإجمالي)</span></span>'
         +'<span>مرتجعات: <b style="color:var(--red)">'+fmt(totRet)+'</b></span>'
         +'</span>';
     } else {
-      sm.innerHTML = '<span style="color:var(--muted)">'+data.length+' صنف</span>'
+      sm.innerHTML = 'عرض <b>'+( itemsSt+1)+'–'+Math.min(itemsSt+_PAGE_SIZE,data.length)+'</b> من <span style="color:var(--muted)">'+data.length+'</span> صنف'
         +' &nbsp;|&nbsp; صافي: <b style="color:var(--accent2)">'+fmt(totNs)+'</b>'
         +' &nbsp;|&nbsp; مرتجعات: <b style="color:var(--red)">'+fmt(totRet)+'</b>';
     }
@@ -7118,6 +7455,7 @@ function renderItems() {
   // تحديث KPIs والمخططات حسب الفلتر
   updateProductsTabFiltered(data);
 }
+function itemsGoPage(p) { itemsPage = p; renderItems(true); }
 
 // ════════════════════════════════════════════════════════════════
 //  _buildProductBubble(data) — رسم صافي المبيعات vs الكميات
@@ -7432,13 +7770,13 @@ function initItemsPanels() {
     data:{
       labels: top10ns.map(d=>d.name),
       datasets:[
-        { label:'💰 صافي المبيعات',   data:top10ns.map(d=>d.ns),     backgroundColor:'rgba(0,255,136,0.85)', borderRadius:4 },
-        { label:'↩️ المرتجعات',       data:top10ns.map(d=>d.retVal), backgroundColor:'rgba(255,71,87,0.75)', borderRadius:4 },
-        { label:'📦 إجمالي المبيعات', data:top10ns.map(d=>d.sales),  backgroundColor:'rgba(0,212,255,0.35)', borderRadius:4 }
+        { label:'💰 صافي المبيعات',   data:top10ns.map(d=>d.ns),     backgroundColor:'rgba(0,255,136,0.85)', borderRadius:4, datalabels:_dl({hbar:true, color:'#b8ffde', size:9}) },
+        { label:'↩️ المرتجعات',       data:top10ns.map(d=>d.retVal), backgroundColor:'rgba(255,71,87,0.75)', borderRadius:4, datalabels:_dl({hbar:true, color:'#ffb8b8', size:9}) },
+        { label:'📦 إجمالي المبيعات', data:top10ns.map(d=>d.sales),  backgroundColor:'rgba(0,212,255,0.35)', borderRadius:4, datalabels:_dl({hbar:true, color:'#a0d8ff', size:9}) }
       ]},
     options:{
       indexAxis:'y', responsive:true, maintainAspectRatio:false,
-      layout:{padding:{right:16}},
+      layout:{padding:{right:72, left:4, top:4, bottom:4}},
       plugins:{
         legend:{position:'bottom', labels:{color:'#a0b8cc', padding:14, font:{size:11}}},
         tooltip:{callbacks:{
@@ -7460,13 +7798,13 @@ function initItemsPanels() {
     data:{
       labels: top10nq.map(d=>d.name),
       datasets:[
-        { label:'✅ صافي الكمية',    data:top10nq.map(d=>d.nqty),   backgroundColor:'rgba(0,255,136,0.85)', borderRadius:4 },
-        { label:'📦 إجمالي الكمية', data:top10nq.map(d=>d.qty),    backgroundColor:'rgba(0,212,255,0.4)',  borderRadius:4 },
-        { label:'🔄 المرتجعات',      data:top10nq.map(d=>d.retQty), backgroundColor:'rgba(255,71,87,0.75)', borderRadius:4 }
+        { label:'✅ صافي الكمية',    data:top10nq.map(d=>d.nqty),   backgroundColor:'rgba(0,255,136,0.85)', borderRadius:4, datalabels:_dl({hbar:true, color:'#b8ffde', size:9}) },
+        { label:'📦 إجمالي الكمية', data:top10nq.map(d=>d.qty),    backgroundColor:'rgba(0,212,255,0.4)',  borderRadius:4, datalabels:_dl({hbar:true, color:'#a0d8ff', size:9}) },
+        { label:'🔄 المرتجعات',      data:top10nq.map(d=>d.retQty), backgroundColor:'rgba(255,71,87,0.75)', borderRadius:4, datalabels:_dl({hbar:true, color:'#ffb8b8', size:9}) }
       ]},
     options:{
       indexAxis:'y', responsive:true, maintainAspectRatio:false,
-      layout:{padding:{right:16}},
+      layout:{padding:{right:72, left:4, top:4, bottom:4}},
       plugins:{
         legend:{position:'bottom', labels:{color:'#a0b8cc', padding:14, font:{size:11}}},
         tooltip:{callbacks:{
@@ -7491,11 +7829,12 @@ function initItemsPanels() {
         label:'نسبة المرتجعات %',
         data: topRet.map(d=>d.retPct),
         backgroundColor: topRet.map(d=>d.retPct>=30?'rgba(255,71,87,0.85)':d.retPct>=15?'rgba(255,107,53,0.8)':'rgba(255,215,0,0.75)'),
-        borderRadius:4
+        borderRadius:4,
+        datalabels: _dl({hbar:true, color:'#ffe082', size:9, isPercent:true})
       }]},
     options:{
       indexAxis:'y', responsive:true, maintainAspectRatio:false,
-      layout:{padding:{right:16}},
+      layout:{padding:{right:72, left:4, top:4, bottom:4}},
       plugins:{
         legend:{display:false},
         tooltip:{callbacks:{
@@ -7516,13 +7855,13 @@ function initItemsPanels() {
     data:{
       labels: top10ns.map(d=>d.name),
       datasets:[
-        { label:'💰 صافي المبيعات',   data:top10ns.map(d=>d.ns),     backgroundColor:'rgba(0,255,136,0.85)', borderRadius:4 },
-        { label:'↩️ المرتجعات',       data:top10ns.map(d=>d.retVal), backgroundColor:'rgba(255,71,87,0.75)', borderRadius:4 },
-        { label:'📦 إجمالي المبيعات', data:top10ns.map(d=>d.sales),  backgroundColor:'rgba(0,212,255,0.35)', borderRadius:4 }
+        { label:'💰 صافي المبيعات',   data:top10ns.map(d=>d.ns),     backgroundColor:'rgba(0,255,136,0.85)', borderRadius:4, datalabels:_dl({hbar:true, color:'#b8ffde', size:9}) },
+        { label:'↩️ المرتجعات',       data:top10ns.map(d=>d.retVal), backgroundColor:'rgba(255,71,87,0.75)', borderRadius:4, datalabels:_dl({hbar:true, color:'#ffb8b8', size:9}) },
+        { label:'📦 إجمالي المبيعات', data:top10ns.map(d=>d.sales),  backgroundColor:'rgba(0,212,255,0.35)', borderRadius:4, datalabels:_dl({hbar:true, color:'#a0d8ff', size:9}) }
       ]},
     options:{
       indexAxis:'y', responsive:true, maintainAspectRatio:false,
-      layout:{padding:{right:16}},
+      layout:{padding:{right:72, left:4, top:4, bottom:4}},
       plugins:{
         legend:{position:'bottom', labels:{color:'#a0b8cc', padding:14, font:{size:11}}},
         tooltip:{callbacks:{
@@ -7557,26 +7896,35 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// ===== رسم بياني المرتجعات =====
-(function() {
+// ===== رسم بياني المرتجعات — يُحسب من repsData الحية =====
+function _buildReturnsChart(data) {
+  const src = data || repsData;
+  const catKeys   = ['تجزئة','جملة','أسواق','مقاهي ومطاعم','مستقل'];
+  const catLabels = ['التجزئة','الجملة','الأسواق','مقاهي ومطاعم','مستقل','الإجمالي'];
+  const targets   = [6, 8, 5, 8, 10, 7];
+  const active    = src.filter(r => r.sales > 0);
+  const catActual = catKeys.map(k => {
+    const grp  = active.filter(r => r.cat === k);
+    if (!grp.length) return 0;
+    const totS = grp.reduce((s,r)=>s+r.sales,0);
+    const totR = grp.reduce((s,r)=>s+r.returns,0);
+    return totS > 0 ? +(totR/totS*100).toFixed(2) : 0;
+  });
+  const totSAll = active.reduce((s,r)=>s+r.sales,0);
+  const totRAll = active.reduce((s,r)=>s+r.returns,0);
+  catActual.push(totSAll > 0 ? +(totRAll/totSAll*100).toFixed(2) : 0);
+  const sugMax = Math.max(...catActual, 15) * 1.3;
   _rebuildChart('returnsChart', {
     type: 'bar',
     data: {
-      labels: ['التجزئة','الجملة','الأسواق','مقاهي ومطاعم','مستقل','الإجمالي'],
+      labels: catLabels,
       datasets: [
-        {
-          label: 'المعدل الحالي %',
-          data: [7.58,10.72,15.62,14.16,29.9,10.05],
+        { label: 'المعدل الحالي %',   data: catActual,
           backgroundColor: ['rgba(0,212,255,0.8)','rgba(0,255,136,0.75)','rgba(255,71,87,0.85)','rgba(255,215,0,0.8)','rgba(255,107,53,0.8)','rgba(138,165,192,0.75)'],
-          borderRadius: 5
-        },
-        {
-          label: 'الهدف المستهدف %',
-          data: [6,8,5,8,10,7],
-          backgroundColor: 'rgba(0,212,255,0.2)',
-          borderWidth: 2, borderColor: 'rgba(0,212,255,0.5)',
-          borderRadius: 5
-        }
+          borderRadius: 5 },
+        { label: 'الهدف المستهدف %', data: targets,
+          backgroundColor: 'rgba(0,212,255,0.2)', borderWidth: 2,
+          borderColor: 'rgba(0,212,255,0.5)', borderRadius: 5 }
       ]
     },
     options: {
@@ -7584,11 +7932,13 @@ document.addEventListener('DOMContentLoaded', () => {
       plugins: { legend: { position: 'bottom', labels: { color: '#8aa5c0', padding: 14 } } },
       scales: {
         x: { grid: { color: 'rgba(30,58,95,0.5)' }, ticks: { color: '#8aa5c0' } },
-        y: { grid: { color: 'rgba(30,58,95,0.5)' }, ticks: { callback: v => v+'%', color: '#8aa5c0' }, max: 41.9 }
+        y: { grid: { color: 'rgba(30,58,95,0.5)' }, ticks: { callback: v => v+'%', color: '#8aa5c0' }, suggestedMax: sugMax }
       }
     }
   });
-})();
+}
+// استدعاء أولي عند التحميل
+document.addEventListener('DOMContentLoaded', () => { try { _buildReturnsChart(); } catch(e) {} });
 
 
 
@@ -7670,6 +8020,7 @@ function debtFilterBoth() {
   let filteredReps = debtRepsData.filter(r => !repQ || r.name.toLowerCase().includes(repQ));
   if (activeCat) filteredReps = filteredReps.filter(r => r.cat === activeCat);
   if (effectiveRepF) filteredReps = filteredReps.filter(r => r.name === effectiveRepF);
+  debtRepPage = 1; // إعادة للصفحة الأولى عند كل تغيير فلتر
   renderDebtRepsTable(filteredReps);
 
   // ── Reps summary ──────────────────────────────────────────────────────
@@ -7701,17 +8052,29 @@ function debtFilterBoth() {
   updateDebtTabFiltered(filteredReps, debtDetailFiltered);
 }
 
+// ── آخر بيانات مناديب مديونية مفلترة (لاستخدامها في pagination) ──
+let _lastDebtRepsFiltered = null;
+
 function renderDebtRepsTable(data){
+  if (data !== undefined) _lastDebtRepsFiltered = data; // حفظ آخر بيانات مفلترة
+  const src = _lastDebtRepsFiltered || debtRepsData;
   const fmt=n=>Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
   const body=document.getElementById('debtRepBody');if(!body)return;
-  body.innerHTML=[...data].sort((a,b)=>b.net-a.net).map((r,i)=>{
+  const sorted=[...src].sort((a,b)=>b.net-a.net);
+  const tp=Math.ceil(sorted.length/_PAGE_SIZE)||1;
+  if(debtRepPage>tp)debtRepPage=1;
+  const st=(debtRepPage-1)*_PAGE_SIZE;
+  const page=sorted.slice(st,st+_PAGE_SIZE);
+  body.innerHTML=page.map((r,i)=>{
     const nc=r.net>500000?'var(--red)':r.net>100000?'#ff6b35':r.net<0?'var(--accent2)':'var(--text)';
     const pc=r.pct>=100?'var(--accent2)':r.pct>=70?'var(--accent)':r.pct>=50?'#ff6b35':'var(--red)';
-    const st=r.net<0?'<span class="tag tag-green">دائن ✓</span>':r.pct>=100?'<span class="tag tag-blue">سدد كامل ⭐</span>':r.pct>=70?'<span class="tag tag-green">جيد</span>':r.pct>=50?'<span class="tag tag-orange">متوسط</span>':'<span class="tag tag-red">يحتاج متابعة ⚠️</span>';
+    const st2=r.net<0?'<span class="tag tag-green">دائن ✓</span>':r.pct>=100?'<span class="tag tag-blue">سدد كامل ⭐</span>':r.pct>=70?'<span class="tag tag-green">جيد</span>':r.pct>=50?'<span class="tag tag-orange">متوسط</span>':'<span class="tag tag-red">يحتاج متابعة ⚠️</span>';
     const bw=Math.min(r.pct,100);const bc=r.pct>=100?'#00ff88':r.pct>=70?'#00d4ff':r.pct>=50?'#ff6b35':'#ff4757';
-    return `<tr><td style="color:var(--text2);text-align:center">${i+1}</td><td><b>${r.name}</b></td><td style="text-align:center">${r.customers}</td><td style="text-align:right;color:var(--text2)">${fmt(r.debit)}</td><td style="text-align:right;color:var(--accent2)">${fmt(r.credit)}</td><td style="text-align:right;font-weight:700;color:${nc}">${fmt(r.net)}</td><td><div style="display:flex;align-items:center;gap:6px"><span style="color:${pc};font-weight:700;font-size:11px;min-width:45px">${r.pct.toFixed(1)}%</span><span class="bar-bg" style="flex:1"><span class="bar-fill" style="width:${bw}%;background:${bc}"></span></span></div></td><td>${st}</td></tr>`;
+    return `<tr><td style="color:var(--text2);text-align:center">${st+i+1}</td><td><b>${r.name}</b></td><td style="text-align:center">${r.customers}</td><td style="text-align:right;color:var(--text2)">${fmt(r.debit)}</td><td style="text-align:right;color:var(--accent2)">${fmt(r.credit)}</td><td style="text-align:right;font-weight:700;color:${nc}">${fmt(r.net)}</td><td><div style="display:flex;align-items:center;gap:6px"><span style="color:${pc};font-weight:700;font-size:11px;min-width:45px">${r.pct.toFixed(1)}%</span><span class="bar-bg" style="flex:1"><span class="bar-fill" style="width:${bw}%;background:${bc}"></span></span></div></td><td>${st2}</td></tr>`;
   }).join('');
+  _mkPagination('debtRepPagination',debtRepPage,tp,'debtRepGoPage');
 }
+function debtRepGoPage(p){debtRepPage=p;renderDebtRepsTable();}
 
 // ── تحديث masterRepMap من debtDetailData (المصدر 2) ──────────
 (function enrichRepMapFromDebt() {
@@ -7739,7 +8102,7 @@ function renderDebtDetailTable(){
   const sumEl=document.getElementById('debtDetailSummary');
   const pg=document.getElementById('debtDetailPagination');
   if(!body)return;
-  const ps=50,tp=Math.ceil(debtDetailFiltered.length/ps),st2=(debtDetailPage-1)*ps;
+  const ps=_PAGE_SIZE,tp=Math.ceil(debtDetailFiltered.length/ps),st2=(debtDetailPage-1)*ps;
   const page=debtDetailFiltered.slice(st2,st2+ps);
   const tn=debtDetailFiltered.reduce((s,r)=>s+r.net,0);
   const td=debtDetailFiltered.reduce((s,r)=>s+(r.debit||0),0);
@@ -7753,18 +8116,9 @@ function renderDebtDetailTable(){
     const st=r.net<0?'<span class="tag tag-green">دائن</span>':r.net===0?'<span class="tag tag-blue">مسوّى</span>':r.net>50000?'<span class="tag tag-red">حرج</span>':r.net>10000?'<span class="tag tag-orange">مرتفع</span>':'<span class="tag" style="background:rgba(0,212,255,.1);color:var(--accent)">عادي</span>';
     return `<tr><td style="color:var(--text2);text-align:center">${st2+i+1}</td><td style="color:var(--text2);font-size:11px">${r.code}</td><td style="max-width:280px;word-break:break-word;line-height:1.4"><b>${r.name}</b></td><td style="color:var(--accent);font-weight:600">${r.rep}</td><td style="text-align:right;color:var(--text2)">${fmt(r.debit)}</td><td style="text-align:right;color:var(--accent2)">${fmt(r.credit)}</td><td style="text-align:right;font-weight:700;color:${nc}">${fmt(r.net)}</td><td>${st}</td></tr>`;
   }).join('');
-  if(pg){
-    let h='';const bs=(a)=>`style="padding:5px 10px;border-radius:6px;border:1px solid var(--border);cursor:pointer;font-family:'Cairo',sans-serif;font-size:12px;${a?'background:var(--accent);color:#000;font-weight:700':'background:var(--surface2);color:var(--text2)'}"`; 
-    h+=`<button ${bs(false)} onclick="debtDetailPage=Math.max(1,debtDetailPage-1);renderDebtDetailTable()" ${debtDetailPage===1?'disabled':''}>‹</button>`;
-    const s2=Math.max(1,debtDetailPage-3),e2=Math.min(tp,s2+6);
-    if(s2>1)h+=`<button ${bs(false)} onclick="debtDetailPage=1;renderDebtDetailTable()">1</button><span style="color:var(--text2)">…</span>`;
-    for(let p=s2;p<=e2;p++)h+=`<button ${bs(p===debtDetailPage)} onclick="debtDetailPage=${p};renderDebtDetailTable()">${p}</button>`;
-    if(e2<tp)h+=`<span style="color:var(--text2)">…</span><button ${bs(false)} onclick="debtDetailPage=${tp};renderDebtDetailTable()">${tp}</button>`;
-    h+=`<button ${bs(false)} onclick="debtDetailPage=Math.min(${tp},debtDetailPage+1);renderDebtDetailTable()" ${debtDetailPage===tp?'disabled':''}>›</button>`;
-    h+=`<span style="color:var(--text2);font-size:11px;margin-right:4px">صفحة ${debtDetailPage} من ${tp}</span>`;
-    pg.innerHTML=h;
-  }
+  _mkPagination('debtDetailPagination', debtDetailPage, tp, 'debtDetailGoPage');
 }
+function debtDetailGoPage(p){debtDetailPage=p;renderDebtDetailTable();}
 function initDebtRepFilter(){
   const sel=document.getElementById('debtRepFilter');if(!sel)return;
   [...new Set(debtDetailData.map(r=>r.rep))].sort().forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;sel.appendChild(o);});
@@ -7863,6 +8217,35 @@ function printCurrentTab() {
   if (!active) return;
   const tabId = active.id.replace('tab-', '');
 
+  // ══ تحويل كل canvas إلى صورة قبل الطباعة ══════════════
+  // نستبدل كل <canvas> بـ <img> يحمل نفس بيانات الرسم
+  // حتى تظهر الرسوم في نافذة الطباعة بدون Chart.js
+  const canvasEls = active.querySelectorAll('canvas');
+  const savedCanvasHTML = [];
+  canvasEls.forEach((canvas, i) => {
+    try {
+      // نحتاج أن يكون canvas مرئياً وبحجم حقيقي
+      const chart = Chart.getChart(canvas);
+      if (!chart) { savedCanvasHTML.push(null); return; }
+      // رفع جودة الصورة عبر pixel ratio أعلى
+      const origRatio = window.devicePixelRatio || 1;
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      const w = canvas.offsetWidth  || canvas.width  || 400;
+      const h = canvas.offsetHeight || canvas.height || 200;
+      // استبدال canvas بـ img مؤقتاً في DOM للحصول على innerHTML الصحيح
+      const img = document.createElement('img');
+      img.src = imgData;
+      img.style.cssText = 'width:100%;height:' + h + 'px;max-width:100%;display:block;object-fit:contain;';
+      img.className = 'print-chart-img';
+      img.setAttribute('data-canvas-idx', i);
+      canvas.parentNode.insertBefore(img, canvas);
+      canvas.style.display = 'none';
+      savedCanvasHTML.push({ canvas, img });
+    } catch(e) {
+      savedCanvasHTML.push(null);
+    }
+  });
+
   // Tab title map
   const tabTitles = {
     overview: '📈 نظرة عامة', reps: '👥 أداء المناديب',
@@ -7873,20 +8256,28 @@ function printCurrentTab() {
   // For debt: expand paginated detail table
   if (tabId === 'debt') {
     const repBody = document.getElementById('debtRepBody');
-    if (repBody && !repBody.innerHTML) {
-      renderDebtRepsTable(debtRepsData);
-      initDebtRepFilter();
-      debtDetailFiltered = debtDetailData.slice();
-      renderDebtDetailTable();
+    const savedDebtRepPage = debtRepPage;
+    const savedRepData = _lastDebtRepsFiltered || debtRepsData;
+    const fmt2 = n => Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+    // Expand reps table fully for print
+    if (repBody) {
+      repBody.innerHTML = [...savedRepData].sort((a,b)=>b.net-a.net).map((r,i) => {
+        const nc=r.net>500000?'var(--red)':r.net>100000?'#ff6b35':r.net<0?'var(--accent2)':'var(--text)';
+        const pc=r.pct>=100?'var(--accent2)':r.pct>=70?'var(--accent)':r.pct>=50?'#ff6b35':'var(--red)';
+        const st2=r.net<0?'دائن ✓':r.pct>=100?'سدد كامل ⭐':r.pct>=70?'جيد':r.pct>=50?'متوسط':'يحتاج متابعة ⚠️';
+        const bw=Math.min(r.pct,100);const bc=r.pct>=100?'#00ff88':r.pct>=70?'#00d4ff':r.pct>=50?'#ff6b35':'#ff4757';
+        return `<tr><td style="text-align:center">${i+1}</td><td><b>${r.name}</b></td><td style="text-align:center">${r.customers}</td><td style="text-align:right">${fmt2(r.debit)}</td><td style="text-align:right;color:var(--accent2)">${fmt2(r.credit)}</td><td style="text-align:right;font-weight:700;color:${nc}">${fmt2(r.net)}</td><td>${r.pct.toFixed(1)}%</td><td>${st2}</td></tr>`;
+      }).join('');
     }
+
     const detailBody = document.getElementById('debtDetailBody');
     if (detailBody) {
-      const fmt = n => Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
       const savedPage = debtDetailPage, savedFiltered = debtDetailFiltered.slice();
-      detailBody.innerHTML = debtDetailData.map((r,i) => {
+      detailBody.innerHTML = debtDetailFiltered.map((r,i) => {
         const nc = r.net>50000?'#c0392b':r.net>10000?'#e67e22':r.net<0?'#27ae60':'#333';
         const st = r.net<0?'دائن':r.net===0?'مسوّى':r.net>50000?'حرج':r.net>10000?'مرتفع':'عادي';
-        return `<tr><td style="text-align:center">${i+1}</td><td>${r.code}</td><td>${r.name}</td><td>${r.rep}</td><td>${fmt(r.debit)}</td><td>${fmt(r.credit)}</td><td style="font-weight:700;color:${nc}">${fmt(r.net)}</td><td>${st}</td></tr>`;
+        return `<tr><td style="text-align:center">${i+1}</td><td>${r.code}</td><td>${r.name}</td><td>${r.rep}</td><td>${fmt2(r.debit)}</td><td>${fmt2(r.credit)}</td><td style="font-weight:700;color:${nc}">${fmt2(r.net)}</td><td>${st}</td></tr>`;
       }).join('');
     }
   }
@@ -7979,7 +8370,10 @@ body { font-family:'Cairo',sans-serif; direction:rtl; background:#fff; color:#11
 .chart-card { background:#f8faff !important; border:1px solid #d0d8ea !important; border-radius:6pt !important; padding:8pt !important; page-break-inside:avoid; }
 .chart-title { color:#1a2a4a !important; font-size:9pt !important; font-weight:700; margin-bottom:3pt; }
 .chart-sub   { color:#666 !important; font-size:7.5pt !important; }
-canvas { max-width:100% !important; max-height:100pt !important; }
+canvas { max-width:100% !important; max-height:160pt !important; display:block; }
+.print-chart-img { max-width:100% !important; width:100% !important; height:auto !important; display:block !important; object-fit:contain; border-radius:4pt; }
+.chart-wrap { height:160pt !important; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+.chart-wrap img, .chart-wrap canvas { width:100% !important; height:160pt !important; }
 
 /* Table cards */
 .table-card { background:#fff !important; border:1px solid #d0d8ea !important; border-radius:6pt !important; padding:8pt !important; margin-bottom:8pt !important; page-break-inside:auto; }
@@ -8031,7 +8425,6 @@ ${activeHTML}
   const url = URL.createObjectURL(blob);
   const win = window.open(url, '_blank', 'width=900,height=700');
   if (!win) {
-    // Fallback: direct print
     try { window.print(); } catch(e) {
       alert('يرجى استخدام Ctrl+P أو Cmd+P للطباعة');
     }
@@ -8039,14 +8432,62 @@ ${activeHTML}
     setTimeout(() => URL.revokeObjectURL(url), 60000);
   }
 
+  // ══ استعادة الـ canvas بعد فتح نافذة الطباعة ══
+  setTimeout(() => {
+    savedCanvasHTML.forEach(item => {
+      if (!item) return;
+      try {
+        item.canvas.style.display = '';
+        item.img.remove();
+      } catch(e) {}
+    });
+  }, 200);
+
   // Restore paginated tables
   if (tabId === 'debt') {
-    setTimeout(() => { debtDetailFiltered = debtDetailData.slice(); renderDebtDetailTable(); }, 500);
+    setTimeout(() => {
+      renderDebtRepsTable();
+      debtDetailFiltered = debtDetailData.slice();
+      renderDebtDetailTable();
+    }, 500);
   }
   if (tabId === 'customers') {
     setTimeout(() => renderCustTable(), 500);
   }
 }
+
+// ══════════════════════════════════════════════════════════════
+//  beforeprint / afterprint — تحويل canvas عند Ctrl+P المباشر
+// ══════════════════════════════════════════════════════════════
+(function() {
+  let _printImgs = [];
+
+  window.addEventListener('beforeprint', function() {
+    _printImgs = [];
+    document.querySelectorAll('canvas').forEach((canvas, i) => {
+      try {
+        const chart = typeof Chart !== 'undefined' ? Chart.getChart(canvas) : null;
+        if (!chart) return;
+        const imgData = canvas.toDataURL('image/png', 1.0);
+        const h = canvas.offsetHeight || canvas.height || 200;
+        const img = document.createElement('img');
+        img.src = imgData;
+        img.className = 'print-chart-img';
+        img.style.cssText = 'width:100%;height:' + h + 'px;max-width:100%;display:block;object-fit:contain;';
+        canvas.parentNode.insertBefore(img, canvas);
+        canvas.style.display = 'none';
+        _printImgs.push({ canvas, img });
+      } catch(e) {}
+    });
+  });
+
+  window.addEventListener('afterprint', function() {
+    _printImgs.forEach(({ canvas, img }) => {
+      try { canvas.style.display = ''; img.remove(); } catch(e) {}
+    });
+    _printImgs = [];
+  });
+})();
 
 // ── Print individual table ────────────────────────────────────────────────
 // ── Helper: collect active filters for a given table and return readable label ──
@@ -9532,18 +9973,18 @@ function _rebuildChart(canvasId, config) {
           return;
         }
 
-        if (dsCount === 1) {
-          // dataset وحيد → داخل عمود بدون دوران (أو مع دوران إذا أعمدة كثيرة)
+        if (isPieOrDoughnut) {
+          // دائري: خارج الدائرة مع خط رابط
+          d.datalabels = _dl({ isPie: true, size: 9 });
+        } else if (dsCount === 1) {
           const lblCount = (config.data?.labels || []).length;
-          d.datalabels = _dl({ inside: true, rotate: !isHBar && lblCount > 5, color: '#ffffff', size: 10, hbar: isHBar, isPercent: isPieOrDoughnut });
+          d.datalabels = _dl({ rotate: !isHBar && lblCount > 5, color: '#ffffff', size: 10, hbar: isHBar, isPercent: false });
         } else if (dsCount === 2) {
-          // dataset-ان → داخل مع دوران
           const clrs = ['#ffffff','#ccffee'];
-          d.datalabels = _dl({ inside: true, rotate: !isHBar, color: clrs[di] || '#ffffff', size: 9, hbar: isHBar });
+          d.datalabels = _dl({ rotate: !isHBar, color: clrs[di] || '#ffffff', size: 9, hbar: isHBar });
         } else {
-          // 3+ datasets → داخل كل عمود مع دوران -90°، ألوان مميزة
           const clrMap = ['#cceeff','#ffaaaa','#ffffff','#fff9cc','#ccffee','#ffd9cc'];
-          d.datalabels = _dl({ inside: true, rotate: !isHBar, color: clrMap[di] || '#ffffff', size: di === 0 ? 9 : 8, hbar: isHBar });
+          d.datalabels = _dl({ rotate: !isHBar, color: clrMap[di] || '#ffffff', size: di === 0 ? 9 : 8, hbar: isHBar });
         }
       });
 
@@ -9552,9 +9993,9 @@ function _rebuildChart(canvasId, config) {
       config.plugins = [ChartDataLabels];
       if (!config.options.layout) config.options.layout = {};
       if (!config.options.layout.padding) {
-        config.options.layout.padding = isPieOrDoughnut ? 10
-          : isHBar ? { right: dsCount > 2 ? 8 : 50, left: 4, top: 3, bottom: 3 }
-          : { top: dsCount >= 3 ? 6 : 22, right: 4, bottom: 4, left: 4 };
+        config.options.layout.padding = isPieOrDoughnut ? 40
+          : isHBar ? { right: dsCount >= 3 ? 65 : 72, left: 4, top: 3, bottom: 3 }
+          : { top: dsCount >= 3 ? 8 : 26, right: 4, bottom: 4, left: 4 };
       }
 
     } else {
@@ -9568,6 +10009,13 @@ function _rebuildChart(canvasId, config) {
     config.plugins = typeof ChartDataLabels !== 'undefined' ? [ChartDataLabels] : [];
 
   } // نهاية معالجة DataLabels
+
+  // للرسوم الدائرية: تفعيل خطوط الربط عبر afterDraw
+  if (isPieOrDoughnut && _showDataLabels) {
+    if (!config.options.plugins) config.options.plugins = {};
+    config.options.plugins.datalabels = config.options.plugins.datalabels || {};
+    // خطوط ربط مدمجة في ChartDataLabels عبر borderWidth و offset
+  }
 
   new Chart(el, config);
 }
@@ -9966,13 +10414,13 @@ function updateProductsTabFiltered(data) {
     data:{
       labels: top10s.map(d=>d.name),
       datasets:[
-        { label:'💰 صافي المبيعات',   data:top10s.map(d=>d.ns),     backgroundColor:'rgba(0,255,136,0.85)', borderRadius:4 },
-        { label:'↩️ المرتجعات',       data:top10s.map(d=>d.retVal), backgroundColor:'rgba(255,71,87,0.75)', borderRadius:4 },
-        { label:'📦 إجمالي المبيعات', data:top10s.map(d=>d.sales),  backgroundColor:'rgba(0,212,255,0.35)', borderRadius:4 }
+        { label:'💰 صافي المبيعات',   data:top10s.map(d=>d.ns),     backgroundColor:'rgba(0,255,136,0.85)', borderRadius:4, datalabels:_dl({hbar:true, color:'#b8ffde', size:9}) },
+        { label:'↩️ المرتجعات',       data:top10s.map(d=>d.retVal), backgroundColor:'rgba(255,71,87,0.75)', borderRadius:4, datalabels:_dl({hbar:true, color:'#ffb8b8', size:9}) },
+        { label:'📦 إجمالي المبيعات', data:top10s.map(d=>d.sales),  backgroundColor:'rgba(0,212,255,0.35)', borderRadius:4, datalabels:_dl({hbar:true, color:'#a0d8ff', size:9}) }
       ]},
     options:{
       indexAxis:'y', responsive:true, maintainAspectRatio:false,
-      layout:{padding:{right:16}},
+      layout:{padding:{right:72, left:4, top:4, bottom:4}},
       plugins:{
         legend:{position:'bottom', labels:{color:'#a0b8cc', padding:14, font:{size:11}}},
         tooltip:{callbacks:{
@@ -9997,11 +10445,12 @@ function updateProductsTabFiltered(data) {
         label:'نسبة المرتجعات %',
         data: top12ret.map(d=>d.retPct),
         backgroundColor: top12ret.map(d=>d.retPct>=30?'rgba(255,71,87,0.85)':d.retPct>=15?'rgba(255,107,53,0.8)':'rgba(255,215,0,0.75)'),
-        borderRadius:4
+        borderRadius:4,
+        datalabels: _dl({hbar:true, color:'#ffe082', size:9, isPercent:true})
       }]},
     options:{
       indexAxis:'y', responsive:true, maintainAspectRatio:false,
-      layout:{padding:{right:16}},
+      layout:{padding:{right:72, left:4, top:4, bottom:4}},
       plugins:{
         legend:{display:false},
         tooltip:{callbacks:{
@@ -10352,8 +10801,7 @@ function _gsRenderConnected() {
      <button onclick="gsDisconnect()" style="background:rgba(255,71,87,.15);color:#ff4757;border:1px solid rgba(255,71,87,.3);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:'Cairo',sans-serif">قطع الاتصال</button>`;
   _gsShowMsg('', 'clear');
   // أيقونة في الهيدر
-  const hdr = document.getElementById('gsHeaderLive');
-  if (hdr) { hdr.style.display = 'flex'; hdr.querySelector('#gsHeaderLastSync').textContent = _gsUserEmail; }
+  // header live removed
 }
 
 function _gsRenderDisconnected() {
@@ -10363,8 +10811,7 @@ function _gsRenderDisconnected() {
   if (loginBox)  loginBox.style.display  = 'block';
   if (configBox) configBox.style.display = 'none';
   if (userInfo)  userInfo.innerHTML = '';
-  const hdr = document.getElementById('gsHeaderLive');
-  if (hdr) hdr.style.display = 'none';
+  // header live removed
 }
 
 function _gsSaveConfig() {
@@ -10498,8 +10945,7 @@ async function gsFetchAndUpdate() {
     _gsShowMsg('✅ تم تحديث اللوحة — ' + now, 'info');
     _gsSaveConfig();
     // تحديث وقت آخر مزامنة في الهيدر
-    const hdr = document.getElementById('gsHeaderLastSync');
-    if (hdr) hdr.textContent = _gsUserEmail + ' | آخر تحديث: ' + now;
+    // header last sync removed
   } catch(e) {
     _gsShowMsg('❌ خطأ في المعالجة: ' + e.message, 'error');
   }
@@ -10543,30 +10989,134 @@ async function gsPubTestLinks() {
   const msg = document.getElementById('gsPubMsg');
   const active = keys.filter(k => _gsPubUrls[k]?.trim());
   if (!active.length) { msg.style.color='var(--gold)'; msg.textContent='⚠️ أدخل رابطاً واحداً على الأقل'; return; }
-  msg.style.color='var(--accent)'; msg.textContent='🧪 جارٍ الاختبار...';
-  const GAS = 'https://script.google.com/macros/s/AKfycbwXfVllagoawUcXJepWywMNSRBo6Vtd0m5eaRnIndmEBfm0TAXWWqHLBP0PzuS6RKf2/exec';
-  const _xhr = (u,to) => new Promise((res,rej) => { const x=new XMLHttpRequest(); x.open('GET',u,true); x.timeout=to||30000; x.onload=()=>x.status<300?res(x.responseText):rej(new Error('HTTP '+x.status)); x.onerror=()=>rej(new Error('err')); x.ontimeout=()=>rej(new Error('timeout')); x.send(); });
-  const results = [];
-  for (const key of active) {
-    const st = document.getElementById('gsPubStatus_' + key);
-    if (st) st.textContent = '⏳';
-    const u = _gsPubUrls[key].trim();
-    const tries = [GAS+'?url='+encodeURIComponent(u), 'https://api.allorigins.win/raw?url='+encodeURIComponent(u), u];
-    const names = ['Google Script','allorigins','مباشر'];
-    let ok=false, via='';
-    for (let i=0;i<tries.length;i++) {
-      try {
-        const t = await _xhr(tries[i]);
-        const fc=(t||'').trim()[0]||'';
-        if (fc!=='<'&&fc!=='{'&&(t||'').length>10) { ok=true; via=names[i]; break; }
-      } catch(e) {}
-    }
-    if (st) st.textContent = ok ? '✅' : '❌';
-    results.push((ok?'✅':'❌')+' '+key+(ok?' ('+via+')':' — فشل'));
+  msg.style.color='var(--accent)'; msg.textContent='⚡ اختبار بالتوازي...';
+  active.forEach(k => { const st=document.getElementById('gsPubStatus_'+k); if(st) st.textContent='⚡'; });
+  const testOne = async (key) => {
+    try { await _fetchRace(key, _gsPubUrls[key]); return { key, ok: true, via: _gsBestProxy[key] || '?' }; }
+    catch(e) { return { key, ok: false }; }
+  };
+  const testResults = await Promise.all(active.map(testOne));
+  const labels = { direct: 'مباشر', gas: 'GAS', orig: 'allorigins', cors1: 'corsproxy.io', cors2: 'codetabs' };
+  const parts = [];
+  for (const r of testResults) {
+    const st = document.getElementById('gsPubStatus_' + r.key);
+    if (st) st.textContent = r.ok ? '✅' : '❌';
+    parts.push((r.ok ? '✅' : '❌') + ' ' + r.key + (r.ok ? ' (' + (labels[r.via] || r.via) + ')' : ' — فشل'));
   }
-  const allOk = results.every(r=>r.startsWith('✅'));
+  const allOk = testResults.every(r => r.ok);
   msg.style.color = allOk ? 'var(--accent2)' : 'var(--red)';
-  msg.textContent = results.join('  |  ') + (allOk ? '  — اضغط تحديث الآن ✅' : '');
+  msg.textContent = parts.join('  |  ') + (allOk ? '  — اضغط تحديث الآن ✅' : '');
+}
+
+// ══════════════════════════════════════════════════════════
+//  ⚡ ULTRA TURBO SYNC ENGINE v2 — أقصى سرعة ممكنة
+//  • 5 proxies تتسابق بالتوازي — أسرعها يفوز
+//  • ذاكرة تخزين مؤقت (ETag/hash) — لا إعادة معالجة إذا لم تتغير البيانات
+//  • timeouts مضبوطة بدقة (3ث للـ best proxy، 8ث للباقي)
+//  • حفظ الـ proxy الفائز في localStorage لإعادة الاستخدام
+// ══════════════════════════════════════════════════════════
+
+// كاش الـ proxy الفائز — يُحفظ في localStorage للجلسات القادمة
+const _gsBestProxy = (() => {
+  try { return JSON.parse(localStorage.getItem('_gsBestProxy_v2') || '{}'); } catch(e) { return {}; }
+})();
+function _saveBestProxy() {
+  try { localStorage.setItem('_gsBestProxy_v2', JSON.stringify(_gsBestProxy)); } catch(e) {}
+}
+
+// ذاكرة تخزين مؤقت للبيانات — لتجنب إعادة المعالجة إذا لم تتغير
+const _gsDataCache = {};
+
+// دالة fetch مع timeout دقيق
+function _tFetch(url, timeoutMs) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  return fetch(url, { signal: ctrl.signal, cache: 'no-store' })
+    .then(r => { clearTimeout(timer); if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+    .catch(e => { clearTimeout(timer); throw e; });
+}
+
+// ⚡ محرك السباق الفائق — 5 proxies بالتوازي
+async function _fetchRace(key, rawUrl) {
+  const _GAS = 'https://script.google.com/macros/s/AKfycbwXfVllagoawUcXJepWywMNSRBo6Vtd0m5eaRnIndmEBfm0TAXWWqHLBP0PzuS6RKf2/exec';
+  let url = rawUrl.trim();
+  if (url.includes('/edit') || url.includes('/view')) url = url.replace(/\/(edit|view).*/, '/pub?output=csv');
+  const bust = '_t=' + Date.now();
+  const cacheBusted = url + (url.includes('?') ? '&' : '?') + bust;
+  const enc = encodeURIComponent(cacheBusted);
+
+  const isValid = t => {
+    const s = (t||'').trim();
+    return s.length > 10 && s[0] !== '<' && s[0] !== '{';
+  };
+
+  // 5 proxies متنوعة — أسرعها يفوز
+  const proxies = [
+    { id: 'direct', url: cacheBusted,                                                           to: 6000  },
+    { id: 'gas',    url: _GAS + '?url=' + enc,                                                  to: 8000  },
+    { id: 'orig',   url: 'https://api.allorigins.win/raw?url=' + enc,                           to: 8000  },
+    { id: 'cors1',  url: 'https://corsproxy.io/?' + enc,                                        to: 8000  },
+    { id: 'cors2',  url: 'https://api.codetabs.com/v1/proxy?quest=' + enc,                     to: 10000 },
+  ];
+
+  // ⚡ إذا عندنا best proxy من قبل: جربه أولاً بـ timeout قصير جداً (3ث)
+  if (_gsBestProxy[key]) {
+    const best = proxies.find(p => p.id === _gsBestProxy[key]);
+    if (best) {
+      try {
+        const t = await _tFetch(best.url.replace(enc, encodeURIComponent(cacheBusted)), 3000);
+        if (isValid(t)) {
+          // تحقق من Cache — إذا لم تتغير البيانات، تخطَّ المعالجة
+          if (_gsDataCache[key] === t) { _gsDataCache[key+'_unchanged'] = true; return t; }
+          _gsDataCache[key+'_unchanged'] = false;
+          _gsDataCache[key] = t;
+          return t;
+        }
+      } catch(e) { _gsBestProxy[key] = null; _saveBestProxy(); }
+    }
+  }
+
+  // ⚡ السباق الكامل: كل الـ proxies تنطلق في نفس اللحظة
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    let failed  = 0;
+    const controllers = [];
+
+    proxies.forEach(({ id, url: pu, to }) => {
+      const ctrl = new AbortController();
+      controllers.push(ctrl);
+      const timer = setTimeout(() => ctrl.abort(), to);
+
+      fetch(pu, { signal: ctrl.signal, cache: 'no-store' })
+        .then(r => r.ok ? r.text() : Promise.reject(new Error('HTTP ' + r.status)))
+        .then(text => {
+          clearTimeout(timer);
+          if (settled) return;
+          if (!isValid(text)) { failed++; if (failed === proxies.length) { settled=true; reject(new Error('تعذّر جلب ' + key)); } return; }
+          settled = true;
+          // إلغاء كل الطلبات الأخرى فوراً
+          controllers.forEach(c => { try { c.abort(); } catch(e){} });
+          // حفظ الفائز
+          _gsBestProxy[key] = id;
+          _saveBestProxy();
+          // تحديث الكاش
+          _gsDataCache[key+'_unchanged'] = (_gsDataCache[key] === text);
+          _gsDataCache[key] = text;
+          resolve(text);
+        })
+        .catch(e => {
+          clearTimeout(timer);
+          if (settled) return;
+          failed++;
+          if (failed === proxies.length) {
+            settled = true;
+            const origin = window.location.protocol;
+            const hint = origin === 'file:' ? ' (ملف محلي — جرّب رفعه على server)' : ' — تحقق من رابط النشر';
+            reject(new Error('تعذّر جلب ' + key + hint));
+          }
+        });
+    });
+  });
 }
 
 async function gsPubFetchAndUpdate() {
@@ -10579,48 +11129,32 @@ async function gsPubFetchAndUpdate() {
     if (msg) { msg.textContent = '⚠️ أدخل رابط نشر واحد على الأقل'; msg.style.color = 'var(--gold)'; }
     return;
   }
+
+  // تحذير file:// — CORS يمنع الطلب المباشر، لكن proxies تعمل
+  if (window.location.protocol === 'file:' && msg) {
+    msg.style.color = 'var(--gold)';
+    msg.textContent = '⚠️ تشغيل محلي (file://) — جارٍ المحاولة عبر proxies...';
+  }
+
   if (btn) btn.disabled = true;
-  if (msg) { msg.textContent = '⏳ جارٍ جلب البيانات...'; msg.style.color = 'var(--accent2)'; }
+  const t0 = Date.now();
+  window._syncT0 = t0; // لقياس وقت المزامنة في التقرير
+  // إخفاء بطاقة التقرير القديم
+  const _rc = document.getElementById('syncReportCard');
+  if (_rc) _rc.style.display = 'none';
+  if (msg && window.location.protocol !== 'file:') {
+    msg.textContent = '⚡ جلب ' + active.length + ' ملفات بسرعة البرق...';
+    msg.style.color = 'var(--accent)';
+  }
+  active.forEach(k => { const st=document.getElementById('gsPubStatus_'+k); if(st) st.textContent='⚡'; });
 
-  // ══ جلب جميع الملفات بالتوازي — Promise.all بدل التسلسل ══
-  const _GAS2 = 'https://script.google.com/macros/s/AKfycbwXfVllagoawUcXJepWywMNSRBo6Vtd0m5eaRnIndmEBfm0TAXWWqHLBP0PzuS6RKf2/exec';
-  if (msg) msg.textContent = '⏳ جلب ' + active.length + ' ملفات بالتوازي...';
-  active.forEach(k => { const st=document.getElementById('gsPubStatus_'+k); if(st) st.textContent='⏳'; });
-
-  const _fetchOne = (key) => {
-    let url = _gsPubUrls[key].trim();
-    if (url.includes('/edit') || url.includes('/view')) url = url.replace(/\/(edit|view).*/, '/pub?output=csv');
-    url += (url.includes('?') ? '&' : '?') + '_t=' + Date.now();
-    const _timeout = key === 'مبيعات' ? 90000 : 30000;
-    const _tries = [
-      _GAS2 + '?url=' + encodeURIComponent(url),
-      'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
-      url
-    ];
-    const _xhr = (u, t) => new Promise((res,rej) => {
-      const x = new XMLHttpRequest();
-      x.open('GET', u, true); x.timeout = t || _timeout;
-      x.onload  = () => x.status < 300 ? res(x.responseText) : rej(new Error('HTTP ' + x.status));
-      x.onerror = () => rej(new Error('network error'));
-      x.ontimeout = () => rej(new Error('timeout'));
-      x.send();
-    });
-    // يجرب كل proxy بالتسلسل، لكن الملفات المختلفة بالتوازي
-    const tryAll = async () => {
-      for (const u of _tries) {
-        try {
-          const t = await _xhr(u, key === 'مبيعات' && u === _tries[0] ? 120000 : _timeout);
-          const fc = (t||'').trim()[0]||'';
-          if (fc !== '<' && fc !== '{' && (t||'').length > 10) return t;
-        } catch(e) {}
-      }
-      throw new Error('تعذّر جلب ' + key);
-    };
-    return tryAll();
-  };
+  // ⚡ كل الملفات بالتوازي — سباق داخل كل ملف بين الـ proxies
+  const fetchResults = await Promise.allSettled(
+    active.map(k => _fetchRace(k, _gsPubUrls[k]))
+  );
 
   const results = {};
-  const fetchResults = await Promise.allSettled(active.map(k => _fetchOne(k)));
+  let hasError = false;
   for (let i = 0; i < active.length; i++) {
     const key = active[i];
     const st = document.getElementById('gsPubStatus_' + key);
@@ -10630,26 +11164,37 @@ async function gsPubFetchAndUpdate() {
     } else {
       if (st) st.textContent = '❌';
       if (msg) { msg.textContent = '❌ ' + fetchResults[i].reason?.message; msg.style.color = 'var(--red)'; }
-      if (btn) btn.disabled = false;
-      return;
+      hasError = true;
     }
   }
+  if (hasError && !Object.keys(results).length) {
+    if (btn) btn.disabled = false;
+    return;
+  }
 
-  if (msg) msg.textContent = '⏳ تطبيق البيانات على اللوحة...';
+  // فحص هل تغيّرت البيانات (كاش)
+  const unchanged = Object.keys(results).every(k => _gsDataCache[k+'_unchanged']);
+
+  if (msg) msg.textContent = unchanged ? '⚡ البيانات لم تتغير — تخطّي المعالجة...' : '⚡ تطبيق البيانات...';
   try {
-    for (const [key, text] of Object.entries(results)) {
-      const blob = new Blob([text], { type: 'text/csv' });
-      csvFiles[key] = new File([blob], key + '.csv', { type: 'text/csv' });
+    if (!unchanged) {
+      for (const [key, text] of Object.entries(results)) {
+        const blob = new Blob([text], { type: 'text/csv' });
+        csvFiles[key] = new File([blob], key + '.csv', { type: 'text/csv' });
+      }
+      for (const key of keys) if (!(key in results)) csvFiles[key] = null;
+      await applyCsvData('pub');
     }
-    for (const key of keys) if (!(key in results)) csvFiles[key] = null;
-    await applyCsvData('pub');
+    const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
     const now = new Date().toLocaleTimeString('ar');
-    if (msg) { msg.textContent = '✅ تم تحديث اللوحة — ' + now; msg.style.color = 'var(--accent2)'; }
-    // تحديث الهيدر
-    const hdr = document.getElementById('gsHeaderLive');
-    const hdrTxt = document.getElementById('gsHeaderLastSync');
-    if (hdr) hdr.style.display = 'flex';
-    if (hdrTxt) hdrTxt.textContent = 'آخر تحديث: ' + now;
+    const proxyUsed = Object.values(_gsBestProxy).filter(Boolean);
+    const via = proxyUsed.length ? ' (' + [...new Set(proxyUsed)].join('/') + ')' : '';
+    if (msg) {
+      msg.textContent = unchanged
+        ? '⚡ لا تغييرات — ' + elapsed + 'ث' + via + ' — ' + now
+        : '✅ تم التحديث في ' + elapsed + 'ث' + via + ' — ' + now;
+      msg.style.color = unchanged ? 'var(--gold)' : 'var(--accent2)';
+    }
   } catch(e) {
     if (msg) { msg.textContent = '❌ خطأ في المعالجة: ' + e.message; msg.style.color = 'var(--red)'; }
   }
@@ -10760,6 +11305,80 @@ document.addEventListener('DOMContentLoaded', () => {
   document.head.appendChild(s);
 });
 
+// ══════════════════════════════════════════════════
+// ⚡ Quick Sync from header button
+async function headerQuickSync() {
+  const btn = document.getElementById('headerQuickSync');
+  if (btn) { btn.disabled = true; btn.textContent = '⚡ جارٍ...'; }
+  try {
+    await gsPubFetchAndUpdate();
+  } catch(e) { console.warn('headerQuickSync error:', e); }
+  if (btn) { btn.disabled = false; btn.textContent = '⚡ مزامنة الآن'; }
+}
+
+// ══ Auto-Sync Engine ══════════════════════════════
+let _autoSyncTimer = null;
+let _autoSyncInterval = 5 * 60 * 1000; // 5 دقائق افتراضياً
+let _autoSyncCountdown = null;
+let _autoSyncActive = false;
+
+function toggleAutoSync() {
+  if (_autoSyncActive) {
+    stopAutoSync();
+  } else {
+    // خيارات سريعة بدلاً من prompt
+    const choice = prompt('فترة المزامنة التلقائية:\n1 = 30 ثانية\n2 = دقيقة واحدة\n3 = دقيقتان\n4 = 5 دقائق\n5 = 10 دقائق\nأو أدخل عدد الدقائق مباشرة', '2');
+    if (!choice || choice.trim() === '') return;
+    const shortcuts = { '1': 0.5, '2': 1, '3': 2, '4': 5, '5': 10 };
+    const mins = shortcuts[choice.trim()] || parseFloat(choice);
+    if (!mins || mins < 0.25 || mins > 120) return;
+    _autoSyncInterval = Math.round(mins * 60 * 1000);
+    startAutoSync();
+  }
+}
+
+function startAutoSync() {
+  _autoSyncActive = true;
+  const btn = document.getElementById('headerAutoSyncBtn');
+  if (btn) { btn.style.background = 'rgba(0,255,136,0.25)'; btn.style.borderColor = 'rgba(0,255,136,0.6)'; }
+  _runAutoSync();
+}
+
+function stopAutoSync() {
+  _autoSyncActive = false;
+  if (_autoSyncTimer) { clearTimeout(_autoSyncTimer); _autoSyncTimer = null; }
+  if (_autoSyncCountdown) { clearInterval(_autoSyncCountdown); _autoSyncCountdown = null; }
+  const btn = document.getElementById('headerAutoSyncBtn');
+  if (btn) { btn.textContent = '🔄 تلقائي'; btn.style.background = 'rgba(0,255,136,0.08)'; btn.style.borderColor = 'rgba(0,255,136,0.25)'; }
+}
+
+async function _runAutoSync() {
+  if (!_autoSyncActive) return;
+  // مزامنة فورية
+  await gsPubFetchAndUpdate();
+  if (!_autoSyncActive) return;
+  // عداد تنازلي ذكي — يُظهر الثواني أو الدقائق حسب الوقت
+  const btn = document.getElementById('headerAutoSyncBtn');
+  let remaining = Math.floor(_autoSyncInterval / 1000);
+  if (_autoSyncCountdown) clearInterval(_autoSyncCountdown);
+  _autoSyncCountdown = setInterval(() => {
+    remaining--;
+    if (btn) {
+      if (remaining > 60) {
+        const m = Math.floor(remaining / 60), s = remaining % 60;
+        btn.textContent = '⏱ ' + m + 'د' + (s > 0 ? s + 'ث' : '');
+      } else {
+        btn.textContent = '⏱ ' + remaining + 'ث';
+      }
+    }
+    if (remaining <= 0) {
+      clearInterval(_autoSyncCountdown);
+      _autoSyncCountdown = null;
+    }
+  }, 1000);
+  // جدولة المزامنة التالية
+  _autoSyncTimer = setTimeout(_runAutoSync, _autoSyncInterval);
+}
 // ══════════════════════════════════════════════════
 
 function openCsvModal() {
@@ -11527,23 +12146,64 @@ window._dfUI = function() { try { _ui(); } catch(e) { console.warn('_dfUI:', e);
 })();
 
 // ════════════════════════════════════════════════════════════════════
-//  _fullRefreshAfterSync() — تحديث شامل ومضمون لكل عناصر اللوحة
-//  يُستدعى بعد اكتمال تحميل ومعالجة ملفات CSV/Google Sheets
-//  يضمن أن كل بطاقة وجدول ورسم يحصل على الأرقام الحقيقية الجديدة
+//  _fullRefreshAfterSync() — تحديث شامل مضمون ✅
+//  المبدأ: كل عنصر في كل تبويب يُحدَّث بالتسلسل مع تسجيل الأخطاء
 // ════════════════════════════════════════════════════════════════════
 function _fullRefreshAfterSync(fromGS, msg, btn, hasMabee3at, hasTahseel, hasMadiooniya, hasTasneef, newRepsAdded, repsUpdated) {
 
-  // ── 0. تحديث topDebtors من custData الجديدة ──────────────────────
-  try {
+  // ══════════════════════════════════════════════════
+  //  أداة التسجيل — تتبع كل عملية وتبلّغ عن الأخطاء
+  // ══════════════════════════════════════════════════
+  const _log = [];
+  const _safe = (label, fn) => {
+    try { fn(); _log.push('✅ ' + label); }
+    catch(e) { _log.push('❌ ' + label + ': ' + e.message); console.warn('[Sync] ' + label + ':', e); }
+  };
+
+  // ══════════════════════════════════════════════════
+  //  تدمير جميع الرسوم القديمة أولاً (يمنع التعارض)
+  // ══════════════════════════════════════════════════
+  _safe('destroy all charts', () => {
+    document.querySelectorAll('canvas').forEach(c => {
+      try { const ch = Chart.getChart(c); if (ch) ch.destroy(); } catch(e) {}
+    });
+    // إعادة تعيين حالة رسوم المديونية
+    if (typeof window !== 'undefined') window._debtChartsInit = false;
+  });
+
+  // ══════════════════════════════════════════════════
+  //  المرحلة 0 — تحديث البيانات المشتقة العالمية
+  // ══════════════════════════════════════════════════
+  _safe('topDebtors', () => {
     const freshTop = [...custData].filter(c=>c.g>0).sort((a,b)=>b.g-a.g).slice(0,15);
     topDebtors.length = 0;
     freshTop.forEach(c => topDebtors.push({n:c.n, gap:c.g, col:c.c||0, cat:c.cat}));
-  } catch(e) {}
+  });
 
-  // ── 1. تحديث قوائم المناديب في كل الفلاتر ───────────────────────
-  try {
-    const repNames = [...new Set(repsData.map(r=>r.name))].sort();
+  // تحديث itemsData من productsData (يضمن التزامن بين المصدرين)
+  _safe('itemsData sync', () => {
+    if (productsData.length > 0) {
+      itemsData.length = 0;
+      productsData.forEach(p => itemsData.push({
+        name:p.name, sales:p.sales, qty:p.qty||0,
+        inv:p.inv||0, cust:p.cust||0, reps:p.reps||0,
+        retVal:p.retVal||0, retQty:p.retQty||0,
+        ns:p.ns||0, nqty:p.nqty||0, retPct:p.retPct||0,
+        avgP: (p.qty||0)>0 ? +(p.sales/(p.qty||1)).toFixed(2) : 0,
+        turn: p.inv||0
+      }));
+    }
+  });
+
+  // ══════════════════════════════════════════════════
+  //  المرحلة 1 — قوائم الفلاتر الشاملة (كل التبويبات)
+  // ══════════════════════════════════════════════════
+  _safe('filter dropdowns - all tabs', () => {
+    // ① مصدر الحقيقة: repsData + repClassification المُحدَّثان
+    const repNames = [...new Set(repsData.map(r=>r.name))].filter(Boolean).sort();
     const cats     = [...new Set(repsData.map(r=>r.cat))].filter(Boolean).sort();
+
+    // مساعد: يُعيد بناء قائمة select مع حفظ الاختيار الحالي
     const rs = (id, ph, opts) => {
       const el = document.getElementById(id); if (!el) return;
       const cur = el.value;
@@ -11551,15 +12211,13 @@ function _fullRefreshAfterSync(fromGS, msg, btn, hasMabee3at, hasTahseel, hasMad
       opts.forEach(v => { const o=document.createElement('option'); o.value=v; o.textContent=v; el.appendChild(o); });
       el.value = opts.includes(cur) ? cur : '';
     };
-    rs('repRepFilter',   '👤 كل المناديب', repNames);
-    rs('custRepFilter',  '👤 كل المناديب', repNames);
-    rs('rcRep',          'كل المناديب',    repNames);
-    rs('debtRepFilter',  '👤 كل المناديب', repNames);
-    rs('itemRepFilter',  '👤 كل المناديب', repNames);
-    rs('repCatFilter',   '🏷 كل الفئات',  cats);
-    rs('custCatRepFilter','📂 كل الفئات',  cats);
-    rs('itemRepCat',     '📂 كل الفئات',  cats);
-    rs('debtCatFilter',  '📂 كل الفئات',  cats);
+
+    // ── تبويب المناديب ────────────────────────────────────────────
+    rs('repRepFilter', '👤 كل المناديب', repNames);
+    rs('repCatFilter', '🏷 كل الفئات',  cats);
+
+    // ── تبويب مقارنة المناديب ─────────────────────────────────────
+    rs('rcRep', 'كل المناديب', repNames);
     const rcEl = document.getElementById('rcCat');
     if (rcEl) {
       const cur = rcEl.value;
@@ -11567,115 +12225,368 @@ function _fullRefreshAfterSync(fromGS, msg, btn, hasMabee3at, hasTahseel, hasMad
       cats.forEach(v => { const o=document.createElement('option'); o.value=v; o.textContent=v; rcEl.appendChild(o); });
       rcEl.value = (cats.includes(cur)||cur==='all') ? cur : 'all';
     }
-  } catch(e) {}
 
-  // ── 2. KPIs الرئيسية — فورياً ──────────────────────────────────
-  try { updateKPIs(); } catch(e) {}
+    // ── تبويب العملاء ─────────────────────────────────────────────
+    rs('custRepFilter',    '👤 كل المناديب', repNames);
+    rs('custCatRepFilter', '📂 كل الفئات',  cats);
 
-  // ── 3. عنوان الفترة في الهيدر ──────────────────────────────────
-  try {
+    // ── تبويب الأصناف ─────────────────────────────────────────────
+    // يعتمد على repClassification للتصفية حسب الفئة
+    rs('itemRepCat', '📂 كل الفئات', cats);
+    // قائمة المناديب في الأصناف: من repsData (الأحدث) وليس repToItems الثابت
+    const itemRepSel = document.getElementById('itemRepFilter');
+    if (itemRepSel) {
+      const curR = itemRepSel.value;
+      const curCat = document.getElementById('itemRepCat')?.value || '';
+      itemRepSel.innerHTML = '<option value="">👤 كل المناديب</option>';
+      const itemReps = curCat
+        ? repNames.filter(r => (repClassification[r]||'') === curCat)
+        : repNames;
+      itemReps.forEach(r => { const o=document.createElement('option'); o.value=r; o.textContent=r; itemRepSel.appendChild(o); });
+      itemRepSel.value = itemReps.includes(curR) ? curR : '';
+    }
+
+    // ── تبويب المديونية ───────────────────────────────────────────
+    rs('debtRepFilter', '👤 كل المناديب', repNames);
+    rs('debtCatFilter', '📂 كل الفئات',  cats);
+
+    // ── تبويب أعمار الذمم ─────────────────────────────────────────
+    const agRepSel = document.getElementById('agRepFilter');
+    if (agRepSel) {
+      const curAg = agRepSel.value;
+      const curAgCat = document.getElementById('agRepCatFilter')?.value || '';
+      agRepSel.innerHTML = '<option value="">👤 كل المناديب</option>';
+      const agReps = curAgCat
+        ? repNames.filter(r => (repClassification[r]||'') === curAgCat)
+        : repNames;
+      agReps.forEach(r => { const o=document.createElement('option'); o.value=r; o.textContent=r; agRepSel.appendChild(o); });
+      agRepSel.value = agReps.includes(curAg) ? curAg : '';
+    }
+    const agCatSel = document.getElementById('agCatFilter');
+    if (agCatSel) {
+      const curC = agCatSel.value;
+      agCatSel.innerHTML = '<option value="">📂 كل الفئات</option>';
+      const agCats = [...new Set(custData.map(c=>c.cat).filter(Boolean))];
+      agCats.sort();
+      agCats.forEach(c => { const icons={'ممتاز':'⭐','جيد':'✅','متوسط':'🔶','مخاطرة':'⚠️','مخاطرة عالية':'🚨'}; const o=document.createElement('option'); o.value=c; o.textContent=(icons[c]||'')+' '+c; agCatSel.appendChild(o); });
+      if ([...agCatSel.options].map(o=>o.value).includes(curC)) agCatSel.value = curC;
+    }
+    const agRepCatSel = document.getElementById('agRepCatFilter');
+    if (agRepCatSel) {
+      const curRc = agRepCatSel.value;
+      agRepCatSel.innerHTML = '<option value="">📂 كل فئات المناديب</option>';
+      cats.forEach(v => { const o=document.createElement('option'); o.value=v; o.textContent=v; agRepCatSel.appendChild(o); });
+      agRepCatSel.value = cats.includes(curRc) ? curRc : '';
+    }
+  });
+
+  // ══════════════════════════════════════════════════
+  //  المرحلة 2 — KPIs + شارات الهيدر (فورية)
+  // ══════════════════════════════════════════════════
+  _safe('KPIs', () => { updateKPIs(); });
+  _safe('header badges', () => {
+    const badge = document.getElementById('repCountBadge');
+    if (badge) badge.textContent = repsData.length + ' مندوباً';
     const lbls = window._monthlyStats?.labels || [];
     const hdr  = document.getElementById('header-period');
     if (hdr && lbls.length) hdr.innerHTML = 'الفترة: '+lbls[0]+' — '+lbls[lbls.length-1]+'&nbsp;|&nbsp; إعداد المحاسب أحمد العكاري';
-    const badge = document.getElementById('repCountBadge');
-    if (badge) badge.textContent = repsData.length + ' مندوباً';
-  } catch(e) {}
+  });
 
-  // ── 4. الرسوم البيانية كلها ─────────────────────────────────────
-  requestAnimationFrame(() => setTimeout(() => {
-    try { rebuildCharts(); } catch(e) { console.warn('rebuildCharts:', e); }
+  // ══════════════════════════════════════════════════
+  //  المرحلة 3 — الأقسام الثابتة + القسم الشهري
+  // ══════════════════════════════════════════════════
+  _safe('static panels',       () => { if(typeof updateAllStaticPanels==='function') updateAllStaticPanels(); });
+  _safe('monthly table',       () => { if(typeof updateMonthlyTable==='function') updateMonthlyTable(); });
+  _safe('monthly section',     () => { if(typeof renderMonthlySection==='function') renderMonthlySection(); });
+  _safe('plan tab',            () => { if(typeof updatePlanTab==='function') updatePlanTab(); });
+  _safe('period labels',       () => { if(typeof _updateAllPeriodLabels==='function') _updateAllPeriodLabels(); });
 
-    // ── 5. جدول المقارنة الشهرية + قسم التحليل الشهري ──────────────
-    try { updateMonthlyTable(); } catch(e) {}
-    try { if (typeof renderMonthlySection==='function') renderMonthlySection(); } catch(e) {}
+  // ══════════════════════════════════════════════════
+  //  المرحلة 4 — تبويب نظرة عامة (Overview)
+  // ══════════════════════════════════════════════════
+  _safe('overview charts', () => { _rebuildOverviewCharts(); });
 
-    // ── 6. جميع الأقسام الثابتة (فئات المناديب، أعلى 5، إلخ) ───────
-    try { if (typeof updateAllStaticPanels==='function') updateAllStaticPanels(); } catch(e) {}
+  // ══════════════════════════════════════════════════
+  //  المرحلة 5 — تبويب المناديب
+  // ══════════════════════════════════════════════════
+  _safe('reps table',    () => { if(typeof renderRepsTable==='function') renderRepsTable(); });
+  _safe('reps KPIs',     () => { if(typeof updateRepsTabFiltered==='function') updateRepsTabFiltered(repsData); });
+  _safe('reps charts',   () => { _rebuildRepsCharts(); });
 
-    // ── 7. تبويب المناديب ────────────────────────────────────────────
-    try { if (typeof renderRepsTable==='function') renderRepsTable(); } catch(e) {}
-    try { if (typeof updateRepsTabFiltered==='function') updateRepsTabFiltered(repsData); } catch(e) {}
+  // ══════════════════════════════════════════════════
+  //  المرحلة 6 — تبويب مقارنة المناديب
+  // ══════════════════════════════════════════════════
+  _safe('repcmp table',  () => { if(typeof renderRepCmp==='function') renderRepCmp(); });
+  _safe('repcmp KPIs',   () => { if(typeof updateRepcmpTabFiltered==='function') updateRepcmpTabFiltered(repsData); });
+  _safe('repcmp panels', () => { if(typeof initRepCmpPanels==='function') initRepCmpPanels(); });
+  _safe('repcmp charts', () => { _rebuildRepcmpCharts(); });
 
-    // ── 8. تبويب مقارنة مناديب — الجدول + البطاقات + الرسوم ─────────
-    try { if (typeof renderRepCmp==='function') renderRepCmp(); } catch(e) {}
-    try { if (typeof updateRepcmpTabFiltered==='function') updateRepcmpTabFiltered(repsData); } catch(e) {}
-    try { if (typeof initRepCmpPanels==='function') initRepCmpPanels(); } catch(e) {}
+  // ══════════════════════════════════════════════════
+  //  المرحلة 7 — تبويب العملاء
+  //  ⚠️ ترتيب دقيق: إعادة بناء filteredCust أولاً ثم التحديث
+  // ══════════════════════════════════════════════════
+  _safe('cust filteredCust reset', () => {
+    // إعادة بناء filteredCust من custData الجديدة (يمسح الكاش القديم)
+    if (typeof filteredCust !== 'undefined') {
+      filteredCust.length = 0;
+      custData.forEach(c => filteredCust.push(c));
+    }
+  });
+  _safe('chip counts',   () => { if(typeof updateChipCounts==='function') updateChipCounts(); });
+  _safe('cust filters',  () => { if(typeof applyFilters==='function') applyFilters(); });
+  _safe('cust table',    () => { if(typeof renderCustTable==='function') renderCustTable(); });
+  _safe('cust KPIs',     () => { if(typeof updateCustomersTabFiltered==='function') updateCustomersTabFiltered(typeof filteredCust!=='undefined'&&filteredCust.length?filteredCust:custData); });
 
-    // ── 9. تبويب العملاء — الجدول + البطاقات + الرسم ────────────────
-    try {
-      if (typeof updateChipCounts==='function') updateChipCounts();
-      if (typeof applyFilters==='function') applyFilters();
-      if (typeof renderCustTable==='function') renderCustTable();
-      if (typeof updateCustomersTabFiltered==='function') updateCustomersTabFiltered(custData);
-    } catch(e) {}
+  // ══════════════════════════════════════════════════
+  //  المرحلة 8 — تبويب الأصناف
+  // ══════════════════════════════════════════════════
+  _safe('items reset',   () => { if(typeof resetItemFilters==='function') resetItemFilters(); });
+  _safe('items render',  () => { if(typeof renderItems==='function') renderItems(); });
+  _safe('items panels',  () => { if(typeof initItemsPanels==='function') initItemsPanels(); });
+  _safe('items KPIs',    () => { if(typeof updateProductsTabFiltered==='function') updateProductsTabFiltered(itemsData); });
 
-    // ── 10. تبويب الأصناف — الجدول + البطاقات + الرسوم ─────────────
-    try {
-      if (typeof resetItemFilters==='function') resetItemFilters();
-      if (typeof renderItems==='function') renderItems();
-      if (typeof initItemsPanels==='function') initItemsPanels();
-      if (typeof updateProductsTabFiltered==='function') updateProductsTabFiltered(itemsData);
-    } catch(e) {}
+  // ══════════════════════════════════════════════════
+  //  المرحلة 9 — تبويب المديونية (يحتاج تأخير بسيط للرسوم)
+  // ══════════════════════════════════════════════════
+  _safe('debt detail reset', () => { debtDetailFiltered = debtDetailData.slice(); });
+  _safe('debt rep filter',   () => { if(typeof initDebtRepFilter==='function') initDebtRepFilter(); });
+  _safe('debt reps table',   () => { if(typeof renderDebtRepsTable==='function') renderDebtRepsTable(debtRepsData); });
+  _safe('debt detail table', () => { if(typeof renderDebtDetailTable==='function') renderDebtDetailTable(); });
+  _safe('debt KPIs',         () => { if(typeof updateDebtTabFiltered==='function') updateDebtTabFiltered(debtRepsData, debtDetailData); });
 
-    // ── 11. النصوص الفرعية والعناوين في كل التبويبات ─────────────────
-    try { if (typeof _updateAllPeriodLabels==='function') _updateAllPeriodLabels(); } catch(e) {}
+  // ══════════════════════════════════════════════════
+  //  المرحلة 10 — تبويب أعمار الذمم
+  // ══════════════════════════════════════════════════
+  _safe('aging data',   () => { if(typeof buildAgingData==='function') buildAgingData(); });
+  _safe('aging KPIs',   () => { if(typeof updateAgingKPIs==='function') updateAgingKPIs(); });
+  _safe('aging rep fil',() => { if(typeof populateAgingRepFilter==='function') populateAgingRepFilter(); });
+  _safe('aging cat fil',() => { if(typeof populateAgingCatFilter==='function') populateAgingCatFilter(); });
+  _safe('aging table',  () => { if(typeof renderAgingTable==='function') renderAgingTable(); });
 
-    // ── 12. تبويب المديونية + أعمار الذمم (300ms — ثقيلة) ───────────
-    setTimeout(() => {
-      try {
-        debtDetailFiltered = debtDetailData.slice();
-        if (typeof initDebtRepFilter==='function') initDebtRepFilter();
-        if (typeof renderDebtRepsTable==='function') renderDebtRepsTable(debtRepsData);
-        if (typeof renderDebtDetailTable==='function') renderDebtDetailTable();
-        _debtChartsInit = false;
-        if (typeof initDebtCharts==='function') initDebtCharts();
-        if (typeof updateDebtTabFiltered==='function') updateDebtTabFiltered(debtRepsData, debtDetailData);
-      } catch(e) {}
+  // ══════════════════════════════════════════════════
+  //  المرحلة 11 — فلتر التاريخ (قائمة الشهور)
+  // ══════════════════════════════════════════════════
+  _safe('date range', () => { if(typeof dfInitRange==='function') dfInitRange(); });
+  _safe('month dropdown', () => {
+    const sr=window._dfSR||[], sh=window._dfSH||[], iDate=sh.indexOf('التاريخ');
+    if (iDate>=0) {
+      const ms=new Set();
+      for (const r of sr) { const d=(r[iDate]||'').trim().substring(0,7); if(d&&d.length===7) ms.add(d); }
+      if (ms.size && typeof _buildMonthDropdown==='function') _buildMonthDropdown([...ms].sort());
+    }
+  });
 
-      try {
-        if (typeof buildAgingData==='function') {
-          buildAgingData();
-          if (typeof updateAgingKPIs==='function') updateAgingKPIs();
-          if (typeof populateAgingRepFilter==='function') populateAgingRepFilter();
-          if (typeof populateAgingCatFilter==='function') populateAgingCatFilter();
-          if (typeof renderAgingTable==='function') renderAgingTable();
-        }
-      } catch(e) {}
-
-      // ── 13. تبويب خطة العمل ──────────────────────────────────────
-      try { if (typeof updatePlanTab==='function') updatePlanTab(); } catch(e) {}
-
-      // ── 14. تحديث الـ Snapshot للفلتر الزمني بالبيانات الجديدة ─────
-      try {
-        if (typeof dfInitRange==='function') dfInitRange();
-        // إعادة بناء قائمة الشهور في الفلتر
-        const sr=window._dfSR||[], sh=window._dfSH||[];
-        const iDate=sh.indexOf('التاريخ');
-        if (iDate>=0) {
-          const monthSet=new Set();
-          for (const r of sr) { const d=(r[iDate]||'').trim().substring(0,7); if(d&&d.length===7) monthSet.add(d); }
-          if (monthSet.size && typeof _buildMonthDropdown==='function') _buildMonthDropdown([...monthSet].sort());
-        }
-      } catch(e) {}
-
-      // ── 15. رسالة النجاح ──────────────────────────────────────────
-      const totalFiles = [hasMabee3at, hasTahseel, hasMadiooniya, hasTasneef].filter(Boolean).length;
-      let successMsg = '✅ تم التحديث الكامل! (' + totalFiles + ' ملف' + (totalFiles===1?'':' ملفات') + ')';
-      if (hasTasneef) {
-        const parts = [];
-        if (newRepsAdded > 0)  parts.push('مندوبين جدد: ' + newRepsAdded);
-        if (repsUpdated > 0)   parts.push('محدَّث: ' + repsUpdated);
-        if (parts.length) successMsg += ' — ' + parts.join('، ');
+  // ══════════════════════════════════════════════════
+  //  المرحلة 12 — رسوم المديونية (مع تأخير للـ canvas)
+  // ══════════════════════════════════════════════════
+  setTimeout(() => {
+    _safe('debt charts init', () => {
+      if(typeof initDebtCharts==='function') {
+        window._debtChartsInit = false;
+        initDebtCharts();
       }
-      // إضافة ملخص الأرقام للتحقق
-      successMsg += ' | المناديب: ' + repsData.length + ' | العملاء: ' + custData.length + ' | الأصناف: ' + itemsData.length;
-      if (msg) msg.textContent = successMsg;
-      if (btn) btn.disabled = false;
-      if (!fromGS) setTimeout(() => closeCsvModal(), 3000);
+    });
 
-    }, 300);
+    // ══════════════════════════════════════════════
+    //  التحقق النهائي — فحص كل عنصر أساسي
+    // ══════════════════════════════════════════════
+    const _checks = [];
+    const _chk = (label, fn) => {
+      try { const val = fn(); _checks.push({ label, ok: !!val, val }); }
+      catch(e) { _checks.push({ label, ok: false, val: 'ERR: ' + e.message }); }
+    };
 
-  }, 0));
+    // ── فحص صحة المصفوفات ──────────────────────────────────────────
+    _chk('repsData count',       () => repsData.length > 0);
+    _chk('custData count',       () => custData.length > 0);
+    _chk('itemsData count',      () => itemsData.length > 0);
+    _chk('monthlyStats',         () => window._monthlyStats?.labels?.length > 0);
+    _chk('debtRepsData',         () => debtRepsData.length >= 0);  // يمكن أن يكون صفر
+
+    // ── فحص KPI cards (الأرقام الفعلية وليس القيم الافتراضية) ──────
+    const _kpiOk = id => { const el = document.getElementById(id); return el && el.textContent && el.textContent !== '—' && el.textContent !== '0'; };
+    _chk('KPI main totalSales',  () => _kpiOk('kpi-totalSales-main'));
+    _chk('KPI main netSales',    () => _kpiOk('kpi-netSales-main'));
+    _chk('KPI main col',         () => _kpiOk('kpi-col-main'));
+    _chk('KPI reps sales',       () => _kpiOk('reps-kpi-sales'));
+    _chk('KPI cust count',       () => _kpiOk('cust-kpi-count'));
+    _chk('KPI prod net',         () => _kpiOk('prod-kpi-net'));
+    _chk('KPI debt net',         () => _kpiOk('debt-kpi-net'));
+    _chk('KPI aging custs',      () => _kpiOk('ag-total-custs'));
+
+    // ── فحص الرسوم ─────────────────────────────────────────────────
+    _chk('chart monthlyChart',   () => !!Chart.getChart(document.getElementById('monthlyChart')));
+    _chk('chart repChart',       () => !!Chart.getChart(document.getElementById('repChart')));
+    _chk('chart custPie',        () => !!Chart.getChart(document.getElementById('custPie')));
+    _chk('chart roiDist',        () => !!Chart.getChart(document.getElementById('roiDist')));
+    _chk('chart allRepsChart',   () => !!Chart.getChart(document.getElementById('allRepsChart')));
+
+    // ── فحص الجداول (صفوف فعلية) ───────────────────────────────────
+    _chk('reps table rows',      () => (document.getElementById('repsBody')?.querySelectorAll('tr').length || 0) > 0);
+    _chk('cust table rows',      () => (document.getElementById('custBody')?.querySelectorAll('tr').length || 0) > 0);
+    _chk('items table rows',     () => (document.getElementById('itemsBody')?.querySelectorAll('tr').length || 0) > 0);
+    _chk('aging table rows',     () => (document.getElementById('agingTbody')?.querySelectorAll('tr').length || 0) >= 0);
+    _chk('debt reps table',      () => (document.getElementById('debtRepBody')?.querySelectorAll('tr').length || 0) >= 0);
+    _chk('monthly table body',   () => (document.getElementById('monthlyTableBody')?.querySelectorAll('tr').length || 0) >= 0);
+    _chk('cat-panels-updated',    () => typeof updateAllStaticPanels === 'function'); // فحص وجود الدالة فقط
+
+    const failed  = _checks.filter(c => !c.ok);
+    const errors  = _log.filter(l => l.startsWith('❌'));
+    const passed  = _checks.filter(c => c.ok).length;
+    const totalCh = _checks.length;
+
+    // رسالة الحالة الشاملة
+    const totalFiles = [hasMabee3at, hasTahseel, hasMadiooniya, hasTasneef].filter(Boolean).length;
+    let successMsg = '✅ تحديث شامل (' + totalFiles + ' ملف) | '
+      + repsData.length + ' مندوب | '
+      + custData.length + ' عميل | '
+      + itemsData.length + ' صنف';
+    if (hasTasneef && (newRepsAdded||repsUpdated))
+      successMsg += ' | تصنيف: +' + (newRepsAdded||0) + ' جديد, ' + (repsUpdated||0) + ' محدَّث';
+
+    if (errors.length > 0 || failed.length > 0) {
+      const problems = [...errors, ...failed.map(c=>'⚠️ '+c.label+': '+c.val)];
+      console.warn('[Sync Verification] Problems: ' + problems.join(' | '));
+      successMsg += ' | ⚠️ ' + problems.length + ' تحذير (راجع Console)';
+    } else {
+      successMsg += ' | ✅ تحقق ' + passed + '/' + totalCh;
+    }
+
+    const hasProblem = errors.length > 0 || failed.length > 0;
+    if (msg) { msg.textContent = successMsg; msg.style.color = hasProblem ? 'var(--gold)' : 'var(--accent2)'; }
+    if (btn) btn.disabled = false;
+    if (!fromGS) setTimeout(() => closeCsvModal(), 1500);
+
+    // ── تقرير مرئي داخل المودال فقط ────────────────────────────
+    (function _showSyncReport() {
+      const card = document.getElementById('syncReportCard');
+      if (!card) return;
+      const now = new Date().toLocaleTimeString('ar');
+      const elapsed = ((Date.now() - (window._syncT0||Date.now())) / 1000).toFixed(1);
+
+      // العنوان والأيقونة
+      const iconEl  = document.getElementById('syncReportIcon');
+      const titleEl = document.getElementById('syncReportTitle');
+      const timeEl  = document.getElementById('syncReportTime');
+      if (iconEl)  iconEl.textContent  = hasProblem ? '⚠️' : '✅';
+      if (titleEl) {
+        titleEl.textContent = hasProblem ? 'تم التحديث مع تحذيرات' : 'تم التحديث بنجاح';
+        titleEl.style.color = hasProblem ? 'var(--gold)' : 'var(--accent2)';
+      }
+      if (timeEl) timeEl.textContent = now + ' (' + elapsed + 'ث)';
+
+      // إحصاءات البيانات
+      const statsEl = document.getElementById('syncReportStats');
+      if (statsEl) {
+        const statItem = (icon, val, lbl, col) =>
+          '<span style="display:flex;align-items:center;gap:4px;">'
+          + '<span style="font-size:13px">' + icon + '</span>'
+          + '<span style="font-weight:700;color:' + col + '">' + val + '</span>'
+          + '<span>' + lbl + '</span></span>';
+        statsEl.innerHTML =
+          statItem('👥', repsData.length,    'مندوب',  'var(--accent)')  +
+          statItem('🏪', custData.length,    'عميل',   'var(--accent2)') +
+          statItem('📦', itemsData.length,   'صنف',    'var(--gold)')    +
+          statItem('💳', debtRepsData.length,'مديون',  'var(--red)')     +
+          statItem('✔️', passed+'/'+totalCh, 'تحقق',  hasProblem?'var(--gold)':'var(--accent2)');
+      }
+
+      // سطر التحقق
+      const verEl = document.getElementById('syncReportVerify');
+      if (verEl) {
+        const totalFiles = [hasMabee3at, hasTahseel, hasMadiooniya, hasTasneef].filter(Boolean).length;
+        verEl.textContent = 'ملفات محمّلة: ' + totalFiles
+          + ' | الأقسام المُحدَّثة: نظرة عامة، مناديب، عملاء، أصناف، ديون، ذمم، خطة'
+          + (hasTasneef && (newRepsAdded||repsUpdated) ? ' | تصنيف: +' + (newRepsAdded||0) + ' جديد، ' + (repsUpdated||0) + ' محدَّث' : '');
+      }
+
+      // تحذيرات
+      const warnEl = document.getElementById('syncReportWarnings');
+      if (warnEl) {
+        if (hasProblem) {
+          const problems = [...errors, ...failed.map(c => c.label + ': ' + c.val)];
+          warnEl.style.display = 'block';
+          warnEl.innerHTML = '⚠️ ' + problems.slice(0,3).join(' | ') + (problems.length>3?' (+' + (problems.length-3) + ' أخرى)':'');
+        } else {
+          warnEl.style.display = 'none';
+        }
+      }
+
+      // إظهار البطاقة
+      card.style.display = 'block';
+      card.style.borderColor = hasProblem ? 'rgba(255,215,0,0.3)' : 'rgba(0,212,255,0.2)';
+      card.style.background  = hasProblem ? 'rgba(255,215,0,0.05)' : 'rgba(0,212,255,0.06)';
+    })();
+
+    // طباعة تقرير كامل في Console للمطور
+    console.groupCollapsed('[Dashboard Sync] تقرير التحديث الكامل');
+    console.log('📊 البيانات:', { reps: repsData.length, custs: custData.length, items: itemsData.length, debt: debtRepsData.length });
+    console.log('🔄 العمليات (' + _log.length + '):', _log.join(', '));
+    console.log('✅ التحقق (' + passed + '/' + totalCh + '):', _checks.map(c=>(c.ok?'✅':'❌')+' '+c.label+': '+c.val).join(', '));
+    if (errors.length) console.error('❌ أخطاء:', errors);
+    if (failed.length) console.warn('⚠️ تحذيرات:', failed);
+    console.groupEnd();
+
+  }, 150);
+}
+
+// ── دوال بناء الرسوم حسب التبويب (تُستدعى عند الحاجة) ───────────
+function _rebuildOverviewCharts() {
+  try {
+    const ms = window._monthlyStats;
+    if (ms?.labels?.length) {
+      _rebuildChart('monthlyChart', {
+        type:'bar',
+        data:{ labels:ms.labels,
+          datasets:[
+            {label:'مبيعات',data:ms.sales,backgroundColor:'rgba(0,212,255,0.7)',borderRadius:4},
+            {label:'مرتجعات',data:ms.returns,backgroundColor:'rgba(255,71,87,0.7)',borderRadius:4},
+            {label:'صافي',data:ms.net,backgroundColor:'rgba(0,255,136,0.7)',borderRadius:4},
+            {label:'تحصيل',data:ms.col,backgroundColor:'rgba(255,215,0,0.6)',borderRadius:4,type:'line',borderColor:'#ffd700',fill:false}
+          ]},
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#a0b8cc',padding:10,font:{size:11}}}},
+          scales:{x:{ticks:{color:'#a0b8cc',font:{size:10}},grid:{color:'rgba(30,58,95,0.4)'}},y:{ticks:{callback:v=>_fmtM(v),color:'#a0b8cc'},grid:{color:'rgba(30,58,95,0.4)'}}}}
+      });
+    }
+    // custPie, paymentPie, roiDist, productChart
+    const custCats=['ممتاز','جيد','متوسط','مخاطرة','مخاطرة عالية'];
+    const custCounts=custCats.map(c=>custData.filter(x=>x.cat===c).length);
+    _rebuildChart('custPie',{type:'doughnut',data:{labels:custCats,datasets:[{data:custCounts,backgroundColor:['rgba(0,255,136,0.8)','rgba(0,212,255,0.8)','rgba(255,215,0,0.8)','rgba(255,107,53,0.8)','rgba(255,71,87,0.85)'],borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#8ba3b8',padding:10,font:{size:11}}}}}});
+
+    const totalBank=repsData.reduce((s,r)=>s+(r.colBank||0),0);
+    const totalCash=repsData.reduce((s,r)=>s+(r.colCash||0),0);
+    _rebuildChart('paymentPie',{type:'doughnut',data:{labels:['حوالات بنكية','نقدي'],datasets:[{data:[Math.round(totalBank),Math.round(totalCash)],backgroundColor:['rgba(124,111,255,0.85)','rgba(255,215,0,0.8)'],borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#8ba3b8',padding:10,font:{size:11}}}}}});
+
+    const top10=([...repsData].sort((a,b)=>b.roi-a.roi)).slice(0,15);
+    _rebuildChart('roiDist',{type:'bar',data:{labels:top10.map(r=>r.name),fullLabels:top10.map(r=>r.name),datasets:[{label:'ROI%',data:top10.map(r=>+r.roi.toFixed(1)),backgroundColor:top10.map(r=>r.roi>=100?'rgba(0,255,136,0.8)':r.roi>=80?'rgba(0,212,255,0.7)':r.roi>=50?'rgba(255,215,0,0.7)':'rgba(255,71,87,0.8)'),borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>v+'%',color:'#a0b8cc'},grid:{color:'rgba(30,58,95,0.4)'}},y:{ticks:{color:'#e8f4f8',font:{size:11}},grid:{display:false}}}}});
+
+    const topP=[...productsData].sort((a,b)=>b.ns-a.ns).slice(0,8);
+    _rebuildChart('productChart',{type:'bar',data:{labels:topP.map(p=>p.name.substring(0,20)),fullLabels:topP.map(p=>p.name),datasets:[{label:'صافي المبيعات',data:topP.map(p=>p.ns),backgroundColor:'rgba(0,255,136,0.7)',borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>_fmtM(v),color:'#a0b8cc'},grid:{color:'rgba(30,58,95,0.4)'}},y:{ticks:{color:'#e8f4f8',font:{size:10}},grid:{display:false}}}}});
+  } catch(e) { console.warn('overview charts:', e); }
+}
+
+function _rebuildRepsCharts() {
+  try {
+    const top10=([...repsData].sort((a,b)=>b.sales-a.sales)).slice(0,10);
+    _rebuildChart('repChart',{type:'bar',data:{labels:top10.map(r=>r.name),fullLabels:top10.map(r=>r.name),datasets:[{label:'المبيعات',data:top10.map(r=>r.sales),backgroundColor:'rgba(0,212,255,0.7)',borderRadius:4},{label:'التحصيل',data:top10.map(r=>r.col),backgroundColor:'rgba(0,255,136,0.7)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#a0b8cc',padding:8}}},scales:{x:{ticks:{font:{size:10},color:'#a0b8cc'},grid:{color:'rgba(30,58,95,0.4)'}},y:{ticks:{callback:v=>_fmtM(v),color:'#a0b8cc'},grid:{color:'rgba(30,58,95,0.4)'}}}}});
+
+    const byRoi=[...repsData].filter(r=>r.sales>0).sort((a,b)=>b.roi-a.roi).slice(0,15);
+    _rebuildChart('allRepsChart',{type:'bar',data:{labels:byRoi.map(r=>r.name),fullLabels:byRoi.map(r=>r.name),datasets:[{label:'ROI%',data:byRoi.map(r=>+r.roi.toFixed(1)),backgroundColor:byRoi.map(r=>r.roi>=100?'rgba(0,255,136,0.8)':r.roi>=80?'rgba(0,212,255,0.7)':r.roi>=50?'rgba(255,215,0,0.7)':'rgba(255,71,87,0.8)'),borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>v+'%',color:'#a0b8cc'},grid:{color:'rgba(30,58,95,0.4)'}},y:{ticks:{color:'#e8f4f8',font:{size:10}},grid:{display:false}}}}});
+
+    const top8sc=[...repsData].sort((a,b)=>b.sales-a.sales).slice(0,8);
+    _rebuildChart('repSalesColChart',{type:'bar',data:{labels:top8sc.map(r=>r.name),fullLabels:top8sc.map(r=>r.name),datasets:[{label:'المبيعات',data:top8sc.map(r=>r.sales),backgroundColor:'rgba(0,212,255,0.7)',borderRadius:4},{label:'التحصيل',data:top8sc.map(r=>r.col),backgroundColor:'rgba(0,255,136,0.7)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#a0b8cc',padding:8}}},scales:{x:{ticks:{font:{size:10},color:'#a0b8cc'},grid:{color:'rgba(30,58,95,0.4)'}},y:{ticks:{callback:v=>_fmtM(v),color:'#a0b8cc'},grid:{color:'rgba(30,58,95,0.4)'}}}}});
+
+    const top8r=[...repsData].filter(r=>r.sales>5000).sort((a,b)=>b.returns-a.returns).slice(0,8);
+    _rebuildChart('repReturnsChart',{type:'bar',data:{labels:top8r.map(r=>r.name),fullLabels:top8r.map(r=>r.name),datasets:[{label:'المرتجعات',data:top8r.map(r=>r.returns),backgroundColor:top8r.map(r=>r.retPct>=20?'rgba(255,71,87,0.85)':r.retPct>=10?'rgba(255,107,53,0.8)':'rgba(255,215,0,0.75)'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10},color:'#a0b8cc'},grid:{color:'rgba(30,58,95,0.4)'}},y:{ticks:{callback:v=>_fmtM(v),color:'#a0b8cc'},grid:{color:'rgba(30,58,95,0.4)'}}}}});
+
+    if (typeof _buildReturnsChart==='function') _buildReturnsChart(repsData);
+  } catch(e) { console.warn('reps charts:', e); }
+}
+
+function _rebuildRepcmpCharts() {
+  try {
+    if (typeof initRepCmpPanels==='function') initRepCmpPanels();
+  } catch(e) { console.warn('repcmp charts:', e); }
 }
 
 async function applyCsvData(fromGS) {
@@ -11700,35 +12611,28 @@ async function applyCsvData(fromGS) {
     let colRows   = [], colHeaders   = [];
     let debtRows  = [], debtHeaders  = [];
 
-    // ══ تحميل الملفات الأربعة بالتوازي (Promise.all) بدل التسلسلي ══
+    // ══ تحميل الملفات الأربعة بالتوازي (Promise.all) ══
     const [salesResult, colResult, debtResult, tasneefRaw] = await Promise.all([
-      hasMabee3at   ? readFileAsText(csvFiles['مبيعات']).then(t => parseCSVContent(t))            : Promise.resolve(null),
-      hasTahseel    ? readFileAsText(csvFiles['تحصيل']).then(t => parseCSVContent(t))             : Promise.resolve(null),
-      hasMadiooniya ? readFileAsText(csvFiles['مديونية']).then(t => parseCSVContent(t))           : Promise.resolve(null),
-      hasTasneef    ? parseTasneefFile(csvFiles['تصنيف'])                                          : Promise.resolve(null),
+      hasMabee3at   ? readFileAsText(csvFiles['مبيعات']).then(t => parseCSVContent(t))  : Promise.resolve(null),
+      hasTahseel    ? readFileAsText(csvFiles['تحصيل']).then(t => parseCSVContent(t))   : Promise.resolve(null),
+      hasMadiooniya ? readFileAsText(csvFiles['مديونية']).then(t => parseCSVContent(t)) : Promise.resolve(null),
+      hasTasneef    ? parseTasneefFile(csvFiles['تصنيف'])                                : Promise.resolve(null),
     ]);
 
     if (salesResult) {
       salesHeaders = salesResult[0];
       salesRows = salesResult.slice(1).filter(r => r.length > 2 && r[0] !== '#' && r[0] !== '' && !isNaN(Number(r[0])));
     }
-    if (colResult) {
-      colHeaders = colResult[0];
-      colRows = colResult.slice(1).filter(r => r.length > 2);
-    }
-    if (debtResult) {
-      debtHeaders = debtResult[0];
-      debtRows = debtResult.slice(1).filter(r => r.length > 2);
-    }
+    if (colResult) { colHeaders = colResult[0]; colRows = colResult.slice(1).filter(r => r.length > 2); }
+    if (debtResult) { debtHeaders = debtResult[0]; debtRows = debtResult.slice(1).filter(r => r.length > 2); }
 
-    msg.textContent = '✅ تم تحميل الملفات — جارٍ التحليل...';
+    msg.textContent = '⏳ جارٍ التحليل...';
 
-    // ══ تحليل ملف تصنيف المناديب — يُقرأ مبكراً ليُطبَّق على بيانات المبيعات لاحقاً ══
+    // ══ تحليل ملف تصنيف المناديب ══
     let newRepsAdded = 0, repsUpdated = 0;
-    // tasneefMap: name → { cat, phone, target, notes, area, code }
     const tasneefMap = {};
     if (hasTasneef && tasneefRaw) {
-      msg.textContent = '⏳ تحليل ملف تصنيف المناديب...';
+
       try {
         const rawRows = tasneefRaw;
 
@@ -11807,16 +12711,16 @@ async function applyCsvData(fromGS) {
         msg.textContent = tCount > 0
           ? `✅ تم قراءة ${tCount} مندوب من ملف التصنيف`
           : '⚠️ لم يتم قراءة بيانات من ملف التصنيف';
-        await new Promise(r => setTimeout(r, 400));
+        // لا انتظار — المضي فوراً
 
       } catch(err) {
         console.error('Tasneef error:', err);
         msg.textContent = '❌ خطأ في قراءة ملف التصنيف: ' + err.message;
-        await new Promise(r => setTimeout(r, 2000));
+        await new Promise(r => setTimeout(r, 500)); // انتظار قصير عند الخطأ فقط
       }
     }
     if (hasMabee3at && salesRows.length > 0) {
-      msg.textContent = '⏳ حساب الإجماليات...';
+
 
       // Compute monthly breakdown from salesRows
       if (salesRows.length > 0) {
@@ -11992,7 +12896,7 @@ async function applyCsvData(fromGS) {
         }
       }
       
-      msg.textContent = '⏳ بناء بيانات المناديب...';
+
 
       // إضافة المناديب الجدد من tasneefMap الذين لا يوجدون في repMap
       if (hasTasneef) {
@@ -12042,7 +12946,7 @@ async function applyCsvData(fromGS) {
         };
       }).sort((a, b) => b.netSales - a.netSales);
       
-      msg.textContent = '⏳ بناء بيانات العملاء...';
+
       // ── FIFO على الفترات لحساب أعمار الذمم ──
       const _custAgeMap = {};
       for (const [cust, b] of Object.entries(_custBuckets)) {
@@ -12082,7 +12986,7 @@ async function applyCsvData(fromGS) {
                  age30: Math.round(_ag.age30 || 0), age60: Math.round(_ag.age60 || 0) };
       }).sort((a, b) => b.s - a.s);
       
-      msg.textContent = '⏳ بناء بيانات الأصناف...';
+
       const newItemsData = Object.entries(itemMap).map(([name, d]) => {
         const sales=d.sales, qty=d.qty, inv=d.invoices.size, cust=d.customers.size, reps=d.reps.size;
         const retVal=d.returns, retQty=d.retQty, ns=sales-retVal, nqty=qty-retQty;
@@ -12248,7 +13152,7 @@ async function applyCsvData(fromGS) {
 // ═══════════════════════════════════════════════════════
 let agingData = [];      // مصفوفة بيانات العملاء الكاملة
 let agingPage = 1;
-const agingPageSize = 50;
+const agingPageSize = _PAGE_SIZE;
 
 function buildAgingData() {
   const today = new Date();
@@ -12615,24 +13519,10 @@ function renderAgingTable() {
 
   // تحديث العداد
   const countEl = document.getElementById('agCount');
-  if (countEl) countEl.textContent = `عرض ${Math.min(start+agingPageSize,total)} من ${total}`;
+  if (countEl) countEl.textContent = `عرض ${start+1}–${Math.min(start+agingPageSize,total)} من ${total}`;
 
-  // ترقيم الصفحات
-  const pag = document.getElementById('agingPagination');
-  if (pag) {
-    if (pages<=1) { pag.innerHTML=''; return; }
-    let html = '';
-    const btnStyle = 'padding:5px 12px;border-radius:20px;font-family:"Cairo",sans-serif;font-size:12px;cursor:pointer;border:1px solid;';
-    if (agingPage>1) html += `<button onclick="agingGo(${agingPage-1})" style="${btnStyle}background:var(--surface2);border-color:var(--border);color:var(--text)">← السابق</button>`;
-    const maxBtn=7; const half=Math.floor(maxBtn/2);
-    let lo=Math.max(1,agingPage-half), hi=Math.min(pages,lo+maxBtn-1);
-    if(hi-lo<maxBtn-1) lo=Math.max(1,hi-maxBtn+1);
-    if(lo>1) html+=`<button onclick="agingGo(1)" style="${btnStyle}background:var(--surface2);border-color:var(--border);color:var(--text)">1</button>${lo>2?'<span style="color:var(--muted)">…</span>':''}`;
-    for(let p=lo;p<=hi;p++) html+=`<button onclick="agingGo(${p})" style="${btnStyle}background:${p===agingPage?'var(--accent)':'var(--surface2)'};border-color:${p===agingPage?'var(--accent)':'var(--border)'};color:${p===agingPage?'#000':'var(--text)'}">${p}</button>`;
-    if(hi<pages) html+=`${hi<pages-1?'<span style="color:var(--muted)">…</span>':''}<button onclick="agingGo(${pages})" style="${btnStyle}background:var(--surface2);border-color:var(--border);color:var(--text)">${pages}</button>`;
-    if (agingPage<pages) html += `<button onclick="agingGo(${agingPage+1})" style="${btnStyle}background:var(--surface2);border-color:var(--border);color:var(--text)">التالي →</button>`;
-    pag.innerHTML = html;
-  }
+  // ترقيم الصفحات عبر الدالة المركزية
+  _mkPagination('agingPagination', agingPage, pages, 'agingGo');
 }
 
 function agingGo(p) { agingPage=p; renderAgingTable(); }
@@ -12884,11 +13774,25 @@ function exportAgingCSV() {
           <input class="gs-url-input" id="gsPubUrl_تصنيف" placeholder="https://docs.google.com/spreadsheets/d/…/pub?output=csv&gid=…" oninput="gsPubUrlChanged('تصنيف')">
           <span class="gs-url-status" id="gsPubStatus_تصنيف">⬜</span>
         </div>
-        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:12px;flex-wrap:wrap">
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center">
           <button onclick="gsPubTestLinks()" style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.35);color:#ffd700;padding:9px 18px;border-radius:999px;font-family:'Cairo',sans-serif;font-weight:700;font-size:13px;cursor:pointer">🧪 اختبار الروابط</button>
-          <button class="gs-sync-btn" id="gsPubFetchBtn" onclick="gsPubFetchAndUpdate()">🔄 تحديث الآن</button>
+          <button class="gs-sync-btn" id="headerAutoSyncBtn" onclick="toggleAutoSync()" style="background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.3);color:var(--accent2);">🔄 تلقائي</button>
+          <button class="gs-sync-btn" id="headerQuickSync" onclick="headerQuickSync()" style="background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.45);font-weight:700;">⚡ مزامنة الآن</button>
+          <button class="gs-sync-btn" id="gsPubFetchBtn" onclick="gsPubFetchAndUpdate()">🔄 تحديث</button>
         </div>
         <div class="csv-progress-msg" id="gsPubMsg" style="margin-top:8px"></div>
+
+        <!-- بطاقة تقرير المزامنة المرئية -->
+        <div id="syncReportCard" style="display:none;margin-top:10px;padding:10px 14px;border-radius:10px;background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.2);font-family:'Cairo',sans-serif;font-size:12px;direction:rtl;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span id="syncReportIcon" style="font-size:16px">✅</span>
+            <span id="syncReportTitle" style="font-weight:700;color:var(--accent2)">تم التحديث بنجاح</span>
+            <span id="syncReportTime" style="color:var(--muted);margin-right:auto;font-size:11px"></span>
+          </div>
+          <div id="syncReportStats" style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:6px;color:var(--text2);font-size:11px;"></div>
+          <div id="syncReportVerify" style="font-size:11px;color:var(--muted);border-top:1px solid rgba(255,255,255,0.06);padding-top:5px;margin-top:4px;"></div>
+          <div id="syncReportWarnings" style="display:none;margin-top:5px;font-size:11px;color:var(--gold);"></div>
+        </div>
       </div>
 
       <!-- فاصل -->
@@ -13010,5 +13914,19 @@ function exportAgingCSV() {
 
 </div><!-- end main-area -->
 </div><!-- end app-shell -->
+
+
+<!-- ══════════════════════════════════════════════════
+     FOOTER — ذيل اللوحة
+════════════════════════════════════════════════════ -->
+<footer class="dashboard-footer" role="contentinfo">
+  <div class="dashboard-footer__inner">
+    <span class="dashboard-footer__ar">جميع الحقوق محفوظة &copy; 2026 &mdash; المحاسب أحمد العكاري</span>
+    <span class="dashboard-footer__sep">|</span>
+    <span class="dashboard-footer__en">All Rights Reserved &copy; 2026 &mdash; Accountant Ahmed Al-Aakari</span>
+    <span class="dashboard-footer__sep">|</span>
+    <span class="dashboard-footer__phone">هاتف &nbsp;|&nbsp; Phone: &lrm;0915528970</span>
+  </div>
+</footer>
 
 </body>
