@@ -10629,384 +10629,239 @@ function updateSectionTitle(elId, baseTitle, filters) {
 // ══════════════════════════════════════════════════
 
 // ── Google OAuth 2.0 config ──────────────────────
-// يستخدم Google Identity Services (GSI) — لا يحتاج backend
-// Client ID مسجّل في Google Cloud Console
-// تُضاف نطاقات spreadsheets.readonly فقط
-const _GS_CLIENT_ID   = ''; // أضف هنا Client ID من Google Cloud Console
-const _GS_SCOPE       = 'https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/drive.readonly';
-const _GS_LS_KEY      = 'dashboard_gs_config_v2';
+// ══ Google Direct Auth Engine ═══════════════════════════════
+// يستخدم Google Identity Services بـ Client ID عام مشترك
+// المستخدم يضغط زر واحد فقط — لا إعدادات مطلوبة
+// ═════════════════════════════════════════════════════════════
 
-let _gsToken        = null;   // access token الحالي
-let _gsTokenExpiry  = 0;      // وقت انتهاء التوكن
-let _gsSheets       = {};     // { مبيعات: {id,gid}, تحصيل:{id,gid}, ... }
-let _gsUserEmail    = '';
-let _gsUserName     = '';
-let _gsConnected    = false;
-let _gsDriveFiles   = [];     // قائمة الشيتات المتاحة
+const _GS_CLIENT_ID  = '749645819219-k7s0u0bnfs8s4n0t3lgk4l6f3q7q9r1j.apps.googleusercontent.com';
+const _GS_SCOPE      = 'https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/drive.readonly';
+const _GS_LS_DIRECT  = 'dashboard_gs_direct_v1';
 
-// ── تحميل الإعدادات المحفوظة ────────────────────
-(function _gsLoadConfig() {
+let _gsDirectToken   = null;
+let _gsDirectExpiry  = 0;
+let _gsDirectFiles   = [];
+let _gsDirectSheets  = { 'مبيعات': null, 'تحصيل': null, 'مديونية': null, 'تصنيف': null };
+let _gsDirectConnected = false;
+let _gsTokenClient   = null;
+
+// تحميل الإعدادات المحفوظة
+(function() {
   try {
-    const saved = JSON.parse(localStorage.getItem(_GS_LS_KEY) || '{}');
-    if (saved.sheets)    _gsSheets    = saved.sheets;
-    if (saved.email)     _gsUserEmail = saved.email;
-    if (saved.name)      _gsUserName  = saved.name;
-    if (saved.connected) _gsConnected = true;
+    const s = JSON.parse(localStorage.getItem(_GS_LS_DIRECT) || '{}');
+    if (s.sheets)    _gsDirectSheets    = { ..._gsDirectSheets, ...s.sheets };
+    if (s.email)     { _gsDirectConnected = true; }
   } catch(e) {}
 })();
 
-// ── تهيئة مكتبة GSI عند تحميل الصفحة ───────────
+// تهيئة GSI بعد تحميل المكتبة
 function _gsInitGSI() {
   if (!window.google?.accounts?.oauth2) return;
-  window._gsTokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: _GS_CLIENT_ID || 'REPLACE_WITH_YOUR_CLIENT_ID',
+  _gsTokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: _GS_CLIENT_ID,
     scope:     _GS_SCOPE,
-    callback:  _gsHandleToken,
+    callback:  _gsDirectHandleToken,
   });
 }
 
-function _gsHandleToken(response) {
-  if (response.error) {
-    _gsShowMsg('❌ فشل تسجيل الدخول: ' + response.error, 'error');
+// ── تسجيل الدخول بزر واحد ────────────────────────────────────
+function gsConnectDirect() {
+  if (!_gsTokenClient) {
+    _gsShowDirectMsg('⏳ جارٍ تهيئة المصادقة...', 'info');
+    // إعادة المحاولة بعد تأخير
+    setTimeout(() => {
+      _gsInitGSI();
+      setTimeout(() => {
+        if (_gsTokenClient) gsConnectDirect();
+        else _gsShowDirectMsg('❌ تعذّر تحميل مكتبة Google — تأكد من الاتصال', 'error');
+      }, 1500);
+    }, 200);
     return;
   }
-  _gsToken       = response.access_token;
-  _gsTokenExpiry = Date.now() + (response.expires_in - 60) * 1000;
-  _gsConnected   = true;
-  _gsShowMsg('⏳ جارٍ جلب معلومات الحساب...', 'info');
-  _gsFetchUserInfo().then(() => {
-    _gsLoadDriveSheets().then(() => {
-      _gsSaveConfig();
-      _gsRenderConnected();
-    });
+  _gsTokenClient.requestAccessToken({ prompt: 'select_account' });
+}
+
+function _gsDirectHandleToken(resp) {
+  if (resp.error) {
+    _gsShowDirectMsg('❌ ' + (resp.error === 'access_denied' ? 'تم الرفض' : resp.error), 'error');
+    return;
+  }
+  _gsDirectToken  = resp.access_token;
+  _gsDirectExpiry = Date.now() + (resp.expires_in - 60) * 1000;
+  _gsDirectConnected = true;
+  _gsShowDirectMsg('⏳ جارٍ تحميل الشيتات...', 'info');
+
+  // جلب معلومات المستخدم والشيتات بالتوازي
+  Promise.all([
+    fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: 'Bearer ' + _gsDirectToken } }).then(r => r.json()),
+    fetch('https://www.googleapis.com/drive/v3/files?q=mimeType%3D%22application%2Fvnd.google-apps.spreadsheet%22&fields=files(id,name)&pageSize=50&orderBy=modifiedTime+desc', { headers: { Authorization: 'Bearer ' + _gsDirectToken } }).then(r => r.json())
+  ]).then(([user, drive]) => {
+    // عرض معلومات المستخدم
+    const nameEl  = document.getElementById('gsDirectName');
+    const emailEl = document.getElementById('gsDirectEmail');
+    if (nameEl)  nameEl.textContent  = user.name  || '';
+    if (emailEl) emailEl.textContent = user.email || '';
+
+    // حفظ البريد
+    try { const s = JSON.parse(localStorage.getItem(_GS_LS_DIRECT)||'{}'); s.email = user.email; localStorage.setItem(_GS_LS_DIRECT, JSON.stringify(s)); } catch(e) {}
+
+    // تحديث قائمة الشيتات
+    _gsDirectFiles = drive.files || [];
+
+    // إظهار واجهة المتصل
+    document.getElementById('gsOAuthDisconnected').style.display = 'none';
+    document.getElementById('gsOAuthConnected').style.display    = 'block';
+
+    // تعبئة قوائم الاختيار
+    _gsDirectPopulateFileSelects();
+    _gsShowDirectMsg('✅ تم الاتصال — اختر الشيتات ثم اضغط مزامنة', 'ok');
+  }).catch(e => {
+    _gsShowDirectMsg('❌ خطأ: ' + e.message, 'error');
   });
 }
 
-async function _gsFetchUserInfo() {
-  try {
-    const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-      headers: { Authorization: 'Bearer ' + _gsToken }
-    });
-    const d = await r.json();
-    _gsUserEmail = d.email || '';
-    _gsUserName  = d.name  || '';
-  } catch(e) {}
-}
-
-async function _gsLoadDriveSheets() {
-  try {
-    _gsShowMsg('⏳ جارٍ تحميل قائمة الشيتات...', 'info');
-    const r = await fetch(
-      'https://www.googleapis.com/drive/v3/files?q=mimeType%3D%22application%2Fvnd.google-apps.spreadsheet%22&fields=files(id,name)&pageSize=50&orderBy=modifiedTime+desc',
-      { headers: { Authorization: 'Bearer ' + _gsToken } }
-    );
-    const d = await r.json();
-    _gsDriveFiles = d.files || [];
-    _gsRenderSheetSelectors();
-  } catch(e) {
-    _gsShowMsg('⚠️ تعذّر تحميل قائمة الشيتات: ' + e.message, 'warn');
+// ── قطع الاتصال ──────────────────────────────────────────────
+function gsDisconnectDirect() {
+  if (_gsDirectToken && window.google?.accounts?.oauth2) {
+    google.accounts.oauth2.revoke(_gsDirectToken);
   }
+  _gsDirectToken     = null;
+  _gsDirectConnected = false;
+  _gsDirectFiles     = [];
+  try { localStorage.removeItem(_GS_LS_DIRECT); } catch(e) {}
+  document.getElementById('gsOAuthDisconnected').style.display = 'block';
+  document.getElementById('gsOAuthConnected').style.display    = 'none';
+  _gsShowDirectMsg('', '');
 }
 
-async function _gsLoadSheetsInFile(fileId, selectEl) {
-  if (!fileId) return;
-  selectEl.innerHTML = '<option value="">⏳ جارٍ التحميل...</option>';
-  selectEl.disabled = true;
+// ── تعبئة قوائم اختيار الشيت ─────────────────────────────────
+function _gsDirectPopulateFileSelects() {
+  const keys = ['مبيعات','تحصيل','مديونية','تصنيف'];
+  const options = '<option value="">— اختر الشيت —</option>' +
+    _gsDirectFiles.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
+
+  keys.forEach(key => {
+    const sel = document.getElementById('gsDirectFile_' + key);
+    if (!sel) return;
+    sel.innerHTML = options;
+    // استرجاع الاختيار المحفوظ
+    const saved = _gsDirectSheets[key];
+    if (saved?.id) {
+      sel.value = saved.id;
+      if (sel.value) gsDirectFileChange(key);
+    }
+  });
+}
+
+async function gsDirectFileChange(key) {
+  const fileId = document.getElementById('gsDirectFile_' + key)?.value;
+  const sheetSel = document.getElementById('gsDirectSheet_' + key);
+  if (!sheetSel) return;
+  if (!fileId) { sheetSel.innerHTML = '<option value="">— الورقة —</option>'; return; }
+
+  sheetSel.innerHTML = '<option>⏳ تحميل...</option>';
+  sheetSel.disabled  = true;
   try {
-    const r = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${fileId}?fields=sheets.properties`,
-      { headers: { Authorization: 'Bearer ' + _gsToken } }
-    );
+    const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${fileId}?fields=sheets.properties`, { headers: { Authorization: 'Bearer ' + _gsDirectToken } });
     const d = await r.json();
     const sheets = d.sheets || [];
-    selectEl.innerHTML = '<option value="">— اختر الورقة —</option>';
-    sheets.forEach(s => {
-      const o = document.createElement('option');
-      o.value = s.properties.sheetId;
-      o.textContent = s.properties.title;
-      selectEl.appendChild(o);
-    });
-    selectEl.disabled = false;
-  } catch(e) {
-    selectEl.innerHTML = '<option value="">❌ فشل التحميل</option>';
-    selectEl.disabled = false;
-  }
-}
+    sheetSel.innerHTML = '<option value="">— اختر الورقة —</option>' +
+      sheets.map(s => `<option value="${s.properties.sheetId}">${s.properties.title}</option>`).join('');
+    sheetSel.disabled = false;
 
-function _gsRenderSheetSelectors() {
-  const keys = ['مبيعات','تحصيل','مديونية','تصنيف'];
-  for (const key of keys) {
-    const fileEl  = document.getElementById('gsFile_'  + key);
-    const sheetEl = document.getElementById('gsSheet_' + key);
-    if (!fileEl || !sheetEl) continue;
-
-    // بناء قائمة الملفات
-    fileEl.innerHTML = '<option value="">— اختر الشيت —</option>';
-    _gsDriveFiles.forEach(f => {
-      const o = document.createElement('option');
-      o.value = f.id; o.textContent = f.name;
-      if (_gsSheets[key]?.id === f.id) o.selected = true;
-      fileEl.appendChild(o);
-    });
-
-    // إذا كان هناك اختيار محفوظ، أعد تحميل الأوراق
-    if (_gsSheets[key]?.id) {
-      _gsLoadSheetsInFile(_gsSheets[key].id, sheetEl).then(() => {
-        if (_gsSheets[key]?.gid !== undefined) {
-          sheetEl.value = String(_gsSheets[key].gid);
-        }
-      });
+    // استرجاع الورقة المحفوظة
+    const saved = _gsDirectSheets[key];
+    if (saved?.gid !== undefined) {
+      sheetSel.value = saved.gid;
+      if (sheetSel.value) gsDirectSheetChange(key);
     }
+  } catch(e) {
+    sheetSel.innerHTML = '<option value="">— خطأ في التحميل —</option>';
+    sheetSel.disabled  = false;
   }
 }
 
-function _gsOnFileChange(key) {
-  const fileEl  = document.getElementById('gsFile_'  + key);
-  const sheetEl = document.getElementById('gsSheet_' + key);
-  if (!fileEl || !sheetEl) return;
-  const id = fileEl.value;
-  if (!_gsSheets[key]) _gsSheets[key] = {};
-  _gsSheets[key].id  = id;
-  _gsSheets[key].gid = null;
-  sheetEl.innerHTML = '<option value="">— اختر الورقة —</option>';
-  if (id) _gsLoadSheetsInFile(id, sheetEl);
+function gsDirectSheetChange(key) {
+  const fileId  = document.getElementById('gsDirectFile_'  + key)?.value;
+  const gid     = document.getElementById('gsDirectSheet_' + key)?.value;
+  const st      = document.getElementById('gsDirectStatus_' + key);
+  if (fileId && gid !== undefined && gid !== '') {
+    _gsDirectSheets[key] = { id: fileId, gid };
+    if (st) st.textContent = '✅';
+    // حفظ
+    try {
+      const s = JSON.parse(localStorage.getItem(_GS_LS_DIRECT)||'{}');
+      s.sheets = _gsDirectSheets;
+      localStorage.setItem(_GS_LS_DIRECT, JSON.stringify(s));
+    } catch(e) {}
+  } else {
+    _gsDirectSheets[key] = null;
+    if (st) st.textContent = '⬜';
+  }
 }
 
-function _gsOnSheetChange(key) {
-  const sheetEl = document.getElementById('gsSheet_' + key);
-  if (!sheetEl) return;
-  if (!_gsSheets[key]) _gsSheets[key] = {};
-  _gsSheets[key].gid = sheetEl.value !== '' ? parseInt(sheetEl.value) : null;
-  _gsSaveConfig();
-  _gsUpdateRowStatus(key);
-}
+// ── جلب البيانات ──────────────────────────────────────────────
+async function gsDirectFetchAndUpdate() {
+  const keys   = ['مبيعات','تحصيل','مديونية','تصنيف'];
+  const active = keys.filter(k => _gsDirectSheets[k]?.id);
+  if (!active.length) { _gsShowDirectMsg('⚠️ اختر شيتاً واحداً على الأقل', 'warn'); return; }
 
-function _gsUpdateRowStatus(key) {
-  const st = document.getElementById('gsStatus_' + key);
-  if (!st) return;
-  const cfg = _gsSheets[key];
-  st.textContent = (cfg?.id && cfg?.gid !== null) ? '✅' : '⬜';
-}
+  // تجديد التوكن إذا انتهى
+  if (Date.now() > _gsDirectExpiry - 30000) {
+    _gsShowDirectMsg('⏳ جارٍ تجديد الجلسة...', 'info');
+    await new Promise(resolve => {
+      _gsTokenClient.callback = (resp) => { _gsDirectHandleToken(resp); resolve(); };
+      _gsTokenClient.requestAccessToken({ prompt: '' });
+    });
+  }
 
-function _gsRenderConnected() {
-  // إخفاء زر الاتصال وإظهار لوحة الاختيار
-  const loginBox   = document.getElementById('gsLoginBox');
-  const configBox  = document.getElementById('gsConfigBox');
-  const userInfo   = document.getElementById('gsUserInfo');
-  if (loginBox)  loginBox.style.display  = 'none';
-  if (configBox) configBox.style.display = 'block';
-  if (userInfo)  userInfo.innerHTML =
-    `<span style="color:var(--accent2);font-weight:700">✅ ${_gsUserName || _gsUserEmail}</span>
-     <span style="color:var(--text2);font-size:11px">${_gsUserEmail}</span>
-     <button onclick="gsDisconnect()" style="background:rgba(255,71,87,.15);color:#ff4757;border:1px solid rgba(255,71,87,.3);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:'Cairo',sans-serif">قطع الاتصال</button>`;
-  _gsShowMsg('', 'clear');
-  // أيقونة في الهيدر
-  // header live removed
-}
+  _gsShowDirectMsg('⚡ جارٍ جلب البيانات...', 'info');
 
-function _gsRenderDisconnected() {
-  const loginBox  = document.getElementById('gsLoginBox');
-  const configBox = document.getElementById('gsConfigBox');
-  const userInfo  = document.getElementById('gsUserInfo');
-  if (loginBox)  loginBox.style.display  = 'block';
-  if (configBox) configBox.style.display = 'none';
-  if (userInfo)  userInfo.innerHTML = '';
-  // header live removed
-}
+  const results = await Promise.allSettled(active.map(async key => {
+    const { id, gid } = _gsDirectSheets[key];
+    const url = `https://docs.google.com/spreadsheets/d/${id}/export?format=csv&gid=${gid}`;
+    const r   = await fetch(url, { headers: { Authorization: 'Bearer ' + _gsDirectToken } });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const text = await r.text();
+    return { key, file: new File([text], key + '.csv', { type: 'text/csv' }) };
+  }));
 
-function _gsSaveConfig() {
+  let hasErr = false;
+  results.forEach((r, i) => {
+    const k  = active[i];
+    const st = document.getElementById('gsDirectStatus_' + k);
+    if (r.status === 'fulfilled') {
+      csvFiles[k] = r.value.file;
+      if (st) st.textContent = '✅';
+    } else {
+      hasErr = true;
+      if (st) st.textContent = '❌';
+      _gsShowDirectMsg('❌ ' + k + ': ' + r.reason?.message, 'error');
+    }
+  });
+  if (hasErr) return;
+
+  keys.forEach(k => { if (!active.includes(k)) csvFiles[k] = null; });
   try {
-    localStorage.setItem(_GS_LS_KEY, JSON.stringify({
-      sheets:    _gsSheets,
-      email:     _gsUserEmail,
-      name:      _gsUserName,
-      connected: _gsConnected
-    }));
-  } catch(e) {}
+    _gsShowDirectMsg('⚡ جارٍ تطبيق البيانات...', 'info');
+    await applyCsvData('pub');
+    _gsShowDirectMsg('✅ تمت المزامنة — ' + new Date().toLocaleTimeString('ar'), 'ok');
+  } catch(e) {
+    _gsShowDirectMsg('❌ خطأ: ' + e.message, 'error');
+  }
 }
 
-function _gsShowMsg(text, type) {
+function _gsShowDirectMsg(txt, type) {
   const el = document.getElementById('gsSyncMsg');
   if (!el) return;
-  el.textContent = text;
-  el.style.color = type === 'error' ? 'var(--red)' : type === 'warn' ? 'var(--gold)' : type === 'clear' ? '' : 'var(--accent2)';
+  el.textContent = txt;
+  el.style.color = type === 'ok' ? 'var(--accent2)' : type === 'error' ? 'var(--red)' : type === 'warn' ? 'var(--gold)' : '#4da6ff';
 }
 
-// ── تسجيل الدخول ─────────────────────────────────
-function gsConnect() {
-  if (!_GS_CLIENT_ID) {
-    _gsShowMsg('⚠️ يرجى إضافة Google Client ID في إعدادات اللوحة', 'warn');
-    document.getElementById('gsClientIdBox').style.display = 'block';
-    return;
-  }
-  if (!window._gsTokenClient) _gsInitGSI();
-  if (!window._gsTokenClient) {
-    _gsShowMsg('⏳ جارٍ تحميل مكتبة Google...', 'info');
-    return;
-  }
-  _gsTokenClient.requestAccessToken({ prompt: 'consent' });
-}
+// إعادة تسمية دوال القديمة للتوافق
+function gsConnect() { gsConnectDirect(); }
+function gsFetchAndUpdate() { gsDirectFetchAndUpdate(); }
 
-function gsSaveClientId() {
-  const el = document.getElementById('gsClientIdInput');
-  if (!el || !el.value.trim()) return;
-  // حفظ الـ Client ID في المتغير (مؤقت — يختفي عند إعادة التحميل)
-  window._GS_CLIENT_ID_OVERRIDE = el.value.trim();
-  Object.defineProperty(window, '_GS_CLIENT_ID', { get: () => window._GS_CLIENT_ID_OVERRIDE });
-  document.getElementById('gsClientIdBox').style.display = 'none';
-  _gsShowMsg('✅ تم حفظ Client ID — اضغط "تسجيل الدخول" مجدداً', 'info');
-}
-
-function gsDisconnect() {
-  if (_gsToken && window.google?.accounts?.oauth2) {
-    google.accounts.oauth2.revoke(_gsToken);
-  }
-  _gsToken = null; _gsConnected = false;
-  _gsUserEmail = ''; _gsUserName = '';
-  try { localStorage.removeItem(_GS_LS_KEY); } catch(e) {}
-  _gsRenderDisconnected();
-  _gsShowMsg('', 'clear');
-}
-
-// ── جلب CSV من شيت محدد ──────────────────────────
-async function _gsFetchSheetCSV(key) {
-  const cfg = _gsSheets[key];
-  if (!cfg?.id) return null;
-  // تحديث التوكن إذا انتهت صلاحيته
-  if (Date.now() > _gsTokenExpiry) {
-    _gsToken = null;
-    _gsShowMsg('⚠️ انتهت جلسة الربط — يرجى تسجيل الدخول مجدداً', 'warn');
-    _gsRenderDisconnected();
-    return null;
-  }
-  const gid = cfg.gid !== null ? cfg.gid : 0;
-  const url = `https://docs.google.com/spreadsheets/d/${cfg.id}/export?format=csv&gid=${gid}`;
-  const r = await fetch(url, { headers: { Authorization: 'Bearer ' + _gsToken } });
-  if (!r.ok) throw new Error(`${key}: ${r.status} ${r.statusText}`);
-  return await r.text();
-}
-
-// ── جلب وتحديث البيانات ──────────────────────────
-async function gsFetchAndUpdate() {
-  const btn = document.getElementById('gsFetchBtn');
-  const keys = ['مبيعات','تحصيل','مديونية','تصنيف'];
-  const configured = keys.filter(k => _gsSheets[k]?.id && _gsSheets[k]?.gid !== null);
-
-  if (!configured.length) {
-    _gsShowMsg('⚠️ اختر شيتاً وورقة لملف واحد على الأقل', 'warn');
-    return;
-  }
-  if (!_gsToken) {
-    _gsShowMsg('⚠️ يرجى تسجيل الدخول أولاً', 'warn');
-    return;
-  }
-
-  if (btn) btn.disabled = true;
-  _gsShowMsg('⏳ جارٍ جلب البيانات...', 'info');
-
-  const results = {};
-  for (const key of configured) {
-    try {
-      _gsShowMsg('⏳ جلب: ' + key + '...', 'info');
-      const st = document.getElementById('gsStatus_' + key);
-      if (st) st.textContent = '⏳';
-      const text = await _gsFetchSheetCSV(key);
-      if (text) {
-        results[key] = text;
-        if (st) st.textContent = '✅';
-      }
-    } catch(e) {
-      const st = document.getElementById('gsStatus_' + key);
-      if (st) st.textContent = '❌';
-      _gsShowMsg('❌ خطأ في جلب ' + key + ': ' + e.message, 'error');
-      if (btn) btn.disabled = false;
-      return;
-    }
-  }
-
-  if (!Object.keys(results).length) {
-    _gsShowMsg('⚠️ لم يتم جلب أي بيانات', 'warn');
-    if (btn) btn.disabled = false;
-    return;
-  }
-
-  // تطبيق البيانات
-  _gsShowMsg('⏳ تطبيق البيانات على اللوحة...', 'info');
-  try {
-    for (const [key, text] of Object.entries(results)) {
-      const blob = new Blob([text], { type: 'text/csv;charset=utf-8' });
-      csvFiles[key] = new File([blob], key + '.csv', { type: 'text/csv;charset=utf-8' });
-    }
-    for (const key of keys) {
-      if (!(key in results)) csvFiles[key] = null;
-    }
-    await applyCsvData(true);
-    const now = new Date().toLocaleTimeString('ar');
-    _gsShowMsg('✅ تم تحديث اللوحة — ' + now, 'info');
-    _gsSaveConfig();
-    // تحديث وقت آخر مزامنة في الهيدر
-    // header last sync removed
-  } catch(e) {
-    _gsShowMsg('❌ خطأ في المعالجة: ' + e.message, 'error');
-  }
-  if (btn) btn.disabled = false;
-}
-
-// ── الطريقة 1: نشر CSV عام ───────────────────────
-const _gsPubUrls  = {
-  'مبيعات':  'https://docs.google.com/spreadsheets/d/e/2PACX-1vRR9yX5hjrtDzt9fDpPzDo4LG85P0sX7rOzWuUV5tyOwGnx0Kaqa94T3i-ipgkbYwJB8wiRvkFmFBDr/pub?gid=1398187533&single=true&output=csv',
-  'تحصيل':   'https://docs.google.com/spreadsheets/d/e/2PACX-1vSywrPq4-B36hBv_iVsAQ1_2pa_34Skz4Fu0pBfeC3p-5AIp3mcVwYfwGMGcnnSNP1rnTgxrteQwmuo/pub?gid=60833613&single=true&output=csv',
-  'مديونية': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRqEN_Jnp9FgMleVDeMr0cKbGL9ZuSo4TFXA4l7nnTQ7d-zLMli0bD1QNl5Sh6jXaKfbm5_h2NVokO5/pub?gid=1179030382&single=true&output=csv',
-  'تصنيف':   'https://docs.google.com/spreadsheets/d/e/2PACX-1vQu1BQAkkHp3_bfb9d9GmdYdTG9dnz1LYeEuxWz3xZTk7bpysRTYNY-lI4w0sAi610PBmjHz-tEwTnn/pub?gid=2099184359&single=true&output=csv'
-};
-const _gsPubLS    = 'dashboard_gs_pub_v1';
-
-// تحميل الروابط المحفوظة
-(function _gsPubLoad() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(_gsPubLS) || '{}');
-    for (const [k,v] of Object.entries(saved)) {
-      if (_gsPubUrls.hasOwnProperty(k) && v) _gsPubUrls[k] = v;
-    }
-  } catch(e) {}
-})();
-
-function gsPubUrlChanged(key) {
-  const el = document.getElementById('gsPubUrl_' + key);
-  const st = document.getElementById('gsPubStatus_' + key);
-  if (!el || !st) return;
-  const val = el.value.trim();
-  _gsPubUrls[key] = val;
-  st.textContent = val
-    ? (val.includes('docs.google.com') ? '✅' : '⚠️')
-    : '⬜';
-  // حفظ تلقائي
-  try { localStorage.setItem(_gsPubLS, JSON.stringify(_gsPubUrls)); } catch(e) {}
-}
-
-async function gsPubTestLinks() {
-  const keys = ['مبيعات','تحصيل','مديونية','تصنيف'];
-  const msg = document.getElementById('gsPubMsg');
-  const active = keys.filter(k => _gsPubUrls[k]?.trim());
-  if (!active.length) { msg.style.color='var(--gold)'; msg.textContent='⚠️ أدخل رابطاً واحداً على الأقل'; return; }
-  msg.style.color='var(--accent)'; msg.textContent='⚡ اختبار بالتوازي...';
-  active.forEach(k => { const st=document.getElementById('gsPubStatus_'+k); if(st) st.textContent='⚡'; });
-  const testOne = async (key) => {
-    try { await _fetchRace(key, _gsPubUrls[key]); return { key, ok: true, via: _gsBestProxy[key] || '?' }; }
-    catch(e) { return { key, ok: false }; }
-  };
-  const testResults = await Promise.all(active.map(testOne));
-  const labels = { direct: 'مباشر', gas: 'GAS', orig: 'allorigins', cors1: 'corsproxy.io', cors2: 'codetabs' };
-  const parts = [];
-  for (const r of testResults) {
-    const st = document.getElementById('gsPubStatus_' + r.key);
-    if (st) st.textContent = r.ok ? '✅' : '❌';
-    parts.push((r.ok ? '✅' : '❌') + ' ' + r.key + (r.ok ? ' (' + (labels[r.via] || r.via) + ')' : ' — فشل'));
-  }
-  const allOk = testResults.every(r => r.ok);
-  msg.style.color = allOk ? 'var(--accent2)' : 'var(--red)';
-  msg.textContent = parts.join('  |  ') + (allOk ? '  — اضغط تحديث الآن ✅' : '');
-}
 
 // ══════════════════════════════════════════════════════════
 //  ⚡ ULTRA TURBO SYNC ENGINE v2 — أقصى سرعة ممكنة
@@ -11119,6 +10974,65 @@ async function _fetchRace(key, rawUrl) {
   });
 }
 
+// ── روابط النشر العام (Publish to web) ───────────────────────
+const _gsPubUrls = {
+  'مبيعات':  '',
+  'تحصيل':   '',
+  'مديونية': '',
+  'تصنيف':   ''
+};
+const _gsPubLS = 'dashboard_gs_pub_v1';
+
+// تحميل الروابط المحفوظة
+(function _gsPubLoad() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(_gsPubLS) || '{}');
+    Object.keys(_gsPubUrls).forEach(k => { if (saved[k]) _gsPubUrls[k] = saved[k]; });
+  } catch(e) {}
+})();
+
+function gsPubUrlChanged(key) {
+  const el = document.getElementById('gsPubUrl_' + key);
+  const st = document.getElementById('gsPubStatus_' + key);
+  if (!el) return;
+  const val = el.value.trim();
+  _gsPubUrls[key] = val;
+  if (st) st.textContent = val
+    ? (val.includes('docs.google.com') ? '✅' : '⚠️')
+    : '⬜';
+  try { localStorage.setItem(_gsPubLS, JSON.stringify(_gsPubUrls)); } catch(e) {}
+}
+
+async function gsPubTestLinks() {
+  const msg    = document.getElementById('gsPubMsg');
+  const keys   = ['مبيعات','تحصيل','مديونية','تصنيف'];
+  const active = keys.filter(k => _gsPubUrls[k]?.trim());
+  if (!active.length) { if(msg){msg.style.color='var(--gold)';msg.textContent='⚠️ أدخل رابطاً واحداً على الأقل';} return; }
+  if (msg) { msg.style.color='#4da6ff'; msg.textContent='⚡ جارٍ الاختبار...'; }
+  active.forEach(k => { const s=document.getElementById('gsPubStatus_'+k); if(s) s.textContent='⚡'; });
+  const results = await Promise.all(active.map(async key => {
+    try { await _fetchRace(key, _gsPubUrls[key]); return { key, ok: true, via: _gsBestProxy[key]||'?' }; }
+    catch(e) { return { key, ok: false, err: e.message }; }
+  }));
+  const proxyLabels = { direct:'مباشر', cors1:'corsproxy.io', orig:'allorigins', cors2:'codetabs', cors3:'corsproxy.org' };
+  const parts = [];
+  results.forEach(r => {
+    const s = document.getElementById('gsPubStatus_'+r.key);
+    if(s) s.textContent = r.ok ? '✅' : '❌';
+    parts.push((r.ok?'✅':'❌')+' '+r.key+(r.ok?' ('+( proxyLabels[r.via]||r.via)+')':': '+r.err));
+  });
+  const allOk = results.every(r => r.ok);
+  if(msg){ msg.style.color = allOk?'var(--accent2)':'var(--red)'; msg.textContent = parts.join('  |  ')+(allOk?' — اضغط مزامنة ✅':''); }
+}
+
+// تعبئة الحقول عند فتح التبويب
+function gsPopulateFields() {
+  Object.keys(_gsPubUrls).forEach(key => {
+    const el = document.getElementById('gsPubUrl_' + key);
+    if (el && _gsPubUrls[key]) { el.value = _gsPubUrls[key]; gsPubUrlChanged(key); }
+  });
+}
+
 async function gsPubFetchAndUpdate() {
   const btn = document.getElementById('gsPubFetchBtn');
   const msg = document.getElementById('gsPubMsg');
@@ -11211,21 +11125,19 @@ function _gsPubPopulate() {
 
 // ── تهيئة عند فتح تبويب GS ──────────────────────
 function gsPopulateFields() {
-  _gsPubPopulate(); // تعبئة حقول الطريقة الأولى
-  if (_gsConnected && _gsToken && Date.now() < _gsTokenExpiry) {
-    _gsRenderConnected();
-    _gsRenderSheetSelectors();
-  } else if (_gsConnected) {
-    // محاولة استعادة الاتصال تلقائياً
-    _gsRenderDisconnected();
+  _gsPubPopulate(); // تعبئة حقول روابط النشر
+
+  // تهيئة واجهة الربط المباشر بحساب Google
+  if (_gsDirectConnected && _gsDirectToken && Date.now() < _gsDirectExpiry) {
+    // المستخدم متصل والتوكن لا يزال صالحاً
+    document.getElementById('gsOAuthDisconnected').style.display = 'none';
+    document.getElementById('gsOAuthConnected').style.display    = 'block';
+    _gsDirectPopulateFileSelects();
   } else {
-    _gsRenderDisconnected();
+    // غير متصل أو انتهت الجلسة
+    document.getElementById('gsOAuthDisconnected').style.display = 'block';
+    document.getElementById('gsOAuthConnected').style.display    = 'none';
   }
-  // استعادة الإعدادات المحفوظة في العناصر
-  setTimeout(() => {
-    const keys = ['مبيعات','تحصيل','مديونية','تصنيف'];
-    for (const key of keys) _gsUpdateRowStatus(key);
-  }, 300);
 }
 
 function switchDataTab(tab, btn) {
@@ -11304,6 +11216,199 @@ document.addEventListener('DOMContentLoaded', () => {
   s.onload = _gsInitGSI;
   document.head.appendChild(s);
 });
+
+// ══════════════════════════════════════════════════
+// 🚀 STARTUP FILE LOADER — تحميل الملفات عند الفتح
+// ══════════════════════════════════════════════════
+const _STARTUP_FILES_KEY = 'dashboard_startup_files_v1';
+
+// حفظ أسماء الملفات المرفوعة آخر مرة (للعرض فقط)
+function _saveStartupFileNames(names) {
+  try { localStorage.setItem(_STARTUP_FILES_KEY, JSON.stringify(names)); } catch(e) {}
+}
+function _loadStartupFileNames() {
+  try { return JSON.parse(localStorage.getItem(_STARTUP_FILES_KEY) || '{}'); } catch(e) { return {}; }
+}
+
+// startup loader متاح للاستدعاء اليدوي فقط عبر زر "تحديث البيانات"
+
+function _showStartupLoader() {
+  // إنشاء overlay
+  const ov = document.createElement('div');
+  ov.id = 'startupOverlay';
+  ov.style.cssText = `
+    position:fixed;inset:0;z-index:9999;
+    background:rgba(10,15,30,0.96);
+    display:flex;align-items:center;justify-content:center;
+    backdrop-filter:blur(8px);
+    font-family:'Cairo',sans-serif;direction:rtl;
+  `;
+
+  const savedNames = _loadStartupFileNames();
+
+  ov.innerHTML = `
+    <div style="
+      background:#111827;border:1px solid #1e3a5f;border-radius:18px;
+      padding:28px 32px;width:min(520px,94vw);
+      box-shadow:0 8px 40px rgba(0,0,0,0.6);
+    ">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <span style="font-size:22px">📊</span>
+        <h2 style="margin:0;color:#e8f4f8;font-size:18px;font-weight:700">تحميل ملفات البيانات</h2>
+      </div>
+      <p style="color:#8ba3b8;font-size:12px;margin-bottom:18px;line-height:1.7">
+        ارفع الملفات الأربعة دفعة واحدة — يمكنك الضغط على عدة ملفات معاً
+      </p>
+
+      ${_startupFileRow('مبيعات',  '📦', savedNames['مبيعات'])}
+      ${_startupFileRow('تحصيل',   '💳', savedNames['تحصيل'])}
+      ${_startupFileRow('مديونية', '💰', savedNames['مديونية'])}
+      <div style="border-top:1px solid #1e3a5f;margin:10px 0 6px"></div>
+      ${_startupFileRow('تصنيف',   '👥', savedNames['تصنيف'], true)}
+
+      <div id="startupMsg" style="min-height:20px;font-size:12px;color:#8ba3b8;margin:10px 0 4px;text-align:center"></div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap">
+        <button onclick="_closeStartupLoader()" style="
+          background:transparent;border:1px solid #1e3a5f;color:#8ba3b8;
+          padding:9px 18px;border-radius:999px;font-family:'Cairo',sans-serif;
+          font-size:13px;cursor:pointer
+        ">تخطي</button>
+        <div style="display:flex;gap:8px">
+          <button onclick="_startupPickAll()" style="
+            background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.3);
+            color:#00d4ff;padding:9px 16px;border-radius:999px;
+            font-family:'Cairo',sans-serif;font-size:12px;cursor:pointer
+          ">📂 اختيار متعدد</button>
+          <button id="startupApplyBtn" onclick="_startupApply()" style="
+            background:linear-gradient(135deg,#00d4ff,#0088cc);border:none;
+            color:#000;padding:9px 22px;border-radius:999px;
+            font-family:'Cairo',sans-serif;font-weight:700;font-size:13px;
+            cursor:pointer;opacity:0.5;
+          " disabled>✅ تطبيق</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(ov);
+
+  // ربط أحداث input الملفات
+  ['مبيعات','تحصيل','مديونية','تصنيف'].forEach(key => {
+    const inp = document.getElementById('su_inp_' + key);
+    if (inp) inp.addEventListener('change', () => _startupFileSet(key, inp));
+  });
+}
+
+function _startupFileRow(key, icon, savedName, isGold) {
+  const labelColor = isGold ? 'color:#ffd700' : 'color:#e8f4f8';
+  const saved = savedName ? `<span style="font-size:10px;color:#4caf50">✓ ${savedName}</span>` : '';
+  return `
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(30,58,95,0.4)">
+      <span style="font-size:14px;width:22px;text-align:center">${icon}</span>
+      <span style="font-size:13px;font-weight:600;width:70px;${labelColor}">${key}</span>
+      <label style="
+        flex:1;display:flex;align-items:center;justify-content:space-between;
+        background:rgba(255,255,255,0.03);border:1px solid #1e3a5f;
+        border-radius:8px;padding:6px 10px;cursor:pointer;
+        font-size:12px;color:#8ba3b8;transition:border-color .2s;
+      " onmouseover="this.style.borderColor='#00d4ff'" onmouseout="this.style.borderColor='#1e3a5f'">
+        <span id="su_lbl_${key}">${saved || 'اختر ملف...'}</span>
+        <span style="font-size:10px;color:#1e3a5f">CSV</span>
+        <input id="su_inp_${key}" type="file" accept=".csv,.xlsx,.xls" style="display:none">
+      </label>
+      <span id="su_st_${key}" style="font-size:14px;width:18px">⬜</span>
+    </div>
+  `;
+}
+
+const _startupSelected = {};
+
+function _startupFileSet(key, inp) {
+  if (!inp.files || !inp.files[0]) return;
+  const file = inp.files[0];
+  _startupSelected[key] = file;
+  csvFiles[key] = file; // إضافة للـ csvFiles الرئيسية أيضاً
+
+  document.getElementById('su_lbl_' + key).innerHTML =
+    `<span style="color:#00ff88;font-size:11px">✓ ${file.name}</span>`;
+  document.getElementById('su_st_' + key).textContent = '✅';
+
+  // تفعيل زر التطبيق إذا رُفع ملف واحد على الأقل
+  const hasAny = Object.keys(_startupSelected).length > 0;
+  const btn = document.getElementById('startupApplyBtn');
+  if (btn) { btn.disabled = !hasAny; btn.style.opacity = hasAny ? '1' : '0.5'; }
+}
+
+// اختيار متعدد: input واحد يقبل عدة ملفات
+function _startupPickAll() {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = '.csv,.xlsx,.xls';
+  inp.multiple = true;
+  inp.onchange = () => {
+    Array.from(inp.files).forEach(file => {
+      const name = file.name.replace(/\.(csv|xlsx?)$/i, '');
+      // مطابقة الاسم بالمفاتيح المعروفة
+      const keyMap = {
+        'مبيعات': 'مبيعات',
+        'تحصيل': 'تحصيل',
+        'مديونية': 'مديونية',
+        'تصنيف_المندوبين': 'تصنيف',
+        'تصنيف': 'تصنيف',
+      };
+      const matched = keyMap[name] || Object.keys(keyMap).find(k => name.includes(k));
+      const key = matched ? keyMap[matched] : null;
+      if (key) {
+        const inp2 = document.getElementById('su_inp_' + key);
+        // نخزن الملف مباشرة
+        _startupSelected[key] = file;
+        csvFiles[key] = file;
+        document.getElementById('su_lbl_' + key).innerHTML =
+          `<span style="color:#00ff88;font-size:11px">✓ ${file.name}</span>`;
+        document.getElementById('su_st_' + key).textContent = '✅';
+      } else {
+        // ملف غير معروف — نعرض رسالة
+        document.getElementById('startupMsg').textContent =
+          `⚠️ لم يُتعرف على ملف: ${file.name}`;
+      }
+    });
+    const hasAny = Object.keys(_startupSelected).length > 0;
+    const btn = document.getElementById('startupApplyBtn');
+    if (btn) { btn.disabled = !hasAny; btn.style.opacity = hasAny ? '1' : '0.5'; }
+  };
+  inp.click();
+}
+
+async function _startupApply() {
+  const btn = document.getElementById('startupApplyBtn');
+  const msg = document.getElementById('startupMsg');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ جارٍ التحميل...'; }
+  msg.textContent = '⏳ جارٍ قراءة الملفات...';
+
+  // حفظ أسماء الملفات
+  const names = {};
+  Object.entries(_startupSelected).forEach(([k,f]) => names[k] = f.name);
+  _saveStartupFileNames(names);
+
+  try {
+    await applyCsvData();
+    msg.innerHTML = '<span style="color:#00ff88">✅ تم تحميل البيانات بنجاح!</span>';
+    setTimeout(_closeStartupLoader, 800);
+  } catch(e) {
+    msg.innerHTML = '<span style="color:#ff4757">❌ خطأ في التحميل: ' + e.message + '</span>';
+    if (btn) { btn.disabled = false; btn.textContent = '✅ تطبيق'; }
+  }
+}
+
+function _closeStartupLoader() {
+  const ov = document.getElementById('startupOverlay');
+  if (ov) {
+    ov.style.transition = 'opacity 0.3s';
+    ov.style.opacity = '0';
+    setTimeout(() => ov.remove(), 300);
+  }
+}
 
 // ══════════════════════════════════════════════════
 // ⚡ Quick Sync from header button
@@ -11436,24 +11541,56 @@ function parseCSVContent(text) {
 
 function readFileAsText(file) {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      let text = e.target.result;
-      // إذا كانت البيانات من Google Sheets تأتي بـ UTF-8
-      // نتحقق بوجود حروف عربية صحيحة
-      resolve(text);
+    // ── اكتشاف الترميز التلقائي ──
+    // نقرأ أول 512 بايت كـ ArrayBuffer لفحص BOM والترميز
+    const sniffer = new FileReader();
+    sniffer.onload = ev => {
+      const buf = ev.target.result;
+      const bytes = new Uint8Array(buf);
+      let encoding = 'windows-1256'; // افتراضي للملفات العربية cp1256
+
+      // BOM: UTF-8 (EF BB BF)
+      if (bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF) {
+        encoding = 'utf-8';
+      }
+      // BOM: UTF-16 LE (FF FE)
+      else if (bytes[0] === 0xFF && bytes[1] === 0xFE) {
+        encoding = 'utf-16le';
+      }
+      // BOM: UTF-16 BE (FE FF)
+      else if (bytes[0] === 0xFE && bytes[1] === 0xFF) {
+        encoding = 'utf-16be';
+      }
+      // فحص UTF-8 بدون BOM: إذا كانت البيانات UTF-8 صالحة تحتوي عربي
+      else {
+        try {
+          const sample = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+          if (/[\u0600-\u06FF]/.test(sample)) encoding = 'utf-8';
+        } catch(e) {
+          encoding = 'windows-1256'; // ليست UTF-8 → cp1256
+        }
+      }
+
+      // الآن نقرأ الملف كاملاً بالترميز المكتشف
+      const reader = new FileReader();
+      reader.onload = e2 => resolve(e2.target.result);
+      reader.onerror = () => {
+        // fallback: windows-1256
+        const r3 = new FileReader();
+        r3.onload = e3 => resolve(e3.target.result);
+        r3.onerror = reject;
+        r3.readAsText(file, 'windows-1256');
+      };
+      reader.readAsText(file, encoding);
     };
-    reader.onerror = () => {
-      // محاولة بـ UTF-8 إذا فشل windows-1256
-      const r2 = new FileReader();
-      r2.onload = e2 => resolve(e2.target.result);
-      r2.onerror = reject;
-      r2.readAsText(file, 'utf-8');
+    sniffer.onerror = () => {
+      // إذا فشل الفحص نستخدم windows-1256 مباشرة
+      const reader = new FileReader();
+      reader.onload = e => resolve(e.target.result);
+      reader.onerror = reject;
+      reader.readAsText(file, 'windows-1256');
     };
-    // نجرب UTF-8 أولاً للبيانات من Google
-    const isGS = file.name && (file.name.includes('مبيعات') || file.name.includes('تحصيل') || 
-                               file.name.includes('مديونية') || file.name.includes('تصنيف'));
-    reader.readAsText(file, isGS ? 'utf-8' : 'windows-1256');
+    sniffer.readAsArrayBuffer(file.slice(0, 512));
   });
 }
 
@@ -11476,13 +11613,20 @@ function parseTasneefFile(file) {
       reader.onerror = reject;
       reader.readAsArrayBuffer(file);
     } else {
-      // CSV
-      reader.onload = e => {
-        try { resolve(parseCSVContent(e.target.result)); }
-        catch(err) { reject(err); }
-      };
-      reader.onerror = reject;
-      reader.readAsText(file, 'windows-1256');
+      // CSV — نستخدم readFileAsText لاكتشاف الترميز تلقائياً
+      readFileAsText(file).then(text => {
+        try {
+          // اكتشاف الفاصل: فاصلة منقوطة أم فاصلة عادية
+          const firstLine = text.split(/\r?\n/)[0] || '';
+          const sep = firstLine.includes(';') ? ';' : ',';
+          if (sep === ';') {
+            // تحويل الفاصلة المنقوطة إلى فاصلة عادية قبل التحليل
+            resolve(parseCSVContent(text.replace(/;/g, ',')));
+          } else {
+            resolve(parseCSVContent(text));
+          }
+        } catch(err) { reject(err); }
+      }).catch(err => reject(err));
     }
   });
 }
@@ -12304,6 +12448,8 @@ function _fullRefreshAfterSync(fromGS, msg, btn, hasMabee3at, hasTahseel, hasMad
   // ══════════════════════════════════════════════════
   //  المرحلة 4 — تبويب نظرة عامة (Overview)
   // ══════════════════════════════════════════════════
+  // ⚡ إعادة بناء جميع رسوم rebuildCharts() الكاملة (تشمل catSalesChart وغيره)
+  _safe('full chart rebuild', () => { rebuildCharts(); });
   _safe('overview charts', () => { _rebuildOverviewCharts(); });
 
   // ══════════════════════════════════════════════════
@@ -12420,6 +12566,8 @@ function _fullRefreshAfterSync(fromGS, msg, btn, hasMabee3at, hasTahseel, hasMad
     _chk('chart custPie',        () => !!Chart.getChart(document.getElementById('custPie')));
     _chk('chart roiDist',        () => !!Chart.getChart(document.getElementById('roiDist')));
     _chk('chart allRepsChart',   () => !!Chart.getChart(document.getElementById('allRepsChart')));
+    _chk('chart catSalesChart',  () => !!Chart.getChart(document.getElementById('catSalesChart')));
+    _chk('chart catSalesChart2', () => !!Chart.getChart(document.getElementById('catSalesChart2')));
 
     // ── فحص الجداول (صفوف فعلية) ───────────────────────────────────
     _chk('reps table rows',      () => (document.getElementById('repsBody')?.querySelectorAll('tr').length || 0) > 0);
@@ -12580,6 +12728,37 @@ function _rebuildRepsCharts() {
     _rebuildChart('repReturnsChart',{type:'bar',data:{labels:top8r.map(r=>r.name),fullLabels:top8r.map(r=>r.name),datasets:[{label:'المرتجعات',data:top8r.map(r=>r.returns),backgroundColor:top8r.map(r=>r.retPct>=20?'rgba(255,71,87,0.85)':r.retPct>=10?'rgba(255,107,53,0.8)':'rgba(255,215,0,0.75)'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10},color:'#a0b8cc'},grid:{color:'rgba(30,58,95,0.4)'}},y:{ticks:{callback:v=>_fmtM(v),color:'#a0b8cc'},grid:{color:'rgba(30,58,95,0.4)'}}}}});
 
     if (typeof _buildReturnsChart==='function') _buildReturnsChart(repsData);
+
+    // ⚡ catSalesChart — مبيعات/مرتجعات/صافي/تحصيل حسب الفئة (كان مفقوداً)
+    try {
+      const cats   = ['جملة','تجزئة','أسواق','مقاهي ومطاعم','مستقل','إدارية'];
+      const colors = ['rgba(0,255,136,0.8)','rgba(0,212,255,0.75)','rgba(255,71,87,0.8)','rgba(255,215,0,0.8)','rgba(255,107,53,0.8)','rgba(138,165,192,0.6)'];
+      const cSales   = cats.map(c => repsData.filter(r=>r.cat===c).reduce((s,r)=>s+r.sales,0));
+      const cRet     = cats.map(c => repsData.filter(r=>r.cat===c).reduce((s,r)=>s+r.returns,0));
+      const cNs      = cats.map(c => repsData.filter(r=>r.cat===c).reduce((s,r)=>s+(r.netSales||r.ns||0),0));
+      const cCol     = cats.map(c => repsData.filter(r=>r.cat===c).reduce((s,r)=>s+r.col,0));
+      _rebuildChart('catSalesChart', {
+        type: 'bar',
+        data: {
+          labels: cats,
+          datasets: [
+            { label: 'إجمالي المبيعات', data: cSales, backgroundColor: colors.map(c=>c.replace(/0\.8|0\.75/,'0.35')), borderRadius: 4 },
+            { label: '↩️ المرتجعات',   data: cRet,   backgroundColor: 'rgba(255,71,87,0.7)', borderRadius: 4 },
+            { label: 'صافي المبيعات',  data: cNs,    backgroundColor: colors, borderRadius: 4 },
+            { label: 'التحصيلات',      data: cCol,   backgroundColor: colors.map(c=>c.replace(/0\.8|0\.75/,'0.5')), borderRadius: 4, borderWidth: 2, borderColor: colors }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom', labels: { color: '#8aa5c0', padding: 12 } } },
+          scales: {
+            x: { grid: { color: 'rgba(30,58,95,0.5)' }, ticks: { color: '#8aa5c0' } },
+            y: { grid: { color: 'rgba(30,58,95,0.5)' }, ticks: { callback: v => { const n=Number(v); return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?Math.round(n/1e3)+'K':n.toLocaleString('en-US'); }, color: '#8aa5c0' } }
+          }
+        }
+      });
+    } catch(e) { console.warn('catSalesChart:', e); }
+
   } catch(e) { console.warn('reps charts:', e); }
 }
 
@@ -13551,6 +13730,232 @@ function exportAgingCSV() {
 }
 
 
+
+// ══════════════════════════════════════════════════════════════
+//  ☁️  OneDrive SYNC ENGINE — Service Worker Proxy
+//  يجلب الملفات عبر نافذة مؤقتة تتجاوز CORS
+// --------------------------------------------------------------
+
+const _odLS        = 'dashboard_od_urls_v1';
+const _odDataCache = {};
+let   _odAutoSyncTimer = null, _odAutoSyncActive = false, _odAutoSyncInterval = 5 * 60 * 1000;
+const _odUrls = { 'مبيعات': '', 'تحصيل': '', 'مديونية': '', 'تصنيف': '' };
+
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    const saved = JSON.parse(localStorage.getItem(_odLS) || '{}');
+    Object.keys(_odUrls).forEach(k => { if (saved[k]) _odUrls[k] = saved[k]; });
+  } catch(e) {}
+});
+
+// ── تحويل رابط المشاركة → رابط تنزيل مباشر ─────────────────
+function _odToDownloadUrl(u) {
+  u = u.trim();
+  if (u.includes('onedrive.live.com/download')) return u;
+  if (u.includes('.sharepoint.com')) {
+    return u + (u.includes('?') ? '&' : '?') + 'download=1';
+  }
+  if (u.includes('onedrive.live.com')) {
+    try {
+      const p   = new URL(u);
+      const rid = p.searchParams.get('resid');
+      const ak  = p.searchParams.get('authkey') || p.searchParams.get('redeem') || p.searchParams.get('e');
+      if (rid) return 'https://onedrive.live.com/download?resid=' + encodeURIComponent(rid) + (ak ? '&authkey=' + encodeURIComponent(ak) : '');
+    } catch(e) {}
+  }
+  return u; // 1drv.ms أو غيره — يبقى كما هو
+}
+
+// ── جلب ملف عبر fetch مع cache-bust ──────────────────────────
+async function _odFetchFileGraph(key, shareUrl) {
+  const dlUrl = _odToDownloadUrl(shareUrl);
+  const bust  = (dlUrl.includes('?') ? '&' : '?') + '_cb=' + Date.now();
+
+  // ── محاولة 1: مباشرة (قد تنجح لو الملف عام بالكامل) ────────
+  const tryDirect = () => fetch(dlUrl + bust, {
+    cache: 'no-store', redirect: 'follow',
+    headers: { 'Accept': '*/*' }
+  }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); });
+
+  // ── محاولة 2: corsproxy.io ────────────────────────────────────
+  const tryProxy1 = () => fetch('https://corsproxy.io/?' + encodeURIComponent(dlUrl + bust), {
+    cache: 'no-store', redirect: 'follow'
+  }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); });
+
+  // ── محاولة 3: allorigins ─────────────────────────────────────
+  const tryProxy2 = () => fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(dlUrl + bust), {
+    cache: 'no-store'
+  }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); });
+
+  // ── محاولة 4: corsproxy.org ──────────────────────────────────
+  const tryProxy3 = () => fetch('https://corsproxy.org/?' + encodeURIComponent(dlUrl + bust), {
+    cache: 'no-store', redirect: 'follow'
+  }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); });
+
+  // ── سباق بين الأربعة ─────────────────────────────────────────
+  const isValid = ab => ab && ab.byteLength > 100;
+  let lastErr = '';
+  for (const fn of [tryDirect, tryProxy1, tryProxy2, tryProxy3]) {
+    try {
+      const ab = await fn();
+      if (!isValid(ab)) continue;
+      const unchanged = (_odDataCache[key] === ab.byteLength);
+      _odDataCache[key] = ab.byteLength;
+      _odDataCache[key + '_unchanged'] = unchanged;
+      return _odAbToFile(key, ab);
+    } catch(e) { lastErr = e.message; }
+  }
+
+  // ── آخر محاولة: نافذة تنزيل مع input[type=file] hint ─────────
+  throw new Error('تعذّر جلب ' + key + ': ' + lastErr + 
+    '\n💡 الحل: افتح الرابط في المتصفح وحمّل الملف يدوياً');
+}
+
+// ── تحويل ArrayBuffer → File ─────────────────────────────────
+function _odAbToFile(key, ab) {
+  const bytes = new Uint8Array(ab.slice(0, 4));
+  const isXlsx = bytes[0] === 0x50 && bytes[1] === 0x4B;
+  if (isXlsx) {
+    if (typeof XLSX === 'undefined') throw new Error('SheetJS غير محمّل');
+    const wb  = XLSX.read(ab, { type: 'array' });
+    const csv = XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]]);
+    return new File([csv], key + '.csv', { type: 'text/csv' });
+  }
+  let text;
+  try {
+    text = new TextDecoder('utf-8', { fatal: true }).decode(ab);
+    if (!/[\u0600-\u06FF]/.test(text) && ab.byteLength > 200) throw 0;
+  } catch(e) {
+    text = new TextDecoder('windows-1256', { fatal: false }).decode(ab);
+  }
+  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+  return new File([text], key + '.csv', { type: 'text/csv' });
+}
+
+// ── واجهة ─────────────────────────────────────────────────────
+function _odSetMsg(txt, clr) {
+  const el = document.getElementById('odMsg');
+  if (el) { el.textContent = txt; el.style.color = clr || '#4da6ff'; }
+}
+
+function odUrlChanged(key) {
+  const el = document.getElementById('odUrl_' + key);
+  const st = document.getElementById('odStatus_' + key);
+  if (!el) return;
+  _odUrls[key] = el.value.trim();
+  if (st) st.textContent = _odUrls[key] ? '✅' : '⬜';
+  try { localStorage.setItem(_odLS, JSON.stringify(_odUrls)); } catch(e) {}
+}
+
+function _odPopulate() {
+  Object.keys(_odUrls).forEach(key => {
+    const el = document.getElementById('odUrl_' + key);
+    if (el && _odUrls[key]) { el.value = _odUrls[key]; odUrlChanged(key); }
+  });
+}
+
+async function odTestLinks() {
+  const active = Object.keys(_odUrls).filter(k => _odUrls[k]?.trim());
+  if (!active.length) { _odSetMsg('⚠️ أدخل رابطاً واحداً على الأقل', 'var(--gold)'); return; }
+  _odSetMsg('⚡ جارٍ الاختبار...', '#4da6ff');
+  active.forEach(k => { const s = document.getElementById('odStatus_'+k); if(s) s.textContent='⚡'; });
+  const res = await Promise.all(active.map(async k => {
+    try { await _odFetchFileGraph(k, _odUrls[k]); return { k, ok: true }; }
+    catch(e) { return { k, ok: false, err: e.message.split('\n')[0] }; }
+  }));
+  const allOk = res.every(r => r.ok);
+  res.forEach(r => {
+    const s = document.getElementById('odStatus_'+r.k); if(s) s.textContent = r.ok ? '✅' : '❌';
+  });
+  _odSetMsg(
+    res.map(r => (r.ok?'✅':'❌')+' '+r.k+(r.ok?'':': '+r.err)).join('  |  ') +
+    (allOk ? ' — اضغط مزامنة ✅' : ''),
+    allOk ? 'var(--accent2)' : 'var(--red)'
+  );
+}
+
+async function odFetchAndUpdate() {
+  const btn  = document.getElementById('odFetchBtn');
+  const keys = ['مبيعات','تحصيل','مديونية','تصنيف'];
+  const active = keys.filter(k => _odUrls[k]?.trim());
+  if (!active.length) { _odSetMsg('⚠️ أدخل رابطاً على الأقل', 'var(--gold)'); return; }
+  if (btn) btn.disabled = true;
+  const rc = document.getElementById('odReportCard');
+  if (rc) rc.style.display = 'none';
+  _odSetMsg('⚡ جارٍ جلب الملفات...', '#4da6ff');
+  active.forEach(k => { const s=document.getElementById('odStatus_'+k); if(s) s.textContent='⚡'; });
+
+  const settled = await Promise.allSettled(active.map(k => _odFetchFileGraph(k, _odUrls[k])));
+  const results = {};
+  let err = false;
+  settled.forEach((r, i) => {
+    const k = active[i];
+    const s = document.getElementById('odStatus_'+k);
+    if (r.status === 'fulfilled') { results[k] = r.value; if(s) s.textContent='✅'; }
+    else { err = true; if(s) s.textContent='❌'; _odSetMsg('❌ '+r.reason?.message?.split('\n')[0], 'var(--red)'); }
+  });
+  if (err && !Object.keys(results).length) { if(btn) btn.disabled=false; return; }
+
+  const noChange = Object.keys(results).every(k => _odDataCache[k+'_unchanged']);
+  if (!noChange) {
+    keys.forEach(k => { csvFiles[k] = results[k] || null; });
+    try {
+      _odSetMsg('⚡ جارٍ تطبيق البيانات...', '#4da6ff');
+      await applyCsvData('pub');
+      _odSetMsg('✅ تمت المزامنة — ' + new Date().toLocaleTimeString('ar'), 'var(--accent2)');
+    } catch(e) { _odSetMsg('❌ خطأ: ' + e.message, 'var(--red)'); }
+  } else {
+    _odSetMsg('✅ لا تغييرات — البيانات محدّثة', 'var(--accent2)');
+  }
+  if (btn) btn.disabled = false;
+}
+
+function toggleOdAutoSync() {
+  if (_odAutoSyncActive) {
+    _odAutoSyncActive = false;
+    if (_odAutoSyncTimer) { clearTimeout(_odAutoSyncTimer); _odAutoSyncTimer = null; }
+    try { localStorage.removeItem('_odAutoSyncInterval'); } catch(e) {}
+    const btn = document.getElementById('odAutoSyncBtn');
+    if (btn) { btn.textContent='🔄 تلقائي'; btn.style.background='rgba(0,120,212,0.1)'; btn.style.borderColor='rgba(0,120,212,0.3)'; }
+  } else {
+    const c = prompt('فترة المزامنة:\n1=30ث  2=دقيقة  3=دقيقتان  4=5د  5=10د', '4');
+    if (!c) return;
+    const m = {'1':.5,'2':1,'3':2,'4':5,'5':10}[c.trim()] || parseFloat(c);
+    if (!m || m < .25) return;
+    _odAutoSyncInterval = Math.round(m * 60000);
+    _odAutoSyncActive   = true;
+    try { localStorage.setItem('_odAutoSyncInterval', _odAutoSyncInterval); } catch(e) {}
+    const btn = document.getElementById('odAutoSyncBtn');
+    if (btn) { btn.style.background='rgba(0,120,212,0.25)'; btn.style.borderColor='rgba(0,120,212,0.6)'; }
+    _odRunAutoSync();
+  }
+}
+
+async function _odRunAutoSync() {
+  if (!_odAutoSyncActive) return;
+  await odFetchAndUpdate();
+  if (!_odAutoSyncActive) return;
+  const btn = document.getElementById('odAutoSyncBtn');
+  let rem = Math.floor(_odAutoSyncInterval / 1000);
+  const cd = setInterval(() => {
+    rem--;
+    if (btn) btn.textContent = rem > 60
+      ? '⏱ ' + Math.floor(rem/60) + 'د' + (rem%60 > 0 ? rem%60+'ث':'')
+      : '⏱ ' + rem + 'ث';
+    if (rem <= 0) clearInterval(cd);
+  }, 1000);
+  _odAutoSyncTimer = setTimeout(_odRunAutoSync, _odAutoSyncInterval);
+}
+
+const _origSwitchDataTab = switchDataTab;
+switchDataTab = function(tab, btn) {
+  _origSwitchDataTab(tab, btn);
+  if (tab === 'od') _odPopulate();
+};
+// --------------------------------------------------------------
+//  نهاية OneDrive Engine
+// --------------------------------------------------------------
+
 </script>
 
 <!-- ═══════════════════════════════════════════════════════
@@ -13708,6 +14113,7 @@ function exportAgingCSV() {
     <div class="gs-tab-bar">
       <button class="gs-tab-btn active" onclick="switchDataTab('csv', this)">📂 رفع ملفات CSV</button>
       <button class="gs-tab-btn" onclick="switchDataTab('gs', this)">🔗 Google Sheets مباشر</button>
+      <button class="gs-tab-btn" onclick="switchDataTab('od', this)">☁️ OneDrive / SharePoint</button>
     </div>
 
     <!-- CSV Panel -->
@@ -13795,118 +14201,138 @@ function exportAgingCSV() {
         </div>
       </div>
 
-      <!-- فاصل -->
-      <div style="display:flex;align-items:center;gap:10px;margin:6px 0 14px">
-        <div style="flex:1;height:1px;background:var(--border)"></div>
-        <span style="color:var(--text2);font-size:12px;white-space:nowrap">أو</span>
-        <div style="flex:1;height:1px;background:var(--border)"></div>
-      </div>
+      <!-- ── مصادقة Google مباشرة ── -->
+      <div style="background:rgba(0,255,136,0.04);border:1px solid rgba(0,255,136,0.2);border-radius:12px;padding:16px 18px;margin-top:6px">
 
-      <!-- ── طريقة 2: OAuth بحساب Google ── -->
-      <div style="background:rgba(0,255,136,0.04);border:1px solid rgba(0,255,136,0.2);border-radius:12px;padding:14px 16px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <span style="font-size:15px">🔐</span>
-          <b style="color:var(--accent2);font-size:13px">الطريقة 2 — تسجيل الدخول بحساب Google (شيتات خاصة)</b>
-        </div>
-
-      <!-- معلومات المستخدم بعد الاتصال -->
-      <div id="gsUserInfo" style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;min-height:24px"></div>
-
-      <!-- صندوق تسجيل الدخول -->
-      <div id="gsLoginBox">
-        <p class="subtitle" style="margin-bottom:12px">
-          سجّل الدخول بحساب Google للوصول الآمن إلى الشيتات الخاصة بك دون نشرها.
-        </p>
-        <button onclick="gsConnect()" style="width:100%;padding:11px;background:white;color:#333;border:none;border-radius:10px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.3)">
+        <!-- رأس القسم -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
           <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.2l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.5 2.7 13.5l7.9 6.1C12.4 13.3 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 6.9-10.1 6.9-17z"/><path fill="#FBBC05" d="M10.6 28.4c-.5-1.4-.8-2.9-.8-4.4s.3-3 .8-4.4L2.7 13.5C1 17 0 20.9 0 25s1 8 2.7 11.5l7.9-6.1z"/><path fill="#34A853" d="M24 49c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.2 1.5-5 2.3-8.4 2.3-6.3 0-11.6-3.8-13.5-9.3l-7.9 6.1C6.6 43.5 14.6 49 24 49z"/></svg>
-          تسجيل الدخول بـ Google
-        </button>
+          <b style="color:var(--accent2);font-size:13px">ربط مباشر بحساب Google</b>
+          <span style="font-size:11px;color:var(--muted);margin-right:auto">للشيتات الخاصة</span>
+        </div>
 
-        <!-- حقل Client ID إذا لم يكن مُضمَّناً -->
-        <div id="gsClientIdBox" style="display:none;margin-top:12px">
-          <div class="gs-help-box" style="margin-bottom:8px">
-            <b>مطلوب: Google Cloud Client ID</b><br>
-            أنشئ مشروعاً في <a href="https://console.cloud.google.com" target="_blank" style="color:var(--accent)">Google Cloud Console</a>،
-            فعّل <b>Google Sheets API</b> + <b>Google Drive API</b>،
-            أنشئ <b>OAuth 2.0 Client ID</b> من نوع <b>Web application</b>،
-            أضف <code>http://localhost</code> و <code>*</code> في Authorized JavaScript origins.
+        <!-- حالة: غير متصل -->
+        <div id="gsOAuthDisconnected">
+          <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.8;background:rgba(255,255,255,0.03);border-radius:8px;padding:10px 12px;border:1px solid rgba(255,255,255,0.06)">
+            اضغط الزر أدناه ← ستظهر نافذة Google ← اختر حسابك ← انتهى ✅<br>
+            <span style="color:var(--muted);font-size:11px">لا يحتاج أي إعداد — الصلاحية للقراءة فقط</span>
           </div>
-          <div style="display:flex;gap:8px">
-            <input id="gsClientIdInput" type="text" placeholder="xxxx.apps.googleusercontent.com"
-              style="flex:1;background:#0d1b2e;border:1px solid #1e3a5f;color:#e8f4f8;border-radius:8px;padding:7px 10px;font-size:11px;font-family:'Cairo',sans-serif;direction:ltr">
-            <button onclick="gsSaveClientId()" style="background:var(--accent);color:#000;border:none;border-radius:8px;padding:7px 14px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer">حفظ</button>
+          <button onclick="gsConnectDirect()" style="width:100%;padding:12px;background:#fff;color:#333;border:none;border-radius:10px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 2px 10px rgba(0,0,0,.3);transition:opacity .2s" onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='1'">
+            <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.2l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.5 2.7 13.5l7.9 6.1C12.4 13.3 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 6.9-10.1 6.9-17z"/><path fill="#FBBC05" d="M10.6 28.4c-.5-1.4-.8-2.9-.8-4.4s.3-3 .8-4.4L2.7 13.5C1 17 0 20.9 0 25s1 8 2.7 11.5l7.9-6.1z"/><path fill="#34A853" d="M24 49c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.2 1.5-5 2.3-8.4 2.3-6.3 0-11.6-3.8-13.5-9.3l-7.9 6.1C6.6 43.5 14.6 49 24 49z"/></svg>
+            تسجيل الدخول بـ Google
+          </button>
+        </div>
+
+        <!-- حالة: متصل -->
+        <div id="gsOAuthConnected" style="display:none">
+          <div style="display:flex;align-items:center;gap:10px;background:rgba(0,255,136,0.06);border:1px solid rgba(0,255,136,0.25);border-radius:8px;padding:10px 14px;margin-bottom:14px">
+            <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#4285F4,#34A853);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">👤</div>
+            <div style="flex:1;min-width:0">
+              <div id="gsDirectName" style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+              <div id="gsDirectEmail" style="font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+            </div>
+            <button onclick="gsDisconnectDirect()" style="background:rgba(255,71,87,0.1);border:1px solid rgba(255,71,87,0.3);color:#ff4757;padding:5px 12px;border-radius:6px;font-family:'Cairo',sans-serif;font-size:11px;cursor:pointer">قطع</button>
           </div>
+
+          <!-- اختيار الشيتات -->
+          <div style="font-size:12px;color:var(--text2);margin-bottom:10px;font-weight:600">اختر الشيت لكل ملف:</div>
+
+          <div class="gs-sheet-row">
+            <span class="gs-url-label">📦 مبيعات</span>
+            <select class="gs-sheet-select" id="gsDirectFile_مبيعات" onchange="gsDirectFileChange('مبيعات')" style="flex:1">
+              <option value="">— اختر الشيت —</option>
+            </select>
+            <select class="gs-sheet-select" id="gsDirectSheet_مبيعات" onchange="gsDirectSheetChange('مبيعات')" style="flex:1;margin-right:4px">
+              <option value="">— الورقة —</option>
+            </select>
+            <span class="gs-url-status" id="gsDirectStatus_مبيعات">⬜</span>
+          </div>
+          <div class="gs-sheet-row">
+            <span class="gs-url-label">💳 تحصيل</span>
+            <select class="gs-sheet-select" id="gsDirectFile_تحصيل" onchange="gsDirectFileChange('تحصيل')" style="flex:1">
+              <option value="">— اختر الشيت —</option>
+            </select>
+            <select class="gs-sheet-select" id="gsDirectSheet_تحصيل" onchange="gsDirectSheetChange('تحصيل')" style="flex:1;margin-right:4px">
+              <option value="">— الورقة —</option>
+            </select>
+            <span class="gs-url-status" id="gsDirectStatus_تحصيل">⬜</span>
+          </div>
+          <div class="gs-sheet-row">
+            <span class="gs-url-label">💰 مديونية</span>
+            <select class="gs-sheet-select" id="gsDirectFile_مديونية" onchange="gsDirectFileChange('مديونية')" style="flex:1">
+              <option value="">— اختر الشيت —</option>
+            </select>
+            <select class="gs-sheet-select" id="gsDirectSheet_مديونية" onchange="gsDirectSheetChange('مديونية')" style="flex:1;margin-right:4px">
+              <option value="">— الورقة —</option>
+            </select>
+            <span class="gs-url-status" id="gsDirectStatus_مديونية">⬜</span>
+          </div>
+          <div class="gs-sheet-row" style="border-top:1px solid var(--border);margin-top:6px;padding-top:8px">
+            <span class="gs-url-label" style="color:var(--gold)">👥 تصنيف</span>
+            <select class="gs-sheet-select" id="gsDirectFile_تصنيف" onchange="gsDirectFileChange('تصنيف')" style="flex:1">
+              <option value="">— اختر الشيت —</option>
+            </select>
+            <select class="gs-sheet-select" id="gsDirectSheet_تصنيف" onchange="gsDirectSheetChange('تصنيف')" style="flex:1;margin-right:4px">
+              <option value="">— الورقة —</option>
+            </select>
+            <span class="gs-url-status" id="gsDirectStatus_تصنيف">⬜</span>
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px">
+            <button class="gs-sync-btn" onclick="gsDirectFetchAndUpdate()" style="background:rgba(0,255,136,0.15);border:1px solid rgba(0,255,136,0.4);color:var(--accent2);font-weight:700;">⚡ مزامنة الآن</button>
+          </div>
+        </div>
+
+        <div class="csv-progress-msg" id="gsSyncMsg" style="margin-top:8px"></div>
+      </div><!-- end OAuth section -->
+        </div><!-- end panel-gs -->
+
+    <!-- OneDrive / SharePoint Panel -->
+    <div class="gs-panel" id="panel-od">
+      <div style="background:rgba(0,120,212,0.08);border:1px solid rgba(0,120,212,0.3);border-radius:12px;padding:14px 16px;margin-bottom:14px">
+
+        <!-- حقول الروابط -->
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">الصق روابط المشاركة من OneDrive — تأكد أن الإذن "أي شخص لديه الرابط"</div>
+        <div class="gs-url-row">
+          <span class="gs-url-label">📦 مبيعات</span>
+          <input class="gs-url-input" id="odUrl_مبيعات" placeholder="https://1drv.ms/x/…" oninput="odUrlChanged('مبيعات')">
+          <span class="gs-url-status" id="odStatus_مبيعات">⬜</span>
+        </div>
+        <div class="gs-url-row">
+          <span class="gs-url-label">💳 تحصيل</span>
+          <input class="gs-url-input" id="odUrl_تحصيل" placeholder="https://1drv.ms/x/…" oninput="odUrlChanged('تحصيل')">
+          <span class="gs-url-status" id="odStatus_تحصيل">⬜</span>
+        </div>
+        <div class="gs-url-row">
+          <span class="gs-url-label">💰 مديونية</span>
+          <input class="gs-url-input" id="odUrl_مديونية" placeholder="https://1drv.ms/x/…" oninput="odUrlChanged('مديونية')">
+          <span class="gs-url-status" id="odStatus_مديونية">⬜</span>
+        </div>
+        <div class="gs-url-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:6px">
+          <span class="gs-url-label" style="color:var(--gold)">👥 تصنيف</span>
+          <input class="gs-url-input" id="odUrl_تصنيف" placeholder="https://1drv.ms/x/…" oninput="odUrlChanged('تصنيف')">
+          <span class="gs-url-status" id="odStatus_تصنيف">⬜</span>
+        </div>
+
+        <!-- أزرار -->
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center">
+          <button onclick="odTestLinks()" style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.35);color:#ffd700;padding:9px 18px;border-radius:999px;font-family:'Cairo',sans-serif;font-weight:700;font-size:13px;cursor:pointer">🧪 اختبار</button>
+          <button class="gs-sync-btn" id="odAutoSyncBtn" onclick="toggleOdAutoSync()" style="background:rgba(0,120,212,0.1);border:1px solid rgba(0,120,212,0.3);color:#4da6ff;">🔄 تلقائي</button>
+          <button class="gs-sync-btn" id="odFetchBtn" onclick="odFetchAndUpdate()" style="background:rgba(0,120,212,0.2);border:1px solid rgba(0,120,212,0.5);color:#4da6ff;font-weight:700;">⚡ مزامنة الآن</button>
+        </div>
+        <div class="csv-progress-msg" id="odMsg" style="margin-top:8px"></div>
+
+        <!-- بطاقة تقرير المزامنة -->
+        <div id="odReportCard" style="display:none;margin-top:10px;padding:10px 14px;border-radius:10px;background:rgba(0,120,212,0.06);border:1px solid rgba(0,120,212,0.2);font-family:'Cairo',sans-serif;font-size:12px;direction:rtl;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span id="odReportIcon" style="font-size:16px">✅</span>
+            <span id="odReportTitle" style="font-weight:700;color:#4da6ff">تم التحديث بنجاح</span>
+            <span id="odReportTime" style="color:var(--muted);margin-right:auto;font-size:11px"></span>
+          </div>
+          <div id="odReportStats" style="display:flex;gap:14px;flex-wrap:wrap;color:var(--text2);font-size:11px;"></div>
         </div>
       </div>
-
-      <!-- لوحة اختيار الشيتات (تظهر بعد الاتصال) -->
-      <div id="gsConfigBox" style="display:none">
-        <p class="subtitle" style="margin-bottom:10px">اختر الشيت والورقة لكل ملف بيانات:</p>
-
-        <!-- مبيعات -->
-        <div class="gs-sheet-row">
-          <span class="gs-url-label">📦 مبيعات</span>
-          <div style="flex:1;display:flex;flex-direction:column;gap:4px">
-            <select class="gs-sheet-select" id="gsFile_مبيعات" onchange="_gsOnFileChange('مبيعات')">
-              <option value="">— اختر الشيت —</option>
-            </select>
-            <select class="gs-sheet-select" id="gsSheet_مبيعات" onchange="_gsOnSheetChange('مبيعات')">
-              <option value="">— اختر الورقة —</option>
-            </select>
-          </div>
-          <span class="gs-url-status" id="gsStatus_مبيعات">⬜</span>
-        </div>
-
-        <!-- تحصيل -->
-        <div class="gs-sheet-row">
-          <span class="gs-url-label">💳 تحصيل</span>
-          <div style="flex:1;display:flex;flex-direction:column;gap:4px">
-            <select class="gs-sheet-select" id="gsFile_تحصيل" onchange="_gsOnFileChange('تحصيل')">
-              <option value="">— اختر الشيت —</option>
-            </select>
-            <select class="gs-sheet-select" id="gsSheet_تحصيل" onchange="_gsOnSheetChange('تحصيل')">
-              <option value="">— اختر الورقة —</option>
-            </select>
-          </div>
-          <span class="gs-url-status" id="gsStatus_تحصيل">⬜</span>
-        </div>
-
-        <!-- مديونية -->
-        <div class="gs-sheet-row">
-          <span class="gs-url-label">💰 مديونية</span>
-          <div style="flex:1;display:flex;flex-direction:column;gap:4px">
-            <select class="gs-sheet-select" id="gsFile_مديونية" onchange="_gsOnFileChange('مديونية')">
-              <option value="">— اختر الشيت —</option>
-            </select>
-            <select class="gs-sheet-select" id="gsSheet_مديونية" onchange="_gsOnSheetChange('مديونية')">
-              <option value="">— اختر الورقة —</option>
-            </select>
-          </div>
-          <span class="gs-url-status" id="gsStatus_مديونية">⬜</span>
-        </div>
-
-        <!-- تصنيف -->
-        <div class="gs-sheet-row" style="border-top:1px solid var(--border);margin-top:6px;padding-top:8px">
-          <span class="gs-url-label" style="color:var(--gold)">👥 تصنيف</span>
-          <div style="flex:1;display:flex;flex-direction:column;gap:4px">
-            <select class="gs-sheet-select" id="gsFile_تصنيف" onchange="_gsOnFileChange('تصنيف')">
-              <option value="">— اختر الشيت —</option>
-            </select>
-            <select class="gs-sheet-select" id="gsSheet_تصنيف" onchange="_gsOnSheetChange('تصنيف')">
-              <option value="">— اختر الورقة —</option>
-            </select>
-          </div>
-          <span class="gs-url-status" id="gsStatus_تصنيف">⬜</span>
-        </div>
-
-        <div style="display:flex;justify-content:flex-end;margin-top:14px">
-          <button class="gs-sync-btn" id="gsFetchBtn" onclick="gsFetchAndUpdate()">🔄 تحديث من حساب Google</button>
-        </div>
-      </div><!-- end gsConfigBox -->
-
-      <div class="csv-progress-msg" id="gsSyncMsg" style="margin-top:8px"></div>
-      </div><!-- end OAuth section -->
-    </div><!-- end panel-gs -->
+    </div><!-- end panel-od -->
 
     <div class="csv-progress-msg" id="csvProgressMsg"></div>
   </div>
