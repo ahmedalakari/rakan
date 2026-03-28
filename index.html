@@ -85,13 +85,45 @@ TYPE html>
   /* ── sticky-top: ثابت في الأعلى، يختفي عند السكرول، يظهر فقط عند القمة ── */
   #sticky-top {
     position: fixed;
-    top: 0; left: 0; right: 0;
+    top: 0;
+    left: 0;
+    right: 210px;
     z-index: 100;
     transform: translateY(0);
     transition: transform 0.3s ease;
   }
   #sticky-top.is-hidden {
     transform: translateY(-100%);
+  }
+
+  /* ── mini-header: يظهر فوق التبويبات عند السكرول ── */
+  #mini-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 210px;
+    z-index: 99;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 5px clamp(12px, 3vw, 24px);
+    background: linear-gradient(135deg, #0d1b2e 0%, #0a1628 100%);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+  }
+  #mini-header.show {
+    transform: translateY(0);
+  }
+  @media (max-width: 900px) {
+    #mini-header { right: 64px; }
+  }
+  @media (max-width: 600px) {
+    #mini-header { right: 0; }
   }
   /* السايدبار ترتفع مع sticky-top */
   #mainSidebar.is-hidden {
@@ -110,6 +142,17 @@ TYPE html>
     position: static;
     backdrop-filter: blur(20px);
   }
+  .header-title {
+    flex: 1 1 200px;
+    min-width: 0;
+  }
+  .header-meta {
+    display: flex;
+    gap: var(--sp-sm);
+    align-items: center;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+  }
   .header-title h1 {
     font-family: 'Tajawal', sans-serif;
     font-size: clamp(14px, 2vw, 18px);
@@ -120,7 +163,6 @@ TYPE html>
     background-clip: text;
   }
   .header-title p { color: var(--muted); font-size: 11px; margin-top: 1px; }
-  .header-meta { display: flex; gap: var(--sp-sm); align-items: center; flex-wrap: wrap; }
   .badge {
     background: rgba(0,212,255,0.1);
     border: 1px solid rgba(0,212,255,0.25);
@@ -139,7 +181,7 @@ TYPE html>
   /* ── body layout: sidebar + main ── */
   .app-shell {
     display: flex;
-    min-height: calc(100vh - var(--header-h, 64px));
+    min-height: 100vh;
     position: relative;
     align-items: stretch;
   }
@@ -317,6 +359,7 @@ TYPE html>
       gap: 1px;
     }
     .main-area { margin-right: 64px; padding-top: var(--sticky-h, 102px); }
+    #sticky-top { right: 64px; }
 
     .nav-btn {
       flex-direction: column;
@@ -344,7 +387,8 @@ TYPE html>
   /* ── Mobile (≤ 600px): hide sidebar, show bottom tab bar ── */
   @media (max-width: 600px) {
     .nav { display: none !important; }
-
+    .main-area { margin-right: 0 !important; padding-top: var(--sticky-h, 102px); }
+    #sticky-top { right: 0 !important; }
     #sidebarToggle { display: none !important; }
     .content { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important; }
     .sidebar-overlay { display: none !important; }
@@ -434,14 +478,6 @@ TYPE html>
      أعمار الذمم — نظام متجاوب كامل
   ══════════════════════════════════════════════════════ */
 
-  /* البطاقات الخمس */
-  #tab-aging .ag-kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: var(--gap);
-    margin-bottom: var(--gap);
-  }
-
   /* شريط الفلاتر */
   #tab-aging .ag-header-row {
     display: flex;
@@ -474,6 +510,13 @@ TYPE html>
 
   /* الجدول */
   #agingTable { width: 100%; border-collapse: collapse; }
+  /* شبكة الرسوم البيانية */
+  #tab-aging .ag-charts-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 900px) { .ag-charts-grid { grid-template-columns: 1fr 1fr !important; } }
+  @media (max-width: 600px) { .ag-charts-grid { grid-template-columns: 1fr !important; } }
   #agingTable thead th { white-space: nowrap; }
   #agingTable tbody tr:hover td { background: rgba(0,212,255,0.04); }
   #agingTable tbody td { padding: 9px 12px; font-size: 13px; }
@@ -483,14 +526,12 @@ TYPE html>
 
   /* ── Tablet ≤ 900px ── */
   @media (max-width: 900px) {
-    #tab-aging .ag-kpi-grid { grid-template-columns: repeat(3, 1fr); }
     #tab-aging .ag-filters select,
     #tab-aging .ag-filters .filter-select { flex: 1 1 calc(50% - 8px); }
   }
 
   /* ── Mobile ≤ 600px ── */
   @media (max-width: 600px) {
-    #tab-aging .ag-kpi-grid { grid-template-columns: repeat(2, 1fr); }
     #tab-aging .ag-header-row { flex-direction: column; }
     #tab-aging .ag-search { max-width: 100%; width: 100%; }
     #tab-aging .ag-filters { width: 100%; }
@@ -508,7 +549,6 @@ TYPE html>
 
   /* ── Small Mobile ≤ 400px ── */
   @media (max-width: 400px) {
-    #tab-aging .ag-kpi-grid { grid-template-columns: repeat(2, 1fr); }
     #tab-aging .ag-filters select,
     #tab-aging .ag-filters .filter-select { flex: 1 1 100%; max-width: none; }
     #agingTable thead th:nth-child(6),
@@ -880,7 +920,10 @@ TYPE html>
     .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .kpi-value { font-size: 18px; }
     .products-grid, .action-grid, .grid-auto { grid-template-columns: 1fr; }
-    .header-meta .badge:not(:first-child) { display: none; }
+    .header-meta { gap: 6px; }
+    .header-meta .badge { display: none; }
+    .header-title h1 { font-size: 14px; }
+    .header-title p { font-size: 10px; }
     table { min-width: 420px; }
     th, td { padding: 8px 9px; font-size: 11px; }
     .chart-wrap { height: 200px; }
@@ -1422,16 +1465,20 @@ TYPE html>
   background: linear-gradient(135deg, #00d4ff, #00ff88);
   color: #0a0f1e;
   border: none;
-  padding: 8px 16px;
-  border-radius: 999px;
-  font-family: 'Cairo', sans-serif;
-  font-weight: 700;
-  font-size: 12px;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 16px;
+  line-height: 1;
   cursor: pointer;
   transition: opacity .2s, transform .2s;
-  margin-right: 8px;
+  margin-right: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
-.csv-loader-btn:hover { opacity: .85; transform: scale(1.03); }
+.csv-loader-btn:hover { opacity: .85; transform: scale(1.07); }
 
 .csv-modal-overlay {
   display: none;
@@ -1761,8 +1808,10 @@ TYPE html>
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
-  overflow: hidden;
+  overflow: visible;
   transition: border-color .25s, box-shadow .25s;
+  position: relative;
+  z-index: 10;
 }
 #df-bar:focus-within {
   border-color: rgba(0,212,255,.5);
@@ -1831,7 +1880,7 @@ input.df-d::-webkit-calendar-picker-indicator {
 }
 input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,255,.07); }
 
-/* Chips section — now holds month dropdown */
+/* Chips section — month dropdown */
 .df-chips {
   display: flex;
   align-items: center;
@@ -1839,8 +1888,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
   padding: 0 12px;
   height: 46px;
   border-left: 1px solid var(--border);
-  flex: 1;
-  min-width: 0;
+  flex-shrink: 0;
 }
 
 /* Month dropdown */
@@ -1856,8 +1904,9 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
   cursor: pointer;
   outline: none;
   transition: border-color .2s, background .2s;
-  width: 100%;
-  max-width: 200px;
+  width: auto;
+  min-width: 150px;
+  max-width: none;
   direction: rtl;
 }
 .df-month-sel:hover  { border-color: rgba(0,212,255,.4); background: rgba(0,212,255,.06); }
@@ -1868,12 +1917,13 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
 .df-right {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 12px;
+  gap: 12px;
+  padding: 0 16px;
   height: 46px;
   border-left: 1px solid var(--border);
   flex-shrink: 0;
   min-width: 0;
+  margin-right: auto;
 }
 #df-status {
   display: none;
@@ -1929,12 +1979,12 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
 #labelToggleBtn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
   background: none;
   border: 1.5px solid rgba(255,215,0,.4);
   color: var(--gold, #ffd700);
-  border-radius: 20px;
-  padding: 3px 10px;
+  border-radius: 8px;
+  padding: 5px 7px;
   font-family: 'Cairo', sans-serif;
   font-size: 11px;
   font-weight: 700;
@@ -1944,10 +1994,12 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
   flex-shrink: 0;
 }
 #labelToggleBtn:hover { background: rgba(255,215,0,.1); border-color: var(--gold, #ffd700); }
-#labelToggleBtn.active {
-  background: rgba(255,215,0,.15);
+#labelToggleBtn.active,
+#labelToggleBtn.lbl-on {
+  background: rgba(255,215,0,.18);
   border-color: var(--gold, #ffd700);
   color: var(--gold, #ffd700);
+  box-shadow: 0 0 8px rgba(255,215,0,.4), inset 0 0 8px rgba(255,215,0,.08);
 }
 
 @keyframes _dfSpin { to { transform: rotate(360deg); } }
@@ -1961,25 +2013,59 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
   flex-shrink: 0;
 }
 
-/* Responsive: collapse date labels on small screens */
+/* =============================================
+   RESPONSIVE — df-bar (شريط التصفية بالتاريخ)
+============================================= */
+
+/* Tablet ≤ 900px */
+@media (max-width: 900px) {
+  .df-icon-section .df-title { display: inline; }
+  input.df-d { width: 112px; }
+  .df-month-sel { min-width: 130px; }
+}
+
+/* Tablet صغير ≤ 768px — كل قسم في سطره */
 @media (max-width: 768px) {
   #df-wrap { padding: 5px 10px; }
-  #df-bar  { border-radius: 10px; flex-wrap: wrap; gap: 0; }
-  .df-icon-section { height: 38px; padding: 0 10px; border-left: none; border-bottom: 1px solid var(--border); width: 100%; box-sizing: border-box; }
-  .df-inputs { height: 38px; padding: 0 8px; gap: 4px; border-left: none; border-bottom: 1px solid var(--border); flex: 1; }
-  .df-chips  { height: 38px; padding: 0 6px; border-left: none; border-bottom: 1px solid var(--border); }
-  .df-right  { height: 38px; padding: 0 8px; border-left: none; width: 100%; justify-content: flex-end; box-sizing: border-box; gap: 5px; }
+  #df-bar  { border-radius: 10px; }
+
+  .df-icon-section {
+    height: 40px; padding: 0 12px;
+    border-left: none; border-bottom: 1px solid var(--border);
+    width: 100%; box-sizing: border-box;
+    justify-content: center;
+  }
+  .df-inputs {
+    height: 40px; padding: 0 10px; gap: 6px;
+    border-left: none; border-bottom: 1px solid var(--border);
+    flex: 1 1 auto;
+  }
+  .df-chips {
+    height: 40px; padding: 0 10px;
+    border-left: none; border-bottom: 1px solid var(--border);
+    flex: 1 1 auto; justify-content: flex-start;
+  }
+  .df-right {
+    height: 40px; padding: 0 10px;
+    border-left: none;
+    width: 100%; box-sizing: border-box;
+    justify-content: flex-end; gap: 10px;
+    margin-right: 0;
+  }
   .df-lbl { display: none; }
-  input.df-d { width: 100px; font-size: 11px; }
-  .df-month-sel { max-width: 130px; font-size: 11px; }
+  input.df-d { width: 102px; font-size: 11px; }
+  .df-month-sel { min-width: 0; width: 100%; font-size: 11px; }
   #df-status { font-size: 10px; }
   #df-nodata-alert { font-size: 10px; padding: 2px 7px; }
 }
+
+/* موبايل ≤ 480px */
 @media (max-width: 480px) {
-  .df-inputs { flex: 1 1 auto; }
-  input.df-d { width: 85px; font-size: 10px; }
-  .df-month-sel { max-width: 110px; font-size: 10px; }
-  #df-today, #df-reset, #labelToggleBtn { font-size: 10px; padding: 2px 7px; }
+  .df-inputs { padding: 0 6px; gap: 4px; }
+  input.df-d { width: 88px; font-size: 10px; }
+  .df-month-sel { font-size: 10px; }
+  .df-arrow { display: none; }
+  #df-today, #df-reset, #labelToggleBtn { font-size: 10px; padding: 3px 8px; }
 }
 
 
@@ -2065,7 +2151,18 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
   <div class="header-meta">
     <span class="badge">🟢 بيانات محدّثة</span>
     <span class="badge" id="repCountBadge">35 مندوباً</span>
-    <button class="csv-loader-btn" onclick="openCsvModal()">📂 تحديث البيانات</button>
+    <button class="csv-loader-btn" onclick="openCsvModal()" title="تحديث البيانات">📂</button>
+    <button id="labelToggleBtn" onclick="toggleDataLabels()" title="إظهار/إخفاء أرقام الرسوم">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle">
+          <rect x="2" y="14" width="4" height="7" rx="1" fill="currentColor" opacity="0.7"/>
+          <rect x="8" y="9"  width="4" height="12" rx="1" fill="currentColor" opacity="0.85"/>
+          <rect x="14" y="5" width="4" height="16" rx="1" fill="currentColor"/>
+          <text x="4"  y="12" text-anchor="middle" font-size="4.5" font-family="Cairo,sans-serif" font-weight="700" fill="currentColor">١</text>
+          <text x="10" y="7"  text-anchor="middle" font-size="4.5" font-family="Cairo,sans-serif" font-weight="700" fill="currentColor">٢</text>
+          <text x="16" y="3"  text-anchor="middle" font-size="4.5" font-family="Cairo,sans-serif" font-weight="700" fill="currentColor">٣</text>
+          <line x1="1" y1="21.5" x2="23" y2="21.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+        </svg>
+      </button>
   </div>
 </div>
 
@@ -2137,7 +2234,6 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
     <div class="df-right">
       <div id="df-spin"></div>
       <div id="df-status"><span class="df-st-dot">●</span><span id="df-st-txt">—</span></div>
-      <button id="labelToggleBtn" onclick="toggleDataLabels()" title="إظهار/إخفاء أرقام الرسوم">🔢 أرقام الرسوم</button>
       <button id="df-today" onclick="dfSetToday()" title="عرض بيانات اليوم الحالي">📅 اليوم</button>
       <div id="df-nodata-alert">⚠️ لا توجد بيانات</div>
       <button id="df-reset" onclick="dfQuick('all')" title="إزالة الفلتر">✕ إزالة الفلتر</button>
@@ -2147,6 +2243,24 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
 </div>
 
 </div><!-- /#sticky-top -->
+
+<!-- Mini header — يظهر فوق التبويبات عند السكرول -->
+<div id="mini-header">
+  <span class="badge">🟢 بيانات محدّثة</span>
+  <span class="badge" id="repCountBadgeMini">35 مندوباً</span>
+  <button class="csv-loader-btn" onclick="openCsvModal()" title="تحديث البيانات">📂</button>
+  <button id="labelToggleBtnMini" onclick="toggleDataLabels()" title="إظهار/إخفاء أرقام الرسوم" style="display:inline-flex;align-items:center;justify-content:center;background:none;border:1.5px solid rgba(255,215,0,.4);color:var(--gold,#ffd700);border-radius:8px;padding:4px 6px;cursor:pointer;transition:all .18s">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="14" width="4" height="7" rx="1" fill="currentColor" opacity="0.7"/>
+      <rect x="8" y="9"  width="4" height="12" rx="1" fill="currentColor" opacity="0.85"/>
+      <rect x="14" y="5" width="4" height="16" rx="1" fill="currentColor"/>
+      <text x="4"  y="12" text-anchor="middle" font-size="4.5" font-family="Cairo,sans-serif" font-weight="700" fill="currentColor">١</text>
+      <text x="10" y="7"  text-anchor="middle" font-size="4.5" font-family="Cairo,sans-serif" font-weight="700" fill="currentColor">٢</text>
+      <text x="16" y="3"  text-anchor="middle" font-size="4.5" font-family="Cairo,sans-serif" font-weight="700" fill="currentColor">٣</text>
+      <line x1="1" y1="21.5" x2="23" y2="21.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+    </svg>
+  </button>
+</div>
 
 
 <!-- Mobile sidebar overlay -->
@@ -4327,40 +4441,60 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
 <div id="tab-aging" class="tab-panel">
   <div style="padding:16px 20px 0">
 
+    <div class="print-section-title" style="display:none">📊 لوحة التحليل الاستراتيجي — ⏳ أعمار الذمم</div>
+
     <!-- KPI Cards -->
-    <div class="ag-kpi-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px">
-      <div class="kpi-card" style="text-align:center">
-        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">إجمالي العملاء</div>
-        <div id="agKpiTotal" style="font-size:20px;font-weight:800;color:var(--accent)">—</div>
+    <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(148px,1fr));margin-bottom:16px">
+      <div class="kpi-card blue">
+        <div class="kpi-icon">🏪</div>
+        <div class="kpi-label">إجمالي العملاء</div>
+        <div class="kpi-value" id="agKpiTotal">—</div>
+        <div class="kpi-sub">عميل لديه بيانات</div>
       </div>
-      <div class="kpi-card" style="text-align:center">
-        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">إجمالي الدين</div>
-        <div id="agKpiDebt" style="font-size:20px;font-weight:800;color:var(--red)">—</div>
+      <div class="kpi-card red">
+        <div class="kpi-icon">💳</div>
+        <div class="kpi-label">إجمالي الديون</div>
+        <div class="kpi-value" id="agKpiDebt">—</div>
+        <div class="kpi-sub">الرصيد المستحق</div>
       </div>
-      <div class="kpi-card" style="text-align:center">
-        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">0–30 يوم</div>
-        <div id="agKpi30" style="font-size:20px;font-weight:800;color:var(--red)">—</div>
+      <div class="kpi-card red">
+        <div class="kpi-icon">🔴</div>
+        <div class="kpi-label">ذمة 0–30 يوم</div>
+        <div class="kpi-value" id="agKpi30">—</div>
+        <div class="kpi-sub">حديثة التكوّن</div>
       </div>
-      <div class="kpi-card" style="text-align:center">
-        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">30–60 يوم</div>
-        <div id="agKpi60" style="font-size:20px;font-weight:800;color:var(--gold)">—</div>
+      <div class="kpi-card gold">
+        <div class="kpi-icon">🟡</div>
+        <div class="kpi-label">ذمة 30–60 يوم</div>
+        <div class="kpi-value" id="agKpi60">—</div>
+        <div class="kpi-sub">تحتاج متابعة</div>
       </div>
-      <div class="kpi-card" style="text-align:center">
-        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">أكثر من 60 يوم</div>
-        <div id="agKpiOld" style="font-size:20px;font-weight:800;color:#ff6b35">—</div>
+      <div class="kpi-card orange">
+        <div class="kpi-icon">🟠</div>
+        <div class="kpi-label">ذمة أكثر من 60 يوم</div>
+        <div class="kpi-value" id="agKpiOld">—</div>
+        <div class="kpi-sub">ذمم متأخرة</div>
       </div>
     </div>
 
     <!-- Header Row -->
     <div class="ag-header-row" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;flex-wrap:wrap">
-      <input id="agSearch" class="ag-search" type="text" placeholder="🔍 بحث باسم العميل أو المندوب…"
-        style="flex:1;min-width:200px;max-width:320px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit"
-        oninput="agingPage=1;renderAgingTable()">
+      <div style="display:flex;gap:8px;flex:1;flex-wrap:wrap">
+        <input id="agSearchCust" class="ag-search" type="text" placeholder="🔍 بحث باسم العميل…"
+          style="flex:1;min-width:160px;max-width:260px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit"
+          oninput="agingPage=1;renderAgingTable()">
+        <input id="agSearchRep" class="ag-search" type="text" placeholder="🔍 بحث باسم المندوب…"
+          style="flex:1;min-width:160px;max-width:260px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit"
+          oninput="agingPage=1;renderAgingTable()">
+      </div>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span id="agCount" style="font-size:12px;color:var(--muted)">عرض: —</span>
         <button class="ag-print-btn" onclick="exportAgingCSV()"
           style="padding:7px 14px;border-radius:8px;border:1px solid var(--accent2);background:transparent;color:var(--accent2);font-size:12px;cursor:pointer;font-family:inherit">
           📥 تصدير CSV
+        </button>
+        <button class="print-btn" onclick="printCurrentTab()"
+          style="padding:7px 14px;font-size:12px">
+          🖨️ طباعة
         </button>
       </div>
     </div>
@@ -4370,7 +4504,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
       <select id="agRepCatFilter" class="filter-select"
         style="padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-family:inherit"
         onchange="agingPage=1;renderAgingTable()">
-        <option value="">📂 كل فئات المناديب</option>
+        <option value="">📂 فئة المندوب</option>
       </select>
       <select id="agRepFilter" class="filter-select"
         style="padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-family:inherit"
@@ -4380,7 +4514,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
       <select id="agCatFilter" class="filter-select"
         style="padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-family:inherit"
         onchange="agingPage=1;renderAgingTable()">
-        <option value="">🏷 كل التصنيفات</option>
+        <option value="">🏷 التصنيف</option>
       </select>
       <select id="agDebtFilter" class="filter-select"
         style="padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-family:inherit"
@@ -4428,7 +4562,40 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
     </div>
 
     <!-- Pagination -->
-    <div id="agingPagination" style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:14px;padding-bottom:20px"></div>
+    <div id="agingPagination" style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:14px;padding-bottom:10px"></div>
+
+    <!-- ══ شريط الإحصائيات ══ -->
+    <div id="agingStatsBar" style="font-size:12px;color:var(--text);padding:8px 12px;margin-top:6px;background:var(--surface);border:1px solid var(--border);border-radius:10px;line-height:2;text-align:center;direction:rtl">—</div>
+
+    <!-- ══ رسوم بيانية أعمار الذمم (أسفل الجدول) ══ -->
+    <div id="agChartsGrid" class="ag-charts-grid" style="margin-top:18px;margin-bottom:20px;display:grid">
+
+      <!-- Chart 1: توزيع أعمار الذمم (Donut) -->
+      <div class="kpi-card" style="padding:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px;text-align:center">توزيع أعمار الذمم</div>
+        <div style="position:relative;height:160px">
+          <canvas id="agChartDonut"></canvas>
+        </div>
+        <div id="agDonutLegend" style="display:flex;flex-direction:column;gap:4px;margin-top:8px"></div>
+      </div>
+
+      <!-- Chart 2: الديون حسب التصنيف (Bar) -->
+      <div class="kpi-card" style="padding:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px;text-align:center">الديون حسب التصنيف</div>
+        <div style="position:relative;height:180px">
+          <canvas id="agChartCat"></canvas>
+        </div>
+      </div>
+
+      <!-- Chart 3: أكبر 10 مديونين (Horizontal Bar) -->
+      <div class="kpi-card" style="padding:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px;text-align:center">أكبر 10 مديونين</div>
+        <div style="position:relative;height:180px">
+          <canvas id="agChartTop10"></canvas>
+        </div>
+      </div>
+
+    </div>
 
   </div>
 </div><!-- end tab-aging -->
@@ -6769,6 +6936,9 @@ function showTab(id, triggerEl) {
         buildAgingData();
       }
       if (typeof renderAgingTable === 'function') renderAgingTable();
+      setTimeout(() => {
+        if (typeof renderAgingCharts === 'function') renderAgingCharts(_agLastRows);
+      }, 200);
     }
   }, 50);
 }
@@ -6819,29 +6989,62 @@ window.addEventListener('resize', _updateHeaderHeight);
 // ══════════════════════════════════════
 (function () {
   let ticking = false;
+
   function onScroll() {
-    const st  = document.getElementById('sticky-top');
-    const nav = document.getElementById('mainSidebar');
+    const st   = document.getElementById('sticky-top');
+    const mini = document.getElementById('mini-header');
+    const nav  = document.getElementById('mainSidebar');
     if (!st) return;
-    const atTop = window.scrollY <= 0;
+
+    const atTop   = window.scrollY <= 0;
+    const stickyH = atTop ? st.offsetHeight : 0;
+
+    // toggle sticky-top visibility
     st.classList.toggle('is-hidden', !atTop);
-    if (nav) {
-      nav.classList.toggle('is-hidden', !atTop);
-      if (atTop) {
-        const stickyH = st.offsetHeight;
-        nav.style.top    = stickyH + 'px';
-        nav.style.height = 'calc(100vh - ' + stickyH + 'px)';
-      } else {
-        nav.style.top    = '0px';
-        nav.style.height = '100vh';
-      }
+
+    // toggle mini-header
+    if (mini) {
+      mini.classList.toggle('show', !atTop);
+      // مزامنة حالة زر الأرقام في mini-header
+      const btnMini = document.getElementById('labelToggleBtnMini');
+      if (btnMini) btnMini.classList.toggle('lbl-on', !!window._showDataLabels);
     }
+
+    // update nav position
+    if (nav && window.innerWidth > 600) {
+      nav.classList.toggle('is-hidden', !atTop);
+      nav.style.top    = atTop ? stickyH + 'px' : '0px';
+      nav.style.height = atTop ? 'calc(100vh - ' + stickyH + 'px)' : '100vh';
+    }
+
+    // update main-area padding
+    const main = document.querySelector('.main-area');
+    if (main) {
+      main.style.paddingTop = (atTop ? stickyH : 0) + 'px';
+    }
+
+    // update CSS var for other uses
+    document.documentElement.style.setProperty('--sticky-h', stickyH + 'px');
+
     ticking = false;
   }
+
   window.addEventListener('scroll', function () {
     if (!ticking) { requestAnimationFrame(onScroll); ticking = true; }
   }, { passive: true });
-  onScroll(); // تطبيق الحالة الأولية
+
+  // apply on init after layout is ready
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(onScroll, 50);
+
+    // مزامنة repCountBadgeMini مع repCountBadge تلقائياً
+    const src  = document.getElementById('repCountBadge');
+    const dest = document.getElementById('repCountBadgeMini');
+    if (src && dest) {
+      new MutationObserver(() => { dest.textContent = src.textContent; })
+        .observe(src, { childList: true, characterData: true, subtree: true });
+    }
+  });
 })();
 
 
@@ -9934,11 +10137,6 @@ function _updateAllPeriodLabels() {
     ? 'مؤشرات الأداء المالي لشهر ' + firstLbl + ' — بالدينار الليبي'
     : 'جميع مؤشرات الأداء المالي مقارنةً شهراً بشهر (' + n + ' أشهر) — بالدينار الليبي';
 
-  // ── 9. عنوان الفترة في aging tab ────────────────────────────────
-  const agCount = _s('agCount');
-  if (agCount && !agCount.textContent.startsWith('عرض:'))
-    agCount.textContent = 'تحليل الذمم — ' + periodStr;
-
   // ── 10. تحديث الفلتر-بادج في قسم الشهري ──────────────────────────
   const badgeEl = _s('monthly-filter-badge');
   if (badgeEl) {
@@ -10194,14 +10392,14 @@ function toggleDataLabels() {
   const btn = document.getElementById('labelToggleBtn');
   if (btn) {
     btn.classList.toggle('lbl-on', _showDataLabels);
-    // update label span text, preserve icon
-    const lbl = btn.querySelector('.nav-label');
-    if (lbl) lbl.textContent = _showDataLabels ? 'إخفاء الأرقام' : 'أرقام الرسوم';
     // clear any inline styles from old code
     btn.style.background = '';
     btn.style.color = '';
     btn.style.borderColor = '';
   }
+  // مزامنة الزر في mini-header
+  const btnMini = document.getElementById('labelToggleBtnMini');
+  if (btnMini) btnMini.classList.toggle('lbl-on', _showDataLabels);
   // إعادة رسم كل الرسوم البيانية
   try { rebuildCharts(); } catch(e) {}
   try { renderRepsTable(); } catch(e) {}
@@ -10215,6 +10413,15 @@ function toggleDataLabels() {
       updateDebtTabFiltered(debtRepsData, debtDetailData);
     } catch(e) {}
   }, 100);
+  // إعادة رسم رسوم أعمار الذمم
+  setTimeout(() => {
+    try {
+      if (_agChart1) { _agChart1.destroy(); _agChart1 = null; }
+      if (_agChart2) { _agChart2.destroy(); _agChart2 = null; }
+      if (_agChart3) { _agChart3.destroy(); _agChart3 = null; }
+      renderAgingCharts(_agLastRows);
+    } catch(e) {}
+  }, 150);
 }
 
 // ── دالة تدمير وإعادة رسم مخطط ──────────────────────────────────────
@@ -12935,7 +13142,7 @@ function _fullRefreshAfterSync(fromGS, msg, btn, hasMabee3at, hasTahseel, hasMad
     const agCatSel = document.getElementById('agCatFilter');
     if (agCatSel) {
       const curC = agCatSel.value;
-      agCatSel.innerHTML = '<option value="">📂 كل الفئات</option>';
+      agCatSel.innerHTML = '<option value="">🏷 التصنيف</option>';
       const agCats = [...new Set(custData.map(c=>c.cat).filter(Boolean))];
       agCats.sort();
       agCats.forEach(c => { const icons={'ممتاز':'⭐','جيد':'✅','متوسط':'🔶','مخاطرة':'⚠️','مخاطرة عالية':'🚨'}; const o=document.createElement('option'); o.value=c; o.textContent=(icons[c]||'')+' '+c; agCatSel.appendChild(o); });
@@ -12944,7 +13151,7 @@ function _fullRefreshAfterSync(fromGS, msg, btn, hasMabee3at, hasTahseel, hasMad
     const agRepCatSel = document.getElementById('agRepCatFilter');
     if (agRepCatSel) {
       const curRc = agRepCatSel.value;
-      agRepCatSel.innerHTML = '<option value="">📂 كل فئات المناديب</option>';
+      agRepCatSel.innerHTML = '<option value="">📂 فئة المندوب</option>';
       cats.forEach(v => { const o=document.createElement('option'); o.value=v; o.textContent=v; agRepCatSel.appendChild(o); });
       agRepCatSel.value = cats.includes(curRc) ? curRc : '';
     }
@@ -13857,6 +14064,8 @@ async function applyCsvData(fromGS) {
 // ═══════════════════════════════════════════════════════
 let agingData = [];      // مصفوفة بيانات العملاء الكاملة
 let agingPage = 1;
+let _agChart1 = null, _agChart2 = null, _agChart3 = null;
+let _agLastRows = null;
 const agingPageSize = _PAGE_SIZE;
 
 function buildAgingData() {
@@ -14022,6 +14231,7 @@ function buildAgingData() {
   updateAgingKPIs();
   populateAgingRepFilter();
   populateAgingCatFilter();
+  setTimeout(() => renderAgingCharts(), 50);
 }
 
 function updateAgingKPIs(filteredRows) {
@@ -14034,12 +14244,25 @@ function updateAgingKPIs(filteredRows) {
   const tot60   = data.reduce((s,c)=>s+(c.age60>0?c.age60:0),0);
   const totOld  = data.reduce((s,c)=>s+(c.ageOld>0?c.ageOld:0),0);
   const totDebt = data.reduce((s,c)=>s+(c.debt_net>0?c.debt_net:0),0);
+  const totSales= data.reduce((s,c)=>s+(c.sales>0?c.sales:0),0);
+  const totCol  = data.reduce((s,c)=>s+(c.col>0?c.col:0),0);
   // New IDs in tab-aging HTML
   if (el('agKpiTotal')) el('agKpiTotal').textContent = data.length.toLocaleString('ar');
   if (el('agKpiDebt'))  el('agKpiDebt').textContent  = fmt(totDebt);
   if (el('agKpi30'))    el('agKpi30').textContent    = fmt(tot30);
   if (el('agKpi60'))    el('agKpi60').textContent    = fmt(tot60);
   if (el('agKpiOld'))   el('agKpiOld').textContent   = totOld > 0 ? fmt(totOld) : '0';
+  // Stats bar (below table)
+  const sb = el('agingStatsBar');
+  if (sb) sb.innerHTML =
+    `عرض <b style="color:var(--accent)">${data.length.toLocaleString('ar')}</b> عميل &nbsp;|&nbsp; ` +
+    `مبيعات: <b style="color:var(--accent)">${fmt(totSales)}</b> &nbsp;|&nbsp; ` +
+    `صافي: <b style="color:var(--accent2)">${fmt(totSales - data.reduce((s,c)=>s+(c.ret>0?c.ret:0),0))}</b> &nbsp;|&nbsp; ` +
+    `تحصيل: <b style="color:var(--accent2)">${fmt(totCol)}</b> &nbsp;|&nbsp; ` +
+    `ذمة 0–30: <b style="color:#ff4757">${fmt(tot30)}</b> &nbsp;|&nbsp; ` +
+    `ذمة 30–60: <b style="color:#ffd700">${fmt(tot60)}</b> &nbsp;|&nbsp; ` +
+    `ذمة +60: <b style="color:#ff6b35">${fmt(totOld)}</b> &nbsp;|&nbsp; ` +
+    `إجمالي الديون: <b style="color:var(--red)">${fmt(totDebt)}</b>`;
   // Legacy IDs
   if (el('ag-total-custs')) el('ag-total-custs').textContent = data.length.toLocaleString('ar');
   if (el('ag-age30'))      el('ag-age30').textContent      = fmt(tot30);
@@ -14154,7 +14377,7 @@ function populateAgingCatFilter() {
   cats.sort((a,b) => { const ai=catOrder.indexOf(a); const bi=catOrder.indexOf(b); return (ai<0?99:ai)-(bi<0?99:bi); });
 
   const cur = sel.value;
-  sel.innerHTML = '<option value="">📂 كل الفئات</option>';
+  sel.innerHTML = '<option value="">🏷 التصنيف</option>';
   cats.forEach(c => {
     const icons = {ممتاز:'⭐',جيد:'✅',متوسط:'🔶',مخاطرة:'⚠️','مخاطرة عالية':'🚨'};
     const o=document.createElement('option'); o.value=c; o.textContent=(icons[c]||'')+(icons[c]?' ':'')+c; sel.appendChild(o);
@@ -14163,7 +14386,8 @@ function populateAgingCatFilter() {
 }
 
 function renderAgingTable() {
-  const search  = (document.getElementById('agSearch')?.value||'').trim().toLowerCase();
+  const searchCust = (document.getElementById('agSearchCust')?.value||'').trim().toLowerCase();
+  const searchRep  = (document.getElementById('agSearchRep')?.value||'').trim().toLowerCase();
   const repF    = document.getElementById('agRepFilter')?.value||'';
   const catF    = document.getElementById('agCatFilter')?.value||'';
   const debtF   = document.getElementById('agDebtFilter')?.value||'';
@@ -14172,7 +14396,8 @@ function renderAgingTable() {
   const repCatF = document.getElementById('agRepCatFilter')?.value || '';
 
   let rows = agingData.filter(c => {
-    if (search && !c.name.toLowerCase().includes(search) && !(c.rep||'').toLowerCase().includes(search)) return false;
+    if (searchCust && !c.name.toLowerCase().includes(searchCust)) return false;
+    if (searchRep  && !(c.rep||'').toLowerCase().includes(searchRep)) return false;
     if (repCatF && (repClassification[c.rep] || '') !== repCatF) return false;
     if (repF && c.rep !== repF) return false;
     if (catF && c.cat !== catF) return false;
@@ -14193,6 +14418,9 @@ function renderAgingTable() {
 
   // تحديث البطاقات بناءً على الصفوف المفلترة فقط
   updateAgingKPIs(rows);
+  _agLastRows = rows; // حفظ للرسوم
+  // تحديث الرسوم فقط إذا كانت ظاهرة
+  renderAgingCharts(rows);
 
   const total = rows.length;
   const pages = Math.ceil(total/agingPageSize);
@@ -14247,14 +14475,155 @@ function renderAgingTable() {
 
 function agingGo(p) { agingPage=p; renderAgingTable(); }
 
+// ══════════════════════════════════════════════
+// رسوم بيانية — تبويب أعمار الذمم
+// ══════════════════════════════════════════════
+
+function toggleAgingCharts() {
+  const grid = document.getElementById('agChartsGrid');
+  const btn  = document.getElementById('agChartsToggleBtn');
+  if (!grid) return;
+  const isHidden = grid.style.display === 'none';
+  if (isHidden) {
+    grid.style.display = 'grid';
+    if (btn) btn.textContent = '📊 إخفاء الرسوم';
+    if (_agChart1) { _agChart1.destroy(); _agChart1 = null; }
+    if (_agChart2) { _agChart2.destroy(); _agChart2 = null; }
+    if (_agChart3) { _agChart3.destroy(); _agChart3 = null; }
+    const rowsToUse = (_agLastRows && _agLastRows.length) ? _agLastRows : agingData;
+    setTimeout(() => renderAgingCharts(rowsToUse), 120);
+  } else {
+    grid.style.display = 'none';
+    if (btn) btn.textContent = '📊 إظهار الرسوم';
+  }
+}
+
+function renderAgingCharts(rows) {
+  if (typeof Chart === 'undefined') return;
+  const grid = document.getElementById('agChartsGrid');
+  if (!grid || grid.style.display === 'none') return;
+  const data = rows || _agLastRows || agingData || [];
+  if (!data.length) return;
+  _agLastRows = data;
+
+  const fmtK = n => n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1e3 ? Math.round(n/1e3)+'K' : Math.round(n)+'';
+
+  // ── Chart 1: Donut ─────────────────────────────
+  const tot30  = data.reduce((s,r) => s + (r.age30  || 0), 0);
+  const tot60  = data.reduce((s,r) => s + (r.age60  || 0), 0);
+  const totOld = data.reduce((s,r) => s + (r.ageOld || 0), 0);
+  if (_agChart1) { _agChart1.destroy(); _agChart1 = null; }
+  _rebuildChart('agChartDonut', {
+    type: 'doughnut',
+    data: {
+      labels: ['0–30 يوم', '30–60 يوم', '+60 يوم'],
+      datasets: [{ data: [tot30, tot60, totOld || 1],
+        backgroundColor: ['rgba(255,71,87,0.85)','rgba(255,215,0,0.85)','rgba(255,107,53,0.85)'],
+        borderColor: ['#ff4757','#ffd700','#ff6b35'],
+        borderWidth: 2, hoverOffset: 6 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '65%',
+      animation: { duration: 700 },
+      plugins: { legend: { display: false }, tooltip: { rtl: true, callbacks: {
+        label: ctx => ' ' + fmtK(ctx.parsed) + ' د.ل (' + ((ctx.parsed/(tot30+tot60+(totOld||1)))*100).toFixed(1) + '%)'
+      }}}
+    }
+  });
+  _agChart1 = Chart.getChart(document.getElementById('agChartDonut'));
+  // legend
+  const leg = document.getElementById('agDonutLegend');
+  if (leg) {
+    const colors = ['#ff4757','#ffd700','#ff6b35'];
+    const labels = ['0–30 يوم','30–60 يوم','+60 يوم'];
+    const vals   = [tot30, tot60, totOld];
+    leg.innerHTML = labels.map((l,i) =>
+      `<div style="display:flex;align-items:center;justify-content:space-between;font-size:11px">
+        <span style="display:flex;align-items:center;gap:5px">
+          <span style="width:10px;height:10px;border-radius:50%;background:${colors[i]};display:inline-block;flex-shrink:0"></span>
+          <span style="color:var(--text2)">${l}</span>
+        </span>
+        <span style="font-weight:700;color:${colors[i]}">${fmtK(vals[i])}</span>
+      </div>`
+    ).join('');
+  }
+
+  // ── Chart 2: Bar — حسب التصنيف ──────────────
+  const catOrder = ['مخاطرة عالية','مخاطرة','متوسط','جيد','ممتاز'];
+  const catColors = {
+    'مخاطرة عالية':'rgba(255,71,87,0.85)', 'مخاطرة':'rgba(255,107,53,0.85)',
+    'متوسط':'rgba(255,215,0,0.85)', 'جيد':'rgba(124,111,255,0.85)', 'ممتاز':'rgba(0,255,136,0.85)'
+  };
+  const catMap = {};
+  data.forEach(r => { const c = r.cat||'غير محدد'; catMap[c] = (catMap[c]||0) + (r.debt_net||0); });
+  const catLabels = catOrder.filter(k => catMap[k]);
+  const catVals   = catLabels.map(k => catMap[k]);
+  if (_agChart2) { _agChart2.destroy(); _agChart2 = null; }
+  if (catLabels.length) {
+    _rebuildChart('agChartCat', {
+      type: 'bar',
+      data: {
+        labels: catLabels,
+        datasets: [{ data: catVals,
+          backgroundColor: catLabels.map(k => catColors[k]||'rgba(0,212,255,0.7)'),
+          borderColor:     catLabels.map(k => (catColors[k]||'#00d4ff').replace('0.85','1')),
+          borderWidth: 1, borderRadius: 5 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        animation: { duration: 700 },
+        plugins: { legend: { display: false }, tooltip: { rtl: true,
+          callbacks: { label: ctx => ' ' + fmtK(ctx.parsed.y) + ' د.ل' }
+        }},
+        scales: {
+          x: { ticks: { color: 'rgba(139,163,184,0.8)', font: { size: 10, family: 'Cairo' } }, grid: { display: false } },
+          y: { ticks: { color: 'rgba(139,163,184,0.8)', font: { size: 9 }, callback: v => fmtK(v) }, grid: { color: 'rgba(30,58,95,0.4)' } }
+        }
+      }
+    });
+    _agChart2 = Chart.getChart(document.getElementById('agChartCat'));
+  }
+
+  // ── Chart 3: Horizontal Bar — أكبر 10 مديونين ─
+  const top10 = [...data].filter(r => r.debt_net > 0).sort((a,b) => b.debt_net - a.debt_net).slice(0, 10);
+  if (_agChart3) { _agChart3.destroy(); _agChart3 = null; }
+  if (top10.length) {
+    const shortName = n => n.length > 20 ? n.substring(0,18)+'…' : n;
+    _rebuildChart('agChartTop10', {
+      type: 'bar',
+      data: {
+        labels: top10.map(r => shortName(r.name)),
+        datasets: [{ data: top10.map(r => r.debt_net),
+          backgroundColor: top10.map((_,i) => `hsla(${5+i*8},90%,60%,0.8)`),
+          borderColor:     top10.map((_,i) => `hsl(${5+i*8},90%,60%)`),
+          borderWidth: 1, borderRadius: 4 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+        animation: { duration: 700 },
+        plugins: { legend: { display: false }, tooltip: { rtl: true,
+          callbacks: { label: ctx => ' ' + ctx.parsed.x.toLocaleString('en-US') + ' د.ل' }
+        }},
+        scales: {
+          y: { ticks: { color: 'rgba(139,163,184,0.8)', font: { size: 9, family: 'Cairo' } }, grid: { display: false } },
+          x: { ticks: { color: 'rgba(139,163,184,0.8)', font: { size: 9 }, callback: v => fmtK(v) }, grid: { color: 'rgba(30,58,95,0.4)' } }
+        }
+      }
+    });
+    _agChart3 = Chart.getChart(document.getElementById('agChartTop10'));
+  }
+} // end renderAgingCharts
+
 function exportAgingCSV() {
-  const search  = (document.getElementById('agSearch')?.value||'').trim().toLowerCase();
+  const searchCust = (document.getElementById('agSearchCust')?.value||'').trim().toLowerCase();
+  const searchRep  = (document.getElementById('agSearchRep')?.value||'').trim().toLowerCase();
   const repF    = document.getElementById('agRepFilter')?.value||'';
   const catF    = document.getElementById('agCatFilter')?.value||'';
   const debtF   = document.getElementById('agDebtFilter')?.value||'';
   const sortBy  = document.getElementById('agSortBy')?.value||'debt_net';
   let rows = agingData.filter(c => {
-    if (search && !c.name.toLowerCase().includes(search) && !(c.rep||'').toLowerCase().includes(search)) return false;
+    if (searchCust && !c.name.toLowerCase().includes(searchCust)) return false;
+    if (searchRep  && !(c.rep||'').toLowerCase().includes(searchRep)) return false;
     if (repF && c.rep !== repF) return false;
     if (catF && c.cat !== catF) return false;
     if (debtF==='has_debt' && c.debt_net<=0) return false;
