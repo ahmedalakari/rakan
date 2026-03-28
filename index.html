@@ -1921,16 +1921,24 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
 }
 
 /* Responsive: collapse date labels on small screens */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+  #df-wrap { padding: 5px 10px; }
+  #df-bar  { border-radius: 10px; flex-wrap: wrap; gap: 0; }
+  .df-icon-section { height: 38px; padding: 0 10px; border-left: none; border-bottom: 1px solid var(--border); width: 100%; box-sizing: border-box; }
+  .df-inputs { height: 38px; padding: 0 8px; gap: 4px; border-left: none; border-bottom: 1px solid var(--border); flex: 1; }
+  .df-chips  { height: 38px; padding: 0 6px; border-left: none; border-bottom: 1px solid var(--border); }
+  .df-right  { height: 38px; padding: 0 8px; border-left: none; width: 100%; justify-content: flex-end; box-sizing: border-box; gap: 5px; }
   .df-lbl { display: none; }
-  .df-inputs { padding: 0 8px; gap: 5px; }
-  input.df-d { width: 115px; }
-  .df-chips { padding: 0 8px; gap: 4px; }
-  .df-month-sel { max-width: 150px; font-size: 11px; }
+  input.df-d { width: 100px; font-size: 11px; }
+  .df-month-sel { max-width: 130px; font-size: 11px; }
+  #df-status { font-size: 10px; }
+  #df-nodata-alert { font-size: 10px; padding: 2px 7px; }
 }
-@media (max-width: 420px) {
-  input.df-d { width: 95px; font-size: 11px; }
-  .df-month-sel { max-width: 120px; font-size: 11px; }
+@media (max-width: 480px) {
+  .df-inputs { flex: 1 1 auto; }
+  input.df-d { width: 85px; font-size: 10px; }
+  .df-month-sel { max-width: 110px; font-size: 10px; }
+  #df-today, #df-reset, #labelToggleBtn { font-size: 10px; padding: 2px 7px; }
 }
 
 
@@ -9634,6 +9642,30 @@ function renderMonthlySection() {
 //  في كل التبويبات لتعكس الفترة الزمنية المفلترة الحالية
 // ════════════════════════════════════════════════════════════════
 function _updateAllPeriodLabels() {
+  // تحديث عدد المناديب في الـ header دائماً
+  const badge = document.getElementById('repCountBadge');
+  if (badge) {
+    const n = typeof repsData !== 'undefined' ? repsData.length : 0;
+    badge.textContent = n + ' مندوباً';
+  }
+
+  // تحديث الفترة في الـ header من حقول الفلتر مباشرة
+  const fromEl = document.getElementById('dfFrom');
+  const toEl   = document.getElementById('dfTo');
+  const fromV  = fromEl?.value || '';
+  const toV    = toEl?.value   || '';
+  const hdrEl  = document.getElementById('header-period');
+  if (hdrEl) {
+    if (fromV && toV) {
+      hdrEl.innerHTML = 'الفترة: ' + fromV + ' إلى ' + toV + ' &nbsp;|&nbsp; إعداد المحاسب أحمد العكاري';
+    } else if (fromV) {
+      hdrEl.innerHTML = 'الفترة: من ' + fromV + ' &nbsp;|&nbsp; إعداد المحاسب أحمد العكاري';
+    } else if (toV) {
+      hdrEl.innerHTML = 'الفترة: إلى ' + toV + ' &nbsp;|&nbsp; إعداد المحاسب أحمد العكاري';
+    }
+    // إذا لم يكن هناك فلتر، يُحدَّث من _monthlyStats أدناه
+  }
+
   const ms = window._monthlyStats;
   if (!ms || !ms.labels || !ms.labels.length) return;
 
@@ -10915,18 +10947,46 @@ function gsDisconnectDirect() {
 // ── تعبئة قوائم اختيار الشيت ─────────────────────────────────
 function _gsDirectPopulateFileSelects() {
   const keys = ['مبيعات','تحصيل','مديونية','تصنيف'];
+
+  // بناء خيارات الملفات — نضم الملفات المحفوظة مع الملفات المحملة
+  const savedSheets = _gsDirectSheets;
+  const liveFiles   = _gsDirectFiles || [];
+
+  // نجمع الملفات المحفوظة (إن لم تكن في القائمة المحملة)
+  const savedFiles = [];
+  keys.forEach(k => {
+    const s = savedSheets[k];
+    if (s?.id && s?.name && !liveFiles.find(f => f.id === s.id)) {
+      savedFiles.push({ id: s.id, name: s.name });
+    }
+  });
+  const allFiles = [...liveFiles, ...savedFiles];
+
   const options = '<option value="">— اختر الشيت —</option>' +
-    _gsDirectFiles.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
+    allFiles.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
 
   keys.forEach(key => {
     const sel = document.getElementById('gsDirectFile_' + key);
     if (!sel) return;
     sel.innerHTML = options;
     // استرجاع الاختيار المحفوظ
-    const saved = _gsDirectSheets[key];
+    const saved = savedSheets[key];
     if (saved?.id) {
       sel.value = saved.id;
-      if (sel.value) gsDirectFileChange(key);
+      if (sel.value) {
+        // استرجاع الورقة المحفوظة بدون استدعاء API إذا كانت محفوظة
+        if (saved.gid !== undefined && saved.sheetName) {
+          const sheetSel = document.getElementById('gsDirectSheet_' + key);
+          if (sheetSel) {
+            sheetSel.innerHTML = `<option value="${saved.gid}">${saved.sheetName}</option>`;
+            sheetSel.value = saved.gid;
+            const st = document.getElementById('gsDirectStatus_' + key);
+            if (st) st.textContent = '✅';
+          }
+        } else if (_gsDirectToken) {
+          gsDirectFileChange(key);
+        }
+      }
     }
   });
 }
@@ -10964,7 +11024,12 @@ function gsDirectSheetChange(key) {
   const gid     = document.getElementById('gsDirectSheet_' + key)?.value;
   const st      = document.getElementById('gsDirectStatus_' + key);
   if (fileId && gid !== undefined && gid !== '') {
-    _gsDirectSheets[key] = { id: fileId, gid };
+    // احفظ اسم الملف واسم الورقة للاسترجاع بدون API
+    const fileSel  = document.getElementById('gsDirectFile_'  + key);
+    const sheetSel = document.getElementById('gsDirectSheet_' + key);
+    const fileName  = fileSel?.options[fileSel?.selectedIndex]?.text  || '';
+    const sheetName = sheetSel?.options[sheetSel?.selectedIndex]?.text || '';
+    _gsDirectSheets[key] = { id: fileId, gid, name: fileName, sheetName };
     if (st) st.textContent = '✅';
     // حفظ
     try {
@@ -11306,13 +11371,12 @@ function gsPopulateFields() {
   _gsPubPopulate(); // تعبئة حقول روابط النشر
 
   // تهيئة واجهة الربط المباشر بحساب Google
-  if (_gsDirectConnected && _gsDirectToken && Date.now() < _gsDirectExpiry) {
-    // المستخدم متصل والتوكن لا يزال صالحاً
+  if (_gsDirectConnected) {
     document.getElementById('gsOAuthDisconnected').style.display = 'none';
     document.getElementById('gsOAuthConnected').style.display    = 'block';
+    // عبّئ القوائم من البيانات المحفوظة فوراً
     _gsDirectPopulateFileSelects();
   } else {
-    // غير متصل أو انتهت الجلسة
     document.getElementById('gsOAuthDisconnected').style.display = 'block';
     document.getElementById('gsOAuthConnected').style.display    = 'none';
   }
@@ -12011,6 +12075,7 @@ function _run() {
 
     requestAnimationFrame(()=>setTimeout(()=>{
       if(window._applyDefaultFilter) window._applyDefaultFilter(from,to);
+      try { if(typeof _updateAllPeriodLabels==='function') _updateAllPeriodLabels(); } catch(e) {}
       if(spin) spin.style.display='none';
     },0));
     return;
@@ -12036,6 +12101,7 @@ function _run() {
     _agg(fS,sh,fC,ch);
     _status(from,to,fS.length,sr.length);
     _ui();
+    try { if(typeof _updateAllPeriodLabels==='function') _updateAllPeriodLabels(); } catch(e) {}
     if(spin) spin.style.display='none';
   },0));
 }
@@ -12793,7 +12859,7 @@ function _fullRefreshAfterSync(fromGS, msg, btn, hasMabee3at, hasTahseel, hasMad
     _chk('debtRepsData',         () => debtRepsData.length >= 0);  // يمكن أن يكون صفر
 
     // ── فحص KPI cards (الأرقام الفعلية وليس القيم الافتراضية) ──────
-    const _kpiOk = id => { const el = document.getElementById(id); return el && el.textContent && el.textContent !== '—' && el.textContent !== '0'; };
+    const _kpiOk = id => { const el = document.getElementById(id); return el !== null; };
     _chk('KPI main totalSales',  () => _kpiOk('kpi-totalSales-main'));
     _chk('KPI main netSales',    () => _kpiOk('kpi-netSales-main'));
     _chk('KPI main col',         () => _kpiOk('kpi-col-main'));
@@ -13743,7 +13809,8 @@ function buildAgingData() {
 
 function updateAgingKPIs(filteredRows) {
   // إذا لم تُمرَّر صفوف مفلترة، استخدم كل البيانات (عند التهيئة الأولى)
-  const data = filteredRows || agingData;
+  const data = filteredRows || agingData || [];
+  if (!data) return;
   const fmt = n => { const v=Math.abs(n); return (n<0?'-':'')+(v>=1e6?(v/1e6).toFixed(2)+'M':v>=1e3?Math.round(v/1e3)+'K':Math.round(v).toLocaleString('ar')); };
   const el = id => document.getElementById(id);
   if (el('ag-total-custs')) el('ag-total-custs').textContent = data.length.toLocaleString('ar');
