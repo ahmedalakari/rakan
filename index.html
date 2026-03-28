@@ -2685,7 +2685,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
           <option value="هيتم الصادق">هيتم الصادق</option>
           <option value="هيتم الصغير">هيتم الصغير</option>
         </select>
-        <input type="text" id="repSearch" class="search-input" placeholder="🔍 بحث..." oninput="renderRepsTable()">
+        <input type="text" id="repSearch" class="search-input" placeholder="🔍 بحث..." oninput="_debouncedRepsSearch()">
         <select id="repCatFilter" class="filter-select" onchange="onRepCatChange()">
           <option value="">كل الفئات</option>
           <option value="جملة">🏭 جملة (7)</option>
@@ -3858,7 +3858,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
       <button class="print-btn" style="font-size:12px;padding:5px 12px;flex-shrink:0;margin-right:auto" onclick="printTable('custTable','قاعدة بيانات العملاء الكاملة')">🖨️ طباعة الجدول</button>
           <div class="chart-sub" id="custCountLabel">عرض: 1,788 عميل</div>
         </div>
-        <input type="text" id="custSearch" class="search-input" placeholder="🔍 ابحث باسم العميل..." oninput="applyFilters()" style="min-width:220px">
+        <input type="text" id="custSearch" class="search-input" placeholder="🔍 ابحث باسم العميل..." oninput="_debouncedCustSearch()" style="min-width:220px">
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">
         <select id="custRepFilter" class="filter-select" onchange="setRepCatFromRep(this.value,'custCatRepFilter'); applyFilters();">
@@ -4072,7 +4072,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
         <div id="itemsSummary" style="color:var(--muted);font-size:12px;margin-top:3px"></div>
       </div>
       <div class="filter-row">
-        <input id="itemSearch" placeholder="🔍 بحث عن صنف..." class="search-input" style="min-width:180px">
+        <input id="itemSearch" placeholder="🔍 بحث عن صنف..." class="search-input" style="min-width:180px" oninput="_debouncedItemSearch()">
         <select id="itemRepCat" class="filter-select">
           <option value="">📂 كل فئات المناديب</option>
           <option value="جملة">🏭 جملة</option>
@@ -4482,10 +4482,10 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
       <div style="display:flex;gap:8px;flex:1;flex-wrap:wrap">
         <input id="agSearchCust" class="ag-search" type="text" placeholder="🔍 بحث باسم العميل…"
           style="flex:1;min-width:160px;max-width:260px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit"
-          oninput="agingPage=1;renderAgingTable()">
+          oninput="_debouncedAgingSearch()">
         <input id="agSearchRep" class="ag-search" type="text" placeholder="🔍 بحث باسم المندوب…"
           style="flex:1;min-width:160px;max-width:260px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit"
-          oninput="agingPage=1;renderAgingTable()">
+          oninput="_debouncedAgingSearch()">
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
         <button class="ag-print-btn" onclick="exportAgingCSV()"
@@ -5633,6 +5633,45 @@ const catStyle = {
 // ════════════════════════════════════════════════════════════════
 const _PAGE_SIZE = 10;
 
+// ══════════════════════════════════════════════════════════
+//  🚀 أدوات الأداء العالمية
+// ══════════════════════════════════════════════════════════
+
+// ── Debounce: تأخير التنفيذ حتى يتوقف المستخدم عن الكتابة ──
+function _debounce(fn, delay) {
+  let t;
+  return function(...args) { clearTimeout(t); t = setTimeout(() => fn.apply(this, args), delay); };
+}
+
+// ── تنسيق سريع للأرقام مع كاش — بديل toLocaleString المبطئ ──
+const _fmtCache = new Map();
+function _fmtN(n) {
+  if (n == null || n === '') return '—';
+  const v = typeof n === 'number' ? n : parseFloat(n) || 0;
+  const key = Math.round(v * 100);
+  if (_fmtCache.has(key)) return _fmtCache.get(key);
+  const s = v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (_fmtCache.size < 20000) _fmtCache.set(key, s);
+  return s;
+}
+
+// ── تحويل تاريخ نصي لـ timestamp بدون new Date() في الحلقات ──
+const _dateCache = new Map();
+function _dateToTs(dStr) {
+  if (!dStr || dStr.length < 10) return 0;
+  const d = dStr.substring(0, 10);
+  if (_dateCache.has(d)) return _dateCache.get(d);
+  const [y, m, day] = d.split('-').map(Number);
+  const ts = Date.UTC(y, m - 1, day);
+  if (_dateCache.size < 5000) _dateCache.set(d, ts);
+  return ts;
+}
+
+// ── Lazy Tab Rendering: يُحدَّث التبويب فقط عند فتحه ──
+const _tabDirty = { overview:false, reps:false, repcmp:false, customers:false, products:false, debt:false, aging:false, plan:false };
+function _markAllTabsDirty() { Object.keys(_tabDirty).forEach(k => _tabDirty[k] = true); }
+function _markTabClean(id)   { _tabDirty[id] = false; }
+
 function _mkPagination(containerId, currentPage, totalPages, onGoFn) {
   const el = document.getElementById(containerId);
   if (!el) return;
@@ -6032,13 +6071,19 @@ function renderCustTable() {
   const st = (custPage - 1) * ps;
   const page = filteredCust.slice(st, st + ps);
 
+  // ── بناء Map مسبق لربط العميل بفهرسه — بدلاً من indexOf في كل صف ──
+  if (!window._custIdxMap || window._custIdxMapLen !== custData.length) {
+    window._custIdxMap = new Map();
+    custData.forEach((c, i) => window._custIdxMap.set(c, i));
+    window._custIdxMapLen = custData.length;
+  }
+
   body.innerHTML = page.map((r, i) => {
     const cpColor = r.cp >= 80 ? 'var(--accent2)' : r.cp >= 50 ? 'var(--gold)' : 'var(--red)';
     const rpColor = r.rp >= 15 ? 'var(--red)' : r.rp >= 5 ? 'var(--accent3)' : 'var(--text2)';
     const gColor  = r.g > 0 ? 'var(--red)' : r.g < 0 ? 'var(--accent2)' : 'var(--text2)';
     const nsColor = r.ns >= 0 ? 'var(--text)' : 'var(--red)';
-    // استرداد المندوب من r.rep أو custToRep بالفهرس الأصلي في custData
-    const origIdx = custData.indexOf(r);
+    const origIdx = window._custIdxMap.get(r) ?? -1;
     const repName = r.rep || custToRep[origIdx] || custNameToRep[r.n || r.name || ''] || '—';
     return `<tr>
       <td style="text-align:center;color:var(--text2);font-size:11px">${st+i+1}</td>
@@ -6112,10 +6157,15 @@ function applyFilters() {
     if (catRepF && repClassification[rep] !== catRepF) return false;
     return true;
   });
-  // إضافة حقل rep للعناصر المفلترة لضمان ظهوره في الجدول وأعمار الذمم
-  filteredCust.forEach((r, fi) => {
+  // إضافة حقل rep للعناصر المفلترة — باستخدام Map بدلاً من indexOf
+  if (!window._custIdxMap || window._custIdxMapLen !== custData.length) {
+    window._custIdxMap = new Map();
+    custData.forEach((c, i) => window._custIdxMap.set(c, i));
+    window._custIdxMapLen = custData.length;
+  }
+  filteredCust.forEach((r) => {
     if (!r.rep) {
-      const origIdx = custData.indexOf(r);
+      const origIdx = window._custIdxMap.get(r) ?? -1;
       if (origIdx >= 0 && custToRep[origIdx]) r.rep = custToRep[origIdx];
     }
   });
@@ -6898,6 +6948,14 @@ function _safeRebuildCharts() {
 document.addEventListener('DOMContentLoaded', _safeRebuildCharts);
 
 // Product bubble
+// ══════════════════════════════════════════════════════════
+//  🚀 دوال Debounce للبحث (300ms تأخير)
+// ══════════════════════════════════════════════════════════
+const _debouncedRepsSearch  = _debounce(() => renderRepsTable(),   300);
+const _debouncedCustSearch  = _debounce(() => applyFilters(),      300);
+const _debouncedAgingSearch = _debounce(() => { agingPage=1; renderAgingTable(); }, 300);
+const _debouncedItemSearch  = _debounce(() => renderItems(),       300);
+
 function showTab(id, triggerEl) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -6908,32 +6966,62 @@ function showTab(id, triggerEl) {
     || document.querySelector(`.nav-btn[onclick*="'${id}'"]`);
   if (btnEl) btnEl.classList.add('active');
 
-  // تحديث الجداول والرسوم عند التبديل
+  // ── Lazy Rendering: يُحدَّث التبويب فقط إذا كانت بياناته قديمة ──
   setTimeout(() => {
     if (id === 'debt') {
       var body = document.getElementById('debtRepBody');
-      if (body && !body.innerHTML) {
+      if (body && (!body.innerHTML || _tabDirty.debt)) {
         renderDebtRepsTable(debtRepsData);
         initDebtRepFilter();
         debtDetailFiltered = debtDetailData.slice();
         renderDebtDetailTable();
+        _markTabClean('debt');
       }
       if (typeof Chart !== 'undefined' && !_debtChartsInit) initDebtCharts();
     } else if (id === 'reps') {
-      // تحقق إذا رسوم المناديب بحاجة لإعادة بناء
-      const rc = Chart.getChart(document.getElementById('allRepsChart'));
-      if (!rc) _rebuildRepsCharts();
+      if (_tabDirty.reps) {
+        renderRepsTable();
+        _markTabClean('reps');
+      } else {
+        const rc = Chart.getChart(document.getElementById('allRepsChart'));
+        if (!rc) _rebuildRepsCharts();
+      }
     } else if (id === 'repcmp') {
+      if (_tabDirty.repcmp) {
+        if (typeof renderRepCmp==='function') renderRepCmp();
+        _markTabClean('repcmp');
+      }
       const rc = Chart.getChart(document.getElementById('repcmpChart'));
       if (!rc && typeof initRepCmpPanels==='function') initRepCmpPanels();
     } else if (id === 'overview') {
-      const rc = Chart.getChart(document.getElementById('monthlyChart'));
-      if (!rc) _rebuildOverviewCharts();
+      if (_tabDirty.overview) {
+        rebuildCharts();
+        _rebuildOverviewCharts();
+        _markTabClean('overview');
+      } else {
+        const rc = Chart.getChart(document.getElementById('monthlyChart'));
+        if (!rc) _rebuildOverviewCharts();
+      }
+    } else if (id === 'customers') {
+      if (_tabDirty.customers) {
+        applyFilters();
+        _markTabClean('customers');
+      }
+    } else if (id === 'products') {
+      if (_tabDirty.products) {
+        if (typeof renderItems==='function') renderItems();
+        _markTabClean('products');
+      }
+    } else if (id === 'plan') {
+      if (_tabDirty.plan) {
+        if (typeof updatePlanTab==='function') updatePlanTab();
+        _markTabClean('plan');
+      }
     } else if (id === 'aging') {
-      // بناء بيانات أعمار الذمم عند أول فتح للتبويب
-      if (typeof buildAgingData === 'function' && (!window._agingBuilt)) {
+      if (typeof buildAgingData === 'function' && (!window._agingBuilt || _tabDirty.aging)) {
         window._agingBuilt = true;
         buildAgingData();
+        _markTabClean('aging');
       }
       if (typeof renderAgingTable === 'function') renderAgingTable();
       setTimeout(() => {
@@ -12258,21 +12346,21 @@ function parseCSVContent(text) {
 
     // مسار بطيء للصفوف التي تحتوي على "
     const parts = [];
-    let cur = '', inQ = false, i = 0, len = line.length;
+    let curChars = [], inQ = false, i = 0, len = line.length;
     while (i < len) {
       const ch = line.charCodeAt(i);
       if (ch === 34) { // "
-        if (inQ && line.charCodeAt(i+1) === 34) { cur += '"'; i += 2; }
+        if (inQ && line.charCodeAt(i+1) === 34) { curChars.push('"'); i += 2; }
         else { inQ = !inQ; i++; }
       } else if (ch === 44 && !inQ) { // ,
-        parts.push(cur); cur = ''; i++;
+        parts.push(curChars.join('')); curChars = []; i++;
       } else if (ch === 13 && i === len-1) { // \r at end
         i++;
       } else {
-        cur += line[i]; i++;
+        curChars.push(line[i]); i++;
       }
     }
-    parts.push(cur);
+    parts.push(curChars.join(''));
     if (parts.length > 0) result.push(parts);
   }
   return result;
@@ -13087,6 +13175,16 @@ window._dfUI = function() { try { _ui(); } catch(e) { console.warn('_dfUI:', e);
 // ════════════════════════════════════════════════════════════════════
 function _fullRefreshAfterSync(fromGS, msg, btn, hasMabee3at, hasTahseel, hasMadiooniya, hasTasneef, newRepsAdded, repsUpdated) {
 
+  // ── إبطال كاش الفهارس عند تحديث البيانات ──
+  window._custIdxMap    = null;
+  window._custIdxMapLen = -1;
+  window._agingBuilt    = false;
+  // ── تحديد كل التبويبات كـ "قديمة" — تُحدَّث عند فتحها فقط ──
+  _markAllTabsDirty();
+  // ── التبويب الحالي المفتوح يُحدَّث فوراً ──
+  const _activeTabId = document.querySelector('.tab-panel.active')?.id?.replace('tab-','') || 'overview';
+  _markTabClean(_activeTabId); // سيُحدَّث في المراحل أدناه
+
   // ══════════════════════════════════════════════════
   //  أداة التسجيل — تتبع كل عملية وتبلّغ عن الأخطاء
   // ══════════════════════════════════════════════════
@@ -13753,7 +13851,7 @@ async function applyCsvData(fromGS) {
       const allCustSet = new Set();
 
       // حساب أعمار الذمم في نفس الحلقة — مرور واحد فقط
-      const _today = new Date();
+      const _today = Date.now();
       const _t30 = _today - 30*86400000;
       const _t60 = _today - 60*86400000;
       const _custBuckets = {};
@@ -13795,7 +13893,7 @@ async function applyCsvData(fromGS) {
             if (dStr.length >= 10) {
               const sign = isSale ? 1 : isRet ? -1 : 0;
               if (sign) {
-                const dt = new Date(dStr).getTime();
+                const dt = _dateToTs(dStr);
                 if (!_custBuckets[cust]) _custBuckets[cust] = { b30: 0, b60: 0, bold: 0 };
                 if      (dt >= _t30) _custBuckets[cust].b30  += sign * total;
                 else if (dt >= _t60) _custBuckets[cust].b60  += sign * total;
