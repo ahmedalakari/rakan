@@ -11277,19 +11277,44 @@ let _gsTokenClient   = null;
 })();
 
 // تهيئة GSI بعد تحميل المكتبة
+// _gsTokenMode: 'login' = تسجيل الدخول الكامل | 'refresh' = تجديد صامت
+let _gsTokenMode      = 'login';
+let _gsRefreshResolve = null;
+let _gsRefreshReject  = null;
+
 function _gsInitGSI() {
   if (!window.google?.accounts?.oauth2) return;
   _gsTokenClient = google.accounts.oauth2.initTokenClient({
     client_id: _GS_CLIENT_ID,
     scope:     _GS_SCOPE,
-    callback:  _gsDirectHandleToken,
+    callback:  (resp) => {
+      if (_gsTokenMode === 'refresh') {
+        // وضع التجديد الصامت — حفظ التوكن فقط بدون إعادة بناء الواجهة
+        if (resp.error) {
+          if (_gsRefreshReject) _gsRefreshReject(new Error(resp.error));
+        } else {
+          _gsStoreToken(resp);
+          if (_gsRefreshResolve) _gsRefreshResolve();
+        }
+        _gsRefreshResolve = null;
+        _gsRefreshReject  = null;
+      } else {
+        // وضع تسجيل الدخول الكامل
+        _gsDirectHandleToken(resp);
+      }
+    },
     error_callback: (err) => {
-      // فشل التجديد الصامت — إعادة الحالة إلى غير متصل بهدوء
+      if (_gsTokenMode === 'refresh') {
+        // فشل التجديد الصامت — تجاهل بهدوء
+        if (_gsRefreshReject) _gsRefreshReject(new Error(err.type || 'refresh_failed'));
+        _gsRefreshResolve = null;
+        _gsRefreshReject  = null;
+        return;
+      }
       if (err.type === 'popup_failed_to_open' || err.type === 'access_denied') return;
-      _gsDirectToken      = null;
-      _gsDirectConnected  = false;
-      _gsDirectExpiry     = 0;
-      // لا نظهر خطأ للمستخدم إلا إذا كان يحاول الاتصال يدوياً
+      _gsDirectToken     = null;
+      _gsDirectConnected = false;
+      _gsDirectExpiry    = 0;
     },
   });
 }
@@ -11308,6 +11333,7 @@ function gsConnectDirect() {
     }, 200);
     return;
   }
+  _gsTokenMode = 'login';
   _gsTokenClient.requestAccessToken({ prompt: 'select_account' });
 }
 
@@ -11319,6 +11345,7 @@ function _gsStoreToken(resp) {
 }
 
 function _gsDirectHandleToken(resp) {
+  _gsTokenMode = 'login'; // إعادة الوضع الافتراضي دائماً
   if (resp.error) {
     _gsShowDirectMsg('❌ ' + (resp.error === 'access_denied' ? 'تم الرفض' : resp.error), 'error');
     return;
@@ -11470,21 +11497,30 @@ function gsDirectSheetChange(key) {
   }
 }
 
-// ── تجديد التوكن بشكل صحيح: يحفظ التوكن فقط دون إعادة بناء الواجهة ──
+// ── تجديد التوكن بشكل معزول — يحفظ التوكن فقط دون إعادة بناء الواجهة ──
 function _gsRefreshToken() {
   return new Promise((resolve, reject) => {
     if (!_gsTokenClient) { reject(new Error('GSI غير مهيأ')); return; }
-    const origCallback = _gsTokenClient.callback;
-    _gsTokenClient.callback = (resp) => {
-      _gsTokenClient.callback = origCallback; // استعادة الـ callback الأصلي فوراً
-      if (resp.error) {
-        reject(new Error(resp.error === 'access_denied' ? 'انتهت الجلسة — أعد تسجيل الدخول' : resp.error));
-      } else {
-        _gsStoreToken(resp); // حفظ التوكن فقط بدون إعادة بناء الواجهة
-        resolve();
+    _gsTokenMode      = 'refresh';
+    _gsRefreshResolve = resolve;
+    _gsRefreshReject  = reject;
+    // timeout احتياطي: إذا لم يُستجب خلال 10 ثوانٍ
+    setTimeout(() => {
+      if (_gsTokenMode === 'refresh') {
+        _gsTokenMode      = 'login';
+        _gsRefreshResolve = null;
+        _gsRefreshReject  = null;
+        reject(new Error('timeout'));
       }
-    };
-    _gsTokenClient.requestAccessToken({ prompt: '' });
+    }, 10000);
+    try {
+      _gsTokenClient.requestAccessToken({ prompt: '' });
+    } catch(e) {
+      _gsTokenMode      = 'login';
+      _gsRefreshResolve = null;
+      _gsRefreshReject  = null;
+      reject(e);
+    }
   });
 }
 
