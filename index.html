@@ -11346,8 +11346,11 @@ function _gsStoreToken(resp) {
 
 function _gsDirectHandleToken(resp) {
   _gsTokenMode = 'login'; // إعادة الوضع الافتراضي دائماً
-  if (resp.error) {
-    _gsShowDirectMsg('❌ ' + (resp.error === 'access_denied' ? 'تم الرفض' : resp.error), 'error');
+  if (resp.error || !resp.access_token) {
+    // تجاهل صامت إذا لم يكن هناك توكن — قد يحدث عند تجديد صامت فاشل
+    if (resp.error && resp.error !== 'popup_closed_by_user') {
+      _gsShowDirectMsg('❌ ' + (resp.error === 'access_denied' ? 'تم الرفض' : resp.error), 'error');
+    }
     return;
   }
   _gsStoreToken(resp);
@@ -11941,18 +11944,7 @@ document.addEventListener('DOMContentLoaded', () => {
   s.async = true; s.defer = true;
   s.onload = () => {
     _gsInitGSI();
-    // محاولة تجديد صامت تلقائي إذا كان البريد محفوظاً
-    try {
-      const saved = JSON.parse(localStorage.getItem(_GS_LS_DIRECT) || '{}');
-      if (saved.email && _gsTokenClient) {
-        // تجديد صامت للتوكن — يحفظ التوكن فقط دون إعادة بناء الواجهة
-        setTimeout(() => {
-          try {
-            _gsRefreshToken().catch(() => { /* تجاهل أخطاء التجديد الصامت */ });
-          } catch(e) { /* تجاهل */ }
-        }, 1500);
-      }
-    } catch(e) {}
+    // لا نُجدد التوكن تلقائياً عند التحميل — سيُجدَّد عند الضغط على مزامنة
   };
   document.head.appendChild(s);
 });
