@@ -1276,9 +1276,10 @@ TYPE html>
     .table-scroll { overflow: visible !important; max-height: none !important; }
     table {
       width: 100% !important;
-      min-width: unset !important;
+      min-width: 0 !important;
       border-collapse: collapse !important;
       font-size: 7.5pt !important;
+      table-layout: fixed !important;
       page-break-inside: auto;
     }
     thead { display: table-header-group; }
@@ -1286,17 +1287,32 @@ TYPE html>
     th {
       background: #1a2a4a !important;
       color: #fff !important;
-      padding: 5pt 6pt !important;
+      padding: 5pt 5pt !important;
       font-size: 7.5pt !important;
       font-weight: 700 !important;
-      text-align: right !important;
+      text-align: center !important;
       border: 1px solid #2a3a5a !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      white-space: normal !important;
+      word-break: break-word !important;
+      line-height: 1.3 !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
     }
     td {
-      padding: 4pt 6pt !important;
+      padding: 3.5pt 5pt !important;
       border: 1px solid #dde4f0 !important;
       color: #111 !important;
       font-size: 7.5pt !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      white-space: normal !important;
+      word-break: break-word !important;
+      vertical-align: middle !important;
+      overflow: hidden !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
     }
     tr:nth-child(even) td { background: #f4f7ff !important; }
 
@@ -2345,6 +2361,9 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
   <div class="nav-group-label">التخطيط</div>
   <button class="nav-btn" onclick="showTab('plan');closeSidebar()">
     <span class="nav-icon">🎯</span><span class="nav-label">خطة العمل</span>
+  </button>
+  <button class="nav-btn" onclick="showTab('guide');closeSidebar()">
+    <span class="nav-icon">📋</span><span class="nav-label">دليل الرفع</span>
   </button>
 
   <div class="nav-spacer"></div>
@@ -4441,6 +4460,11 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
 <div id="tab-aging" class="tab-panel">
   <div style="padding:16px 20px 0">
 
+    <!-- ── شريط الطباعة العلوي ── -->
+    <div class="print-bar" style="display:flex;justify-content:flex-end;margin-bottom:12px">
+      <button class="print-btn" onclick="printCurrentTab()">🖨️ طباعة — ⏳ أعمار الذمم</button>
+    </div>
+
     <div class="print-section-title" style="display:none">📊 لوحة التحليل الاستراتيجي — ⏳ أعمار الذمم</div>
 
     <!-- KPI Cards -->
@@ -4492,9 +4516,9 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
           style="padding:7px 14px;border-radius:8px;border:1px solid var(--accent2);background:transparent;color:var(--accent2);font-size:12px;cursor:pointer;font-family:inherit">
           📥 تصدير CSV
         </button>
-        <button class="print-btn" onclick="printCurrentTab()"
+        <button class="print-btn" onclick="printTable('agingTable','جدول أعمار الذمم الكامل')"
           style="padding:7px 14px;font-size:12px">
-          🖨️ طباعة
+          🖨️ طباعة الجدول
         </button>
       </div>
     </div>
@@ -4599,6 +4623,275 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
 
   </div>
 </div><!-- end tab-aging -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     تبويب دليل رفع الملفات
+════════════════════════════════════════════════════════════ -->
+<div id="tab-guide" class="tab-panel">
+<div style="max-width:900px;margin:0 auto;padding:24px 16px 60px;direction:rtl;font-family:'Cairo',sans-serif">
+
+  <!-- عنوان -->
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:28px">
+    <span style="font-size:32px">📋</span>
+    <div>
+      <h1 style="margin:0;font-size:22px;font-weight:900;color:var(--accent)">دليل رفع الملفات والمزامنة</h1>
+      <p style="margin:4px 0 0;font-size:13px;color:var(--muted)">تنسيقات الأعمدة المطلوبة لضمان نجاح عملية التحديث الكامل للوحة</p>
+    </div>
+  </div>
+
+  <!-- ════ ملف المبيعات ════ -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:20px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+      <span style="font-size:24px">📦</span>
+      <div>
+        <div style="font-size:16px;font-weight:800;color:var(--text)">ملف المبيعات</div>
+        <div style="font-size:11px;color:var(--muted)">اسم الملف المتوقع: <code style="background:rgba(0,212,255,0.1);padding:1px 6px;border-radius:4px;color:var(--accent)">مبيعات.csv / مبيعات.xls / مبيعات.xlsx</code></div>
+      </div>
+      <span style="margin-right:auto;background:rgba(0,255,136,0.1);color:var(--accent2);padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700">إلزامي للمبيعات</span>
+    </div>
+
+    <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead>
+        <tr style="background:rgba(0,212,255,0.08)">
+          <th style="padding:9px 12px;text-align:right;border:1px solid var(--border);color:var(--accent);font-weight:700">اسم العمود (حرفياً)</th>
+          <th style="padding:9px 12px;text-align:right;border:1px solid var(--border);color:var(--accent);font-weight:700">النوع</th>
+          <th style="padding:9px 12px;text-align:right;border:1px solid var(--border);color:var(--accent);font-weight:700">مثال</th>
+          <th style="padding:9px 12px;text-align:right;border:1px solid var(--border);color:var(--accent);font-weight:700">الوصف</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td style="padding:8px 12px;border:1px solid var(--border);font-weight:700;color:var(--accent2)">رقم الفاتورة</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">رقم</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--gold)">10045</td><td style="padding:8px 12px;border:1px solid var(--border)">رقم الفاتورة — يُستخدم لعدّ الفواتير لكل مندوب</td></tr>
+        <tr style="background:rgba(255,255,255,0.02)"><td style="padding:8px 12px;border:1px solid var(--border);font-weight:700;color:var(--accent2)">التاريخ</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">تاريخ</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--gold)">2024-03-15</td><td style="padding:8px 12px;border:1px solid var(--border)">تنسيق YYYY-MM-DD أو DD/MM/YYYY — يُستخدم للفلترة الزمنية وأعمار الذمم</td></tr>
+        <tr><td style="padding:8px 12px;border:1px solid var(--border);font-weight:700;color:var(--accent2)">النوع</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">نص</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--gold)">مبيع / مرتجع مبيع</td><td style="padding:8px 12px;border:1px solid var(--border)">⚠️ يجب أن تكون القيمة <b style="color:var(--accent2)">مبيع</b> أو <b style="color:var(--red)">مرتجع مبيع</b> حرفياً</td></tr>
+        <tr style="background:rgba(255,255,255,0.02)"><td style="padding:8px 12px;border:1px solid var(--border);font-weight:700;color:var(--accent2)">المادة</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">نص</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--gold)">مياه نيفين 1.5L</td><td style="padding:8px 12px;border:1px solid var(--border)">اسم الصنف — يُستخدم في تبويب الأصناف</td></tr>
+        <tr><td style="padding:8px 12px;border:1px solid var(--border);font-weight:700;color:var(--accent2)">الكمية الخارجة</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">رقم</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--gold)">48</td><td style="padding:8px 12px;border:1px solid var(--border)">الكمية المباعة أو المرتجعة</td></tr>
+        <tr style="background:rgba(255,255,255,0.02)"><td style="padding:8px 12px;border:1px solid var(--border);font-weight:700;color:var(--accent2)">الاجمالي الصافي</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">رقم</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--gold)">1250.500</td><td style="padding:8px 12px;border:1px solid var(--border)">القيمة المالية للسطر — بدون فاصلة آلاف</td></tr>
+        <tr><td style="padding:8px 12px;border:1px solid var(--border);font-weight:700;color:var(--accent2)">اسم الزبون</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">نص</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--gold)">سوبرماركت النور</td><td style="padding:8px 12px;border:1px solid var(--border)">اسم العميل — يُستخدم في تبويب العملاء</td></tr>
+        <tr style="background:rgba(255,255,255,0.02)"><td style="padding:8px 12px;border:1px solid var(--border);font-weight:700;color:var(--accent2)">المندوب</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">نص</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--gold)">أحمد محمد</td><td style="padding:8px 12px;border:1px solid var(--border)">⚠️ يجب أن يطابق الاسم في ملف التصنيف تماماً</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div style="margin-top:12px;background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.2);border-radius:8px;padding:10px 14px;font-size:11px;line-height:1.9">
+      <b style="color:var(--accent)">📌 مثال على صف صحيح:</b><br>
+      <code style="color:var(--accent2);font-size:11px">10045, 2024-03-15, مبيع, مياه نيفين 1.5L, 48, 1250.500, سوبرماركت النور, أحمد محمد</code>
+    </div>
+  </div>
+
+  <!-- ════ ملف التحصيل ════ -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:20px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+      <span style="font-size:24px">💳</span>
+      <div>
+        <div style="font-size:16px;font-weight:800;color:var(--text)">ملف التحصيل</div>
+        <div style="font-size:11px;color:var(--muted)">اسم الملف المتوقع: <code style="background:rgba(0,212,255,0.1);padding:1px 6px;border-radius:4px;color:var(--accent)">تحصيل.csv / تحصيل.xls / تحصيل.xlsx</code></div>
+      </div>
+      <span style="margin-right:auto;background:rgba(0,212,255,0.1);color:var(--accent);padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700">إلزامي للتحصيل</span>
+    </div>
+
+    <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead>
+        <tr style="background:rgba(0,212,255,0.08)">
+          <th style="padding:9px 12px;text-align:right;border:1px solid var(--border);color:var(--accent);font-weight:700">اسم العمود (حرفياً)</th>
+          <th style="padding:9px 12px;text-align:right;border:1px solid var(--border);color:var(--accent);font-weight:700">النوع</th>
+          <th style="padding:9px 12px;text-align:right;border:1px solid var(--border);color:var(--accent);font-weight:700">مثال</th>
+          <th style="padding:9px 12px;text-align:right;border:1px solid var(--border);color:var(--accent);font-weight:700">الوصف</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td style="padding:8px 12px;border:1px solid var(--border);font-weight:700;color:var(--accent2)">المندوب</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">نص</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--gold)">أحمد محمد</td><td style="padding:8px 12px;border:1px solid var(--border)">اسم المندوب — يجب أن يطابق ملف المبيعات</td></tr>
+        <tr style="background:rgba(255,255,255,0.02)"><td style="padding:8px 12px;border:1px solid var(--border);font-weight:700;color:var(--accent2)">دائن</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">رقم</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--gold)">850.000</td><td style="padding:8px 12px;border:1px solid var(--border)">قيمة التحصيل — الصفوف ذات القيمة صفر تُتجاهل تلقائياً</td></tr>
+        <tr><td style="padding:8px 12px;border:1px solid var(--border);font-weight:700;color:var(--accent2)">الحساب المقابل</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">نص</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--gold)">مصرف الوحدة</td><td style="padding:8px 12px;border:1px solid var(--border)">يحدد نوع التحصيل: إذا احتوى على <b style="color:#7c6fff">مصرف/بنك</b> → تحويل بنكي</td></tr>
+        <tr style="background:rgba(255,255,255,0.02)"><td style="padding:8px 12px;border:1px solid var(--border);font-weight:700;color:var(--accent2)">اسم الحساب</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">نص</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--gold)">سوبرماركت النور</td><td style="padding:8px 12px;border:1px solid var(--border)">اسم العميل الذي سدّد — يُستخدم لتحصيل العملاء</td></tr>
+        <tr><td style="padding:8px 12px;border:1px solid var(--border);font-weight:700;color:var(--accent2)">البيان</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">نص</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--gold)">إيداع / صك / حوالة</td><td style="padding:8px 12px;border:1px solid var(--border)">إذا احتوى على <b style="color:#7c6fff">صك/شيك/حوالة/إيداع</b> → يُصنَّف تلقائياً كبنكي</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div style="margin-top:12px;background:rgba(124,111,255,0.07);border:1px solid rgba(124,111,255,0.25);border-radius:8px;padding:10px 14px;font-size:11px;line-height:1.9">
+      <b style="color:#7c6fff">🏦 آلية تصنيف التحصيل (بنكي/نقدي):</b><br>
+      البيانات تُصنَّف تلقائياً — إذا احتوى <b>الحساب المقابل</b> على كلمة <code style="background:rgba(124,111,255,0.15);padding:1px 5px;border-radius:3px">مصرف</code> أو <code style="background:rgba(124,111,255,0.15);padding:1px 5px;border-radius:3px">بنك</code>، أو احتوى <b>البيان</b> على <code style="background:rgba(124,111,255,0.15);padding:1px 5px;border-radius:3px">صك / شيك / حوالة / إيداع</code> → يُعدّ تحويلاً بنكياً. وإلا → نقداً.
+    </div>
+  </div>
+
+  <!-- ════ ملف المديونية ════ -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:20px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+      <span style="font-size:24px">💰</span>
+      <div>
+        <div style="font-size:16px;font-weight:800;color:var(--text)">ملف المديونية</div>
+        <div style="font-size:11px;color:var(--muted)">اسم الملف المتوقع: <code style="background:rgba(0,212,255,0.1);padding:1px 6px;border-radius:4px;color:var(--accent)">مديونية.csv / مديونية.xls / مديونية.xlsx</code></div>
+      </div>
+      <span style="margin-right:auto;background:rgba(255,71,87,0.12);color:var(--red);padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700">إلزامي للذمم</span>
+    </div>
+
+    <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead>
+        <tr style="background:rgba(0,212,255,0.08)">
+          <th style="padding:9px 12px;text-align:right;border:1px solid var(--border);color:var(--accent);font-weight:700">اسم العمود (حرفياً)</th>
+          <th style="padding:9px 12px;text-align:right;border:1px solid var(--border);color:var(--accent);font-weight:700">النوع</th>
+          <th style="padding:9px 12px;text-align:right;border:1px solid var(--border);color:var(--accent);font-weight:700">مثال</th>
+          <th style="padding:9px 12px;text-align:right;border:1px solid var(--border);color:var(--accent);font-weight:700">الوصف</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td style="padding:8px 12px;border:1px solid var(--border);font-weight:700;color:var(--accent2)">المندوب</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">نص</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--gold)">أحمد محمد</td><td style="padding:8px 12px;border:1px solid var(--border)">اسم المندوب — صف الرأس يُتجاهل تلقائياً</td></tr>
+        <tr style="background:rgba(255,255,255,0.02)"><td style="padding:8px 12px;border:1px solid var(--border);font-weight:700;color:var(--accent2)">مجموع مدين</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">رقم</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--gold)">15000.000</td><td style="padding:8px 12px;border:1px solid var(--border)">إجمالي الدين على المندوب (المبالغ المطلوبة)</td></tr>
+        <tr><td style="padding:8px 12px;border:1px solid var(--border);font-weight:700;color:var(--accent2)">مجموع دائن</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">رقم</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--gold)">8500.000</td><td style="padding:8px 12px;border:1px solid var(--border)">ما تم تحصيله/سداده — الصافي = مدين − دائن</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div style="margin-top:12px;background:rgba(255,71,87,0.05);border:1px solid rgba(255,71,87,0.2);border-radius:8px;padding:10px 14px;font-size:11px;line-height:1.9">
+      <b style="color:var(--red)">📌 ملاحظة:</b> الصافي يُحسب تلقائياً = <b>مجموع مدين − مجموع دائن</b>. الصفوف التي تحتوي على اسم المندوب كرأس (نص) تُتجاهل تلقائياً.
+    </div>
+  </div>
+
+  <!-- ════ ملف التصنيف ════ -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:20px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+      <span style="font-size:24px">👥</span>
+      <div>
+        <div style="font-size:16px;font-weight:800;color:var(--gold)">ملف تصنيف المناديب</div>
+        <div style="font-size:11px;color:var(--muted)">اسم الملف المتوقع: <code style="background:rgba(255,215,0,0.1);padding:1px 6px;border-radius:4px;color:var(--gold)">تصنيف.csv</code> أو <code style="background:rgba(255,215,0,0.1);padding:1px 6px;border-radius:4px;color:var(--gold)">تصنيف_المندوبين.xlsx</code></div>
+      </div>
+      <span style="margin-right:auto;background:rgba(255,215,0,0.1);color:var(--gold);padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700">اختياري لكن مهم</span>
+    </div>
+
+    <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead>
+        <tr style="background:rgba(255,215,0,0.06)">
+          <th style="padding:9px 12px;text-align:right;border:1px solid var(--border);color:var(--gold);font-weight:700">اسم العمود</th>
+          <th style="padding:9px 12px;text-align:right;border:1px solid var(--border);color:var(--gold);font-weight:700">إلزامي؟</th>
+          <th style="padding:9px 12px;text-align:right;border:1px solid var(--border);color:var(--gold);font-weight:700">القيم المقبولة / مثال</th>
+          <th style="padding:9px 12px;text-align:right;border:1px solid var(--border);color:var(--gold);font-weight:700">الوصف</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td style="padding:8px 12px;border:1px solid var(--border);font-weight:700;color:var(--accent2)">المندوب</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--accent2)">✅ إلزامي</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--gold)">أحمد محمد</td><td style="padding:8px 12px;border:1px solid var(--border)">اسم المندوب حرفياً — يُطابق مع ملف المبيعات</td></tr>
+        <tr style="background:rgba(255,255,255,0.02)"><td style="padding:8px 12px;border:1px solid var(--border);font-weight:700;color:var(--accent2)">تصنيف</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--accent2)">✅ إلزامي</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--gold)">جملة / تجزئة / أسواق</td><td style="padding:8px 12px;border:1px solid var(--border)">فئة المندوب — انظر القيم المقبولة أدناه</td></tr>
+        <tr><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">هاتف</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">اختياري</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--gold)">0912345678</td><td style="padding:8px 12px;border:1px solid var(--border)">رقم هاتف المندوب</td></tr>
+        <tr style="background:rgba(255,255,255,0.02)"><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">هدف</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">اختياري</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--gold)">50000</td><td style="padding:8px 12px;border:1px solid var(--border)">الهدف الشهري للمندوب بالدينار</td></tr>
+        <tr><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">منطقة</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">اختياري</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--gold)">طرابلس الشرق</td><td style="padding:8px 12px;border:1px solid var(--border)">المنطقة الجغرافية</td></tr>
+        <tr style="background:rgba(255,255,255,0.02)"><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">ملاحظات</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--muted)">اختياري</td><td style="padding:8px 12px;border:1px solid var(--border);color:var(--gold)">مندوب جديد</td><td style="padding:8px 12px;border:1px solid var(--border)">أي ملاحظات إضافية</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- قيم الفئات المقبولة -->
+    <div style="margin-top:14px">
+      <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px">🏷 قيم عمود "تصنيف" المقبولة:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <span style="background:rgba(0,212,255,0.12);border:1px solid rgba(0,212,255,0.3);color:var(--accent);padding:5px 14px;border-radius:999px;font-size:12px;font-weight:700">جملة</span>
+        <span style="background:rgba(0,255,136,0.12);border:1px solid rgba(0,255,136,0.3);color:var(--accent2);padding:5px 14px;border-radius:999px;font-size:12px;font-weight:700">تجزئة</span>
+        <span style="background:rgba(255,215,0,0.12);border:1px solid rgba(255,215,0,0.3);color:var(--gold);padding:5px 14px;border-radius:999px;font-size:12px;font-weight:700">أسواق</span>
+        <span style="background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.3);color:#7c6fff;padding:5px 14px;border-radius:999px;font-size:12px;font-weight:700">مقاهي ومطاعم</span>
+        <span style="background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.3);color:var(--accent3);padding:5px 14px;border-radius:999px;font-size:12px;font-weight:700">مستقل</span>
+        <span style="background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--muted);padding:5px 14px;border-radius:999px;font-size:12px">إدارية</span>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px">⚡ اللوحة تقبل أيضاً: الجملة، التجزئة، الاسواق، مقاهي، مطاعم — وتُحوّلها تلقائياً للقيمة الصحيحة.</div>
+    </div>
+  </div>
+
+  <!-- ════ أسباب فشل المزامنة ════ -->
+  <div style="background:rgba(255,71,87,0.06);border:1px solid rgba(255,71,87,0.25);border-radius:16px;padding:22px;margin-bottom:20px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <span style="font-size:22px">⚠️</span>
+      <div style="font-size:15px;font-weight:800;color:var(--red)">أسباب شائعة لفشل أو عدم اكتمال المزامنة</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;font-size:12px">
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,71,87,0.2);border-radius:10px;padding:12px">
+        <div style="font-weight:700;color:var(--red);margin-bottom:4px">❌ اسم عمود خاطئ</div>
+        <div style="color:var(--muted);line-height:1.7">مثلاً: كتابة <code style="color:var(--red)">الاجمالى</code> بدلاً من <code style="color:var(--accent2)">الاجمالي الصافي</code> — أي فرق في الأحرف يُفشل التعرف</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,71,87,0.2);border-radius:10px;padding:12px">
+        <div style="font-weight:700;color:var(--red);margin-bottom:4px">❌ قيمة النوع غير صحيحة</div>
+        <div style="color:var(--muted);line-height:1.7">عمود النوع يجب أن يحتوي على <code style="color:var(--accent2)">مبيع</code> أو <code style="color:var(--red)">مرتجع مبيع</code> حرفياً — أي قيمة أخرى تُتجاهل</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,71,87,0.2);border-radius:10px;padding:12px">
+        <div style="font-weight:700;color:var(--red);margin-bottom:4px">❌ أسماء مناديب غير متطابقة</div>
+        <div style="color:var(--muted);line-height:1.7">اسم المندوب في المبيعات يجب أن يطابق اسمه في التصنيف والتحصيل تماماً — بما فيها المسافات والأحرف</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,71,87,0.2);border-radius:10px;padding:12px">
+        <div style="font-weight:700;color:var(--red);margin-bottom:4px">❌ أرقام بفواصل آلاف</div>
+        <div style="color:var(--muted);line-height:1.7">مثلاً: <code style="color:var(--red)">1,250,500</code> قد تُسبب مشكلة — الأفضل: <code style="color:var(--accent2)">1250500</code> أو <code style="color:var(--accent2)">1250500.000</code></div>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,71,87,0.2);border-radius:10px;padding:12px">
+        <div style="font-weight:700;color:var(--red);margin-bottom:4px">❌ تنسيق تاريخ خاطئ</div>
+        <div style="color:var(--muted);line-height:1.7">التنسيق المدعوم: <code style="color:var(--accent2)">YYYY-MM-DD</code> أو <code style="color:var(--accent2)">DD/MM/YYYY</code> — أي تنسيق آخر يُخل بفلتر التاريخ</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,71,87,0.2);border-radius:10px;padding:12px">
+        <div style="font-weight:700;color:var(--red);margin-bottom:4px">❌ ترميز الملف خاطئ</div>
+        <div style="color:var(--muted);line-height:1.7">ملفات <b>CSV</b>: يُفضَّل <code style="background:rgba(0,212,255,0.1);padding:1px 5px;border-radius:3px;color:var(--accent)">UTF-8</code> أو <code style="background:rgba(0,212,255,0.1);padding:1px 5px;border-radius:3px;color:var(--accent)">Windows-1256</code>. ملفات <b>XLS/XLSX</b>: لا مشكلة في الترميز — تُقرأ تلقائياً بدون أي إعداد.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ خطوات المزامنة الناجحة ════ -->
+  <div style="background:rgba(0,255,136,0.04);border:1px solid rgba(0,255,136,0.2);border-radius:16px;padding:22px;margin-bottom:20px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <span style="font-size:22px">✅</span>
+      <div style="font-size:15px;font-weight:800;color:var(--accent2)">خطوات المزامنة الناجحة</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;font-size:12px">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <span style="background:var(--accent);color:#000;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0">1</span>
+        <div><b style="color:var(--text)">جهّز ملفاتك</b> — تأكد أن أسماء الأعمدة مطابقة تماماً للجدول أعلاه، وأن أسماء المناديب موحّدة في جميع الملفات.</div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <span style="background:var(--accent);color:#000;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0">2</span>
+        <div><b style="color:var(--text)">افتح نافذة البيانات</b> — اضغط على زر <b style="color:var(--accent)">📊 تحديث البيانات</b> في أعلى اللوحة.</div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <span style="background:var(--accent);color:#000;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0">3</span>
+        <div><b style="color:var(--text)">ارفع الملفات</b> — اسحب وأفلت ملفاتك على المنطقة الزرقاء في تبويب <b style="color:var(--accent)">📂 رفع CSV</b>، أو اضغط للاختيار اليدوي. يمكنك رفع الأربعة دفعة واحدة.</div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <span style="background:var(--accent);color:#000;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0">4</span>
+        <div><b style="color:var(--text)">اضغط "✅ تطبيق التحديث"</b> — تبدأ اللوحة في قراءة الملفات وتحديث جميع التبويبات والرسوم والجداول والبطاقات تلقائياً.</div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <span style="background:var(--accent2);color:#000;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0">✓</span>
+        <div><b style="color:var(--accent2)">علامة النجاح</b> — ستظهر رسالة <b style="color:var(--accent2)">✅ تحديث شامل (X ملف) | X مندوب | X عميل | X صنف</b>. إذا ظهرت ⚠️ تحذيرات، راجع Console للتفاصيل.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ مزامنة Google Sheets ════ -->
+  <div style="background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.2);border-radius:16px;padding:22px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <span style="font-size:22px">🔗</span>
+      <div style="font-size:15px;font-weight:800;color:var(--accent)">مزامنة Google Sheets المباشرة</div>
+    </div>
+    <div style="font-size:12px;line-height:2;color:var(--text2)">
+      لاستخدام المزامنة المباشرة من Google Sheets، يجب أن تتبع الشيتات <b style="color:var(--text)">نفس تنسيق الأعمدة</b> الموضحة أعلاه تماماً. إضافةً إلى ذلك:
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;font-size:12px">
+      <div style="display:flex;gap:10px;align-items:flex-start">
+        <span style="color:var(--accent);font-size:14px;flex-shrink:0">①</span>
+        <div>تأكد من أن الشيت مشارَك عاماً أو مع حساب Google الذي ستسجل به الدخول.</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start">
+        <span style="color:var(--accent);font-size:14px;flex-shrink:0">②</span>
+        <div>عند استخدام <b>روابط CSV العامة</b>: افتح الشيت → ملف → مشاركة → نشر على الويب → اختر الورقة المطلوبة → تنسيق CSV → انسخ الرابط وألصقه في الحقل المناسب.</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start">
+        <span style="color:var(--accent);font-size:14px;flex-shrink:0">③</span>
+        <div>عند استخدام <b>تسجيل الدخول بـ Google</b>: اضغط "تسجيل الدخول بـ Google" — أكمل المصادقة — اختر الشيت المناسب لكل ملف — اضغط "⚡ مزامنة الآن".</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start">
+        <span style="color:var(--accent2);font-size:14px;flex-shrink:0">✓</span>
+        <div>بعد نجاح المزامنة تتحدث <b style="color:var(--text)">جميع التبويبات والرسوم والجداول والبطاقات</b> تلقائياً في ثوانٍ.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div><!-- end tab-guide -->
 
 </div><!-- end content -->
 
@@ -6930,8 +7223,8 @@ function showTab(id, triggerEl) {
       const rc = Chart.getChart(document.getElementById('monthlyChart'));
       if (!rc) _rebuildOverviewCharts();
     } else if (id === 'aging') {
-      // بناء بيانات أعمار الذمم عند أول فتح للتبويب
-      if (typeof buildAgingData === 'function' && (!window._agingBuilt)) {
+      // إعادة بناء كاملة إذا لم تُبنَ بعد أو بعد مزامنة جديدة
+      if (typeof buildAgingData === 'function' && !window._agingBuilt) {
         window._agingBuilt = true;
         buildAgingData();
       }
@@ -8644,25 +8937,309 @@ fullLabels:s12.map(r=>r.name),datasets:[{label:'صافي المديونية',dat
 fullLabels:pd.map(r=>r.name),datasets:[{label:'نسبة السداد',data:pd.map(r=>Math.min(r.pct,100)),backgroundColor:pd.map(r=>r.pct>=70?'rgba(0,255,136,0.55)':r.pct>=50?'rgba(255,107,53,0.55)':'rgba(255,71,87,0.55)'),borderColor:pd.map(r=>r.pct>=70?'#00ff88':r.pct>=50?'#ff6b35':'#ff4757'),borderWidth:1,borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.raw.toFixed(1)+'%'}}},scales:{x:{min:0,max:100,grid:{color:'rgba(30,58,95,0.4)'},ticks:{color:'#8ba3b8',font:{family:'Cairo'},callback:v=>v+'%'}},y:{grid:{display:false},ticks:{color:'#e8f4f8',font:{family:'Cairo',size:11}}}}}});
 }
 // ── Print current active tab ──────────────────────────────────────────────
+/* ── مولّد الذيل المشترك لجميع نوافذ الطباعة ── */
+function _buildPrintFooter() {
+  return `
+<div class="print-footer" style="
+  width:100%;
+  margin-top:20pt;
+  padding:7pt 14pt;
+  background:#1a2a4a;
+  -webkit-print-color-adjust:exact;
+  print-color-adjust:exact;
+  border-top:3pt solid #00d4ff;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-family:'Cairo',sans-serif;
+  page-break-inside:avoid;
+  clear:both;
+">
+  <span style="color:#ffffff;font-weight:800;font-size:9pt;letter-spacing:0.2pt">جميع الحقوق محفوظة © 2026 — المحاسب أحمد العكاري</span>
+  <span style="color:#00d4ff;font-weight:800;font-size:10pt;letter-spacing:0.5pt">0915528970 &nbsp;|&nbsp; هاتف / Phone</span>
+  <span style="color:#cce4ff;font-size:8.5pt;font-weight:600">All Rights Reserved © 2026 — Accountant Ahmed Al-Aakari</span>
+</div>`;
+}
+
+/* ── CSS الذيل المشترك ── */
+function _footerCSS() {
+  return '.print-footer{display:flex!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}';
+}
+
+/* ─── CSS طباعة الجداول المشترك ─────────────────────────────────────
+   يُستدعى من printCurrentTab و printTable و printBothDebtTables
+   cols  : عدد الأعمدة الفعلي
+   isLand: true = landscape
+   ──────────────────────────────────────────────────────────────── */
+function _tableCSS(cols, isLand) {
+  /*
+   * عرض الأعمدة المقترح (mm) حسب نوع الجدول:
+   *   table-layout:fixed + colgroup يضمن العرض المحدد
+   *   عمود الاسم/الصنف: أعرض + سطرين
+   *   باقي الأعمدة: متساوية ومتناسقة
+   */
+
+  /* ── حجم الخط حسب عدد الأعمدة ── */
+  var fs = cols <= 8  ? '8pt'
+         : cols <= 10 ? '7.5pt'
+         : cols <= 13 ? '7pt'
+         :              '6.5pt';
+
+  /* ── حشو الخلايا ── */
+  var thP = cols <= 8  ? '5pt 6pt'
+           : cols <= 10 ? '4pt 5pt'
+           : cols <= 13 ? '4pt 4pt'
+           :              '3.5pt 3pt';
+  var tdP = cols <= 8  ? '4pt 6pt'
+           : cols <= 10 ? '3.5pt 5pt'
+           : cols <= 13 ? '3pt 4pt'
+           :              '3pt 3pt';
+
+  return (
+    /* ── الجدول الرئيسي ── */
+    'table{width:100%!important;min-width:0!important;border-collapse:collapse!important;'
+    + 'font-size:' + fs + '!important;table-layout:fixed!important;}'
+
+    + 'thead{display:table-header-group!important;}'
+    + 'tr{page-break-inside:avoid!important;}'
+
+    /* ── رؤوس الأعمدة ── */
+    + 'th{'
+    + 'background:#1a2a4a!important;color:#fff!important;'
+    + 'padding:' + thP + '!important;font-size:' + fs + '!important;'
+    + 'font-weight:700!important;text-align:center!important;'
+    + 'border:1px solid #2a3a5a!important;'
+    + 'min-width:0!important;'
+    + 'white-space:normal!important;'          /* التفاف النص في الرأس */
+    + 'word-break:break-word!important;'
+    + 'line-height:1.35!important;'
+    + 'vertical-align:middle!important;'
+    + 'overflow:hidden!important;'
+    + '-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}'
+
+    /* ── خلايا البيانات العامة ── */
+    + 'td{'
+    + 'padding:' + tdP + '!important;border:1px solid #e0e8f0!important;'
+    + 'color:#111!important;font-size:' + fs + '!important;'
+    + 'min-width:0!important;'
+    + 'white-space:normal!important;'
+    + 'word-break:break-word!important;'
+    + 'vertical-align:middle!important;'
+    + 'overflow:hidden!important;'
+    + 'line-height:1.4!important;'
+    + '-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}'
+
+    /* ── تمييز العمود الأول (#) ── */
+    + 'td:nth-child(1){text-align:center!important;color:#666!important;'
+    + 'font-size:' + (cols <= 10 ? '7pt' : '6pt') + '!important;}'
+
+    /* ── عمود الاسم/الصنف (الثاني دائماً) — سطرين مع كسر الكلمات ── */
+    + 'td:nth-child(2){'
+    + 'text-align:right!important;'
+    + 'font-weight:600!important;'
+    + 'white-space:normal!important;'
+    + 'word-break:break-word!important;'
+    + 'overflow-wrap:break-word!important;'
+    + 'line-height:1.5!important;'
+    + 'max-height:' + (cols <= 10 ? '3.2em' : '2.8em') + '!important;'   /* سطرين تقريباً */
+    + 'overflow:hidden!important;}'
+
+    /* ── عمود المندوب (الثالث) — أصغر خط ── */
+    + 'td:nth-child(3){'
+    + 'text-align:right!important;'
+    + 'color:#444!important;'
+    + 'font-size:' + (cols <= 10 ? fs : (parseFloat(fs)-0.5)+'pt') + '!important;'
+    + 'white-space:normal!important;word-break:break-word!important;}'
+
+    /* ── الأعمدة الرقمية (من الرابع فصاعداً) ── */
+    + 'td:nth-child(n+4){text-align:right!important;}'
+
+    /* ── صفوف زوجية ── */
+    + 'tr:nth-child(even) td{background:#f5f8ff!important;}'
+    + 'tr:nth-child(odd) td{background:#ffffff!important;}'
+
+    /* ── Tags ── */
+    + '.tag,.tag-red,.tag-green,.tag-blue,.tag-orange,.tag-gold{'
+    + 'border:1px solid #999!important;color:#333!important;background:#f0f0f0!important;'
+    + 'font-size:6pt!important;padding:1pt 3pt!important;border-radius:4pt!important;'
+    + 'display:inline-block!important;font-weight:700!important;'
+    + 'white-space:nowrap!important;line-height:1.4!important;}'
+
+    /* ── إخفاء عناصر واجهة المستخدم ── */
+    + '.bar-bg,.bar-fill{display:none!important;}'
+    + 'div[style*="height:3px"],div[style*="height:5px"]{display:none!important;}'
+    + 'canvas{display:none!important;}'
+    + 'button{display:none!important;}'
+
+    /* ── الألوان ── */
+    + 'span[style*="color"]{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}'
+    + 'span[style*="background"]{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}'
+
+    /* ── divs داخل td ── */
+    + 'td div{display:inline!important;}'
+
+    + _footerCSS()
+  );
+}
+
+/* ── دالة مساعدة: تُنشئ <colgroup> بعروض نسبية مثلى حسب نوع الجدول ── */
+function _buildColgroup(tableId, cols) {
+  /*
+   * عرض % لكل عمود:
+   *   العمود # (1)     : ضيق جداً
+   *   عمود الاسم (2)   : الأعرض
+   *   عمود المندوب (3) : متوسط (إذا وُجد)
+   *   الأعمدة الرقمية  : متساوية
+   *   عمود التصنيف     : متوسط
+   */
+  var cg = '<colgroup>';
+  if (tableId === 'custTable') {
+    /* 17 عمود: # اسم مندوب فواتير مبيعات أصناف كمية مرتجعات تحصيل عمليات صافيمبيعات %تحصيل %مرتجع فجوة ذمة30 ذمة60 تصنيف */
+    cg += '<col style="width:3%">';   /* # */
+    cg += '<col style="width:14%">';  /* اسم العميل */
+    cg += '<col style="width:7%">';   /* المندوب */
+    cg += '<col style="width:4%">';   /* الفواتير */
+    cg += '<col style="width:7%">';   /* المبيعات */
+    cg += '<col style="width:4%">';   /* الأصناف */
+    cg += '<col style="width:5%">';   /* الكمية */
+    cg += '<col style="width:6%">';   /* المرتجعات */
+    cg += '<col style="width:6%">';   /* التحصيلات */
+    cg += '<col style="width:5%">';   /* عمليات التحصيل */
+    cg += '<col style="width:7%">';   /* صافي المبيعات */
+    cg += '<col style="width:5%">';   /* % التحصيل */
+    cg += '<col style="width:5%">';   /* % المرتجعات */
+    cg += '<col style="width:6%">';   /* الفجوة */
+    cg += '<col style="width:6%">';   /* ذمة ≤30 */
+    cg += '<col style="width:6%">';   /* ذمة ≤60 */
+    cg += '<col style="width:4%">';   /* التصنيف */
+  } else if (tableId === 'itemsTable') {
+    /* 11 عمود: # صنف مبيعات مرتجعات صافي كمية كميةمرتجع صافيكمية نسبة متوسط دوران */
+    cg += '<col style="width:3%">';   /* # */
+    cg += '<col style="width:22%">';  /* الصنف — أعرض */
+    cg += '<col style="width:9%">';   /* إجمالي المبيعات */
+    cg += '<col style="width:9%">';   /* قيمة المرتجعات */
+    cg += '<col style="width:9%">';   /* صافي المبيعات */
+    cg += '<col style="width:9%">';   /* كمية المبيعات */
+    cg += '<col style="width:9%">';   /* كمية المرتجعات */
+    cg += '<col style="width:9%">';   /* صافي الكمية */
+    cg += '<col style="width:7%">';   /* نسبة المرتجع */
+    cg += '<col style="width:7%">';   /* متوسط السعر */
+    cg += '<col style="width:7%">';   /* معدل الدوران */
+  } else if (tableId === 'agingTable') {
+    /* 12 عمود: # اسم مندوب مبيعات مرتجعات صافي تحصيل ذمة30 ذمة60 ذمةقديم دين تصنيف */
+    cg += '<col style="width:3%">';   /* # */
+    cg += '<col style="width:16%">';  /* اسم العميل */
+    cg += '<col style="width:8%">';   /* المندوب */
+    cg += '<col style="width:9%">';   /* المبيعات */
+    cg += '<col style="width:7%">';   /* المرتجعات */
+    cg += '<col style="width:9%">';   /* صافي المبيعات */
+    cg += '<col style="width:9%">';   /* التحصيل */
+    cg += '<col style="width:8%">';   /* ذمة 0-30 */
+    cg += '<col style="width:8%">';   /* ذمة 30-60 */
+    cg += '<col style="width:8%">';   /* ذمة +60 */
+    cg += '<col style="width:8%">';   /* الدين الصافي */
+    cg += '<col style="width:7%">';   /* التصنيف */
+  } else if (tableId === 'repsTable' || tableId === 'rcTable') {
+    /* مناديب: # اسم فئة + أعمدة رقمية متساوية */
+    cg += '<col style="width:3%">';   /* # */
+    cg += '<col style="width:14%">';  /* المندوب */
+    cg += '<col style="width:8%">';   /* الفئة */
+    var remain = 75, numCols = cols - 3;
+    var perCol = (remain / numCols).toFixed(1);
+    for (var i = 0; i < numCols; i++) cg += '<col style="width:' + perCol + '%">';
+  } else if (tableId === 'debtRepBody' || tableId === 'debtDetailBody') {
+    /* مديونية: # اسم + 6 رقمية */
+    cg += '<col style="width:4%">';   /* # */
+    cg += '<col style="width:22%">';  /* الاسم */
+    var numCols2 = cols - 2;
+    var perCol2 = ((100-26) / numCols2).toFixed(1);
+    for (var j = 0; j < numCols2; j++) cg += '<col style="width:' + perCol2 + '%">';
+  } else {
+    /* افتراضي: # اسم + بقية متساوية */
+    cg += '<col style="width:4%">';
+    cg += '<col style="width:20%">';
+    var numColsDef = cols - 2;
+    var perColDef = ((100-24) / numColsDef).toFixed(1);
+    for (var k = 0; k < numColsDef; k++) cg += '<col style="width:' + perColDef + '%">';
+  }
+  cg += '</colgroup>';
+  return cg;
+}
+
+/* ── CSS عروض الأعمدة لـ printCurrentTab (بديل colgroup عبر CSS) ── */
+function _buildTabColWidths(tabId) {
+  if (tabId === 'customers') {
+    /* custTable: 17 عمود */
+    return (
+      'table:nth-of-type(1) td:nth-child(1),table:nth-of-type(1) th:nth-child(1){width:3%}'
+      + 'table:nth-of-type(1) td:nth-child(2),table:nth-of-type(1) th:nth-child(2){width:14%}'   /* اسم العميل */
+      + 'table:nth-of-type(1) td:nth-child(3),table:nth-of-type(1) th:nth-child(3){width:7%}'    /* المندوب */
+      + 'table:nth-of-type(1) td:nth-child(4),table:nth-of-type(1) th:nth-child(4){width:4%}'
+      + 'table:nth-of-type(1) td:nth-child(5),table:nth-of-type(1) th:nth-child(5){width:7%}'
+      + 'table:nth-of-type(1) td:nth-child(6),table:nth-of-type(1) th:nth-child(6){width:4%}'
+      + 'table:nth-of-type(1) td:nth-child(7),table:nth-of-type(1) th:nth-child(7){width:5%}'
+      + 'table:nth-of-type(1) td:nth-child(8),table:nth-of-type(1) th:nth-child(8){width:6%}'
+      + 'table:nth-of-type(1) td:nth-child(9),table:nth-of-type(1) th:nth-child(9){width:6%}'
+      + 'table:nth-of-type(1) td:nth-child(10),table:nth-of-type(1) th:nth-child(10){width:5%}'
+      + 'table:nth-of-type(1) td:nth-child(11),table:nth-of-type(1) th:nth-child(11){width:7%}'
+      + 'table:nth-of-type(1) td:nth-child(12),table:nth-of-type(1) th:nth-child(12){width:5%}'
+      + 'table:nth-of-type(1) td:nth-child(13),table:nth-of-type(1) th:nth-child(13){width:5%}'
+      + 'table:nth-of-type(1) td:nth-child(14),table:nth-of-type(1) th:nth-child(14){width:6%}'
+      + 'table:nth-of-type(1) td:nth-child(15),table:nth-of-type(1) th:nth-child(15){width:6%}'
+      + 'table:nth-of-type(1) td:nth-child(16),table:nth-of-type(1) th:nth-child(16){width:6%}'
+      + 'table:nth-of-type(1) td:nth-child(17),table:nth-of-type(1) th:nth-child(17){width:4%}'
+    );
+  }
+  if (tabId === 'products') {
+    /* itemsTable: 11 عمود */
+    return (
+      '#itemsTable td:nth-child(1),#itemsTable th:nth-child(1){width:3%}'
+      + '#itemsTable td:nth-child(2),#itemsTable th:nth-child(2){width:22%}'  /* الصنف */
+      + '#itemsTable td:nth-child(3),#itemsTable th:nth-child(3){width:9%}'
+      + '#itemsTable td:nth-child(4),#itemsTable th:nth-child(4){width:9%}'
+      + '#itemsTable td:nth-child(5),#itemsTable th:nth-child(5){width:9%}'
+      + '#itemsTable td:nth-child(6),#itemsTable th:nth-child(6){width:9%}'
+      + '#itemsTable td:nth-child(7),#itemsTable th:nth-child(7){width:9%}'
+      + '#itemsTable td:nth-child(8),#itemsTable th:nth-child(8){width:9%}'
+      + '#itemsTable td:nth-child(9),#itemsTable th:nth-child(9){width:7%}'
+      + '#itemsTable td:nth-child(10),#itemsTable th:nth-child(10){width:7%}'
+      + '#itemsTable td:nth-child(11),#itemsTable th:nth-child(11){width:7%}'
+    );
+  }
+  if (tabId === 'aging') {
+    /* agingTable: 12 عمود */
+    return (
+      '#agingTable td:nth-child(1),#agingTable th:nth-child(1){width:3%}'
+      + '#agingTable td:nth-child(2),#agingTable th:nth-child(2){width:16%}'  /* اسم العميل */
+      + '#agingTable td:nth-child(3),#agingTable th:nth-child(3){width:8%}'   /* المندوب */
+      + '#agingTable td:nth-child(4),#agingTable th:nth-child(4){width:9%}'
+      + '#agingTable td:nth-child(5),#agingTable th:nth-child(5){width:7%}'
+      + '#agingTable td:nth-child(6),#agingTable th:nth-child(6){width:9%}'
+      + '#agingTable td:nth-child(7),#agingTable th:nth-child(7){width:9%}'
+      + '#agingTable td:nth-child(8),#agingTable th:nth-child(8){width:8%}'
+      + '#agingTable td:nth-child(9),#agingTable th:nth-child(9){width:8%}'
+      + '#agingTable td:nth-child(10),#agingTable th:nth-child(10){width:8%}'
+      + '#agingTable td:nth-child(11),#agingTable th:nth-child(11){width:8%}'
+      + '#agingTable td:nth-child(12),#agingTable th:nth-child(12){width:7%}'
+    );
+  }
+  return '';  /* باقي التبويبات بدون تخصيص */
+}
+
 function printBothDebtTables() {
-  // Expand both tables fully
   const fmt = n => Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 
   const repBody = document.getElementById('debtRepBody');
-  const repSaved = repBody ? repBody.innerHTML : '';
-
   const detailBody = document.getElementById('debtDetailBody');
-  const detailSaved = detailBody ? detailBody.innerHTML : '';
 
   if (detailBody) {
     detailBody.innerHTML = debtDetailFiltered.map((r,i) => {
       const nc = r.net>50000?'#c0392b':r.net>10000?'#e67e22':r.net<0?'#27ae60':'#333';
       const st = r.net<0?'دائن':r.net===0?'مسوّى':r.net>50000?'حرج':r.net>10000?'مرتفع':'عادي';
-      return '<tr><td style="text-align:center">'+(i+1)+'</td><td>'+r.code+'</td><td>'+r.name+'</td><td>'+r.rep+'</td><td>'+fmt(r.debit)+'</td><td>'+fmt(r.credit)+'</td><td style="font-weight:700;color:'+nc+'">'+fmt(r.net)+'</td><td>'+st+'</td></tr>';
+      return '<tr><td style="text-align:center">'+(i+1)+'</td><td>'+r.code+'</td><td>'+r.name+'</td><td>'+r.rep+'</td><td style="text-align:right">'+fmt(r.debit)+'</td><td style="text-align:right">'+fmt(r.credit)+'</td><td style="font-weight:700;color:'+nc+';text-align:right">'+fmt(r.net)+'</td><td style="text-align:center">'+st+'</td></tr>';
     }).join('');
   }
 
-  // Build active filter label
   const catF = document.getElementById('debtCatFilter')?.value || '';
   const repF = document.getElementById('debtRepFilter')?.value || '';
   const filterParts = [];
@@ -8670,13 +9247,11 @@ function printBothDebtTables() {
   if (repF) filterParts.push('المندوب: ' + repF);
   const filterLabel = filterParts.length ? ' | ' + filterParts.join(' | ') : '';
 
-  const styles = [...document.styleSheets].map(ss => {
-    try { return [...ss.cssRules].map(r => r.cssText).join('\n'); } catch(e) { return ''; }
-  }).join('\n');
-
   const repTableHTML  = document.querySelector('#debtRepBody')?.closest('table')?.outerHTML || '';
   const detTableHTML  = document.querySelector('#debtDetailBody')?.closest('table')?.outerHTML || '';
+  const printDate = new Date().toLocaleDateString('ar-LY');
 
+  /* جدول المديونية: 8 أعمدة — portrait يكفي */
   const printHTML = `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -8684,31 +9259,27 @@ function printBothDebtTables() {
 <title>طباعة — 💰 المديونية</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-@page { size: A4 portrait; margin: 15mm 12mm; }
+@page { size: A4 portrait; margin: 10mm 9mm 16mm 9mm; }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-body { font-family:'Cairo',sans-serif; direction:rtl; background:#fff; color:#111; font-size:10pt; }
-.print-page-header { background:#1a2a4a; color:#fff; padding:10pt 14pt; margin-bottom:12pt; border-radius:6pt; }
-.print-page-header h1 { font-size:13pt; font-weight:800; }
-.print-page-header p  { font-size:9pt; color:#aac; margin-top:3pt; }
-.section-title { font-size:11pt; font-weight:700; color:#1a2a4a; margin:12pt 0 6pt; border-bottom:2px solid #1a2a4a; padding-bottom:4pt; }
-table { width:100%; border-collapse:collapse; font-size:7.5pt; margin-bottom:14pt; }
-thead { display:table-header-group; }
-tr { page-break-inside:avoid; }
-th { background:#1a2a4a; color:#fff; padding:5pt; font-size:7.5pt; font-weight:700; text-align:right; border:1px solid #2a3a5a; }
-td { padding:4pt 5pt; border:1px solid #dde4f0; color:#111; font-size:7.5pt; }
-tr:nth-child(even) td { background:#f4f7ff; }
+body { font-family:'Cairo',sans-serif; direction:rtl; background:#fff; color:#111; font-size:9pt; line-height:1.4; }
+.print-page-header { background:#1a2a4a; color:#fff; padding:8pt 12pt; margin-bottom:9pt; border-radius:5pt; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+.print-page-header h1 { font-size:11pt; font-weight:800; }
+.print-page-header p  { font-size:8pt; color:#aac; margin-top:2pt; }
+.section-title { font-size:10pt; font-weight:800; color:#1a2a4a; margin:9pt 0 5pt; border-bottom:2px solid #1a2a4a; padding-bottom:3pt; }
+${_tableCSS(8, false)}
 </style>
 </head>
-<body onload="setTimeout(function(){window.print();},400)">
+<body onload="setTimeout(function(){window.print();},450)">
 <div class="print-page-header">
   <h1>📊 لوحة التحليل الاستراتيجي — 💰 المديونية${filterLabel}</h1>
-  <p>تاريخ الطباعة: ${new Date().toLocaleDateString('ar-LY')}</p>
+  <p>تاريخ الطباعة: ${printDate}</p>
 </div>
 <div class="section-title">📋 مديونية المناديب</div>
-${repTableHTML}
+${repTableHTML.replace(/<table([^>]*)>/, '<table$1>' + _buildColgroup('debtRepBody', 8))}
 <div class="section-title">📋 المديونية التفصيلية — كشف العملاء</div>
-${detTableHTML}
-
+${detTableHTML.replace(/<table([^>]*)>/, '<table$1>' + _buildColgroup('debtDetailBody', 8))}
+${_buildPrintFooter()}
+</body>
 </html>`;
 
   const blob = new Blob([printHTML], {type:'text/html;charset=utf-8'});
@@ -8717,7 +9288,6 @@ ${detTableHTML}
   if (!win) { try { window.print(); } catch(e) { alert('يرجى استخدام Ctrl+P للطباعة'); } }
   else { setTimeout(() => URL.revokeObjectURL(url), 60000); }
 
-  // Restore
   setTimeout(() => {
     if (detailBody) { debtDetailFiltered = debtDetailData.slice(); renderDebtDetailTable(); }
   }, 500);
@@ -8793,21 +9363,60 @@ function printCurrentTab() {
     }
   }
 
-  // For customers: expand all rows
+  // For customers: expand all rows — 17 عمود كاملاً
   if (tabId === 'customers') {
     const body = document.getElementById('custBody');
     if (body) {
       const fmt = n => Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
       const savedPage = custPage;
       body.innerHTML = filteredCust.map((r,i) => {
-        const cpC = r.cp>=80?'#27ae60':r.cp>=50?'#f39c12':'#c0392b';
-        return `<tr><td style="text-align:center">${i+1}</td><td>${r.n}</td><td style="text-align:center">${r.inv}</td><td>${fmt(r.s)}</td><td style="text-align:center">${r.itm}</td><td style="text-align:center">${r.qty.toLocaleString()}</td><td>${fmt(r.ret)}</td><td>${fmt(r.c)}</td><td style="text-align:center">${r.cops}</td><td>${fmt(r.ns)}</td><td style="color:${cpC};font-weight:700">${r.cp.toFixed(1)}%</td><td>${r.rp.toFixed(1)}%</td><td>${fmt(r.g)}</td><td>${r.cat}</td></tr>`;
+        const cpC  = r.cp>=80?'#27ae60':r.cp>=50?'#f39c12':'#c0392b';
+        const rpC  = r.rp>=15?'#c0392b':r.rp>=5?'#e67e22':'#555';
+        const gC   = r.g>0?'#c0392b':r.g<0?'#27ae60':'#555';
+        const origIdx = custData.indexOf(r);
+        const repName = r.rep||(typeof custToRep!=='undefined'?custToRep[origIdx]:'')||(typeof custNameToRep!=='undefined'?custNameToRep[r.n||'']:'')||'—';
+        const a30 = r.age30||0;
+        const a60 = r.age60||0;
+        const fmtAge = n => n>0?fmt(n):'—';
+        const catColors = {ممتاز:'#27ae60',جيد:'#2980b9',متوسط:'#f39c12',مخاطرة:'#e67e22','مخاطرة عالية':'#c0392b'};
+        const catC = catColors[r.cat]||'#555';
+        return `<tr>
+          <td style="text-align:center;color:#666">${i+1}</td>
+          <td style="font-weight:600">${r.n}</td>
+          <td style="color:#555;font-size:6pt">${repName}</td>
+          <td style="text-align:center">${r.inv}</td>
+          <td style="text-align:right;font-weight:700;color:#1a2a4a">${fmt(r.s)}</td>
+          <td style="text-align:center">${r.itm}</td>
+          <td style="text-align:center">${r.qty.toLocaleString()}</td>
+          <td style="text-align:right;color:#e67e22">${fmt(r.ret)}</td>
+          <td style="text-align:right;color:#27ae60">${fmt(r.c)}</td>
+          <td style="text-align:center">${r.cops}</td>
+          <td style="text-align:right;font-weight:600">${fmt(r.ns)}</td>
+          <td style="color:${cpC};font-weight:700;text-align:center">${r.cp.toFixed(1)}%</td>
+          <td style="text-align:center;color:${rpC}">${r.rp.toFixed(1)}%</td>
+          <td style="text-align:right;color:${gC};font-weight:600">${fmt(r.g)}</td>
+          <td style="text-align:right;color:${a30>0?'#c0392b':'#aaa'};font-weight:${a30>0?700:400}">${fmtAge(a30)}</td>
+          <td style="text-align:right;color:${a60>0?'#b7860b':'#aaa'};font-weight:${a60>0?700:400}">${fmtAge(a60)}</td>
+          <td style="text-align:center;color:${catC};font-weight:700">${r.cat}</td>
+        </tr>`;
       }).join('');
     }
   }
 
   // Build printable HTML in new window
-  const activeHTML = active.innerHTML;
+  // Inject colgroup for each table inside activeHTML
+  let activeHTML = active.innerHTML;
+  const _tabTableMap = {
+    customers: 'custTable', products: 'itemsTable',
+    aging: 'agingTable', reps: 'repsTable', repcmp: 'rcTable',
+    debt: 'debtRepBody'
+  };
+  const _cgTableId = _tabTableMap[tabId] || '';
+  if (_cgTableId) {
+    const _cgCols = colCount;
+    const _cgHtml = _buildColgroup(_cgTableId, _cgCols);
+    activeHTML = activeHTML.replace(/<table([^>]*)>/g, '<table$1>' + _cgHtml);
+  }
   const title = tabTitles[tabId] || 'لوحة التحليل';
 
   // Build active filters label per tab
@@ -8841,101 +9450,106 @@ function printCurrentTab() {
   }
   const filterLabel = filterParts.length ? ' | ' + filterParts.join(' | ') : '';
 
-  // Get all styles from the page
-  const styles = [...document.styleSheets].map(ss => {
-    try {
-      return [...ss.cssRules].map(r => r.cssText).join('\n');
-    } catch(e) { return ''; }
-  }).join('\n');
+  /* ── تحديد عدد الأعمدة في الجدول الرئيسي لهذا التبويب ── */
+  const colCounts = {
+    overview:  5,   /* نظرة عامة — portrait */
+    reps:     12,   /* collections=12، الأكثر أعمدة — landscape */
+    repcmp:   13,   /* 13 عمود — landscape */
+    debt:      8,   /* 8 أعمدة — portrait */
+    customers: 17,  /* 17 عمود — landscape */
+    products:  11,  /* 11 عمود — landscape */
+    plan:       5,  /* portrait */
+    aging:     12,  /* 12 عمود — landscape */
+  };
+  const colCount = colCounts[tabId] || 8;
+  /* landscape إذا الأعمدة > 10، وإلا portrait */
+  const pageSize  = colCount > 10 ? 'A4 landscape' : 'A4 portrait';
+  const pageMargin = colCount > 10 ? '8mm 7mm 16mm 7mm' : '12mm 10mm 18mm 10mm';
+  const printDate = new Date().toLocaleDateString('ar-LY');
 
   const printHTML = `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width">
 <title>طباعة — ${title}</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-@page { size: A4 portrait; margin: 15mm 12mm; }
+@page { size: ${pageSize}; margin: ${pageMargin}; }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-body { font-family:'Cairo',sans-serif; direction:rtl; background:#fff; color:#111; font-size:10pt; line-height:1.5; }
-.print-bar, .cat-chip, #custCatChips, #debtCatChips,
+body { font-family:'Cairo',sans-serif; direction:rtl; background:#fff; color:#111; font-size:9pt; line-height:1.4; }
+
+/* ── إخفاء عناصر واجهة المستخدم ── */
+.print-bar, .nav, .cat-chip, #custCatChips, #debtCatChips,
 .filter-row, .search-input, .filter-select,
-#custPagination, #debtDetailPagination, #debtDetailSummary { display:none !important; }
+#custPagination, #repsPagination, #rcPagination,
+#debtDetailPagination, #debtDetailSummary, #agingPagination,
+#mobileBottomNav, #df-wrap, #df-bar,
+.print-btn, .print-btn-header, .header-meta,
+button { display:none !important; }
 
-/* Page header */
-.print-page-header { background:#1a2a4a; color:#fff; padding:10pt 14pt; margin-bottom:12pt; border-radius:6pt; }
-.print-page-header h1 { font-size:14pt; font-weight:800; }
-.print-page-header p { font-size:9pt; color:#aac; margin-top:3pt; }
+/* ── رأس الطباعة ── */
+.print-page-header { background:#1a2a4a; color:#fff; padding:9pt 13pt; margin-bottom:10pt; border-radius:5pt; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+.print-page-header h1 { font-size:12pt; font-weight:800; }
+.print-page-header p  { font-size:8pt; color:#aac; margin-top:2pt; }
+.print-section-title  { display:block !important; font-size:11pt !important; font-weight:800 !important; color:#1a2a4a !important; padding:5pt 0 8pt !important; border-bottom:2pt solid #1a2a4a !important; margin-bottom:8pt !important; }
 
-/* KPI Grid */
-.kpi-grid { display:grid !important; grid-template-columns:repeat(4,1fr) !important; gap:6pt !important; margin-bottom:10pt !important; }
-.kpi-card { background:#f0f4ff !important; border:1px solid #c0cce0 !important; border-radius:6pt !important; padding:8pt !important; page-break-inside:avoid; }
-.kpi-label { color:#444 !important; font-size:8pt !important; font-weight:600; margin-bottom:3pt; }
-.kpi-value { color:#1a2a4a !important; font-size:13pt !important; font-weight:800 !important; }
-.kpi-sub   { color:#666 !important; font-size:7.5pt !important; margin-top:2pt; }
-.kpi-icon  { font-size:1.1rem !important; margin-bottom:4pt; display:block; }
+/* ── KPI ── */
+.kpi-grid { display:grid !important; grid-template-columns:repeat(4,1fr) !important; gap:5pt !important; margin-bottom:8pt !important; }
+.kpi-card { background:#f0f4ff !important; border:1px solid #c0cce0 !important; border-radius:5pt !important; padding:7pt !important; page-break-inside:avoid; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+.kpi-label { color:#444 !important; font-size:7.5pt !important; font-weight:600; margin-bottom:2pt; }
+.kpi-value { color:#1a2a4a !important; font-size:12pt !important; font-weight:800 !important; }
+.kpi-sub   { color:#666 !important; font-size:7pt !important; margin-top:2pt; }
+.kpi-icon  { font-size:1rem !important; margin-bottom:3pt; display:block; }
+.kpi-card > div[style*="position:absolute"] { display:none !important; }
 
-/* Charts row */
-.charts-row { display:grid !important; grid-template-columns:repeat(2,1fr) !important; gap:8pt !important; margin-bottom:10pt !important; page-break-inside:avoid; }
-.chart-card { background:#f8faff !important; border:1px solid #d0d8ea !important; border-radius:6pt !important; padding:8pt !important; page-break-inside:avoid; }
-.chart-title { color:#1a2a4a !important; font-size:9pt !important; font-weight:700; margin-bottom:3pt; }
-.chart-sub   { color:#666 !important; font-size:7.5pt !important; }
-canvas { max-width:100% !important; max-height:160pt !important; display:block; }
-.print-chart-img { max-width:100% !important; width:100% !important; height:auto !important; display:block !important; object-fit:contain; border-radius:4pt; }
-.chart-wrap { height:160pt !important; overflow:hidden; display:flex; align-items:center; justify-content:center; }
-.chart-wrap img, .chart-wrap canvas { width:100% !important; height:160pt !important; }
+/* ── الرسوم البيانية ── */
+.charts-row { display:grid !important; grid-template-columns:repeat(2,1fr) !important; gap:7pt !important; margin-bottom:8pt !important; page-break-inside:avoid; }
+.chart-card { background:#f8faff !important; border:1px solid #d0d8ea !important; border-radius:5pt !important; padding:7pt !important; page-break-inside:avoid; }
+.chart-title { color:#1a2a4a !important; font-size:8.5pt !important; font-weight:700; margin-bottom:2pt; }
+.chart-sub   { color:#666 !important; font-size:7pt !important; }
+canvas { max-width:100% !important; max-height:155pt !important; display:block; }
+.print-chart-img { max-width:100% !important; width:100% !important; height:auto !important; display:block !important; object-fit:contain; border-radius:3pt; }
+.chart-wrap { height:155pt !important; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+.chart-wrap img, .chart-wrap canvas { width:100% !important; height:155pt !important; }
 
-/* Table cards */
-.table-card { background:#fff !important; border:1px solid #d0d8ea !important; border-radius:6pt !important; padding:8pt !important; margin-bottom:8pt !important; page-break-inside:auto; }
-.table-header { margin-bottom:6pt; display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:4pt; }
+/* ── الجداول — تُولَّد بـ _tableCSS ── */
+.table-card { background:#fff !important; border:1px solid #d0d8ea !important; border-radius:5pt !important; padding:7pt !important; margin-bottom:7pt !important; page-break-inside:auto; }
+.table-header { margin-bottom:5pt; }
 .table-scroll { overflow:visible !important; max-height:none !important; }
-table { width:100% !important; min-width:unset !important; border-collapse:collapse !important; font-size:7.5pt !important; }
-thead { display:table-header-group; }
-tr    { page-break-inside:avoid; }
-th { background:#1a2a4a !important; color:#fff !important; padding:5pt 5pt !important; font-size:7.5pt !important; font-weight:700 !important; text-align:right !important; border:1px solid #2a3a5a !important; }
-td { padding:4pt 5pt !important; border:1px solid #dde4f0 !important; color:#111 !important; font-size:7.5pt !important; }
-tr:nth-child(even) td { background:#f4f7ff !important; }
+${_tableCSS(colCount, colCount > 10)}
+${_buildTabColWidths(tabId)}
 
-/* Tags */
-.tag { border:1px solid #999 !important; color:#333 !important; background:#f0f0f0 !important; font-size:7pt !important; padding:1pt 5pt !important; border-radius:10pt !important; display:inline-block; }
+/* ── Bars ── */
+.bar-bg   { background:#dde4f0 !important; height:5px; border-radius:3px; display:block; overflow:hidden; }
+.bar-fill { height:5px; display:block; border-radius:3px; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
 
-/* Bars */
-.bar-bg   { background:#dde4f0 !important; height:6px; border-radius:3px; display:block; overflow:hidden; }
-.bar-fill { height:6px; display:block; border-radius:3px; }
+/* ── Insight cards ── */
+.insight-card { background:#f8faff !important; border:1px solid #d0d8ea !important; border-radius:5pt !important; padding:7pt !important; page-break-inside:avoid; display:flex; gap:7pt; margin-bottom:5pt; }
+.insight-icon { font-size:1.2rem; flex-shrink:0; }
+.insight-title { font-size:8.5pt !important; font-weight:700; color:#1a2a4a !important; margin-bottom:2pt; }
+.insight-text  { font-size:7.5pt !important; color:#444 !important; line-height:1.45; }
 
-/* Insight cards */
-.insight-card { background:#f8faff !important; border:1px solid #d0d8ea !important; border-radius:6pt !important; padding:8pt !important; page-break-inside:avoid; display:flex; gap:8pt; margin-bottom:6pt; }
-.insight-icon { font-size:1.4rem; flex-shrink:0; }
-.insight-title { font-size:9pt !important; font-weight:700; color:#1a2a4a !important; margin-bottom:3pt; }
-.insight-text  { font-size:8pt !important; color:#444 !important; line-height:1.5; }
-
-/* Grid layouts */
-.grid-auto, .grid-2, .grid-3 { display:grid !important; grid-template-columns:repeat(2,1fr) !important; gap:6pt !important; }
+/* ── Grid layouts ── */
+.grid-auto, .grid-2, .grid-3 { display:grid !important; grid-template-columns:repeat(2,1fr) !important; gap:5pt !important; }
 [style*="grid-template-columns:repeat(3,1fr)"] { grid-template-columns:repeat(3,1fr) !important; }
 [style*="grid-template-columns:repeat(auto-fit"] { grid-template-columns:repeat(3,1fr) !important; }
 
-/* Plan tab */
-#tab-plan [style*="display:flex;flex-direction:column;gap:12px"] > div { page-break-inside:avoid; margin-bottom:6pt; }
+/* ── Plan tab ── */
+#tab-plan [style*="display:flex;flex-direction:column;gap:12px"] > div { page-break-inside:avoid; margin-bottom:5pt; }
 
-/* Position absolute elements */
-.kpi-card > div[style*="position:absolute"] { display:none !important; }
+/* ── Flex cleanup ── */
+[style*="display:flex"]:not(.print-footer):not(.print-page-header):not(.kpi-card) { flex-wrap:wrap !important; }
+
+${_footerCSS()}
 </style>
 </head>
-<body onload="setTimeout(function(){window.print();},400)">
+<body onload="setTimeout(function(){window.print();},450)">
 <div class="print-page-header">
   <h1>📊 لوحة التحليل الاستراتيجي الشامل — ${title}${filterLabel}</h1>
-  <p>الفترة: 1 يناير 2026 — 19 مارس 2026 &nbsp;|&nbsp; تاريخ الطباعة: ${new Date().toLocaleDateString('ar-LY')}</p>
+  <p>الفترة: 1 يناير 2026 — 19 مارس 2026 &nbsp;|&nbsp; تاريخ الطباعة: ${printDate}</p>
 </div>
 ${activeHTML}
-
-<footer style="width:100%;padding:6pt 14pt;background:#1a2a4a;-webkit-print-color-adjust:exact;print-color-adjust:exact;border-top:2.5pt solid #00d4ff;display:flex;justify-content:space-between;align-items:center;font-family:Cairo,Arial,sans-serif;font-size:8pt;position:fixed;bottom:0;left:0;right:0;">
-  <span style="color:#fff;font-weight:700">جميع الحقوق محفوظة © 2026 — المحاسب أحمد العكاري</span>
-  <span style="color:#00d4ff;font-weight:700">0915528970 | ​هاتف / Phone</span>
-  <span style="color:#cce4ff">All Rights Reserved © 2026 — Accountant Ahmed Al-Aakari</span>
-</footer>
-<style>@page{margin-bottom:18mm}</style>
-
+${_buildPrintFooter()}
 </body>
 </html>`;
 
@@ -8981,6 +9595,16 @@ ${activeHTML}
   let _printImgs = [];
 
   window.addEventListener('beforeprint', function() {
+    // ── ضبط حجم الصفحة حسب التبويب النشط ──
+    var _activeTab = document.querySelector('.tab-panel.active');
+    var _tabId = _activeTab ? _activeTab.id.replace('tab-','') : 'overview';
+    var _bigTabs = ['reps','repcmp','customers','products','aging'];
+    var _isLandscape = _bigTabs.indexOf(_tabId) >= 0;
+    var _pgStyle = document.getElementById('_print_page_style');
+    if (!_pgStyle) { _pgStyle = document.createElement('style'); _pgStyle.id = '_print_page_style'; document.head.appendChild(_pgStyle); }
+    _pgStyle.textContent = _isLandscape
+      ? '@media print { @page { size: A4 landscape; margin: 8mm 7mm 16mm 7mm; } }'
+      : '@media print { @page { size: A4 portrait; margin: 12mm 10mm 18mm 10mm; } }';
     // تحويل الرسوم البيانية لصور
     _printImgs = [];
     document.querySelectorAll('canvas').forEach((canvas, i) => {
@@ -9007,23 +9631,23 @@ ${activeHTML}
       st.id = '_pf_st';
       st.textContent =
         '#_pf_el{' +
-          'width:100%;margin-top:20pt;padding:6pt 14pt;' +
+          'width:100%;margin-top:20pt;padding:7pt 14pt;' +
           'background:#1a2a4a!important;' +
           '-webkit-print-color-adjust:exact!important;' +
           'print-color-adjust:exact!important;' +
-          'border-top:2pt solid #00d4ff;' +
+          'border-top:3pt solid #00d4ff!important;' +
           'display:flex!important;' +
-          'justify-content:space-between;align-items:center;' +
-          'font-family:Cairo,Arial,sans-serif;font-size:8pt;' +
-          'page-break-inside:avoid;' +
+          'justify-content:space-between!important;align-items:center!important;' +
+          'font-family:Cairo,Arial,sans-serif!important;' +
+          'page-break-inside:avoid;clear:both;position:relative;' +
         '}' +
-        '#_pf_el .a{color:#fff!important;font-weight:700}' +
-        '#_pf_el .b{color:#00d4ff!important;font-weight:700}' +
-        '#_pf_el .c{color:#cce4ff!important}';
+        '#_pf_el .a{color:#ffffff!important;font-weight:800!important;font-size:9pt!important;letter-spacing:0.2pt}' +
+        '#_pf_el .b{color:#00d4ff!important;font-weight:800!important;font-size:10pt!important;letter-spacing:0.5pt}' +
+        '#_pf_el .c{color:#cce4ff!important;font-size:8.5pt!important;font-weight:600!important}';
       document.head.appendChild(st);
       pf.innerHTML =
         '<span class="a">جميع الحقوق محفوظة © 2026 — المحاسب أحمد العكاري</span>' +
-        '<span class="b">0915528970  |  ‫هاتف / Phone</span>' +
+        '<span class="b">0915528970  |  هاتف / Phone</span>' +
         '<span class="c">All Rights Reserved © 2026 — Accountant Ahmed Al-Aakari</span>';
       // أضفه في نهاية التبويب النشط
       var activeTab = document.querySelector('.tab-panel.active');
@@ -9043,6 +9667,9 @@ ${activeHTML}
     if (pf) pf.remove();
     var st = document.getElementById('_pf_st');
     if (st) st.remove();
+    // إزالة @page الديناميكي
+    var pg = document.getElementById('_print_page_style');
+    if (pg) pg.remove();
   });
 })();
 
@@ -9102,102 +9729,175 @@ function _getActiveFiltersLabel(tableId) {
 }
 
 function printTable(tableId, title) {
-  // For paginated tables, expand all rows first
+  const fmt = n => Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
   let restoreFn = null;
 
+  /* ── توسيع جدول المديونية التفصيلي ── */
   if (tableId === 'debtDetailBody') {
-    const fmt = n => Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
     const savedPage = debtDetailPage, savedFiltered = debtDetailFiltered.slice();
     const el = document.getElementById('debtDetailBody');
     if (el) {
       el.innerHTML = debtDetailFiltered.map((r,i) => {
         const nc = r.net>50000?'#c0392b':r.net>10000?'#e67e22':r.net<0?'#27ae60':'#333';
         const st = r.net<0?'دائن':r.net===0?'مسوّى':r.net>50000?'حرج':r.net>10000?'مرتفع':'عادي';
-        return '<tr><td style="text-align:center">'+(i+1)+'</td><td>'+r.code+'</td><td>'+r.name+'</td><td>'+r.rep+'</td><td>'+fmt(r.debit)+'</td><td>'+fmt(r.credit)+'</td><td style="font-weight:700;color:'+nc+'">'+fmt(r.net)+'</td><td>'+st+'</td></tr>';
+        return '<tr><td style="text-align:center">'+(i+1)+'</td><td>'+r.code+'</td><td>'+r.name+'</td><td>'+r.rep+'</td><td style="text-align:right">'+fmt(r.debit)+'</td><td style="text-align:right">'+fmt(r.credit)+'</td><td style="font-weight:700;color:'+nc+';text-align:right">'+fmt(r.net)+'</td><td style="text-align:center">'+st+'</td></tr>';
       }).join('');
     }
     restoreFn = () => { debtDetailFiltered = savedFiltered; debtDetailPage = savedPage; renderDebtDetailTable(); };
   }
 
-  if (tableId === 'custBody') {
-    const fmt = n => Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  /* ── توسيع جدول العملاء (custTable أو custBody) — 17 عمود كاملاً ── */
+  if (tableId === 'custTable' || tableId === 'custBody') {
     const savedPage = custPage;
     const el = document.getElementById('custBody');
     if (el) {
       el.innerHTML = filteredCust.map((r,i) => {
-        const cpC = r.cp>=80?'#27ae60':r.cp>=50?'#f39c12':'#c0392b';
-        return '<tr><td style="text-align:center">'+(i+1)+'</td><td>'+r.n+'</td><td style="text-align:center">'+r.inv+'</td><td>'+fmt(r.s)+'</td><td style="text-align:center">'+r.itm+'</td><td style="text-align:center">'+r.qty.toLocaleString()+'</td><td>'+fmt(r.ret)+'</td><td>'+fmt(r.c)+'</td><td style="text-align:center">'+r.cops+'</td><td>'+fmt(r.ns)+'</td><td style="color:'+cpC+';font-weight:700">'+r.cp.toFixed(1)+'%</td><td>'+r.rp.toFixed(1)+'%</td><td>'+fmt(r.g)+'</td><td>'+r.cat+'</td></tr>';
+        const cpC  = r.cp>=80?'#27ae60':r.cp>=50?'#f39c12':'#c0392b';
+        const rpC  = r.rp>=15?'#c0392b':r.rp>=5?'#e67e22':'#555';
+        const gC   = r.g>0?'#c0392b':r.g<0?'#27ae60':'#555';
+        /* المندوب: من r.rep أو custToRep بالفهرس الأصلي */
+        const origIdx = custData.indexOf(r);
+        const repName = r.rep || (typeof custToRep!=='undefined'?custToRep[origIdx]:'') || (typeof custNameToRep!=='undefined'?custNameToRep[r.n||'']:'') || '—';
+        /* أعمار الذمم */
+        const a30 = r.age30||0;
+        const a60 = r.age60||0;
+        const fmtAge = n => n>0 ? fmt(n) : '—';
+        /* تصنيف */
+        const catColors = {ممتاز:'#27ae60',جيد:'#2980b9',متوسط:'#f39c12',مخاطرة:'#e67e22','مخاطرة عالية':'#c0392b'};
+        const catC = catColors[r.cat]||'#555';
+        return '<tr>'
+          + '<td style="text-align:center;color:#666">'+(i+1)+'</td>'
+          + '<td style="font-weight:600">'+r.n+'</td>'
+          + '<td style="color:#555;font-size:6pt">'+repName+'</td>'
+          + '<td style="text-align:center">'+r.inv+'</td>'
+          + '<td style="text-align:right;font-weight:700;color:#1a2a4a">'+fmt(r.s)+'</td>'
+          + '<td style="text-align:center">'+r.itm+'</td>'
+          + '<td style="text-align:center">'+r.qty.toLocaleString()+'</td>'
+          + '<td style="text-align:right;color:#e67e22">'+fmt(r.ret)+'</td>'
+          + '<td style="text-align:right;color:#27ae60">'+fmt(r.c)+'</td>'
+          + '<td style="text-align:center">'+r.cops+'</td>'
+          + '<td style="text-align:right;font-weight:600">'+fmt(r.ns)+'</td>'
+          + '<td style="color:'+cpC+';font-weight:700;text-align:center">'+r.cp.toFixed(1)+'%</td>'
+          + '<td style="text-align:center;color:'+rpC+'">'+r.rp.toFixed(1)+'%</td>'
+          + '<td style="text-align:right;color:'+gC+';font-weight:600">'+fmt(r.g)+'</td>'
+          + '<td style="text-align:right;color:'+(a30>0?'#c0392b':'#aaa')+';font-weight:'+(a30>0?'700':'400')+'">'+fmtAge(a30)+'</td>'
+          + '<td style="text-align:right;color:'+(a60>0?'#b7860b':'#aaa')+';font-weight:'+(a60>0?'700':'400')+'">'+fmtAge(a60)+'</td>'
+          + '<td style="text-align:center;color:'+catC+';font-weight:700">'+r.cat+'</td>'
+          + '</tr>';
       }).join('');
     }
     restoreFn = () => { custPage = savedPage; renderCustTable(); };
+    tableId = 'custTable';
   }
 
-  // Collect active filters label BEFORE any DOM changes
+  /* ── توسيع جدول أعمار الذمم (agingTable) — كل الصفوف المفلترة ── */
+  if (tableId === 'agingTable') {
+    const tbody = document.getElementById('agingTbody');
+    if (tbody) {
+      const rows = (_agLastRows && _agLastRows.length) ? _agLastRows : (agingData || []);
+      const fmtN  = n => (!n && n!==0) ? '—' : Math.round(Math.abs(n)).toLocaleString('en-US');
+      const fmtDebt = n => n<=0 ? '✓ مسوّى' : Math.round(n).toLocaleString('en-US');
+      const fmtAge  = (n, col) => (!n||n<=0) ? '—' : '<span style="color:'+col+';font-weight:700">'+Math.round(n).toLocaleString('en-US')+'</span>';
+      const catColors = {ممتاز:'#27ae60',جيد:'#2980b9',متوسط:'#b7860b',مخاطرة:'#e67e22','مخاطرة عالية':'#c0392b'};
+      tbody.innerHTML = rows.map((c,i) => {
+        const catC = catColors[c.cat]||'#555';
+        const debtC = c.debt_net<=0?'#27ae60':'#c0392b';
+        return '<tr>'
+          + '<td style="text-align:center;color:#666">'+(i+1)+'</td>'
+          + '<td style="font-weight:600">'+c.name+'</td>'
+          + '<td style="color:#555;font-size:6pt">'+(c.rep||'—')+'</td>'
+          + '<td style="text-align:right;font-weight:700;color:#1a2a4a">'+fmtN(c.sales)+'</td>'
+          + '<td style="text-align:right;color:#e67e22">'+fmtN(c.ret)+'</td>'
+          + '<td style="text-align:right;color:#27ae60;font-weight:600">'+fmtN(c.ns)+'</td>'
+          + '<td style="text-align:right;color:#2980b9">'+fmtN(c.col)+'</td>'
+          + '<td style="text-align:right">'+fmtAge(c.age30,'#c0392b')+'</td>'
+          + '<td style="text-align:right">'+fmtAge(c.age60,'#b7860b')+'</td>'
+          + '<td style="text-align:right">'+fmtAge(c.ageOld,'#e67e22')+'</td>'
+          + '<td style="text-align:right;font-weight:700;color:'+debtC+'">'+fmtDebt(c.debt_net)+'</td>'
+          + '<td style="text-align:center;color:'+catC+';font-weight:700">'+(c.cat||'—')+'</td>'
+          + '</tr>';
+      }).join('');
+      restoreFn = () => { renderAgingTable && renderAgingTable(); };
+    }
+  }
+
+  /* ── توسيع جدول المناديب (repsTable) ── */
+  if (tableId === 'repsTable') {
+    const savedPage = repsPage;
+    const body = document.getElementById('repsBody');
+    if (body && typeof filteredReps !== 'undefined') {
+      const fmtN = n => n==null?'-':Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+      const view = document.getElementById('repView')?.value || 'basic';
+      body.innerHTML = filteredReps.map((r,i) => {
+        const roiC = r.roi>=100?'#00d4ff':r.roi>=80?'#00ff88':r.roi>=50?'#ff6b35':'#ff4757';
+        const retC = r.retPct>=20?'#ff4757':r.retPct>=10?'#ff6b35':'#27ae60';
+        if (view==='collections')
+          return '<tr><td>'+(i+1)+'</td><td>'+r.name+'</td><td>'+r.cat+'</td><td>'+fmtN(r.sales)+'</td><td>'+fmtN(r.netSales)+'</td><td>'+fmtN(r.collections)+'</td><td>'+fmtN(r.bank)+'</td><td>'+fmtN(r.cash)+'</td><td>'+r.collOps+'</td><td style="color:'+roiC+'">'+r.roi.toFixed(1)+'%</td><td>'+fmtN(r.gap)+'</td><td></td></tr>';
+        if (view==='returns')
+          return '<tr><td>'+(i+1)+'</td><td>'+r.name+'</td><td>'+r.cat+'</td><td>'+fmtN(r.sales)+'</td><td>'+fmtN(r.netSales)+'</td><td>'+fmtN(r.returns)+'</td><td>'+r.retQty+'</td><td style="color:'+retC+'">'+r.retPct.toFixed(1)+'%</td><td></td></tr>';
+        if (view==='debt')
+          return '<tr><td>'+(i+1)+'</td><td>'+r.name+'</td><td>'+r.cat+'</td><td>'+fmtN(r.sales)+'</td><td>'+fmtN(r.netSales)+'</td><td>'+fmtN(r.debit)+'</td><td>'+fmtN(r.credit)+'</td><td>'+fmtN(r.debtNet)+'</td><td>'+r.debtPct.toFixed(1)+'%</td><td></td></tr>';
+        /* basic default */
+        return '<tr><td>'+(i+1)+'</td><td>'+r.name+'</td><td>'+r.cat+'</td><td>'+r.invoices+'</td><td>'+r.customers+'</td><td>'+r.items+'</td><td>'+r.qty+'</td><td>'+fmtN(r.sales)+'</td><td>'+fmtN(r.netSales)+'</td><td>'+fmtN(r.avgInv)+'</td><td></td></tr>';
+      }).join('');
+    }
+    restoreFn = () => { repsPage = savedPage; renderRepsTable && renderRepsTable(); };
+  }
+
+  /* ── جمع الفلاتر النشطة ── */
   const filtersLabel = _getActiveFiltersLabel(tableId);
 
-  // Get table element (handle both table id and tbody id)
+  /* ── الحصول على عنصر الجدول ── */
   let tableEl = document.getElementById(tableId);
-  if (!tableEl) { if (restoreFn) restoreFn(); return; }
-
-  // If we got a tbody, walk up to <table>
-  if (tableEl.tagName === 'TBODY' || tableEl.tagName === 'THEAD') {
+  if (!tableEl) { if (restoreFn) setTimeout(restoreFn, 100); return; }
+  if (tableEl.tagName === 'TBODY' || tableEl.tagName === 'THEAD')
     tableEl = tableEl.closest('table');
-  }
-  if (!tableEl || tableEl.tagName !== 'TABLE') {
+  if (!tableEl || tableEl.tagName !== 'TABLE')
     tableEl = tableEl ? tableEl.closest('table') || tableEl.querySelector('table') : null;
-  }
-  if (!tableEl) { if (restoreFn) restoreFn(); return; }
+  if (!tableEl) { if (restoreFn) setTimeout(restoreFn, 100); return; }
 
   const tableHTML = tableEl.outerHTML;
   const rowCount  = tableEl.querySelectorAll('tbody tr').length;
   const printDate = new Date().toLocaleDateString('ar-LY');
+
+  /* عدد الأعمدة من thead الفعلي */
+  const thCount  = tableEl.querySelectorAll('thead th').length || 8;
+  const isLand   = thCount > 10;
+  const tblPage  = isLand ? 'A4 landscape' : 'A4 portrait';
+  const tblMarg  = isLand ? '7mm 6mm 15mm 6mm' : '10mm 9mm 16mm 9mm';
+  const bodyFs   = isLand ? '7pt' : '8pt';
 
   const html = '<!DOCTYPE html><html lang="ar" dir="rtl"><head>'
     + '<meta charset="UTF-8">'
     + '<title>' + title + '</title>'
     + '<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">'
     + '<style>'
-    + '@page{size:A4 landscape;margin:8mm 6mm}'
+    + '@page{size:' + tblPage + ';margin:' + tblMarg + '}'
     + '*{margin:0;padding:0;box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
-    + 'body{font-family:"Cairo",sans-serif;direction:rtl;background:#fff;color:#111;font-size:7.5pt}'
-    + '.ph{background:#1a2a4a;color:#fff;padding:6pt 10pt;margin-bottom:4pt;border-radius:4pt}'
+    + 'body{font-family:"Cairo",sans-serif;direction:rtl;background:#fff;color:#111;font-size:' + bodyFs + ';line-height:1.4}'
+    + '.ph{background:#1a2a4a;color:#fff;padding:7pt 11pt;margin-bottom:6pt;border-radius:4pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
     + '.ph-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:3pt}'
     + '.ph h1{font-size:11pt;font-weight:800;margin:0}'
     + '.ph .meta{font-size:7pt;color:#aac;white-space:nowrap}'
-    + '.ph .filter-bar{font-size:7.5pt;color:#cce4ff;background:rgba(0,0,0,0.25);padding:3pt 7pt;border-radius:3pt;margin-top:2pt}'
-    + '.ph .filter-bar strong{color:#fff;margin-left:4pt}'
-    + 'table{width:100%;border-collapse:collapse;font-size:7pt;table-layout:auto}'
-    + 'thead{display:table-header-group}'
-    + 'tr{page-break-inside:avoid}'
-    + 'th{background:#1a2a4a!important;color:#fff!important;padding:4pt 4pt!important;font-size:7pt!important;font-weight:700!important;text-align:right!important;border:1px solid #2a3a5a!important;white-space:nowrap;line-height:1.2}'
-    + 'td{padding:3pt 4pt!important;border:1px solid #d0d8e8!important;color:#111!important;font-size:7pt!important;vertical-align:middle;line-height:1.3}'
-    + 'tr:nth-child(even) td{background:#f0f4fb!important}'
-    + '.tag,.tag-red,.tag-green,.tag-blue,.tag-orange{border:1px solid #999!important;color:#333!important;background:#f0f0f0!important;font-size:6pt!important;padding:1pt 3pt!important;border-radius:6pt!important;display:inline-block;font-weight:700}'
-    + 'span[style]{color:#333!important}'
-    + '.bar-bg,.bar-fill{display:none!important}'
-    + 'div[style*="height:3px"]{display:none!important}'
-    + 'div[style*="height:5px"]{display:none!important}'
-    + '[style*="display:flex"]{display:block!important}'
-    + 'td div{display:inline!important}'
-    + 'td div:first-child{font-weight:600}'
-    + 'canvas{display:none!important}'
-    + 'button{display:none!important}'
+    + '.filter-bar{font-size:7pt;color:#cce4ff;background:rgba(0,0,0,0.25);padding:3pt 8pt;border-radius:3pt;margin-top:3pt}'
+    + '.filter-bar strong{color:#fff}'
+    + _tableCSS(thCount, isLand)
     + '</style>'
-    + '</head><body>'
+    + '</head><body onload="setTimeout(function(){window.print();},450)">'
     + '<div class="ph">'
     +   '<div class="ph-top"><h1>🖨️ ' + title + '</h1><span class="meta">' + rowCount + ' سجل &nbsp;|&nbsp; ' + printDate + '</span></div>'
-    +   '<div class="filter-bar"><strong>🔍 الفلتر المستخدم:</strong> ' + filtersLabel + '</div>'
+    +   '<div class="filter-bar"><strong>🔍 الفلتر: </strong>' + filtersLabel + '</div>'
     + '</div>'
-    + tableHTML
+    + tableHTML.replace(/<table([^>]*)>/, '<table$1>' + _buildColgroup(tableId, thCount))
+    + _buildPrintFooter()
     + '</body></html>';
 
   const blob = new Blob([html], {type:'text/html;charset=utf-8'});
   const url  = URL.createObjectURL(blob);
   const win  = window.open(url, '_blank', 'width=1100,height=750');
-  if (win) {
-    win.onload = function(){ win.print(); };
-    setTimeout(() => URL.revokeObjectURL(url), 120000);
-  }
+  if (!win) alert('يرجى السماح بالنوافذ المنبثقة لهذا الموقع ثم أعد المحاولة');
+  else setTimeout(() => URL.revokeObjectURL(url), 120000);
+
   if (restoreFn) setTimeout(restoreFn, 800);
 }
 
@@ -11988,9 +12688,31 @@ function _showStartupLoader() {
         <span style="font-size:22px">📊</span>
         <h2 style="margin:0;color:#e8f4f8;font-size:18px;font-weight:700">تحميل ملفات البيانات</h2>
       </div>
-      <p style="color:#8ba3b8;font-size:12px;margin-bottom:18px;line-height:1.7">
-        ارفع الملفات الأربعة دفعة واحدة — يمكنك الضغط على عدة ملفات معاً
+      <p style="color:#8ba3b8;font-size:12px;margin-bottom:14px;line-height:1.7">
+        اسحب وأفلت ملفاتك (CSV / XLS / XLSX) أو اضغط للاختيار اليدوي
       </p>
+
+      <!-- ===== Drop Zone ===== -->
+      <div id="su_dropzone" onclick="_startupPickAll()" style="
+        border:2px dashed rgba(0,212,255,0.35);
+        border-radius:12px;
+        padding:18px 14px;
+        text-align:center;
+        cursor:pointer;
+        margin-bottom:14px;
+        transition:border-color .2s, background .2s;
+        background:rgba(0,212,255,0.03);
+        user-select:none;
+      ">
+        <div id="su_dz_icon" style="font-size:28px;margin-bottom:4px">☁️</div>
+        <div id="su_dz_text" style="font-size:12px;color:#8ba3b8;line-height:1.6">
+          اسحب CSV / XLS / XLSX هنا أو <span style="color:#00d4ff;font-weight:600">اضغط للاختيار</span>
+        </div>
+        <div id="su_dz_hint" style="font-size:10px;color:#4a6070;margin-top:3px">
+          يُقبل: CSV · XLS · XLSX — مبيعات · تحصيل · مديونية · تصنيف
+        </div>
+      </div>
+      <!-- ===== End Drop Zone ===== -->
 
       ${_startupFileRow('مبيعات',  '📦', savedNames['مبيعات'])}
       ${_startupFileRow('تحصيل',   '💳', savedNames['تحصيل'])}
@@ -12030,6 +12752,74 @@ function _showStartupLoader() {
     const inp = document.getElementById('su_inp_' + key);
     if (inp) inp.addEventListener('change', () => _startupFileSet(key, inp));
   });
+
+  // ===== Drag & Drop على الـ DropZone =====
+  const dz = document.getElementById('su_dropzone');
+  if (dz) {
+    dz.addEventListener('dragover', e => {
+      e.preventDefault();
+      dz.style.borderColor = '#00d4ff';
+      dz.style.background  = 'rgba(0,212,255,0.08)';
+      document.getElementById('su_dz_icon').textContent = '📂';
+      document.getElementById('su_dz_text').innerHTML =
+        '<span style="color:#00d4ff;font-weight:600">أفلت الملفات هنا!</span>';
+    });
+    dz.addEventListener('dragleave', e => {
+      dz.style.borderColor = 'rgba(0,212,255,0.35)';
+      dz.style.background  = 'rgba(0,212,255,0.03)';
+      document.getElementById('su_dz_icon').textContent = '☁️';
+      document.getElementById('su_dz_text').innerHTML =
+        'اسحب CSV / XLS / XLSX هنا أو <span style="color:#00d4ff;font-weight:600">اضغط للاختيار</span>';
+    });
+    dz.addEventListener('drop', e => {
+      e.preventDefault();
+      dz.style.borderColor = 'rgba(0,212,255,0.35)';
+      dz.style.background  = 'rgba(0,212,255,0.03)';
+      document.getElementById('su_dz_icon').textContent = '✅';
+      document.getElementById('su_dz_text').innerHTML =
+        '<span style="color:#00ff88;font-weight:600">تم استلام الملفات!</span>';
+
+      const keyMap = {
+        'مبيعات':          'مبيعات',
+        'sales':            'مبيعات',
+        'تحصيل':           'تحصيل',
+        'collection':       'تحصيل',
+        'مديونية':          'مديونية',
+        'debt':             'مديونية',
+        'تصنيف_المندوبين':  'تصنيف',
+        'تصنيف':           'تصنيف',
+        'classification':   'تصنيف',
+      };
+      let unrecognized = [];
+
+      Array.from(e.dataTransfer.files).forEach(file => {
+        const base = file.name.replace(/\.(csv|xlsx?)$/i, '').trim();
+        const matched = keyMap[base] ||
+          Object.keys(keyMap).find(k => base.includes(k));
+        const key = matched ? keyMap[matched] : null;
+        if (key) {
+          _startupSelected[key] = file;
+          csvFiles[key]         = file;
+          const lbl = document.getElementById('su_lbl_' + key);
+          const st  = document.getElementById('su_st_'  + key);
+          if (lbl) lbl.innerHTML = `<span style="color:#00ff88;font-size:11px">✓ ${file.name}</span>`;
+          if (st)  st.textContent = '✅';
+        } else {
+          unrecognized.push(file.name);
+        }
+      });
+
+      const msg = document.getElementById('startupMsg');
+      if (unrecognized.length && msg) {
+        msg.textContent = '⚠️ لم يُتعرف على: ' + unrecognized.join(', ');
+      }
+
+      const hasAny = Object.keys(_startupSelected).length > 0;
+      const btn = document.getElementById('startupApplyBtn');
+      if (btn) { btn.disabled = !hasAny; btn.style.opacity = hasAny ? '1' : '0.5'; }
+    });
+  }
+  // ===== End Drag & Drop =====
 }
 
 function _startupFileRow(key, icon, savedName, isGold) {
@@ -12273,8 +13063,25 @@ function parseCSVContent(text) {
 
 function readFileAsText(file) {
   return new Promise((resolve, reject) => {
-    // ── اكتشاف الترميز التلقائي ──
-    // نقرأ أول 512 بايت كـ ArrayBuffer لفحص BOM والترميز
+
+    // ── إذا كان XLS / XLSX → نحوّله عبر SheetJS إلى CSV نصي ──
+    if (/\.xlsx?$/i.test(file.name)) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const wb = XLSX.read(e.target.result, { type: 'array' });
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          // sheet_to_csv يُنتج CSV بدون مشاكل ترميز
+          const csv = XLSX.utils.sheet_to_csv(ws);
+          resolve(csv);
+        } catch(err) { reject(err); }
+      };
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(file);
+      return;
+    }
+
+    // ── CSV: اكتشاف الترميز التلقائي ──
     const sniffer = new FileReader();
     sniffer.onload = ev => {
       const buf = ev.target.result;
@@ -12293,21 +13100,18 @@ function readFileAsText(file) {
       else if (bytes[0] === 0xFE && bytes[1] === 0xFF) {
         encoding = 'utf-16be';
       }
-      // فحص UTF-8 بدون BOM: إذا كانت البيانات UTF-8 صالحة تحتوي عربي
       else {
         try {
           const sample = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
           if (/[\u0600-\u06FF]/.test(sample)) encoding = 'utf-8';
         } catch(e) {
-          encoding = 'windows-1256'; // ليست UTF-8 → cp1256
+          encoding = 'windows-1256';
         }
       }
 
-      // الآن نقرأ الملف كاملاً بالترميز المكتشف
       const reader = new FileReader();
       reader.onload = e2 => resolve(e2.target.result);
       reader.onerror = () => {
-        // fallback: windows-1256
         const r3 = new FileReader();
         r3.onload = e3 => resolve(e3.target.result);
         r3.onerror = reject;
@@ -12316,7 +13120,6 @@ function readFileAsText(file) {
       reader.readAsText(file, encoding);
     };
     sniffer.onerror = () => {
-      // إذا فشل الفحص نستخدم windows-1256 مباشرة
       const reader = new FileReader();
       reader.onload = e => resolve(e.target.result);
       reader.onerror = reject;
@@ -12407,15 +13210,111 @@ function cleanNum(s) {
 const csvFiles = { 'مبيعات': null, 'تحصيل': null, 'مديونية': null, 'تصنيف': null };
 
 function setCsvFile(type, input) {
-  csvFiles[type] = input.files[0] || null;
-  const statusEl = document.getElementById('csvStatus_' + type);
-  if (statusEl) statusEl.textContent = csvFiles[type] ? '✅' : '⬜';
-  // show hint when classification file selected
+  const file = input?.files?.[0] || null;
+  csvFiles[type] = file;
+  const statusEl = document.getElementById('csvStatus_'   + type);
+  const nameEl   = document.getElementById('csvFileName_' + type);
+  if (statusEl) statusEl.textContent = file ? '✅' : '⬜';
+  if (nameEl)   nameEl.textContent   = file ? file.name : '—';
+  if (nameEl)   nameEl.style.color   = file ? 'var(--accent2)' : 'var(--muted)';
   if (type === 'تصنيف') {
     const info = document.getElementById('csvClassifInfo');
-    if (info) info.style.display = csvFiles[type] ? 'block' : 'none';
+    if (info) info.style.display = file ? 'block' : 'none';
   }
 }
+
+// ══════════ Drag & Drop على لوحة CSV ══════════
+
+const _csvKeyMap = {
+  'مبيعات': 'مبيعات', 'sales': 'مبيعات',
+  'تحصيل': 'تحصيل',  'collection': 'تحصيل',
+  'مديونية': 'مديونية', 'debt': 'مديونية',
+  'تصنيف_المندوبين': 'تصنيف', 'تصنيف': 'تصنيف', 'classification': 'تصنيف',
+};
+
+function _csvProcessFiles(files) {
+  let matched = 0;
+  const unmatched = [];
+  files.forEach(file => {
+    const base = file.name.replace(/\.(csv|xlsx?|xls)$/i, '').trim();
+    const key  = _csvKeyMap[base] || Object.keys(_csvKeyMap).find(k => base.includes(k));
+    const dest = key ? _csvKeyMap[key] : null;
+    if (dest) {
+      csvFiles[dest] = file;
+      matched++;
+      const statusEl = document.getElementById('csvStatus_'   + dest);
+      const nameEl   = document.getElementById('csvFileName_' + dest);
+      if (statusEl) statusEl.textContent = '✅';
+      if (nameEl)   { nameEl.textContent = file.name; nameEl.style.color = 'var(--accent2)'; }
+      if (dest === 'تصنيف') {
+        const info = document.getElementById('csvClassifInfo');
+        if (info) info.style.display = 'block';
+      }
+    } else {
+      unmatched.push(file.name);
+    }
+  });
+  const msgEl = document.getElementById('csvDropMsg');
+  if (msgEl) {
+    if (matched === files.length) {
+      msgEl.style.color   = 'var(--accent2)';
+      msgEl.textContent   = '✅ تم التعرف على جميع الملفات (' + matched + ')';
+    } else if (matched > 0) {
+      msgEl.style.color   = 'var(--gold)';
+      msgEl.textContent   = '✅ ' + matched + ' ملف تم التعرف عليه | ⚠️ لم يُتعرف على: ' + unmatched.join('، ');
+    } else {
+      msgEl.style.color   = 'var(--red)';
+      msgEl.textContent   = '⚠️ لم يُتعرف على الملفات: ' + unmatched.join('، ') + ' — تأكد من الأسماء';
+    }
+  }
+  const anyLoaded = Object.values(csvFiles).some(Boolean);
+  const btn = document.getElementById('csvApplyBtn');
+  if (btn) btn.disabled = !anyLoaded;
+}
+
+function _csvDragOver(e) {
+  e.preventDefault(); e.stopPropagation();
+  const zone = document.getElementById('csvDropZone');
+  if (zone) {
+    zone.style.background  = 'rgba(0,212,255,0.10)';
+    zone.style.borderColor = 'rgba(0,212,255,0.8)';
+    zone.style.transform   = 'scale(1.01)';
+  }
+}
+
+function _csvDragLeave(e) {
+  e.preventDefault(); e.stopPropagation();
+  const zone = document.getElementById('csvDropZone');
+  if (zone) {
+    zone.style.background  = 'rgba(0,212,255,0.04)';
+    zone.style.borderColor = 'rgba(0,212,255,0.4)';
+    zone.style.transform   = 'scale(1)';
+  }
+}
+
+function _csvDrop(e) {
+  e.preventDefault(); e.stopPropagation();
+  _csvDragLeave(e);
+  const files = Array.from(e.dataTransfer?.files || []).filter(f =>
+    /\.(csv|xlsx?|xls)$/i.test(f.name)
+  );
+  if (!files.length) {
+    const msgEl = document.getElementById('csvDropMsg');
+    if (msgEl) { msgEl.style.color = 'var(--red)'; msgEl.textContent = '⚠️ الملفات يجب أن تكون CSV أو XLS أو XLSX'; }
+    return;
+  }
+  _csvProcessFiles(files);
+}
+
+function _csvPickAll() {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = '.csv,.xlsx,.xls';
+  inp.multiple = true;
+  inp.onchange = () => _csvProcessFiles(Array.from(inp.files));
+  inp.click();
+}
+// ══════════ End Drag & Drop ══════════
 
 
 // ╔══════════════════════════════════════════════════════════════════╗
@@ -13293,6 +14192,12 @@ function _fullRefreshAfterSync(fromGS, msg, btn, hasMabee3at, hasTahseel, hasMad
   _safe('aging rep fil',() => { if(typeof populateAgingRepFilter==='function') populateAgingRepFilter(); });
   _safe('aging cat fil',() => { if(typeof populateAgingCatFilter==='function') populateAgingCatFilter(); });
   _safe('aging table',  () => { if(typeof renderAgingTable==='function') renderAgingTable(); });
+  _safe('aging charts', () => {
+    if (_agChart1) { try{_agChart1.destroy();}catch(e){} _agChart1=null; }
+    if (_agChart2) { try{_agChart2.destroy();}catch(e){} _agChart2=null; }
+    if (_agChart3) { try{_agChart3.destroy();}catch(e){} _agChart3=null; }
+    if(typeof renderAgingCharts==='function') setTimeout(()=>renderAgingCharts(), 100);
+  });
 
   // ══════════════════════════════════════════════════
   //  المرحلة 11 — فلتر التاريخ (قائمة الشهور)
@@ -13560,7 +14465,7 @@ async function applyCsvData(fromGS) {
   const hasTasneef   = !!csvFiles['تصنيف'];
   
   if (!hasMabee3at && !hasTahseel && !hasMadiooniya && !hasTasneef) {
-    document.getElementById('csvProgressMsg').textContent = '⚠️ يرجى رفع ملف واحد على الأقل';
+    document.getElementById('csvProgressMsg').textContent = '⚠️ يرجى رفع ملف واحد على الأقل (CSV أو XLS أو XLSX)';
     return;
   }
   
@@ -14095,6 +15000,12 @@ async function applyCsvData(fromGS) {
     }
     
     msg.textContent = '✅ جارٍ تحديث اللوحة...';
+
+    // ══ تنظيف الكاش دائماً بغض النظر عن الملفات المرفوعة ══
+    window._defaultSnapshot    = null;   // يمنع تلوث البيانات القديمة
+    window._applyDefaultFilter = null;
+    window._csvLoaded          = true;   // يُعطّل فلتر الـ snapshot
+    window._agingBuilt         = false;  // يُجبر إعادة بناء الذمم
 
     // ══════════════════════════════════════════════════════════════════
     //  تحديث شامل مضمون — 4 مراحل متسلسلة بعد اكتمال البيانات
@@ -14715,27 +15626,60 @@ function exportAgingCSV() {
 
     <!-- CSV Panel -->
     <div class="gs-panel active" id="panel-csv">
-      <p class="subtitle" style="margin-bottom:14px">
-        ارفع ملفات CSV المحدّثة — الملفات الفارغة تُبقي البيانات كما هي.
+      <p class="subtitle" style="margin-bottom:12px">
+        ارفع ملفات CSV أو XLS أو XLSX — الملفات الفارغة تُبقي البيانات كما هي.
       </p>
+
+      <!-- ══ منطقة السحب والإفلات ══ -->
+      <div id="csvDropZone"
+        ondragover="_csvDragOver(event)"
+        ondragleave="_csvDragLeave(event)"
+        ondrop="_csvDrop(event)"
+        onclick="_csvPickAll()"
+        style="
+          border: 2px dashed rgba(0,212,255,0.4);
+          border-radius: 14px;
+          padding: 22px 16px;
+          text-align: center;
+          cursor: pointer;
+          background: rgba(0,212,255,0.04);
+          transition: all 0.2s;
+          margin-bottom: 14px;
+          position: relative;
+        ">
+        <div style="font-size:28px;margin-bottom:6px">📂</div>
+        <div style="font-weight:700;color:var(--accent);font-size:14px;margin-bottom:4px">
+          اسحب الملفات هنا أو اضغط للاختيار
+        </div>
+        <div style="font-size:11px;color:var(--muted)">
+          يمكنك إفلات عدة ملفات دفعة واحدة — تُوزَّع تلقائياً حسب الاسم
+        </div>
+        <div id="csvDropMsg" style="margin-top:8px;font-size:12px;min-height:18px;color:var(--accent2)"></div>
+      </div>
+
+      <!-- ══ حالة كل ملف ══ -->
       <div class="csv-file-row">
         <span class="csv-file-label">📦 مبيعات</span>
-        <input class="csv-file-input" type="file" accept=".csv" onchange="setCsvFile('مبيعات', this)">
+        <input class="csv-file-input" type="file" accept=".csv,.xls,.xlsx" id="csvInput_مبيعات" onchange="setCsvFile('مبيعات', this)">
+        <span id="csvFileName_مبيعات" style="flex:1;font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">—</span>
         <span class="csv-file-status" id="csvStatus_مبيعات">⬜</span>
       </div>
       <div class="csv-file-row">
         <span class="csv-file-label">💳 تحصيل</span>
-        <input class="csv-file-input" type="file" accept=".csv" onchange="setCsvFile('تحصيل', this)">
+        <input class="csv-file-input" type="file" accept=".csv,.xls,.xlsx" id="csvInput_تحصيل" onchange="setCsvFile('تحصيل', this)">
+        <span id="csvFileName_تحصيل" style="flex:1;font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">—</span>
         <span class="csv-file-status" id="csvStatus_تحصيل">⬜</span>
       </div>
       <div class="csv-file-row">
         <span class="csv-file-label">💰 مديونية</span>
-        <input class="csv-file-input" type="file" accept=".csv" onchange="setCsvFile('مديونية', this)">
+        <input class="csv-file-input" type="file" accept=".csv,.xls,.xlsx" id="csvInput_مديونية" onchange="setCsvFile('مديونية', this)">
+        <span id="csvFileName_مديونية" style="flex:1;font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">—</span>
         <span class="csv-file-status" id="csvStatus_مديونية">⬜</span>
       </div>
       <div class="csv-file-row" style="border-top:1px solid var(--border);margin-top:8px;padding-top:10px">
         <span class="csv-file-label" style="color:var(--gold)">👥 تصنيف</span>
-        <input class="csv-file-input" type="file" accept=".csv,.xlsx,.xls" onchange="setCsvFile('تصنيف', this)">
+        <input class="csv-file-input" type="file" accept=".csv,.xlsx,.xls" id="csvInput_تصنيف" onchange="setCsvFile('تصنيف', this)">
+        <span id="csvFileName_تصنيف" style="flex:1;font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">—</span>
         <span class="csv-file-status" id="csvStatus_تصنيف">⬜</span>
       </div>
       <div id="csvClassifInfo" style="font-size:11px;color:var(--muted);margin:4px 0 8px 0;padding:6px 10px;background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.15);border-radius:8px;display:none;line-height:1.7">
