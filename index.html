@@ -11244,7 +11244,7 @@ function updateSectionTitle(elId, baseTitle, filters) {
 // ═════════════════════════════════════════════════════════════
 
 const _GS_CLIENT_ID  = '191503304260-l3i0g101u2r2v1be55nt5ung7kthvku9.apps.googleusercontent.com';
-const _GS_SCOPE      = 'https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/drive.readonly';
+const _GS_SCOPE      = 'openid email profile https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/drive.readonly';
 const _GS_LS_DIRECT  = 'dashboard_gs_direct_v1';
 
 let _gsDirectToken   = null;
@@ -11356,21 +11356,28 @@ function _gsDirectHandleToken(resp) {
   _gsStoreToken(resp);
   _gsShowDirectMsg('⏳ جارٍ تحميل الشيتات...', 'info');
 
-  // جلب معلومات المستخدم والشيتات بالتوازي
+  // جلب معلومات المستخدم (اختياري) والشيتات بالتوازي
+  const savedMeta = (() => { try { return JSON.parse(localStorage.getItem(_GS_LS_DIRECT)||'{}'); } catch(e) { return {}; } })();
+
   Promise.all([
     fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: 'Bearer ' + _gsDirectToken } })
-      .then(r => r.ok ? r.json() : Promise.reject(new Error('userinfo ' + r.status))),
+      .then(r => r.ok ? r.json() : null)   // فشل userinfo لا يوقف العملية
+      .catch(() => null),
     fetch('https://www.googleapis.com/drive/v3/files?q=mimeType%3D%22application%2Fvnd.google-apps.spreadsheet%22&fields=files(id,name)&pageSize=50&orderBy=modifiedTime+desc', { headers: { Authorization: 'Bearer ' + _gsDirectToken } })
       .then(r => r.ok ? r.json() : Promise.reject(new Error('drive ' + r.status)))
   ]).then(([user, drive]) => {
-    // عرض معلومات المستخدم
+    // عرض معلومات المستخدم — نستخدم المحفوظ كـ fallback إذا فشل userinfo
+    const name  = user?.name  || savedMeta.name  || '';
+    const email = user?.email || savedMeta.email || '';
     const nameEl  = document.getElementById('gsDirectName');
     const emailEl = document.getElementById('gsDirectEmail');
-    if (nameEl)  nameEl.textContent  = user.name  || '';
-    if (emailEl) emailEl.textContent = user.email || '';
+    if (nameEl)  nameEl.textContent  = name;
+    if (emailEl) emailEl.textContent = email;
 
-    // حفظ البريد
-    try { const s = JSON.parse(localStorage.getItem(_GS_LS_DIRECT)||'{}'); s.email = user.email; s.name = user.name||''; s.picture = user.picture||''; localStorage.setItem(_GS_LS_DIRECT, JSON.stringify(s)); } catch(e) {}
+    // حفظ البيانات إذا جاء userinfo بنجاح
+    if (user?.email) {
+      try { const s = JSON.parse(localStorage.getItem(_GS_LS_DIRECT)||'{}'); s.email = user.email; s.name = user.name||''; s.picture = user.picture||''; localStorage.setItem(_GS_LS_DIRECT, JSON.stringify(s)); } catch(e) {}
+    }
 
     // تحديث قائمة الشيتات
     _gsDirectFiles = drive.files || [];
