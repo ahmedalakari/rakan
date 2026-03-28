@@ -59,6 +59,7 @@ TYPE html>
     --content-pad: clamp(16px, 4vw, 40px);
     --gap:    20px;
     --header-h: 44px;
+    --sticky-h: 102px;
   }
 
   /* =============================================
@@ -81,11 +82,21 @@ TYPE html>
   /* =============================================
      HEADER
   ============================================= */
-  /* ── sticky-top: يجمع header + df-wrap ويخفيهما عند السكرول ── */
+  /* ── sticky-top: ثابت في الأعلى، يختفي عند السكرول، يظهر فقط عند القمة ── */
   #sticky-top {
-    position: sticky;
-    top: 0;
+    position: fixed;
+    top: 0; left: 0; right: 0;
     z-index: 100;
+    transform: translateY(0);
+    transition: transform 0.3s ease;
+  }
+  #sticky-top.is-hidden {
+    transform: translateY(-100%);
+  }
+  /* السايدبار ترتفع مع sticky-top */
+  #mainSidebar.is-hidden {
+    top: 0;
+    height: 100vh;
   }
   .header {
     background: linear-gradient(135deg, #0d1b2e 0%, #0a1628 100%);
@@ -135,53 +146,57 @@ TYPE html>
 
   /* ── Sidebar ── */
   .nav {
-    width: 220px;
-    min-width: 220px;
+    width: 210px;
+    min-width: 210px;
     background: linear-gradient(180deg, #0d1829 0%, #0a1220 100%);
     border-left: 1px solid var(--border);
     display: flex;
     flex-direction: column;
-    gap: 3px;
-    padding: 20px 10px 14px;
-    position: sticky;
-    top: var(--header-h, 52px);
-    height: calc(100vh - var(--header-h, 52px));
+    gap: 1px;
+    padding: 10px 8px 8px;
+    position: fixed;
+    top: var(--sticky-h, 102px);
+    right: 0;
+    height: calc(100vh - var(--sticky-h, 102px));
+    transition: top 0.3s ease, height 0.3s ease;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: rgba(30,58,95,0.6) transparent;
     flex-shrink: 0;
     z-index: 90;
 
-    transition: width 0.25s, min-width 0.25s, transform 0.25s;
+    transition: width 0.25s, min-width 0.25s, top 0.3s ease, height 0.3s ease;
   }
   .nav::-webkit-scrollbar { width: 3px; }
   .nav::-webkit-scrollbar-thumb { background: rgba(30,58,95,0.8); border-radius: 3px; }
 
   /* ── Sidebar group label ── */
   .nav-group-label {
-    font-size: 9.5px;
+    font-size: 9px;
     font-weight: 800;
     color: rgba(139,163,184,0.55);
     letter-spacing: 1.2px;
     text-transform: uppercase;
-    padding: 14px 12px 5px;
-    margin-top: 2px;
+    padding: 8px 10px 3px;
+    margin-top: 1px;
     user-select: none;
   }
   .nav-group-label:first-child { padding-top: 2px; }
+
+
 
   /* ── Sidebar button ── */
   .nav-btn {
     display: flex;
     align-items: center;
-    gap: 11px;
-    padding: 9px 12px;
+    gap: 8px;
+    padding: 7px 10px;
     background: none;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     color: rgba(139,163,184,0.85);
     font-family: 'Cairo', sans-serif;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     text-align: right;
@@ -193,14 +208,14 @@ TYPE html>
     flex-shrink: 0;
   }
   .nav-btn .nav-icon {
-    font-size: 16px;
-    width: 22px;
+    font-size: 14px;
+    width: 20px;
     text-align: center;
     flex-shrink: 0;
     transition: transform 0.17s;
   }
   .nav-btn .nav-label {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -234,13 +249,13 @@ TYPE html>
   .nav-divider {
     height: 1px;
     background: rgba(30,58,95,0.5);
-    margin: 6px 8px;
+    margin: 3px 6px;
     flex-shrink: 0;
   }
 
 
   /* ── spacer ── */
-  .nav-spacer { flex: 1; min-height: 8px; }
+  .nav-spacer { flex: 0; min-height: 0; }
 
   /* ── Main content area ── */
   .main-area {
@@ -248,6 +263,9 @@ TYPE html>
     min-width: 0;
     display: flex;
     flex-direction: column;
+    margin-right: 210px;
+    padding-top: var(--sticky-h, 102px);
+    transition: margin-right 0.25s;
   }
 
   /* ── Hamburger toggle (mobile) ── */
@@ -293,37 +311,40 @@ TYPE html>
   /* ── Tablet (≤ 900px): narrow sidebar — icons + short labels ── */
   @media (max-width: 900px) {
     .nav {
-      width: 72px;
-      min-width: 72px;
-      padding: 16px 5px 12px;
-      gap: 2px;
+      width: 64px;
+      min-width: 64px;
+      padding: 8px 4px 8px;
+      gap: 1px;
     }
+    .main-area { margin-right: 64px; padding-top: var(--sticky-h, 102px); }
+
     .nav-btn {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 4px;
-      padding: 9px 4px 7px;
-      border-radius: 10px;
+      gap: 3px;
+      padding: 7px 3px 6px;
+      border-radius: 8px;
     }
-    .nav-btn .nav-icon { font-size: 18px; width: auto; }
+    .nav-btn .nav-icon { font-size: 16px; width: auto; }
     .nav-btn .nav-label {
-      font-size: 9.5px;
+      font-size: 9px;
       font-weight: 700;
       letter-spacing: 0;
-      max-width: 62px;
+      max-width: 58px;
       text-align: center;
       white-space: normal;
       line-height: 1.2;
       overflow: visible;
     }
     .nav-group-label { display: none; }
-    .nav-divider { margin: 4px 4px; }
+    .nav-divider { margin: 2px 4px; }
   }
 
   /* ── Mobile (≤ 600px): hide sidebar, show bottom tab bar ── */
   @media (max-width: 600px) {
     .nav { display: none !important; }
+
     #sidebarToggle { display: none !important; }
     .content { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important; }
     .sidebar-overlay { display: none !important; }
@@ -1331,46 +1352,66 @@ TYPE html>
 ════════════════════════════════════════════════════ */
 .dashboard-footer {
   width: 100%;
-  background: linear-gradient(135deg, #0d1b2e 0%, #0a1628 100%);
-  border-top: 1px solid var(--border);
-  padding: 8px var(--content-pad);
-  margin-top: 16px;
-  text-align: center;
+  background: linear-gradient(135deg, #0d1b2e 0%, #091525 100%);
+  border-top: 2px solid rgba(0,212,255,0.18);
+  padding: 14px var(--content-pad,20px);
+  margin-top: 20px;
   direction: rtl;
 }
 .dashboard-footer__inner {
-  max-width: var(--content-max);
+  max-width: var(--content-max, 1400px);
   margin: 0 auto;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 4px 14px;
+  gap: 6px 20px;
 }
 .dashboard-footer__ar {
   font-family: 'Cairo', sans-serif;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
-  color: var(--accent2);
+  color: var(--accent2, #00ff88);
+  white-space: nowrap;
 }
 .dashboard-footer__en {
   font-family: 'Tajawal', 'Cairo', sans-serif;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--accent, #00d4ff);
   direction: ltr;
+  white-space: nowrap;
 }
 .dashboard-footer__phone {
   font-family: 'Cairo', sans-serif;
-  font-size: 10px;
-  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gold, #ffd700);
+  white-space: nowrap;
+  letter-spacing: 0.5px;
 }
 .dashboard-footer__sep {
-  color: var(--border);
-  font-size: 10px;
+  color: rgba(0,212,255,0.3);
+  font-size: 14px;
+  line-height: 1;
 }
 .dashboard-footer__divider { display: none; }
+
+/* ≤640px — شاشتان: عربي / إنجليزي+هاتف */
+@media (max-width: 640px) {
+  .dashboard-footer__inner {
+    flex-direction: column;
+    gap: 4px;
+  }
+  .dashboard-footer__sep { display: none; }
+  .dashboard-footer__ar,
+  .dashboard-footer__en,
+  .dashboard-footer__phone {
+    font-size: 11px;
+    text-align: center;
+  }
+}
 
 @media print {
   .dashboard-footer { display: none !important; }
@@ -4280,6 +4321,118 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
 
 </div><!-- end tab-plan -->
 
+<!-- ══════════════════════════════════════════════
+     تبويب أعمار الذمم
+══════════════════════════════════════════════ -->
+<div id="tab-aging" class="tab-panel">
+  <div style="padding:16px 20px 0">
+
+    <!-- KPI Cards -->
+    <div class="ag-kpi-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px">
+      <div class="kpi-card" style="text-align:center">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">إجمالي العملاء</div>
+        <div id="agKpiTotal" style="font-size:20px;font-weight:800;color:var(--accent)">—</div>
+      </div>
+      <div class="kpi-card" style="text-align:center">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">إجمالي الدين</div>
+        <div id="agKpiDebt" style="font-size:20px;font-weight:800;color:var(--red)">—</div>
+      </div>
+      <div class="kpi-card" style="text-align:center">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">0–30 يوم</div>
+        <div id="agKpi30" style="font-size:20px;font-weight:800;color:var(--red)">—</div>
+      </div>
+      <div class="kpi-card" style="text-align:center">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">30–60 يوم</div>
+        <div id="agKpi60" style="font-size:20px;font-weight:800;color:var(--gold)">—</div>
+      </div>
+      <div class="kpi-card" style="text-align:center">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">أكثر من 60 يوم</div>
+        <div id="agKpiOld" style="font-size:20px;font-weight:800;color:#ff6b35">—</div>
+      </div>
+    </div>
+
+    <!-- Header Row -->
+    <div class="ag-header-row" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;flex-wrap:wrap">
+      <input id="agSearch" class="ag-search" type="text" placeholder="🔍 بحث باسم العميل أو المندوب…"
+        style="flex:1;min-width:200px;max-width:320px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit"
+        oninput="agingPage=1;renderAgingTable()">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span id="agCount" style="font-size:12px;color:var(--muted)">عرض: —</span>
+        <button class="ag-print-btn" onclick="exportAgingCSV()"
+          style="padding:7px 14px;border-radius:8px;border:1px solid var(--accent2);background:transparent;color:var(--accent2);font-size:12px;cursor:pointer;font-family:inherit">
+          📥 تصدير CSV
+        </button>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="ag-filters" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+      <select id="agRepCatFilter" class="filter-select"
+        style="padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-family:inherit"
+        onchange="agingPage=1;renderAgingTable()">
+        <option value="">📂 كل فئات المناديب</option>
+      </select>
+      <select id="agRepFilter" class="filter-select"
+        style="padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-family:inherit"
+        onchange="agingPage=1;renderAgingTable()">
+        <option value="">👤 كل المناديب</option>
+      </select>
+      <select id="agCatFilter" class="filter-select"
+        style="padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-family:inherit"
+        onchange="agingPage=1;renderAgingTable()">
+        <option value="">🏷 كل التصنيفات</option>
+      </select>
+      <select id="agDebtFilter" class="filter-select"
+        style="padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-family:inherit"
+        onchange="agingPage=1;renderAgingTable()">
+        <option value="">💰 كل الحالات</option>
+        <option value="has_debt">له دين فقط</option>
+        <option value="age30">0–30 يوم</option>
+        <option value="age60">30–60 يوم</option>
+        <option value="age_old">+60 يوم</option>
+      </select>
+      <select id="agSortBy" class="filter-select"
+        style="padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-family:inherit"
+        onchange="agingPage=1;renderAgingTable()">
+        <option value="debt_net">ترتيب: الدين ↓</option>
+        <option value="age30">ترتيب: 0–30 يوم ↓</option>
+        <option value="age60">ترتيب: 30–60 يوم ↓</option>
+        <option value="sales">ترتيب: المبيعات ↓</option>
+        <option value="name">ترتيب: الاسم أ–ي</option>
+      </select>
+    </div>
+
+    <!-- Table -->
+    <div style="overflow-x:auto;border-radius:10px;border:1px solid var(--border)">
+      <table id="agingTable" class="responsive-table" style="width:100%;border-collapse:collapse;min-width:900px">
+        <thead style="position:sticky;top:0;z-index:2">
+          <tr>
+            <th style="min-width:36px">#</th>
+            <th style="min-width:180px">اسم العميل</th>
+            <th style="min-width:110px">المندوب</th>
+            <th style="min-width:100px;text-align:right">المبيعات</th>
+            <th style="min-width:90px;text-align:right">المرتجعات</th>
+            <th style="min-width:100px;text-align:right">صافي المبيعات</th>
+            <th style="min-width:90px;text-align:right">التحصيل</th>
+            <th style="min-width:100px;text-align:right;color:#ff4757;background:rgba(255,71,87,.06)">ذمة 0–30 يوم</th>
+            <th style="min-width:100px;text-align:right;color:#ffd700;background:rgba(255,215,0,.06)">ذمة 30–60 يوم</th>
+            <th style="min-width:100px;text-align:right;color:#ff6b35;background:rgba(255,107,53,.06)">ذمة +60 يوم</th>
+            <th style="min-width:100px;text-align:right">الدين الصافي</th>
+            <th style="min-width:100px;text-align:center">التصنيف</th>
+          </tr>
+        </thead>
+        <tbody id="agingTbody">
+          <tr><td colspan="12" style="text-align:center;color:var(--muted);padding:50px 20px">جارٍ تحميل البيانات…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div id="agingPagination" style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:14px;padding-bottom:20px"></div>
+
+  </div>
+</div><!-- end tab-aging -->
+
 </div><!-- end content -->
 
 <script>
@@ -5606,7 +5759,13 @@ document.addEventListener('DOMContentLoaded', () => {
   } catch(e) {}
   // بناء بيانات أعمار الذمم الافتراضية فور تحميل الصفحة
   setTimeout(() => {
-    try { if (typeof buildAgingData === 'function') { buildAgingData(); renderAgingTable(); } } catch(e) {}
+    try {
+      if (typeof buildAgingData === 'function') {
+        buildAgingData();
+        window._agingBuilt = true;
+        if (typeof renderAgingTable === 'function') renderAgingTable();
+      }
+    } catch(e) {}
   }, 300);
 });
 
@@ -6603,6 +6762,13 @@ function showTab(id, triggerEl) {
     } else if (id === 'overview') {
       const rc = Chart.getChart(document.getElementById('monthlyChart'));
       if (!rc) _rebuildOverviewCharts();
+    } else if (id === 'aging') {
+      // بناء بيانات أعمار الذمم عند أول فتح للتبويب
+      if (typeof buildAgingData === 'function' && (!window._agingBuilt)) {
+        window._agingBuilt = true;
+        buildAgingData();
+      }
+      if (typeof renderAgingTable === 'function') renderAgingTable();
     }
   }, 50);
 }
@@ -6630,18 +6796,57 @@ function closeSidebar() {
   document.body.style.overflow = '';
 }
 
-// ===== Measure header height and update CSS var =====
+// ===== Measure sticky-top height =====
 function _updateHeaderHeight() {
-  const h = document.querySelector('.header');
-  if (h) {
-    const hh = h.offsetHeight + 'px';
-    document.documentElement.style.setProperty('--header-h', hh);
-    const nav = document.getElementById('mainSidebar');
-    if (nav) { nav.style.top = hh; nav.style.height = 'calc(100vh - ' + hh + ')'; }
+  const st  = document.getElementById('sticky-top');
+  const h   = document.querySelector('.header');
+  if (!h) return;
+  const headerH = h.offsetHeight;
+  const stickyH = st ? st.offsetHeight : headerH;
+  document.documentElement.style.setProperty('--header-h', headerH + 'px');
+  document.documentElement.style.setProperty('--sticky-h',  stickyH  + 'px');
+  const nav = document.getElementById('mainSidebar');
+  if (nav && !nav.classList.contains('is-hidden')) {
+    nav.style.top    = stickyH + 'px';
+    nav.style.height = 'calc(100vh - ' + stickyH + 'px)';
   }
 }
 document.addEventListener('DOMContentLoaded', _updateHeaderHeight);
 window.addEventListener('resize', _updateHeaderHeight);
+
+// ══════════════════════════════════════
+// يظهر الهيدر فقط عند scrollY = 0
+// ══════════════════════════════════════
+(function () {
+  let ticking = false;
+  function onScroll() {
+    const st  = document.getElementById('sticky-top');
+    const nav = document.getElementById('mainSidebar');
+    if (!st) return;
+    const atTop = window.scrollY <= 0;
+    st.classList.toggle('is-hidden', !atTop);
+    if (nav) {
+      nav.classList.toggle('is-hidden', !atTop);
+      if (atTop) {
+        const stickyH = st.offsetHeight;
+        nav.style.top    = stickyH + 'px';
+        nav.style.height = 'calc(100vh - ' + stickyH + 'px)';
+      } else {
+        nav.style.top    = '0px';
+        nav.style.height = '100vh';
+      }
+    }
+    ticking = false;
+  }
+  window.addEventListener('scroll', function () {
+    if (!ticking) { requestAnimationFrame(onScroll); ticking = true; }
+  }, { passive: true });
+  onScroll(); // تطبيق الحالة الأولية
+})();
+
+
+
+
 
 // ===== مقارنة مناديب tab =====
 function setCatFilter(cat) {
@@ -10871,6 +11076,14 @@ function _gsInitGSI() {
     client_id: _GS_CLIENT_ID,
     scope:     _GS_SCOPE,
     callback:  _gsDirectHandleToken,
+    error_callback: (err) => {
+      // فشل التجديد الصامت — إعادة الحالة إلى غير متصل بهدوء
+      if (err.type === 'popup_failed_to_open' || err.type === 'access_denied') return;
+      _gsDirectToken      = null;
+      _gsDirectConnected  = false;
+      _gsDirectExpiry     = 0;
+      // لا نظهر خطأ للمستخدم إلا إذا كان يحاول الاتصال يدوياً
+    },
   });
 }
 
@@ -10903,8 +11116,10 @@ function _gsDirectHandleToken(resp) {
 
   // جلب معلومات المستخدم والشيتات بالتوازي
   Promise.all([
-    fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: 'Bearer ' + _gsDirectToken } }).then(r => r.json()),
-    fetch('https://www.googleapis.com/drive/v3/files?q=mimeType%3D%22application%2Fvnd.google-apps.spreadsheet%22&fields=files(id,name)&pageSize=50&orderBy=modifiedTime+desc', { headers: { Authorization: 'Bearer ' + _gsDirectToken } }).then(r => r.json())
+    fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: 'Bearer ' + _gsDirectToken } })
+      .then(r => r.ok ? r.json() : Promise.reject(new Error('userinfo ' + r.status))),
+    fetch('https://www.googleapis.com/drive/v3/files?q=mimeType%3D%22application%2Fvnd.google-apps.spreadsheet%22&fields=files(id,name)&pageSize=50&orderBy=modifiedTime+desc', { headers: { Authorization: 'Bearer ' + _gsDirectToken } })
+      .then(r => r.ok ? r.json() : Promise.reject(new Error('drive ' + r.status)))
   ]).then(([user, drive]) => {
     // عرض معلومات المستخدم
     const nameEl  = document.getElementById('gsDirectName');
@@ -11454,6 +11669,7 @@ window.dfInitRange = function() {
 document.addEventListener('DOMContentLoaded', () => {
   const s = document.createElement('script');
   s.src = 'https://accounts.google.com/gsi/client';
+  s.onerror = () => { /* Google Identity Services غير متاح */ };
   s.async = true; s.defer = true;
   s.onload = () => {
     _gsInitGSI();
@@ -11464,9 +11680,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // طلب token بدون نافذة (prompt: none) — صامت تماماً
         setTimeout(() => {
           try {
+            // prompt:'' يحاول تجديد صامت — قد يُسبب 401 في بعض المتصفحات؛ نتجاهله
             _gsTokenClient.requestAccessToken({ prompt: '', hint: saved.email });
-          } catch(e) {}
-        }, 800);
+          } catch(e) { /* تجاهل أخطاء التجديد الصامت */ }
+        }, 1500);
       }
     } catch(e) {}
   };
@@ -12867,7 +13084,7 @@ function _fullRefreshAfterSync(fromGS, msg, btn, hasMabee3at, hasTahseel, hasMad
     _chk('KPI cust count',       () => _kpiOk('cust-kpi-count'));
     _chk('KPI prod net',         () => _kpiOk('prod-kpi-net'));
     _chk('KPI debt net',         () => _kpiOk('debt-kpi-net'));
-    _chk('KPI aging custs',      () => _kpiOk('ag-total-custs'));
+    // _chk('KPI aging custs',   () => _kpiOk('agKpiTotal')); // tab-aging loaded lazily
 
     // ── فحص الرسوم ─────────────────────────────────────────────────
     _chk('chart monthlyChart',   () => !!Chart.getChart(document.getElementById('monthlyChart')));
@@ -13675,7 +13892,7 @@ function buildAgingData() {
         col:     c.c   || 0,
         age30:   c.age30 || a30,
         age60:   c.age60 || a60,
-        ageOld:  Math.max(0, debt_net - (c.age30 || a30) - (c.age60 || a60)),
+        ageOld:  0, // البيانات الافتراضية لا تحتوي على شريحة >60 يوم
         debt_net: debt_net
       };
     }).filter(c => c.name);
@@ -13813,11 +14030,18 @@ function updateAgingKPIs(filteredRows) {
   if (!data) return;
   const fmt = n => { const v=Math.abs(n); return (n<0?'-':'')+(v>=1e6?(v/1e6).toFixed(2)+'M':v>=1e3?Math.round(v/1e3)+'K':Math.round(v).toLocaleString('ar')); };
   const el = id => document.getElementById(id);
-  if (el('ag-total-custs')) el('ag-total-custs').textContent = data.length.toLocaleString('ar');
   const tot30   = data.reduce((s,c)=>s+(c.age30>0?c.age30:0),0);
   const tot60   = data.reduce((s,c)=>s+(c.age60>0?c.age60:0),0);
   const totOld  = data.reduce((s,c)=>s+(c.ageOld>0?c.ageOld:0),0);
   const totDebt = data.reduce((s,c)=>s+(c.debt_net>0?c.debt_net:0),0);
+  // New IDs in tab-aging HTML
+  if (el('agKpiTotal')) el('agKpiTotal').textContent = data.length.toLocaleString('ar');
+  if (el('agKpiDebt'))  el('agKpiDebt').textContent  = fmt(totDebt);
+  if (el('agKpi30'))    el('agKpi30').textContent    = fmt(tot30);
+  if (el('agKpi60'))    el('agKpi60').textContent    = fmt(tot60);
+  if (el('agKpiOld'))   el('agKpiOld').textContent   = totOld > 0 ? fmt(totOld) : '0';
+  // Legacy IDs
+  if (el('ag-total-custs')) el('ag-total-custs').textContent = data.length.toLocaleString('ar');
   if (el('ag-age30'))      el('ag-age30').textContent      = fmt(tot30);
   if (el('ag-age60'))      el('ag-age60').textContent      = fmt(tot60);
   if (el('ag-age-old'))    el('ag-age-old').textContent    = fmt(totOld);
@@ -13976,9 +14200,20 @@ function renderAgingTable() {
   const start = (agingPage-1)*agingPageSize;
   const pageRows = rows.slice(start, start+agingPageSize);
 
-  const fmt = n => { if (!n) return '<span style="color:var(--muted)">—</span>'; const v=Math.abs(n); const s=(v>=1e6?(v/1e6).toFixed(2)+'M':v>=1e3?Math.round(v/1e3)+'K':Math.round(v).toLocaleString('ar')); return n<0?`<span style="color:var(--accent2)">${s}</span>`:s; };
-  const fmtDebt = n => { if (n<=0) return '<span style="color:var(--accent2)">✓ مسوّى</span>'; const v=n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?Math.round(n/1e3)+'K':Math.round(n).toLocaleString('ar'); return `<span style="color:var(--red);font-weight:700">${v}</span>`; };
-  const fmtAge = (n, color) => { if (!n||n<=0) return '<span style="color:var(--muted)">—</span>'; const v=n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?Math.round(n/1e3)+'K':Math.round(n).toLocaleString('ar'); return `<span style="color:${color};font-weight:700">${v}</span>`; };
+  // أرقام كاملة مع فاصل الآلاف
+  const fmtFull = n => {
+    if (!n && n !== 0) return '<span style="color:var(--muted)">—</span>';
+    const v = Math.round(Math.abs(n)).toLocaleString('en-US');
+    return n < 0 ? `<span style="color:var(--accent2)">${v}</span>` : v;
+  };
+  const fmtDebt = n => {
+    if (n <= 0) return '<span style="color:var(--accent2)">✓ مسوّى</span>';
+    return `<span style="color:var(--red);font-weight:700">${Math.round(n).toLocaleString('en-US')}</span>`;
+  };
+  const fmtAge = (n, color) => {
+    if (!n || n <= 0) return '<span style="color:var(--muted)">—</span>';
+    return `<span style="color:${color};font-weight:700">${Math.round(n).toLocaleString('en-US')}</span>`;
+  };
 
   const tbody = document.getElementById('agingTbody');
   if (!tbody) return;
@@ -13987,30 +14222,26 @@ function renderAgingTable() {
     tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;color:var(--muted);padding:50px 20px">لا توجد نتائج مطابقة</td></tr>';
   } else {
     tbody.innerHTML = pageRows.map((c,i) => {
-      const catColors = {ممتاز:'var(--accent2)',جيد:'#7c6fff',متوسط:'var(--gold)',مخاطرة:'var(--accent3)','مخاطرة عالية':'var(--red)'};
-      const cc = catColors[c.cat]||'var(--muted)';
+      const catTagClass = {ممتاز:'tag-green',جيد:'tag-blue',متوسط:'tag-gold',مخاطرة:'tag-orange','مخاطرة عالية':'tag-red'}[c.cat] || 'tag-blue';
       return `<tr>
-        <td style="text-align:center;color:var(--muted);white-space:nowrap">${start+i+1}</td>
-        <td style="font-weight:600;max-width:200px;word-break:break-word;line-height:1.4">${c.name}</td>
-        <td style="color:var(--text2);font-size:12px;white-space:nowrap">${c.rep||'—'}</td>
-        <td style="text-align:right;color:var(--accent);font-weight:600;white-space:nowrap">${fmt(c.sales)}</td>
-        <td style="text-align:right;color:var(--red);white-space:nowrap">${fmt(c.ret)}</td>
-        <td style="text-align:right;color:var(--accent2);font-weight:600;white-space:nowrap">${fmt(c.ns)}</td>
-        <td style="text-align:right;color:var(--accent2);white-space:nowrap">${fmt(c.col)}</td>
-        <td style="text-align:right;white-space:nowrap">${fmtAge(c.age30,'var(--red)')}</td>
-        <td style="text-align:right;white-space:nowrap">${fmtAge(c.age60,'var(--gold)')}</td>
-        <td style="text-align:right;white-space:nowrap">${fmtAge(c.ageOld,'#ff6b35')}</td>
-        <td style="text-align:right;white-space:nowrap">${fmtDebt(c.debt_net)}</td>
-        <td style="text-align:center"><span class="tag" style="background:${cc}22;color:${cc};font-size:10px;white-space:nowrap">${c.cat||'—'}</span></td>
+        <td style="text-align:center;color:var(--text2);font-size:11px">${start+i+1}</td>
+        <td style="min-width:180px">
+          <div style="font-weight:600;font-size:12px;word-break:break-word;line-height:1.4" title="${c.name}">${c.name}</div>
+        </td>
+        <td style="font-size:11px;color:var(--text2)">${c.rep||'—'}</td>
+        <td style="text-align:right;color:var(--accent);font-weight:700">${fmtFull(c.sales)}</td>
+        <td style="text-align:right;color:var(--accent3)">${fmtFull(c.ret)}</td>
+        <td style="text-align:right;color:var(--accent2);font-weight:600">${fmtFull(c.ns)}</td>
+        <td style="text-align:right;color:var(--accent2)">${fmtFull(c.col)}</td>
+        <td style="text-align:right;background:rgba(255,71,87,.03)">${fmtAge(c.age30,'#ff4757')}</td>
+        <td style="text-align:right;background:rgba(255,215,0,.03)">${fmtAge(c.age60,'#ffd700')}</td>
+        <td style="text-align:right;background:rgba(255,107,53,.03)">${fmtAge(c.ageOld,'#ff6b35')}</td>
+        <td style="text-align:right">${fmtDebt(c.debt_net)}</td>
+        <td style="text-align:center"><span class="tag ${catTagClass}" style="font-size:10px;white-space:nowrap">${c.cat||'—'}</span></td>
       </tr>`;
     }).join('');
   }
 
-  // تحديث العداد
-  const countEl = document.getElementById('agCount');
-  if (countEl) countEl.textContent = `عرض ${start+1}–${Math.min(start+agingPageSize,total)} من ${total}`;
-
-  // ترقيم الصفحات عبر الدالة المركزية
   _mkPagination('agingPagination', agingPage, pages, 'agingGo');
 }
 
@@ -14251,12 +14482,13 @@ function exportAgingCSV() {
 ════════════════════════════════════════════════════ -->
 <footer class="dashboard-footer" role="contentinfo">
   <div class="dashboard-footer__inner">
-    <span class="dashboard-footer__ar">جميع الحقوق محفوظة &copy; 2026 &mdash; المحاسب أحمد العكاري</span>
+    <span class="dashboard-footer__ar">&#x1F512; جميع الحقوق محفوظة &copy; 2026 &mdash; المحاسب أحمد العكاري</span>
     <span class="dashboard-footer__sep">|</span>
     <span class="dashboard-footer__en">All Rights Reserved &copy; 2026 &mdash; Accountant Ahmed Al-Aakari</span>
     <span class="dashboard-footer__sep">|</span>
-    <span class="dashboard-footer__phone">هاتف &nbsp;|&nbsp; Phone: &lrm;0915528970</span>
+    <span class="dashboard-footer__phone">&#x1F4DE; هاتف: 0915528970</span>
   </div>
 </footer>
 
 </body>
+</html>
