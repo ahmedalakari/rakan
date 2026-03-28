@@ -11311,14 +11311,19 @@ function gsConnectDirect() {
   _gsTokenClient.requestAccessToken({ prompt: 'select_account' });
 }
 
+// ── حفظ التوكن فقط (مشترك بين الحالتين: تسجيل الدخول والتجديد) ──
+function _gsStoreToken(resp) {
+  _gsDirectToken     = resp.access_token;
+  _gsDirectExpiry    = Date.now() + ((resp.expires_in || 3600) - 60) * 1000;
+  _gsDirectConnected = true;
+}
+
 function _gsDirectHandleToken(resp) {
   if (resp.error) {
     _gsShowDirectMsg('❌ ' + (resp.error === 'access_denied' ? 'تم الرفض' : resp.error), 'error');
     return;
   }
-  _gsDirectToken  = resp.access_token;
-  _gsDirectExpiry = Date.now() + (resp.expires_in - 60) * 1000;
-  _gsDirectConnected = true;
+  _gsStoreToken(resp);
   _gsShowDirectMsg('⏳ جارٍ تحميل الشيتات...', 'info');
 
   // جلب معلومات المستخدم والشيتات بالتوازي
@@ -11465,19 +11470,39 @@ function gsDirectSheetChange(key) {
   }
 }
 
+// ── تجديد التوكن بشكل صحيح: يحفظ التوكن فقط دون إعادة بناء الواجهة ──
+function _gsRefreshToken() {
+  return new Promise((resolve, reject) => {
+    if (!_gsTokenClient) { reject(new Error('GSI غير مهيأ')); return; }
+    const origCallback = _gsTokenClient.callback;
+    _gsTokenClient.callback = (resp) => {
+      _gsTokenClient.callback = origCallback; // استعادة الـ callback الأصلي فوراً
+      if (resp.error) {
+        reject(new Error(resp.error === 'access_denied' ? 'انتهت الجلسة — أعد تسجيل الدخول' : resp.error));
+      } else {
+        _gsStoreToken(resp); // حفظ التوكن فقط بدون إعادة بناء الواجهة
+        resolve();
+      }
+    };
+    _gsTokenClient.requestAccessToken({ prompt: '' });
+  });
+}
+
 // ── جلب البيانات ──────────────────────────────────────────────
 async function gsDirectFetchAndUpdate() {
   const keys   = ['مبيعات','تحصيل','مديونية','تصنيف'];
   const active = keys.filter(k => _gsDirectSheets[k]?.id);
   if (!active.length) { _gsShowDirectMsg('⚠️ اختر شيتاً واحداً على الأقل', 'warn'); return; }
 
-  // تجديد التوكن إذا انتهى
-  if (Date.now() > _gsDirectExpiry - 30000) {
+  // تجديد التوكن إذا انتهى أو على وشك الانتهاء
+  if (!_gsDirectToken || Date.now() > _gsDirectExpiry - 30000) {
     _gsShowDirectMsg('⏳ جارٍ تجديد الجلسة...', 'info');
-    await new Promise(resolve => {
-      _gsTokenClient.callback = (resp) => { _gsDirectHandleToken(resp); resolve(); };
-      _gsTokenClient.requestAccessToken({ prompt: '' });
-    });
+    try {
+      await _gsRefreshToken();
+    } catch(e) {
+      _gsShowDirectMsg('❌ ' + e.message, 'error');
+      return;
+    }
   }
 
   _gsShowDirectMsg('⚡ جارٍ جلب البيانات...', 'info');
@@ -11880,16 +11905,15 @@ document.addEventListener('DOMContentLoaded', () => {
   s.async = true; s.defer = true;
   s.onload = () => {
     _gsInitGSI();
-    // محاولة اتصال صامت تلقائي إذا كان البريد محفوظاً
+    // محاولة تجديد صامت تلقائي إذا كان البريد محفوظاً
     try {
       const saved = JSON.parse(localStorage.getItem(_GS_LS_DIRECT) || '{}');
       if (saved.email && _gsTokenClient) {
-        // طلب token بدون نافذة (prompt: none) — صامت تماماً
+        // تجديد صامت للتوكن — يحفظ التوكن فقط دون إعادة بناء الواجهة
         setTimeout(() => {
           try {
-            // prompt:'' يحاول تجديد صامت — قد يُسبب 401 في بعض المتصفحات؛ نتجاهله
-            _gsTokenClient.requestAccessToken({ prompt: '', hint: saved.email });
-          } catch(e) { /* تجاهل أخطاء التجديد الصامت */ }
+            _gsRefreshToken().catch(() => { /* تجاهل أخطاء التجديد الصامت */ });
+          } catch(e) { /* تجاهل */ }
         }, 1500);
       }
     } catch(e) {}
