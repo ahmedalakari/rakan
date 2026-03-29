@@ -1,3 +1,4 @@
+
 <!DOC
 
 
@@ -1804,8 +1805,7 @@ TYPE html>
   font-weight: 600;
 }
 
-/* ═════════════════════════════
- �════════════════
+/* ══════════════════════════════════════════════
    DATE FILTER BAR  — Design System
 ══════════════════════════════════════════════ */
 #df-wrap {
@@ -3709,7 +3709,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
     </div>
   </div>
 
-  <!-- ═══ شريط الفلترة الرئيسي ══ٕ� -->
+  <!-- ═══ شريط الفلترة الرئيسي ═══ -->
   <div class="table-card" style="margin-bottom:var(--gap);padding:var(--sp-md) var(--sp-lg)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
       <div style="font-weight:700;color:var(--text2);font-size:13px">🎛️ الفلترة — تؤثر على كلا الجدولين</div>
@@ -3993,7 +3993,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
       <div class="insight-icon">✅</div>
       <div>
         <div class="insight-title" style="color:#7c6fff">جيد — 218 عميل (12.2%)</div>
-        <div class="insight-text">يسددون جزئياً. يحتاجون خطة دفع واضحة  �متابعة منتظمة مع إمكانية ترقيتهم.</div>
+        <div class="insight-text">يسددون جزئياً. يحتاجون خطة دفع واضحة ومتابعة منتظمة مع إمكانية ترقيتهم.</div>
       </div>
     </div>
     <div class="insight-card" style="margin-bottom:0">
@@ -6893,7 +6893,7 @@ function initRepCmpPanels() {
     kpiGrid.innerHTML = cards3 || `<div style="color:var(--muted);padding:20px;text-align:center">لا توجد فئات مفلترة</div>`;
   }
 
-  // ═════════════════════];�════════════════════════════════════════
+  // ══════════════════════════════════════════════════════════════
   // 4. جداول أداء الفئات التفصيلية — ديناميكية
   // ══════════════════════════════════════════════════════════════
   const catPerfContainer = document.getElementById('repcmp-catperf-tables');
@@ -8933,7 +8933,7 @@ ${_buildPrintFooter()}
       document.head.appendChild(st);
       pf.innerHTML =
         '<span class="a">جميع الحقوق محفوظة © 2026 — المحاسب أحمد العكاري</span>' +
-        '<span class="b">0915528970  |  هاتف / Phone</span>' +
+        '<span class="b">0915528970  |  هاتف / Phone</span>' +
         '<span class="c">All Rights Reserved © 2026 — Accountant Ahmed Al-Aakari</span>';
       // أضفه في نهاية التبويب النشط
       var activeTab = document.querySelector('.tab-panel.active');
@@ -10391,7 +10391,7 @@ function updateAllStaticPanels() {
 
 
 
-// ═══════════�ؐ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════════
 // ════════════════════════════════════════════════════════════════
 //  updatePlanTab() — يُحدِّث أرقام تبويب خطة العمل من البيانات الحية
 // ════════════════════════════════════════════════════════════════
@@ -10531,7 +10531,7 @@ function _rebuildChart(canvasId, config) {
   const existing = Chart.getChart(el);
   if (existing) existing.destroy();
 
-  // ── تطبيق إعدادات موحدة لإظهار الأ��قام والأسماء بوضوح ──
+  // ── تطبيق إعدادات موحدة لإظهار الأرقام والأسماء بوضوح ──
   const isHorizontal = config.options?.indexAxis === 'y';
   const isDoughnut   = config.type === 'doughnut' || config.type === 'pie';
 
@@ -10870,7 +10870,7 @@ function updateRepsTabFiltered(data) {
   try { if (typeof _updateAllPeriodLabels === 'function') _updateAllPeriodLabels(); } catch(e) {}
 }
 
-// ══════════════════>s�═════════════════════
+// ════════════════════════════════════════
 //  تبويب مقارنة مناديب (repcmp)
 // ════════════════════════════════════════
 function updateRepcmpTabFiltered(data) {
@@ -13381,7 +13381,7 @@ function _fullRefreshAfterSync(fromGS, msg, btn, hasMabee3at, hasTahseel, hasMad
 
   // ══════════════════════════════════════════════════
   //  أداة التسجيل — تتبع كل عملية وتبلّغ عن الأخطاء
-  // ═════════════════════════════════════════════════n��
+  // ══════════════════════════════════════════════════
   const _log = [];
   const _safe = (label, fn) => {
     try { fn(); _log.push('✅ ' + label); }
@@ -13734,7 +13734,7 @@ function _fullRefreshAfterSync(fromGS, msg, btn, hasMabee3at, hasTahseel, hasMad
       if (verEl) {
         const totalFiles = [hasMabee3at, hasTahseel, hasMadiooniya, hasTasneef].filter(Boolean).length;
         verEl.textContent = 'ملفات محمّلة: ' + totalFiles
-          + ' | الأقسام المُحدَّثة: نظرة عامة، مناديب، عملا��، أصناف، ديون، ذمم، خطة'
+          + ' | الأقسام المُحدَّثة: نظرة عامة، مناديب، عملاء، أصناف، ديون، ذمم، خطة'
           + (hasTasneef && (newRepsAdded||repsUpdated) ? ' | تصنيف: +' + (newRepsAdded||0) + ' جديد، ' + (repsUpdated||0) + ' محدَّث' : '');
       }
 
@@ -13978,7 +13978,7 @@ async function applyCsvData(fromGS) {
         }
 
         msg.textContent = tCount > 0
-          ? `✅ تم قراءة ${tCount} مند��ب من ملف التصنيف`
+          ? `✅ تم قراءة ${tCount} مندوب من ملف التصنيف`
           : '⚠️ لم يتم قراءة بيانات من ملف التصنيف';
         // لا انتظار — المضي فوراً
 
@@ -15255,5 +15255,5 @@ function exportAgingCSV() {
   </div>
 </footer>
 
-</body>
+<script src="https://replit-cdn.com/replit-pill/replit-pill.global.js" data-referral-code="973es4gjzbzk" data-repl-id="a7962ca8-3446-41a4-ab31-d0bba77f811b"></script></body>
 </html>
