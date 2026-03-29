@@ -1,8 +1,4 @@
-
-<!DOC
-
-
-TYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -2165,6 +2161,19 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
     if (!window[fn]) window[fn] = function(){ /* stub — wait for main script */ };
   });
   // openCsvModal و closeCsvModal لهما منطق مبكر
+  window.downloadDashboard = function() {
+    const a = document.createElement('a');
+    a.href = window.location.pathname.replace(/\/$/, '') + '/dashboard.html';
+    // fallback: download current page source
+    const blob = new Blob([document.documentElement.outerHTML], {type: 'text/html;charset=utf-8'});
+    a.href = URL.createObjectURL(blob);
+    a.download = 'لوحة_تحليل_الأداء.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  };
+
   window.openCsvModal  = function(){ document.getElementById('csvModalOverlay')?.classList.add('open'); };
   window.closeCsvModal = function(){ document.getElementById('csvModalOverlay')?.classList.remove('open'); try{ document.getElementById('csvProgressMsg').textContent=''; }catch(e){} };
 })();
@@ -2181,6 +2190,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
     <span class="badge">🟢 بيانات محدّثة</span>
     <span class="badge" id="repCountBadge">35 مندوباً</span>
     <button class="csv-loader-btn" onclick="openCsvModal()" title="تحديث البيانات">📂</button>
+    <button class="csv-loader-btn" onclick="downloadDashboard()" title="تحميل اللوحة HTML">⬇️</button>
     <button id="labelToggleBtn" onclick="toggleDataLabels()" title="إظهار/إخفاء أرقام الرسوم">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle">
           <rect x="2" y="14" width="4" height="7" rx="1" fill="currentColor" opacity="0.7"/>
@@ -2401,26 +2411,26 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
     <div class="kpi-card blue">
       <div class="kpi-icon">📦</div>
       <div class="kpi-label">إجمالي المبيعات</div>
-      <div class="kpi-value" id="kpi-totalSales-main">9.37M</div>
-      <div class="kpi-sub" id="kpi-totalSales-sub">9,372,372.78 دينار قبل المرتجعات</div>
+      <div class="kpi-value" id="kpi-totalSales-main">—</div>
+      <div class="kpi-sub" id="kpi-totalSales-sub">—</div>
     </div>
     <div class="kpi-card red">
       <div class="kpi-icon">↩️</div>
       <div class="kpi-label">إجمالي المرتجعات</div>
-      <div class="kpi-value" id="kpi-returns-main">965K</div>
-      <div class="kpi-sub" id="kpi-returns-sub">965,909.94 دينار — 10.31% 🔴</div>
+      <div class="kpi-value" id="kpi-returns-main">—</div>
+      <div class="kpi-sub" id="kpi-returns-sub">—</div>
     </div>
     <div class="kpi-card green">
       <div class="kpi-icon">💰</div>
       <div class="kpi-label">صافي المبيعات</div>
-      <div class="kpi-value" id="kpi-netSales-main">8.41M</div>
-      <div class="kpi-sub" id="kpi-netSales-sub">8,406,462.84 دينار بعد المرتجعات</div>
+      <div class="kpi-value" id="kpi-netSales-main">—</div>
+      <div class="kpi-sub" id="kpi-netSales-sub">—</div>
     </div>
     <div class="kpi-card blue">
       <div class="kpi-icon">✅</div>
       <div class="kpi-label">إجمالي التحصيلات</div>
-      <div class="kpi-value" id="kpi-col-main">6.74M</div>
-      <div class="kpi-sub" id="kpi-col-sub">6,742,865.29 دينار — 80.21% من صافي المبيعات</div>
+      <div class="kpi-value" id="kpi-col-main">—</div>
+      <div class="kpi-sub" id="kpi-col-sub">—</div>
       <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px;font-size:11px">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
           <span style="color:#7c6fff">🏦 بنكية</span>
@@ -2435,14 +2445,14 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
     <div class="kpi-card gold">
       <div class="kpi-icon">📊</div>
       <div class="kpi-label">نسبة التحصيل</div>
-      <div class="kpi-value" id="kpi-roi-main">80.21%</div>
+      <div class="kpi-value" id="kpi-roi-main">—</div>
       <div class="kpi-sub">من صافي المبيعات</div>
     </div>
     <div class="kpi-card orange">
       <div class="kpi-icon">⚠️</div>
       <div class="kpi-label">صافي المديونيات</div>
-      <div class="kpi-value" id="kpi-debt-main">6.40M</div>
-      <div class="kpi-sub" id="kpi-debt-sub">6,402,766.14 دينار</div>
+      <div class="kpi-value" id="kpi-debt-main">—</div>
+      <div class="kpi-sub" id="kpi-debt-sub">—</div>
     </div>
   </div>
 
@@ -2452,22 +2462,22 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
       <div style="position:absolute;top:0;right:0;width:3px;height:100%;background:var(--red);border-radius:0 16px 16px 0"></div>
       <div class="kpi-icon">↩️</div>
       <div class="kpi-label">إجمالي المرتجعات</div>
-      <div class="kpi-value" style="color:var(--red)" id="kpi-returns2-main">965K</div>
-      <div class="kpi-sub" id="kpi-returns2-sub">965,909.94 — 10.31% من إجمالي المبيعات 🔴</div>
+      <div class="kpi-value" style="color:var(--red)" id="kpi-returns2-main">—</div>
+      <div class="kpi-sub" id="kpi-returns2-sub">—</div>
     </div>
     <div class="kpi-card" style="border-color:rgba(100,100,255,0.4)">
       <div style="position:absolute;top:0;right:0;width:3px;height:100%;background:#7c6fff;border-radius:0 16px 16px 0"></div>
       <div class="kpi-icon">🏦</div>
       <div class="kpi-label">تحصيلات بنكية (حوالات)</div>
-      <div class="kpi-value" style="color:#7c6fff" id="kpi-bank-main">6.35M</div>
-      <div class="kpi-sub" id="kpi-bank-sub">6,352,893.29 دينار — 94.2%</div>
+      <div class="kpi-value" style="color:#7c6fff" id="kpi-bank-main">—</div>
+      <div class="kpi-sub" id="kpi-bank-sub">—</div>
     </div>
     <div class="kpi-card" style="border-color:rgba(255,215,0,0.4)">
       <div style="position:absolute;top:0;right:0;width:3px;height:100%;background:var(--gold);border-radius:0 16px 16px 0"></div>
       <div class="kpi-icon">💵</div>
       <div class="kpi-label">تحصيلات نقدية (كاش)</div>
-      <div class="kpi-value" style="color:var(--gold)" id="kpi-cash-main">390K</div>
-      <div class="kpi-sub" id="kpi-cash-sub">389,972.00 دينار — 5.8%</div>
+      <div class="kpi-value" style="color:var(--gold)" id="kpi-cash-main">—</div>
+      <div class="kpi-sub" id="kpi-cash-sub">—</div>
     </div>
     <div class="chart-card" style="padding:18px">
       <div class="chart-title" style="margin-bottom:4px">توزيع طرق التحصيل</div>
@@ -2492,7 +2502,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
   <div class="charts-row">
     <div class="chart-card">
       <div class="chart-title">الأداء الشهري — المبيعات والتحصيلات والمرتجعات</div>
-      <div class="chart-sub" id="monthly-chart-sub">يناير — فبراير — مارس 2026</div>
+      <div class="chart-sub" id="monthly-chart-sub">—</div>
       <div class="chart-wrap"><canvas id="monthlyChart"></canvas></div>
     </div>
     <div class="chart-card">
@@ -2523,7 +2533,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
       <div>
         <div style="font-size:var(--fs-xl);font-weight:800;color:var(--gold)">📅 التحليل الشهري التفصيلي</div>
-        <div style="color:var(--muted);font-size:var(--fs-sm)" id="monthly-section-sub">يناير — فبراير — مارس 2026 | مقارنة كاملة لجميع المؤشرات</div>
+        <div style="color:var(--muted);font-size:var(--fs-sm)" id="monthly-section-sub">—</div>
       </div>
       <div id="monthly-filter-badge" style="display:none;background:rgba(0,212,255,0.12);border:1px solid rgba(0,212,255,0.35);border-radius:999px;padding:4px 14px;font-size:12px;font-weight:700;color:var(--accent)"></div>
     </div>
@@ -2556,35 +2566,35 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
               <td style="text-align:right">3,051.50</td>
               <td style="text-align:right;font-weight:700;color:var(--accent)">6,065,770.17</td>
               <td style="text-align:right">3,303,551.11</td>
-              <td style="text-align:right;font-weight:700;color:var(--gold)" id="tbl-sales-total">9,372,372.78</td>
+              <td style="text-align:right;font-weight:700;color:var(--gold)" id="tbl-sales-total">—</td>
             </tr>
             <tr>
               <td style="font-weight:700;color:var(--red)">المرتجعات</td>
               <td style="text-align:right;color:var(--accent2)">0.00</td>
               <td style="text-align:right;color:var(--red);font-weight:700">691,185.05</td>
               <td style="text-align:right;color:var(--red)">274,724.89</td>
-              <td style="text-align:right;font-weight:700;color:var(--red)" id="tbl-returns-total">965,909.94</td>
+              <td style="text-align:right;font-weight:700;color:var(--red)" id="tbl-returns-total">—</td>
             </tr>
             <tr>
               <td style="font-weight:700">صافي المبيعات</td>
               <td style="text-align:right">3,051.50</td>
               <td style="text-align:right;font-weight:700">5,374,585.12</td>
               <td style="text-align:right">3,028,826.22</td>
-              <td style="text-align:right;font-weight:700;color:var(--gold)" id="tbl-net-total">8,406,462.84</td>
+              <td style="text-align:right;font-weight:700;color:var(--gold)" id="tbl-net-total">—</td>
             </tr>
             <tr>
               <td style="font-weight:700;color:var(--accent2)">التحصيلات</td>
               <td style="text-align:right;color:var(--accent2)">88,796.00</td>
               <td style="text-align:right;font-weight:700;color:var(--accent2)">4,578,896.79</td>
               <td style="text-align:right;color:var(--accent2)">2,075,172.50</td>
-              <td style="text-align:right;font-weight:700;color:var(--gold)" id="tbl-col-total">6,742,865.29</td>
+              <td style="text-align:right;font-weight:700;color:var(--gold)" id="tbl-col-total">—</td>
             </tr>
             <tr>
               <td style="font-weight:700;color:var(--red)">الفجوة (غير محصّل)</td>
               <td style="text-align:right;color:var(--accent2)">-85,744.50</td>
               <td style="text-align:right;color:var(--red);font-weight:700">795,688.33</td>
               <td style="text-align:right;color:var(--red)">953,653.72</td>
-              <td style="text-align:right;font-weight:700;color:var(--red)" id="tbl-gap-total">1,663,597.55</td>
+              <td style="text-align:right;font-weight:700;color:var(--red)" id="tbl-gap-total">—</td>
             </tr>
             <tr>
               <td style="font-weight:700;color:var(--gold)">نسبة التحصيل %</td>
@@ -2640,33 +2650,33 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
   <div class="kpi-grid" style="margin-bottom:var(--gap);grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
     <div class="kpi-card blue">
       <div class="kpi-label">إجمالي المبيعات</div>
-      <div class="kpi-value" id="reps-kpi-sales">9,049,110</div>
-      <div class="kpi-sub" id="reps-kpi-sales-sub">قبل المرتجعات — 35 مندوب</div>
+      <div class="kpi-value" id="reps-kpi-sales">—</div>
+      <div class="kpi-sub" id="reps-kpi-sales-sub">—</div>
     </div>
     <div class="kpi-card red">
       <div class="kpi-label">↩️ إجمالي المرتجعات</div>
-      <div class="kpi-value" id="reps-kpi-returns">909,865</div>
-      <div class="kpi-sub" id="reps-kpi-returns-sub" style="color:var(--red)">10.05% من إجمالي المبيعات 🔴</div>
+      <div class="kpi-value" id="reps-kpi-returns">—</div>
+      <div class="kpi-sub" id="reps-kpi-returns-sub" style="color:var(--red)">—</div>
     </div>
     <div class="kpi-card green">
       <div class="kpi-label">صافي المبيعات</div>
-      <div class="kpi-value" id="reps-kpi-net">8,139,245</div>
+      <div class="kpi-value" id="reps-kpi-net">—</div>
       <div class="kpi-sub" style="color:var(--accent2)">بعد خصم المرتجعات</div>
     </div>
     <div class="kpi-card blue">
       <div class="kpi-label">إجمالي التحصيلات</div>
-      <div class="kpi-value" id="reps-kpi-col">6,671,005</div>
-      <div class="kpi-sub" id="reps-kpi-col-sub" style="color:var(--accent2)">81.96% من صافي المبيعات</div>
+      <div class="kpi-value" id="reps-kpi-col">—</div>
+      <div class="kpi-sub" id="reps-kpi-col-sub" style="color:var(--accent2)">—</div>
     </div>
     <div class="kpi-card gold">
       <div class="kpi-label">أعلى مندوب مبيعاً</div>
-      <div class="kpi-value" id="reps-kpi-top-rep" style="font-size:.95rem">زياد الحنش</div>
-      <div class="kpi-sub" id="reps-kpi-top-rep-sub">1,232,418 — جملة</div>
+      <div class="kpi-value" id="reps-kpi-top-rep" style="font-size:.95rem">—</div>
+      <div class="kpi-sub" id="reps-kpi-top-rep-sub">—</div>
     </div>
     <div class="kpi-card orange">
       <div class="kpi-label">أعلى مرتجعات نسبة</div>
-      <div class="kpi-value" id="reps-kpi-top-ret" style="font-size:.95rem">مصطفي بلقاسم</div>
-      <div class="kpi-sub" id="reps-kpi-top-ret-sub">229,704 مرتجعات — 43.59% 🚨</div>
+      <div class="kpi-value" id="reps-kpi-top-ret" style="font-size:.95rem">—</div>
+      <div class="kpi-sub" id="reps-kpi-top-ret-sub">—</div>
     </div>
   </div>
 
@@ -2792,33 +2802,33 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
   <div class="kpi-grid" style="margin-bottom:var(--gap);grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
     <div class="kpi-card blue">
       <div class="kpi-label">إجمالي المبيعات</div>
-      <div class="kpi-value" id="cmp-kpi-sales">9,049,110</div>
-      <div class="kpi-sub" id="cmp-kpi-sales-sub">قبل المرتجعات — 35 مندوب</div>
+      <div class="kpi-value" id="cmp-kpi-sales">—</div>
+      <div class="kpi-sub" id="cmp-kpi-sales-sub">—</div>
     </div>
     <div class="kpi-card red">
       <div class="kpi-label">↩️ إجمالي المرتجعات</div>
-      <div class="kpi-value" id="cmp-kpi-returns">909,865</div>
-      <div class="kpi-sub" id="cmp-kpi-returns-sub" style="color:var(--red)">10.05% من إجمالي المبيعات 🔴</div>
+      <div class="kpi-value" id="cmp-kpi-returns">—</div>
+      <div class="kpi-sub" id="cmp-kpi-returns-sub" style="color:var(--red)">—</div>
     </div>
     <div class="kpi-card green">
       <div class="kpi-label">صافي المبيعات</div>
-      <div class="kpi-value" id="cmp-kpi-net">8,139,245</div>
+      <div class="kpi-value" id="cmp-kpi-net">—</div>
       <div class="kpi-sub" style="color:var(--accent2)">بعد خصم المرتجعات</div>
     </div>
     <div class="kpi-card blue">
       <div class="kpi-label">إجمالي التحصيلات</div>
-      <div class="kpi-value" id="cmp-kpi-col">6,671,005</div>
-      <div class="kpi-sub" id="cmp-kpi-col-sub" style="color:var(--accent2)">81.96% من صافي المبيعات</div>
+      <div class="kpi-value" id="cmp-kpi-col">—</div>
+      <div class="kpi-sub" id="cmp-kpi-col-sub" style="color:var(--accent2)">—</div>
     </div>
     <div class="kpi-card orange">
       <div class="kpi-label">صافي المديونيات</div>
-      <div class="kpi-value" id="cmp-kpi-debt">6,402,415</div>
+      <div class="kpi-value" id="cmp-kpi-debt">—</div>
       <div class="kpi-sub" style="color:#ff6b35">مديونية متراكمة</div>
     </div>
     <div class="kpi-card gold">
       <div class="kpi-label">عدد المناديب</div>
-      <div class="kpi-value" id="cmp-kpi-repcount">35</div>
-      <div class="kpi-sub" id="cmp-kpi-repcount-sub">جملة 7 | تجزئة 20 | أسواق 2 | مقاهي 4 | مستقل 1 | إدارية 1</div>
+      <div class="kpi-value" id="cmp-kpi-repcount">—</div>
+      <div class="kpi-sub" id="cmp-kpi-repcount-sub">—</div>
     </div>
   </div>
 
@@ -3091,7 +3101,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
   </div>
   <div id="repcmp-ret-summary" style="background:rgba(255,107,53,.07);border:1px solid rgba(255,107,53,.3);border-radius:var(--r-lg);padding:var(--sp-md);margin-bottom:14px;font-size:var(--fs-md)">
     📊 <b>إجمالي المرتجعات:</b> <span style="color:var(--red);font-weight:700">910K</span> دينار
-    — <span style="color:var(--red);font-weight:700" id="plan-summary-ret-pct">10.05%</span> من إجمالي المبيعات (<span id="plan-summary-sales">9.05M</span>)
+    — <span style="color:var(--red);font-weight:700" id="plan-summary-ret-pct">—</span> من إجمالي المبيعات (<span id="plan-summary-sales">—</span>)
     — صافي المبيعات بعد المرتجعات: <span style="color:var(--accent2);font-weight:700">8.14M</span>
   </div>
 
@@ -3591,7 +3601,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
       <div style="display:flex;flex-direction:column;gap:10px;font-size:var(--fs-md)">
         <div style="border-right:3px solid var(--red);padding-right:10px">
           <div style="font-weight:700;margin-bottom:3px">معالجة أزمة تحصيل فئة الأسواق</div>
-          <div style="color:var(--text2)">اجتماعات فورية مع <b id="plan-urgent-reps">علي غزيل وعبدالرؤوف بريم</b> — ديون صافية <b style="color:var(--red)" id="plan-urgent-debt">1.21M</b> — معدل تحصيل <b style="color:var(--red)" id="plan-urgent-roi">23.2%</b> فقط</div>
+          <div style="color:var(--text2)">اجتماعات فورية مع <b id="plan-urgent-reps">علي غزيل وعبدالرؤوف بريم</b> — ديون صافية <b style="color:var(--red)" id="plan-urgent-debt">—</b> — معدل تحصيل <b style="color:var(--red)" id="plan-urgent-roi">—</b> فقط</div>
         </div>
         <div style="border-right:3px solid var(--red);padding-right:10px">
           <div style="font-weight:700;margin-bottom:3px">متابعة مناديب الأداء الخطر (ROI &lt; 50%)</div>
@@ -3680,31 +3690,31 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
     <div class="kpi-card red">
       <div class="kpi-icon">💰</div>
       <div class="kpi-label">إجمالي المديونية الصافية</div>
-      <div class="kpi-value" id="debt-kpi-net">6,402,490</div>
+      <div class="kpi-value" id="debt-kpi-net">—</div>
       <div class="kpi-sub">صافي المدين على العملاء</div>
     </div>
     <div class="kpi-card blue">
       <div class="kpi-icon">📋</div>
       <div class="kpi-label">إجمالي المدين</div>
-      <div class="kpi-value" id="debt-kpi-debit">13,291,211</div>
+      <div class="kpi-value" id="debt-kpi-debit">—</div>
       <div class="kpi-sub">مجموع حركة المدين</div>
     </div>
     <div class="kpi-card green">
       <div class="kpi-icon">✅</div>
       <div class="kpi-label">إجمالي الدائن (المحصّل)</div>
-      <div class="kpi-value" id="debt-kpi-credit">6,888,722</div>
+      <div class="kpi-value" id="debt-kpi-credit">—</div>
       <div class="kpi-sub">مجموع حركة الدائن</div>
     </div>
     <div class="kpi-card orange">
       <div class="kpi-icon">👥</div>
       <div class="kpi-label">عدد المناديب</div>
-      <div class="kpi-value" id="debt-kpi-reps">35</div>
+      <div class="kpi-value" id="debt-kpi-reps">—</div>
       <div class="kpi-sub" id="debt-kpi-reps-sub">مندوب لديه ذمم</div>
     </div>
     <div class="kpi-card gold">
       <div class="kpi-icon">🏪</div>
       <div class="kpi-label">إجمالي العملاء</div>
-      <div class="kpi-value" id="debt-kpi-custs">1,579</div>
+      <div class="kpi-value" id="debt-kpi-custs">—</div>
       <div class="kpi-sub" id="debt-kpi-custs-sub">عميل في كشف الذمم</div>
     </div>
   </div>
@@ -3833,51 +3843,51 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
     <div class="kpi-card blue">
       <div class="kpi-icon">📦</div>
       <div class="kpi-label">إجمالي المبيعات</div>
-      <div class="kpi-value" id="cust-kpi-sales">9.37M</div>
+      <div class="kpi-value" id="cust-kpi-sales">—</div>
       <div class="kpi-sub">قبل المرتجعات</div>
     </div>
     <div class="kpi-card red">
       <div class="kpi-icon">↩️</div>
       <div class="kpi-label">المرتجعات</div>
-      <div class="kpi-value" id="cust-kpi-returns">923K</div>
-      <div class="kpi-sub" id="cust-kpi-returns-sub">9.85% من المبيعات 🔴</div>
+      <div class="kpi-value" id="cust-kpi-returns">—</div>
+      <div class="kpi-sub" id="cust-kpi-returns-sub">—</div>
     </div>
     <div class="kpi-card green">
       <div class="kpi-icon">💰</div>
       <div class="kpi-label">صافي المبيعات</div>
-      <div class="kpi-value" id="cust-kpi-net">8.45M</div>
+      <div class="kpi-value" id="cust-kpi-net">—</div>
       <div class="kpi-sub">بعد المرتجعات</div>
     </div>
     <div class="kpi-card blue">
       <div class="kpi-icon">🏪</div>
       <div class="kpi-label">إجمالي العملاء</div>
-      <div class="kpi-value" id="cust-kpi-count">1,788</div>
+      <div class="kpi-value" id="cust-kpi-count">—</div>
       <div class="kpi-sub" id="cust-kpi-total-sub">عميل في قاعدة البيانات</div>
     </div>
     <div class="kpi-card green">
       <div class="kpi-icon">⭐</div>
       <div class="kpi-label">عملاء ممتاز</div>
-      <div class="kpi-value" id="cust-kpi-excellent">964</div>
-      <div class="kpi-sub" id="cust-kpi-excellent-sub">53.9% من العملاء</div>
+      <div class="kpi-value" id="cust-kpi-excellent">—</div>
+      <div class="kpi-sub" id="cust-kpi-excellent-sub">—</div>
     </div>
     <div class="kpi-card" style="border-color:rgba(0,212,255,0.3)">
       <div style="position:absolute;top:0;right:0;width:3px;height:100%;background:#7c6fff;border-radius:0 16px 16px 0"></div>
       <div class="kpi-icon">✅</div>
       <div class="kpi-label">جيد + متوسط</div>
-      <div class="kpi-value" id="cust-kpi-partial" style="color:#7c6fff">415</div>
-      <div class="kpi-sub" id="cust-kpi-partial-sub">23.2% — يسددون جزئياً</div>
+      <div class="kpi-value" id="cust-kpi-partial" style="color:#7c6fff">—</div>
+      <div class="kpi-sub" id="cust-kpi-partial-sub">—</div>
     </div>
     <div class="kpi-card red">
       <div class="kpi-icon">🚨</div>
       <div class="kpi-label">مخاطرة</div>
-      <div class="kpi-value" id="cust-kpi-weak">409</div>
-      <div class="kpi-sub" id="cust-kpi-weak-sub">22.9% — تحصيل ضعيف</div>
+      <div class="kpi-value" id="cust-kpi-weak">—</div>
+      <div class="kpi-sub" id="cust-kpi-weak-sub">—</div>
     </div>
     <div class="kpi-card orange">
       <div class="kpi-icon">💵</div>
       <div class="kpi-label">التحصيلات</div>
-      <div class="kpi-value" id="cust-kpi-gap">5.93M</div>
-      <div class="kpi-sub" id="cust-kpi-gap-sub">63.3% من صافي المبيعات</div>
+      <div class="kpi-value" id="cust-kpi-gap">—</div>
+      <div class="kpi-sub" id="cust-kpi-gap-sub">—</div>
     </div>
   </div>
 
@@ -4046,50 +4056,50 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
     <div class="kpi-card green">
       <div class="kpi-icon">💰</div>
       <div class="kpi-label">صافي المبيعات</div>
-      <div class="kpi-value" id="prod-kpi-net">8.41M</div>
+      <div class="kpi-value" id="prod-kpi-net">—</div>
       <div class="kpi-sub">بعد خصم المرتجعات — الرقم الحقيقي</div>
     </div>
     <div class="kpi-card blue">
       <div class="kpi-icon">📦</div>
       <div class="kpi-label">إجمالي المبيعات</div>
-      <div class="kpi-value" id="prod-kpi-sales">9.37M</div>
+      <div class="kpi-value" id="prod-kpi-sales">—</div>
       <div class="kpi-sub">قبل المرتجعات</div>
     </div>
     <div class="kpi-card red">
       <div class="kpi-icon">↩️</div>
       <div class="kpi-label">قيمة المرتجعات</div>
-      <div class="kpi-value" id="prod-kpi-returns">966K</div>
-      <div class="kpi-sub" id="prod-kpi-returns-sub">10.31% من إجمالي المبيعات 🔴</div>
+      <div class="kpi-value" id="prod-kpi-returns">—</div>
+      <div class="kpi-sub" id="prod-kpi-returns-sub">—</div>
     </div>
     <div class="kpi-card green">
       <div class="kpi-icon">✅</div>
       <div class="kpi-label">صافي الكمية</div>
-      <div class="kpi-value" id="prod-kpi-qty-net">216,548</div>
+      <div class="kpi-value" id="prod-kpi-qty-net">—</div>
       <div class="kpi-sub">وحدة بعد المرتجعات</div>
     </div>
     <div class="kpi-card blue">
       <div class="kpi-icon">📊</div>
       <div class="kpi-label">إجمالي الكمية</div>
-      <div class="kpi-value" id="prod-kpi-qty-total">239,579</div>
+      <div class="kpi-value" id="prod-kpi-qty-total">—</div>
       <div class="kpi-sub">وحدة مباعة</div>
     </div>
     <div class="kpi-card red">
       <div class="kpi-icon">🔄</div>
       <div class="kpi-label">كمية المرتجعات</div>
-      <div class="kpi-value" id="prod-kpi-qty-ret">23,031</div>
-      <div class="kpi-sub" id="prod-kpi-qty-ret-sub">9.61% من الكمية 🔴</div>
+      <div class="kpi-value" id="prod-kpi-qty-ret">—</div>
+      <div class="kpi-sub" id="prod-kpi-qty-ret-sub">—</div>
     </div>
     <div class="kpi-card gold">
       <div class="kpi-icon">🏆</div>
       <div class="kpi-label">عدد الأصناف</div>
-      <div class="kpi-value" id="prod-kpi-items-count">38</div>
-      <div class="kpi-sub" id="prod-kpi-items-sub">صنفاً نشطاً</div>
+      <div class="kpi-value" id="prod-kpi-items-count">—</div>
+      <div class="kpi-sub" id="prod-kpi-items-sub">صنف</div>
     </div>
     <div class="kpi-card orange">
       <div class="kpi-icon">⚠️</div>
       <div class="kpi-label">أعلى نسبة مرتجع</div>
-      <div class="kpi-value" id="prod-kpi-top-ret-item" style="font-size:13px">الندى بتر صودا ز…</div>
-      <div class="kpi-sub" id="prod-kpi-top-ret-item-sub">94.9% مرتجعات</div>
+      <div class="kpi-value" id="prod-kpi-top-ret-item" style="font-size:13px">—</div>
+      <div class="kpi-sub" id="prod-kpi-top-ret-item-sub">—</div>
     </div>
   </div>
 
@@ -4203,7 +4213,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:6px">
       <div>
         <div class="chart-title">📊 صافي المبيعات مقابل الكميات الصافية</div>
-        <div class="chart-sub" id="productBubble-sub">أعلى 15 صنفاً — مرتّبة بصافي المبيعات</div>
+        <div class="chart-sub" id="productBubble-sub">—</div>
       </div>
       <div style="display:flex;gap:10px;font-size:11px;align-items:center;flex-wrap:wrap">
         <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:12px;height:12px;background:rgba(0,212,255,0.85);border-radius:2px"></span><span style="color:var(--text2)">صافي المبيعات</span></span>
@@ -4315,7 +4325,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
         <div class="insight-icon">🚫</div>
         <div>
           <div class="insight-title" style="color:var(--red)">تجميد الحسابات عالية المخاطر</div>
-          <div class="insight-text">الإيقاف الفوري للبيع الآجل لـ <span id="plan-high-risk-count">366</span> عميل مصنف "مخاطرة عالية" لم يسددوا أي دفعات، حتى تسوية أوضاعهم الكاملة.</div>
+          <div class="insight-text">الإيقاف الفوري للبيع الآجل لـ <span id="plan-high-risk-count">—</span> عميل مصنف "مخاطرة عالية" لم يسددوا أي دفعات، حتى تسوية أوضاعهم الكاملة.</div>
         </div>
       </div>
       <div class="insight-card" style="margin-bottom:0;border-right:3px solid var(--accent)">
@@ -4329,14 +4339,14 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
         <div class="insight-icon">📋</div>
         <div>
           <div class="insight-title" style="color:var(--gold)">جدولة الديون الكبيرة</div>
-          <div class="insight-text">التفاوض مع أعلى 20 عميل مديونية (فجوة تتجاوز <span id="plan-top20-debt">6.4M</span> د.ل) لجدولة ديونهم بدفعات أسبوعية موثقة بشيكات آجلة.</div>
+          <div class="insight-text">التفاوض مع أعلى 20 عميل مديونية (فجوة تتجاوز <span id="plan-top20-debt">—</span> د.ل) لجدولة ديونهم بدفعات أسبوعية موثقة بشيكات آجلة.</div>
         </div>
       </div>
       <div class="insight-card" style="margin-bottom:0;border-right:3px solid var(--accent2)">
         <div class="insight-icon">🏦</div>
         <div>
           <div class="insight-title" style="color:var(--accent2)">تفعيل التحصيل الإلكتروني</div>
-          <div class="insight-text">رفع حصة التحويلات المصرفية (حالياً <span id="plan-bank-pct">94.2%</span> ✅) وتقليص النقدي، مع تقليص دورة التحصيل إلى <b>30 يوماً</b> كحد أقصى.</div>
+          <div class="insight-text">رفع حصة التحويلات المصرفية (حالياً <span id="plan-bank-pct">—</span> ✅) وتقليص النقدي، مع تقليص دورة التحصيل إلى <b>30 يوماً</b> كحد أقصى.</div>
         </div>
       </div>
     </div>
@@ -4348,7 +4358,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
       <div style="font-size:2rem">📦</div>
       <div>
         <div style="font-size:var(--fs-lg);font-weight:800;color:#7c6fff">المحور الثاني: تنشيط الأصناف البطيئة</div>
-        <div style="color:var(--muted);font-size:var(--fs-sm)">استراتيجيات لتصريف المخزون وخفض نسب المرتجعات البالغة <span id="plan-ret-pct-label">10.3%</span></div>
+        <div style="color:var(--muted);font-size:var(--fs-sm)">استراتيجيات لتصريف المخزون وخفض نسب المرتجعات البالغة <span id="plan-ret-pct-label">—</span></div>
       </div>
     </div>
     <div class="grid-auto" style="gap:var(--sp-md)">
@@ -4434,7 +4444,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
         <div style="font-size:1.6rem;flex-shrink:0">🔍</div>
         <div style="flex:1">
           <div style="font-weight:800;font-size:var(--fs-md);color:var(--red);margin-bottom:6px">② التحكم في المرتجعات (Returns Control)</div>
-          <div style="color:var(--text2);font-size:var(--fs-sm);line-height:1.7">نسبة المرتجعات <b style="color:var(--red)" id="plan-ret-pct-summary">10.3%</b> مرتفعة وتكلف الشركة أعباء تشغيلية ضخمة. التحقيق الفوري في الأسباب الجذرية: هل هي مشكلة جودة، سوء تخزين، أم تحميل زائد للعملاء من المناديب لتحقيق مستهدفات وهمية؟</div>
+          <div style="color:var(--text2);font-size:var(--fs-sm);line-height:1.7">نسبة المرتجعات <b style="color:var(--red)" id="plan-ret-pct-summary">—</b> مرتفعة وتكلف الشركة أعباء تشغيلية ضخمة. التحقيق الفوري في الأسباب الجذرية: هل هي مشكلة جودة، سوء تخزين، أم تحميل زائد للعملاء من المناديب لتحقيق مستهدفات وهمية؟</div>
         </div>
       </div>
 
@@ -5186,20 +5196,11 @@ repsData.forEach(r => {
   r.retPct = r.sales    > 0 ? +(r.returns / r.sales * 100).toFixed(2) : 0;
 });
 
-// ══ آخر تاريخ فعلي للبيانات — يُحدَّث تلقائياً عند توليد اللوحة ══
-// ⚠️  هذا المتغير يجب أن يُحدَّث عند كل تحديث للبيانات
-// يُحسب تلقائياً: آخر تاريخ في ملف CSV عند بناء اللوحة من Python
-// آخر تاريخ فعلي للبيانات المضمّنة في اللوحة
-window._dataActualMax = '2026-03-19';
+// ══ آخر تاريخ فعلي للبيانات — يُحدَّث تلقائياً عند رفع البيانات ══
+window._dataActualMax = null;
 
-// ══ ضبط _monthlyStats الافتراضي فوراً (قبل DOMContentLoaded) ══
-window._monthlyStats = window._monthlyStats || {
-  labels:  ['يناير 2026', 'فبراير 2026', 'مارس 2026'],
-  sales:   [3051.50, 6065770.17, 3303551.11],
-  returns: [0,        691185.05,  274724.89],
-  net:     [3051.50, 5374585.12, 3028826.22],
-  col:     [88796,   4578896.79, 2075172.50]
-};
+// ══ _monthlyStats — تُحسب من البيانات المرفوعة فقط ══
+window._monthlyStats = { labels: [], sales: [], returns: [], net: [], col: [] };
 
 const productsData = [];
 
@@ -6136,14 +6137,8 @@ const roiBands = [
 
 // ---- Monthly Performance Chart ----
 (function() {
-  // Use _monthlyStats if available (set by CSV loader), otherwise use defaults
-  const ms = window._monthlyStats || {
-    labels:   ['يناير 2026', 'فبراير 2026', 'مارس 2026'],
-    sales:    [3051.50, 6065770.17, 3303551.11],
-    returns:  [0, 691185.05, 274724.89],
-    net:      [3051.50, 5374585.12, 3028826.22],
-    col:      [88796, 4578896.79, 2075172.50]
-  };
+  // _monthlyStats تُحسب من البيانات المرفوعة فقط
+  const ms = window._monthlyStats || { labels: [], sales: [], returns: [], net: [], col: [] };
   // تحديث النص الفرعي للرسم ليعكس الفترة الحالية
   const mChartSub = document.getElementById('monthly-chart-sub');
   if (mChartSub && ms.labels) {
@@ -7169,7 +7164,8 @@ document.addEventListener('DOMContentLoaded', () => { try { initRepCmpPanels(); 
 
 
 // ===== بيانات الأصناف — مصدر: items_analysis.csv =====
-const itemsData = [{"name": "الندى بتر صودا بلاستيك 1 لتر*6", "sales": 531785.0, "qty": 28650, "inv": 1347, "cust": 1084, "reps": 36, "retVal": 31985.0, "retQty": 1725, "ns": 499800.0, "nqty": 26925, "retPct": 6.01, "avgP": 18.56, "turn": 1347}, {"name": "الندى بتر صودا توت ازرق زجاج 175 مل*18", "sales": 4318.72, "qty": 187, "inv": 38, "cust": 35, "reps": 8, "retVal": 422.0, "retQty": 11, "ns": 3896.72, "nqty": 176, "retPct": 9.77, "avgP": 23.09, "turn": 38}, {"name": "الندى بتر صودا دايت بلاستيك 1 لتر*6", "sales": 4484.0, "qty": 236, "inv": 42, "cust": 40, "reps": 13, "retVal": 19.0, "retQty": 1, "ns": 4465.0, "nqty": 235, "retPct": 0.42, "avgP": 19.0, "turn": 42}, {"name": "الندى بتر صودا دايت زجاج 175 مل*18", "sales": 265509.9, "qty": 7133, "inv": 1083, "cust": 896, "reps": 35, "retVal": 41619.0, "retQty": 1103, "ns": 223890.9, "nqty": 6030, "retPct": 15.68, "avgP": 37.22, "turn": 1083}, {"name": "الندى بتر صودا زجاج 100 مل*18", "sales": 28981.0, "qty": 882, "inv": 260, "cust": 229, "reps": 21, "retVal": 1188.0, "retQty": 36, "ns": 27793.0, "nqty": 846, "retPct": 4.1, "avgP": 32.86, "turn": 260}, {"name": "الندى بتر صودا زجاج 175 مل*18", "sales": 3064230.0, "qty": 79889, "inv": 1864, "cust": 1425, "reps": 36, "retVal": 230790.0, "retQty": 6028, "ns": 2833440.0, "nqty": 73861, "retPct": 7.53, "avgP": 38.36, "turn": 1864}, {"name": "الندى بتر صودا زجاج 250 مل*18", "sales": 171788.89, "qty": 5468, "inv": 540, "cust": 452, "reps": 31, "retVal": 67563.89, "retQty": 1837, "ns": 104225.0, "nqty": 3631, "retPct": 39.33, "avgP": 31.42, "turn": 540}, {"name": "الندى بتر صودا زنجبيل زجاج 175 مل*18", "sales": 2833.0, "qty": 89, "inv": 2, "cust": 1, "reps": 1, "retVal": 2688.0, "retQty": 84, "ns": 145.0, "nqty": 5, "retPct": 94.88, "avgP": 31.83, "turn": 2}, {"name": "الندى بتر صودا كرز زجاج 175 مل*18", "sales": 62749.5, "qty": 2590, "inv": 59, "cust": 52, "reps": 13, "retVal": 916.0, "retQty": 50, "ns": 61833.5, "nqty": 2540, "retPct": 1.46, "avgP": 24.23, "turn": 59}, {"name": "الندى بتر صودا كيني زجاج 175 مل*18", "sales": 40400.8, "qty": 1468, "inv": 24, "cust": 19, "reps": 11, "retVal": 0.0, "retQty": 0, "ns": 40400.8, "nqty": 1468, "retPct": 0.0, "avgP": 27.52, "turn": 24}, {"name": "الندى بتر صودا ليمون زجاج 175 مل*18", "sales": 41582.69, "qty": 1522, "inv": 22, "cust": 18, "reps": 11, "retVal": 300.0, "retQty": 40, "ns": 41282.69, "nqty": 1482, "retPct": 0.72, "avgP": 27.32, "turn": 22}, {"name": "الندى بتر صودا موخيتو زجاج 175 مل*18", "sales": 5055.88, "qty": 246, "inv": 45, "cust": 42, "reps": 9, "retVal": 390.0, "retQty": 10, "ns": 4665.88, "nqty": 236, "retPct": 7.71, "avgP": 20.55, "turn": 45}, {"name": "الندى عصير برتقال زجاج 250 مل*18", "sales": 161006.14, "qty": 6815, "inv": 641, "cust": 556, "reps": 34, "retVal": 57698.0, "retQty": 1130, "ns": 103308.14, "nqty": 5685, "retPct": 35.84, "avgP": 23.63, "turn": 641}, {"name": "الندى عصير رمان زجاج 250 مل*18", "sales": 106945.0, "qty": 1915, "inv": 792, "cust": 692, "reps": 31, "retVal": 12630.09, "retQty": 228, "ns": 94314.91, "nqty": 1687, "retPct": 11.81, "avgP": 55.85, "turn": 792}, {"name": "الندى عصير عنب بلاستيك 330 مل*12", "sales": 70528.4, "qty": 7095, "inv": 611, "cust": 502, "reps": 30, "retVal": 10178.6, "retQty": 1018, "ns": 60349.8, "nqty": 6077, "retPct": 14.43, "avgP": 9.94, "turn": 611}, {"name": "الندى عصير عنب زجاج 250 مل*18", "sales": 1164549.0, "qty": 19641, "inv": 1641, "cust": 1297, "reps": 36, "retVal": 160077.03, "retQty": 2708, "ns": 1004471.97, "nqty": 16933, "retPct": 13.75, "avgP": 59.29, "turn": 1641}, {"name": "الندى عصير ليمون وزنجبيل زجاج 250 مل*18", "sales": 359743.24, "qty": 10871, "inv": 935, "cust": 799, "reps": 35, "retVal": 62925.68, "retQty": 1586, "ns": 296817.56, "nqty": 9285, "retPct": 17.49, "avgP": 33.09, "turn": 935}, {"name": "الندى مشروب شعير أناناس زجاج 330 مل*18", "sales": 455616.0, "qty": 7945, "inv": 1150, "cust": 976, "reps": 36, "retVal": 40540.0, "retQty": 706, "ns": 415076.0, "nqty": 7239, "retPct": 8.9, "avgP": 57.35, "turn": 1150}, {"name": "الندى مشروب شعير تفاح زجاج 330 مل*18", "sales": 559141.0, "qty": 9753, "inv": 1360, "cust": 1116, "reps": 36, "retVal": 42958.0, "retQty": 748, "ns": 516183.0, "nqty": 9005, "retPct": 7.68, "avgP": 57.33, "turn": 1360}, {"name": "الندى مشروب شعير رمان زجاج 330 مل*18", "sales": 626269.0, "qty": 10933, "inv": 1308, "cust": 1071, "reps": 36, "retVal": 46930.0, "retQty": 818, "ns": 579339.0, "nqty": 10115, "retPct": 7.49, "avgP": 57.28, "turn": 1308}, {"name": "الندى مشروب شعير عنب زجاج 330 مل*18", "sales": 17332.0, "qty": 299, "inv": 107, "cust": 101, "reps": 21, "retVal": 1846.0, "retQty": 32, "ns": 15486.0, "nqty": 267, "retPct": 10.65, "avgP": 57.97, "turn": 107}, {"name": "الندى مشروب شعير فراولة زجاج 330 مل*18", "sales": 23556.0, "qty": 407, "inv": 110, "cust": 101, "reps": 26, "retVal": 2194.0, "retQty": 38, "ns": 21362.0, "nqty": 369, "retPct": 9.31, "avgP": 57.88, "turn": 110}, {"name": "الندى مشروب طاقة زجاج 250 مل*18", "sales": 192428.0, "qty": 3880, "inv": 1010, "cust": 835, "reps": 35, "retVal": 9744.0, "retQty": 196, "ns": 182684.0, "nqty": 3684, "retPct": 5.06, "avgP": 49.59, "turn": 1010}, {"name": "الندى مشروب غازي لوز زجاج 250 مل*18", "sales": 354795.0, "qty": 7803, "inv": 1315, "cust": 1095, "reps": 36, "retVal": 19682.26, "retQty": 433, "ns": 335112.74, "nqty": 7370, "retPct": 5.55, "avgP": 45.47, "turn": 1315}, {"name": "الندى مياه غازية زجاج 330 مل *18", "sales": 279149.0, "qty": 6110, "inv": 1033, "cust": 879, "reps": 34, "retVal": 17201.0, "retQty": 375, "ns": 261948.0, "nqty": 5735, "retPct": 6.16, "avgP": 45.69, "turn": 1033}, {"name": "الندى مياه معدنية زجاج 330 مل *18", "sales": 12834.0, "qty": 279, "inv": 60, "cust": 55, "reps": 15, "retVal": 3036.0, "retQty": 66, "ns": 9798.0, "nqty": 213, "retPct": 23.66, "avgP": 46.0, "turn": 60}, {"name": "بيانكي مشروب طاقة أناناس زجاج 275 مل*18", "sales": 36116.0, "qty": 446, "inv": 293, "cust": 273, "reps": 27, "retVal": 3238.34, "retQty": 40, "ns": 32877.66, "nqty": 406, "retPct": 8.97, "avgP": 80.98, "turn": 293}, {"name": "بيانكي مشروب طاقة علكة زجاج 275 مل*18", "sales": 37741.0, "qty": 466, "inv": 326, "cust": 304, "reps": 27, "retVal": 3564.0, "retQty": 44, "ns": 34177.0, "nqty": 422, "retPct": 9.44, "avgP": 80.99, "turn": 326}, {"name": "بيانكي مشروب طاقة كشمش أسود 275 مل*18", "sales": 35716.0, "qty": 441, "inv": 303, "cust": 280, "reps": 26, "retVal": 2430.0, "retQty": 30, "ns": 33286.0, "nqty": 411, "retPct": 6.8, "avgP": 80.99, "turn": 303}, {"name": "بيانكي مشروب طاقة مارشميلو زجاج 275 مل*18", "sales": 41143.0, "qty": 508, "inv": 357, "cust": 335, "reps": 28, "retVal": 3154.0, "retQty": 39, "ns": 37989.0, "nqty": 469, "retPct": 7.67, "avgP": 80.99, "turn": 357}, {"name": "بيانكي مشروب طاقة مانجو زجاج 275 مل*18", "sales": 37984.0, "qty": 469, "inv": 325, "cust": 302, "reps": 28, "retVal": 2591.0, "retQty": 32, "ns": 35393.0, "nqty": 437, "retPct": 6.82, "avgP": 80.99, "turn": 325}, {"name": "بيانكي مشروب غازي  موخيتو فراولة 275 مل*18", "sales": 9480.0, "qty": 158, "inv": 79, "cust": 74, "reps": 21, "retVal": 1350.51, "retQty": 24, "ns": 8129.49, "nqty": 134, "retPct": 14.25, "avgP": 60.0, "turn": 79}, {"name": "بيانكي مشروب غازي استوائية زرقاء 275 مل*18", "sales": 149791.0, "qty": 2510, "inv": 946, "cust": 809, "reps": 33, "retVal": 27074.51, "retQty": 457, "ns": 122716.49, "nqty": 2053, "retPct": 18.07, "avgP": 59.68, "turn": 946}, {"name": "بيانكي مشروب غازي بيناكولادا 275 مل*18", "sales": 1980.0, "qty": 33, "inv": 18, "cust": 18, "reps": 10, "retVal": 120.0, "retQty": 2, "ns": 1860.0, "nqty": 31, "retPct": 6.06, "avgP": 60.0, "turn": 18}, {"name": "بيانكي مشروب غازي تفاح أخضر 275 مل*18", "sales": 101860.0, "qty": 1704, "inv": 756, "cust": 668, "reps": 33, "retVal": 8864.0, "retQty": 149, "ns": 92996.0, "nqty": 1555, "retPct": 8.7, "avgP": 59.78, "turn": 756}, {"name": "بيانكي مشروب غازي توت وكرز 275 مل*18", "sales": 137150.0, "qty": 2299, "inv": 859, "cust": 753, "reps": 33, "retVal": 30831.51, "retQty": 521, "ns": 106318.49, "nqty": 1778, "retPct": 22.48, "avgP": 59.66, "turn": 859}, {"name": "بيانكي مشروب غازي ليمون ونعناع 275 مل*18", "sales": 85705.0, "qty": 1431, "inv": 704, "cust": 629, "reps": 31, "retVal": 6523.51, "retQty": 109, "ns": 79181.49, "nqty": 1322, "retPct": 7.61, "avgP": 59.89, "turn": 704}, {"name": "فونتانا عصير عنب بلاستيك 1 لتر*6", "sales": 90095.62, "qty": 7008, "inv": 497, "cust": 415, "reps": 27, "retVal": 10647.0, "retQty": 577, "ns": 79448.62, "nqty": 6431, "retPct": 11.82, "avgP": 12.86, "turn": 497}];
+// ===== بيانات الأصناف — تُحمَّل من ملف CSV عند الرفع =====
+const itemsData = [];
 
 
 
@@ -12458,6 +12454,37 @@ function parseCSVContent(text) {
     parts.push(cur);
     if (parts.length > 0) result.push(parts);
   }
+  // ── تطبيع: إذا كانت صفوف البيانات تحتوي على عمود واحد فقط، أعد تحليلها ──
+  // (يحدث هذا عندما يكون كل صف ملفوفاً بعلامة اقتباس خارجية مثل: "val,""v2"",""v3"","")
+  if (result.length > 1) {
+    const headerCols = result[0].length;
+    const singleColRows = result.slice(1).filter(r => r.length === 1).length;
+    if (headerCols > 1 && singleColRows > 0) {
+      for (let i = 1; i < result.length; i++) {
+        if (result[i].length === 1) {
+          const inner = result[i][0];
+          if (inner.indexOf(',') !== -1) {
+            const parts = [];
+            let cur = '', inQ = false, j = 0, len = inner.length;
+            while (j < len) {
+              const ch = inner.charCodeAt(j);
+              if (ch === 34) {
+                if (inQ && inner.charCodeAt(j+1) === 34) { cur += '"'; j += 2; }
+                else { inQ = !inQ; j++; }
+              } else if (ch === 44 && !inQ) {
+                parts.push(cur.trim()); cur = ''; j++;
+              } else {
+                cur += inner[j]; j++;
+              }
+            }
+            if (cur !== '') parts.push(cur.trim());
+            if (parts.length > 1) result[i] = parts;
+          }
+        }
+      }
+    }
+  }
+
   return result;
 }
 
@@ -13890,11 +13917,16 @@ async function applyCsvData(fromGS) {
 
     if (salesResult) {
       salesHeaders = salesResult[0];
-      salesRows = salesResult.slice(1).filter(r => r.length > 2 && r[0] !== '#' && r[0] !== '' && !isNaN(Number(r[0])));
+      // تنظيف الرؤوس: إزالة BOM وتبييض المسافات
+      salesHeaders = salesHeaders.map(h => String(h||'').replace(/^\uFEFF/, '').trim());
+      // فلتر مرن: نقبل أي صف غير فارغ ليس صف رأس مكرر
+      salesRows = salesResult.slice(1).filter(r => r.length > 2 && String(r[0]||'').trim() !== '' && String(r[0]||'').trim() !== '#' && String(r[0]||'').trim() !== 'م' && String(r[0]||'').trim() !== 'رقم');
     }
-    if (colResult) { colHeaders = colResult[0]; colRows = colResult.slice(1).filter(r => r.length > 2); }
-    if (debtResult) { debtHeaders = debtResult[0]; debtRows = debtResult.slice(1).filter(r => r.length > 2); }
+    if (colResult) { colHeaders = colResult[0].map(h=>String(h||'').replace(/^\uFEFF/,'').trim()); colRows = colResult.slice(1).filter(r => r.length > 2); }
+    if (debtResult) { debtHeaders = debtResult[0].map(h=>String(h||'').replace(/^\uFEFF/,'').trim()); debtRows = debtResult.slice(1).filter(r => r.length > 2); }
 
+    // إظهار إحصائيات التحميل
+    { const _p=[];if(salesRows.length>0)_p.push('مبيعات: '+salesRows.length.toLocaleString('ar')+' صف');if(colRows.length>0)_p.push('تحصيل: '+colRows.length.toLocaleString('ar')+' صف');if(debtRows.length>0)_p.push('مديونية: '+debtRows.length.toLocaleString('ar')+' صف');if(_p.length)msg.textContent='✅ تم تحميل: '+_p.join(' | ');}
     msg.textContent = '⏳ جارٍ التحليل...';
 
     // ══ تحليل ملف تصنيف المناديب ══
@@ -14036,14 +14068,27 @@ async function applyCsvData(fromGS) {
         };
       }
       
-      const iInvoice= salesHeaders.indexOf('رقم الفاتورة');
-      const iType   = salesHeaders.indexOf('النوع');
-      const iMaterial=salesHeaders.indexOf('المادة');
-      const iQtyOut = salesHeaders.indexOf('الكمية الخارجة');
-      const iTotal  = salesHeaders.indexOf('الاجمالي الصافي');
-      const iCust   = salesHeaders.indexOf('اسم الزبون');
-      const iRep    = salesHeaders.indexOf('المندوب');
-      const iDateS  = salesHeaders.indexOf('التاريخ');
+      // اكتشاف مرن لأسماء الأعمدة — يقبل أسماء متعددة ممكنة
+      const _findCol = (hdrs, ...names) => {
+        for (const n of names) {
+          const idx = hdrs.findIndex(h => String(h||'').trim() === n);
+          if (idx >= 0) return idx;
+        }
+        // بحث جزئي إذا لم يوجد تطابق كامل
+        for (const n of names) {
+          const idx = hdrs.findIndex(h => String(h||'').trim().includes(n) || n.includes(String(h||'').trim()));
+          if (idx >= 0) return idx;
+        }
+        return -1;
+      };
+      const iInvoice= _findCol(salesHeaders, 'رقم الفاتورة', 'الفاتورة', 'رقم', 'invoice');
+      const iType   = _findCol(salesHeaders, 'النوع', 'نوع', 'type');
+      const iMaterial=_findCol(salesHeaders, 'المادة', 'الصنف', 'اسم المادة', 'المنتج', 'الصنف/المادة', 'item');
+      const iQtyOut = _findCol(salesHeaders, 'الكمية الخارجة', 'الكمية', 'كمية', 'qty', 'quantity');
+      const iTotal  = _findCol(salesHeaders, 'الاجمالي الصافي', 'الإجمالي الصافي', 'صافي المبيعات', 'الصافي', 'الإجمالي', 'total', 'net');
+      const iCust   = _findCol(salesHeaders, 'اسم الزبون', 'الزبون', 'العميل', 'اسم العميل', 'customer');
+      const iRep    = _findCol(salesHeaders, 'المندوب', 'اسم المندوب', 'rep', 'salesman');
+      const iDateS  = _findCol(salesHeaders, 'التاريخ', 'تاريخ', 'date');
 
       const repMap  = {};
       const custMap = {};
@@ -14118,11 +14163,12 @@ async function applyCsvData(fromGS) {
       const repColMap  = {};
       const custColMap = {};
       if (hasTahseel && colRows.length > 0) {
-        const iColRep    = colHeaders.indexOf('المندوب');
-        const iColCred   = colHeaders.indexOf('دائن');
-        const iColAcc    = colHeaders.indexOf('الحساب المقابل');
-        const iColCustNm = colHeaders.indexOf('اسم الحساب');
-        const iColBayan  = colHeaders.indexOf('البيان');
+        const _fc = (hdrs,...ns) => { for(const n of ns){ const i=hdrs.findIndex(h=>String(h||'').trim()===n); if(i>=0)return i; } for(const n of ns){ const i=hdrs.findIndex(h=>String(h||'').trim().includes(n)&&n.length>1); if(i>=0)return i; } return -1; };
+        const iColRep    = _fc(colHeaders,'المندوب','اسم المندوب');
+        const iColCred   = _fc(colHeaders,'دائن','مجموع دائن','قيمة التحصيل','مبلغ','القيمة');
+        const iColAcc    = _fc(colHeaders,'الحساب المقابل','الحساب');
+        const iColCustNm = _fc(colHeaders,'اسم الحساب','اسم العميل','اسم الزبون','العميل','الزبون');
+        const iColBayan  = _fc(colHeaders,'البيان','ملاحظة');
         for (const row of colRows) {
           const rep    = (row[iColRep]    || '').trim();
           const cred   = cleanNum(row[iColCred]);
@@ -14151,9 +14197,10 @@ async function applyCsvData(fromGS) {
       // مديونية
       const repDebtMap = {};
       if (hasMadiooniya && debtRows.length > 0) {
-        const iDebtRep  = debtHeaders.indexOf('المندوب');
-        const iDebtDeb  = debtHeaders.indexOf('مجموع مدين');
-        const iDebtCred = debtHeaders.indexOf('مجموع دائن');
+        const _fd = (hdrs,...ns) => { for(const n of ns){ const i=hdrs.findIndex(h=>String(h||'').trim()===n); if(i>=0)return i; } for(const n of ns){ const i=hdrs.findIndex(h=>String(h||'').trim().includes(n)&&n.length>1); if(i>=0)return i; } return -1; };
+        const iDebtRep  = _fd(debtHeaders,'المندوب','اسم المندوب');
+        const iDebtDeb  = _fd(debtHeaders,'مجموع مدين','مدين','إجمالي مدين');
+        const iDebtCred = _fd(debtHeaders,'مجموع دائن','دائن','إجمالي دائن');
         for (const row of debtRows) {
           const rep   = (row[iDebtRep] || '').trim();
           const debit = cleanNum(row[iDebtDeb]);
@@ -15255,5 +15302,5 @@ function exportAgingCSV() {
   </div>
 </footer>
 
-<script src="https://replit-cdn.com/replit-pill/replit-pill.global.js" data-referral-code="973es4gjzbzk" data-repl-id="a7962ca8-3446-41a4-ab31-d0bba77f811b"></script></body>
+</body>
 </html>
