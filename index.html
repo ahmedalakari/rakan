@@ -2131,6 +2131,18 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
     transition: opacity .3s;
   }
   #df-nodata-alert.show { display: flex; }
+
+  /* ── Guide Drop Zone ── */
+  #guideDrop.drag-over {
+    border-color: rgba(0,212,255,0.8) !important;
+    background: rgba(0,212,255,0.08) !important;
+    transform: scale(1.01);
+  }
+  #guideDrop.drag-over #guideDropIcon { transform: scale(1.15) translateY(-4px); }
+  .guide-file-slot.slot-ready { border-color: rgba(0,255,136,0.6) !important; background: rgba(0,255,136,0.1) !important; }
+  @media (max-width: 520px) {
+    .guide-file-slot { min-width: 90px !important; padding: 6px 8px !important; }
+  }
 </style>
 </head>
 <body>
@@ -4636,6 +4648,266 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
     <div>
       <h1 style="margin:0;font-size:22px;font-weight:900;color:var(--accent)">دليل رفع الملفات والمزامنة</h1>
       <p style="margin:4px 0 0;font-size:13px;color:var(--muted)">تنسيقات الأعمدة المطلوبة لضمان نجاح عملية التحديث الكامل للوحة</p>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════
+       خريطة ذهنية — آلية رفع ملفات XLS / XLSX
+  ════════════════════════════════════════════════════════════ -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:24px;overflow:hidden">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+      <span style="font-size:22px">🗺️</span>
+      <div>
+        <div style="font-size:15px;font-weight:800;color:var(--accent)">خريطة ذهنية — آلية رفع ملفات XLS / XLSX</div>
+        <div style="font-size:11px;color:var(--muted)">من الرفع حتى ظهور البيانات في اللوحة</div>
+      </div>
+    </div>
+
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+    <svg viewBox="0 0 860 370" xmlns="http://www.w3.org/2000/svg" style="min-width:600px;width:100%;font-family:Cairo,sans-serif;direction:rtl">
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="rgba(0,212,255,0.7)"/>
+        </marker>
+        <marker id="arrG" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="rgba(0,255,136,0.7)"/>
+        </marker>
+        <marker id="arrY" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="rgba(255,215,0,0.7)"/>
+        </marker>
+        <marker id="arrO" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="rgba(255,107,53,0.7)"/>
+        </marker>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+          <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- ══ خلفية ══ -->
+      <rect width="860" height="370" fill="rgba(10,15,30,0.0)" rx="12"/>
+
+      <!-- ══ 1: الملف المرفوع ══ -->
+      <rect x="20" y="145" width="110" height="80" rx="10" fill="rgba(0,255,136,0.12)" stroke="rgba(0,255,136,0.5)" stroke-width="1.5" filter="url(#glow)"/>
+      <text x="75" y="172" text-anchor="middle" font-size="18">📂</text>
+      <text x="75" y="191" text-anchor="middle" font-size="9.5" fill="#00ff88" font-weight="700">ملف المستخدم</text>
+      <text x="75" y="205" text-anchor="middle" font-size="8" fill="#8ba3b8">CSV / XLS / XLSX</text>
+      <text x="75" y="218" text-anchor="middle" font-size="8" fill="#8ba3b8">السحب أو النقر</text>
+
+      <!-- سهم 1→2 -->
+      <line x1="130" y1="185" x2="168" y2="185" stroke="rgba(0,212,255,0.6)" stroke-width="1.5" marker-end="url(#arr)"/>
+
+      <!-- ══ 2: كاشف النوع ══ -->
+      <rect x="170" y="148" width="100" height="74" rx="10" fill="rgba(0,212,255,0.1)" stroke="rgba(0,212,255,0.45)" stroke-width="1.5"/>
+      <text x="220" y="170" text-anchor="middle" font-size="15">🔍</text>
+      <text x="220" y="187" text-anchor="middle" font-size="9.5" fill="#00d4ff" font-weight="700">كاشف النوع</text>
+      <text x="220" y="201" text-anchor="middle" font-size="8" fill="#8ba3b8">هل هو XLS/XLSX؟</text>
+      <text x="220" y="213" text-anchor="middle" font-size="8" fill="#8ba3b8">أم CSV؟</text>
+
+      <!-- مسار CSV -->
+      <text x="160" y="244" text-anchor="middle" font-size="8" fill="#8ba3b8">CSV</text>
+      <path d="M220,222 Q220,248 290,248" stroke="rgba(0,212,255,0.4)" stroke-width="1.2" fill="none" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+      <!-- مسار XLS -->
+      <text x="160" y="132" text-anchor="middle" font-size="8" fill="#00ff88">XLS/XLSX</text>
+      <path d="M220,148 Q220,122 290,122" stroke="rgba(0,255,136,0.5)" stroke-width="1.2" fill="none" stroke-dasharray="4,3" marker-end="url(#arrG)"/>
+
+      <!-- ══ 3a: SheetJS ══ -->
+      <rect x="292" y="100" width="106" height="65" rx="10" fill="rgba(124,111,255,0.12)" stroke="rgba(124,111,255,0.5)" stroke-width="1.5" filter="url(#glow)"/>
+      <text x="345" y="122" text-anchor="middle" font-size="14">⚙️</text>
+      <text x="345" y="139" text-anchor="middle" font-size="9.5" fill="#7c6fff" font-weight="700">SheetJS</text>
+      <text x="345" y="153" text-anchor="middle" font-size="8" fill="#8ba3b8">تحويل XLSX→CSV</text>
+      <text x="345" y="164" text-anchor="middle" font-size="8" fill="#8ba3b8">داخل المتصفح</text>
+
+      <!-- ══ 3b: CSV المباشر ══ -->
+      <rect x="292" y="228" width="106" height="50" rx="10" fill="rgba(0,212,255,0.08)" stroke="rgba(0,212,255,0.3)" stroke-width="1.2"/>
+      <text x="345" y="248" text-anchor="middle" font-size="13">📄</text>
+      <text x="345" y="263" text-anchor="middle" font-size="9" fill="#00d4ff" font-weight="700">قراءة CSV مباشرة</text>
+      <text x="345" y="274" text-anchor="middle" font-size="8" fill="#8ba3b8">cp1256 / UTF-8</text>
+
+      <!-- سهم 3a→4 وسهم 3b→4 -->
+      <path d="M398,132 Q430,132 430,182" stroke="rgba(255,215,0,0.55)" stroke-width="1.5" fill="none" marker-end="url(#arrY)"/>
+      <path d="M398,253 Q430,253 430,210" stroke="rgba(255,215,0,0.55)" stroke-width="1.5" fill="none" marker-end="url(#arrY)"/>
+
+      <!-- ══ 4: محلل الأعمدة ══ -->
+      <rect x="410" y="158" width="110" height="74" rx="10" fill="rgba(255,215,0,0.1)" stroke="rgba(255,215,0,0.5)" stroke-width="1.5" filter="url(#glow)"/>
+      <text x="465" y="180" text-anchor="middle" font-size="15">🔎</text>
+      <text x="465" y="197" text-anchor="middle" font-size="9.5" fill="#ffd700" font-weight="700">محلل الأعمدة</text>
+      <text x="465" y="211" text-anchor="middle" font-size="8" fill="#8ba3b8">يكتشف: مبيع /</text>
+      <text x="465" y="222" text-anchor="middle" font-size="8" fill="#8ba3b8">مرتجع / تاريخ…</text>
+
+      <!-- سهم 4→5 -->
+      <line x1="520" y1="195" x2="558" y2="195" stroke="rgba(0,212,255,0.6)" stroke-width="1.5" marker-end="url(#arr)"/>
+
+      <!-- ══ 5: دمج البيانات ══ -->
+      <rect x="560" y="155" width="110" height="80" rx="10" fill="rgba(0,212,255,0.1)" stroke="rgba(0,212,255,0.45)" stroke-width="1.5"/>
+      <text x="615" y="178" text-anchor="middle" font-size="15">🔗</text>
+      <text x="615" y="195" text-anchor="middle" font-size="9.5" fill="#00d4ff" font-weight="700">دمج البيانات</text>
+      <text x="615" y="209" text-anchor="middle" font-size="8" fill="#8ba3b8">مبيعات + تحصيل</text>
+      <text x="615" y="221" text-anchor="middle" font-size="8" fill="#8ba3b8">+ مديونية + تصنيف</text>
+
+      <!-- سهم 5→6 -->
+      <line x1="670" y1="195" x2="708" y2="195" stroke="rgba(255,107,53,0.7)" stroke-width="1.5" marker-end="url(#arrO)"/>
+
+      <!-- ══ 6: تحديث اللوحة ══ -->
+      <rect x="710" y="148" width="120" height="95" rx="10" fill="rgba(255,107,53,0.1)" stroke="rgba(255,107,53,0.5)" stroke-width="1.5" filter="url(#glow)"/>
+      <text x="770" y="172" text-anchor="middle" font-size="15">📊</text>
+      <text x="770" y="189" text-anchor="middle" font-size="9.5" fill="#ff6b35" font-weight="700">تحديث اللوحة</text>
+      <text x="770" y="203" text-anchor="middle" font-size="7.5" fill="#8ba3b8">KPIs · الرسوم</text>
+      <text x="770" y="215" text-anchor="middle" font-size="7.5" fill="#8ba3b8">الجداول · الفلاتر</text>
+      <text x="770" y="227" text-anchor="middle" font-size="7.5" fill="#8ba3b8">أعمار الذمم</text>
+      <text x="770" y="237" text-anchor="middle" font-size="7.5" fill="#8ba3b8">خطة العمل</text>
+
+      <!-- ══ أفرع التصنيفات (أسفل) ══ -->
+      <!-- مبيعات -->
+      <rect x="292" y="305" width="80" height="38" rx="8" fill="rgba(0,255,136,0.08)" stroke="rgba(0,255,136,0.3)" stroke-width="1"/>
+      <text x="332" y="320" text-anchor="middle" font-size="8.5" fill="#00ff88" font-weight="700">📦 مبيعات</text>
+      <text x="332" y="333" text-anchor="middle" font-size="7.5" fill="#8ba3b8">مبيع / مرتجع</text>
+      <line x1="332" y1="305" x2="345" y2="293" stroke="rgba(0,255,136,0.3)" stroke-width="1" stroke-dasharray="3,2"/>
+
+      <!-- تحصيل -->
+      <rect x="385" y="305" width="80" height="38" rx="8" fill="rgba(0,212,255,0.08)" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
+      <text x="425" y="320" text-anchor="middle" font-size="8.5" fill="#00d4ff" font-weight="700">💳 تحصيل</text>
+      <text x="425" y="333" text-anchor="middle" font-size="7.5" fill="#8ba3b8">بنكي / نقدي</text>
+      <line x1="425" y1="305" x2="435" y2="293" stroke="rgba(0,212,255,0.3)" stroke-width="1" stroke-dasharray="3,2"/>
+
+      <!-- مديونية -->
+      <rect x="478" y="305" width="80" height="38" rx="8" fill="rgba(255,71,87,0.08)" stroke="rgba(255,71,87,0.3)" stroke-width="1"/>
+      <text x="518" y="320" text-anchor="middle" font-size="8.5" fill="#ff4757" font-weight="700">💰 مديونية</text>
+      <text x="518" y="333" text-anchor="middle" font-size="7.5" fill="#8ba3b8">مدين / دائن</text>
+      <line x1="518" y1="305" x2="505" y2="293" stroke="rgba(255,71,87,0.3)" stroke-width="1" stroke-dasharray="3,2"/>
+
+      <!-- تصنيف -->
+      <rect x="571" y="305" width="80" height="38" rx="8" fill="rgba(255,215,0,0.08)" stroke="rgba(255,215,0,0.3)" stroke-width="1"/>
+      <text x="611" y="320" text-anchor="middle" font-size="8.5" fill="#ffd700" font-weight="700">👥 تصنيف</text>
+      <text x="611" y="333" text-anchor="middle" font-size="7.5" fill="#8ba3b8">فئات / أهداف</text>
+      <line x1="611" y1="305" x2="615" y2="235" stroke="rgba(255,215,0,0.3)" stroke-width="1" stroke-dasharray="3,2"/>
+
+      <!-- ══ علامة النجاح ══ -->
+      <circle cx="770" cy="318" r="22" fill="rgba(0,255,136,0.1)" stroke="rgba(0,255,136,0.4)" stroke-width="1.5"/>
+      <text x="770" y="323" text-anchor="middle" font-size="18">✅</text>
+      <line x1="770" y1="243" x2="770" y2="296" stroke="rgba(0,255,136,0.4)" stroke-width="1.2" stroke-dasharray="3,2"/>
+      <text x="770" y="340" text-anchor="middle" font-size="8" fill="#00ff88">جاهز!</text>
+
+      <!-- ══ الأرقام ══ -->
+      <circle cx="75" cy="130" r="9" fill="rgba(0,255,136,0.2)" stroke="rgba(0,255,136,0.5)" stroke-width="1"/>
+      <text x="75" y="134" text-anchor="middle" font-size="9" fill="#00ff88" font-weight="800">1</text>
+      <circle cx="220" cy="143" r="9" fill="rgba(0,212,255,0.2)" stroke="rgba(0,212,255,0.5)" stroke-width="1"/>
+      <text x="220" y="147" text-anchor="middle" font-size="9" fill="#00d4ff" font-weight="800">2</text>
+      <circle cx="345" cy="96" r="9" fill="rgba(124,111,255,0.2)" stroke="rgba(124,111,255,0.5)" stroke-width="1"/>
+      <text x="345" y="100" text-anchor="middle" font-size="9" fill="#7c6fff" font-weight="800">3</text>
+      <circle cx="465" cy="153" r="9" fill="rgba(255,215,0,0.2)" stroke="rgba(255,215,0,0.5)" stroke-width="1"/>
+      <text x="465" y="157" text-anchor="middle" font-size="9" fill="#ffd700" font-weight="800">4</text>
+      <circle cx="615" cy="150" r="9" fill="rgba(0,212,255,0.2)" stroke="rgba(0,212,255,0.5)" stroke-width="1"/>
+      <text x="615" y="154" text-anchor="middle" font-size="9" fill="#00d4ff" font-weight="800">5</text>
+      <circle cx="770" cy="143" r="9" fill="rgba(255,107,53,0.2)" stroke="rgba(255,107,53,0.5)" stroke-width="1"/>
+      <text x="770" y="147" text-anchor="middle" font-size="9" fill="#ff6b35" font-weight="800">6</text>
+    </svg>
+    </div>
+
+    <!-- مفتاح الألوان -->
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:11px">
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:11px;height:11px;border-radius:3px;background:rgba(0,255,136,0.25);border:1px solid #00ff88;display:inline-block"></span><span style="color:var(--muted)">الملف المُدخَل</span></span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:11px;height:11px;border-radius:3px;background:rgba(124,111,255,0.25);border:1px solid #7c6fff;display:inline-block"></span><span style="color:var(--muted)">SheetJS — تحويل XLS</span></span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:11px;height:11px;border-radius:3px;background:rgba(255,215,0,0.25);border:1px solid #ffd700;display:inline-block"></span><span style="color:var(--muted)">تحليل الأعمدة</span></span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:11px;height:11px;border-radius:3px;background:rgba(0,212,255,0.25);border:1px solid #00d4ff;display:inline-block"></span><span style="color:var(--muted)">دمج البيانات</span></span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:11px;height:11px;border-radius:3px;background:rgba(255,107,53,0.25);border:1px solid #ff6b35;display:inline-block"></span><span style="color:var(--muted)">تحديث اللوحة الكامل</span></span>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════
+       منطقة Drag & Drop التفاعلية — رفع الملفات مباشرةً
+  ════════════════════════════════════════════════════════════ -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:24px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+      <span style="font-size:22px">⚡</span>
+      <div>
+        <div style="font-size:15px;font-weight:800;color:var(--accent)">رفع سريع — اسحب وأفلت هنا مباشرةً</div>
+        <div style="font-size:11px;color:var(--muted)">تُوزَّع الملفات تلقائياً · CSV · XLS · XLSX</div>
+      </div>
+    </div>
+
+    <!-- منطقة السحب الكبيرة -->
+    <div id="guideDrop"
+      ondragenter="_guideDragEnter(event)"
+      ondragover="_guideDragOver(event)"
+      ondragleave="_guideDragLeave(event)"
+      ondrop="_guideDrop(event)"
+      onclick="_guidePickFiles()"
+      style="
+        border: 2.5px dashed rgba(0,212,255,0.35);
+        border-radius: 16px;
+        padding: 36px 20px;
+        text-align: center;
+        cursor: pointer;
+        background: rgba(0,212,255,0.03);
+        transition: all 0.25s;
+        position: relative;
+        user-select: none;
+      ">
+      <!-- أيقونة مركزية -->
+      <div style="font-size:42px;margin-bottom:10px;transition:transform 0.2s" id="guideDropIcon">📂</div>
+      <div style="font-weight:800;color:var(--accent);font-size:15px;margin-bottom:6px">اسحب ملفاتك هنا أو اضغط للاختيار</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px">يمكنك إفلات عدة ملفات دفعة واحدة — تُوزَّع تلقائياً حسب الاسم</div>
+
+      <!-- شارات الأنواع المقبولة -->
+      <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        <span style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.35);color:#00ff88;padding:3px 11px;border-radius:999px;font-size:11px;font-weight:700">CSV</span>
+        <span style="background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.35);color:#7c6fff;padding:3px 11px;border-radius:999px;font-size:11px;font-weight:700">XLS</span>
+        <span style="background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.35);color:#00d4ff;padding:3px 11px;border-radius:999px;font-size:11px;font-weight:700">XLSX</span>
+      </div>
+
+      <!-- حالة كل ملف -->
+      <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap">
+        <div class="guide-file-slot" id="gSlot_مبيعات" style="background:rgba(0,255,136,0.06);border:1px solid rgba(0,255,136,0.2);border-radius:10px;padding:8px 14px;min-width:120px;text-align:center;transition:all 0.2s">
+          <div style="font-size:16px">📦</div>
+          <div style="font-size:10px;font-weight:700;color:#00ff88;margin:2px 0">مبيعات</div>
+          <div id="gSlotName_مبيعات" style="font-size:9px;color:var(--muted)">لم يُرفع بعد</div>
+        </div>
+        <div class="guide-file-slot" id="gSlot_تحصيل" style="background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.2);border-radius:10px;padding:8px 14px;min-width:120px;text-align:center;transition:all 0.2s">
+          <div style="font-size:16px">💳</div>
+          <div style="font-size:10px;font-weight:700;color:#00d4ff;margin:2px 0">تحصيل</div>
+          <div id="gSlotName_تحصيل" style="font-size:9px;color:var(--muted)">لم يُرفع بعد</div>
+        </div>
+        <div class="guide-file-slot" id="gSlot_مديونية" style="background:rgba(255,71,87,0.06);border:1px solid rgba(255,71,87,0.2);border-radius:10px;padding:8px 14px;min-width:120px;text-align:center;transition:all 0.2s">
+          <div style="font-size:16px">💰</div>
+          <div style="font-size:10px;font-weight:700;color:#ff4757;margin:2px 0">مديونية</div>
+          <div id="gSlotName_مديونية" style="font-size:9px;color:var(--muted)">لم يُرفع بعد</div>
+        </div>
+        <div class="guide-file-slot" id="gSlot_تصنيف" style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:10px;padding:8px 14px;min-width:120px;text-align:center;transition:all 0.2s">
+          <div style="font-size:16px">👥</div>
+          <div style="font-size:10px;font-weight:700;color:#ffd700;margin:2px 0">تصنيف</div>
+          <div id="gSlotName_تصنيف" style="font-size:9px;color:var(--muted)">لم يُرفع بعد</div>
+        </div>
+      </div>
+
+      <!-- رسالة النتيجة -->
+      <div id="guideDropMsg" style="margin-top:14px;font-size:12px;min-height:20px;color:var(--accent2);font-weight:600"></div>
+
+      <!-- input مخفي -->
+      <input type="file" id="guideFileInput" multiple accept=".csv,.xls,.xlsx"
+        style="position:absolute;width:1px;height:1px;opacity:0;top:0;left:0"
+        onchange="_guideFilesChosen(this.files)">
+    </div>
+
+    <!-- زر التطبيق -->
+    <div id="guideApplyBar" style="display:none;margin-top:14px;text-align:center">
+      <button onclick="_guideApply()" style="
+        background:linear-gradient(135deg,rgba(0,212,255,0.2),rgba(0,255,136,0.15));
+        border:1.5px solid rgba(0,212,255,0.5);
+        color:var(--accent);
+        padding:11px 32px;
+        border-radius:999px;
+        font-family:'Cairo',sans-serif;
+        font-size:14px;
+        font-weight:800;
+        cursor:pointer;
+        transition:all 0.2s;
+      " onmouseover="this.style.background='linear-gradient(135deg,rgba(0,212,255,0.35),rgba(0,255,136,0.25))'"
+         onmouseout="this.style.background='linear-gradient(135deg,rgba(0,212,255,0.2),rgba(0,255,136,0.15))'">
+        ✅ تطبيق التحديث
+      </button>
+      <div id="guideApplyMsg" style="margin-top:8px;font-size:12px;color:var(--muted)"></div>
     </div>
   </div>
 
@@ -9900,6 +10172,120 @@ function printTable(tableId, title) {
 
   if (restoreFn) setTimeout(restoreFn, 800);
 }
+
+
+// ══════════════════════════════════════════════════════════════
+//  Guide Tab — Drag & Drop منطقة رفع الدليل
+// ══════════════════════════════════════════════════════════════
+(function() {
+  var _guideFiles = {}; // {مبيعات: File, تحصيل: File, ...}
+
+  /* تحديد نوع الملف من اسمه */
+  function _detectType(name) {
+    var n = name.toLowerCase().replace(/\s/g,'');
+    if (n.includes('مبيع') || n.includes('sales') || n.includes('sale'))      return 'مبيعات';
+    if (n.includes('تحصيل') || n.includes('collect'))                         return 'تحصيل';
+    if (n.includes('مديوني') || n.includes('debt') || n.includes('balance'))  return 'مديونية';
+    if (n.includes('تصنيف') || n.includes('classif'))                         return 'تصنيف';
+    return null;
+  }
+
+  /* تحديث حالة الـ slot */
+  function _updateSlot(type, filename) {
+    var slot = document.getElementById('gSlot_' + type);
+    var lbl  = document.getElementById('gSlotName_' + type);
+    if (slot) slot.classList.add('slot-ready');
+    if (lbl)  lbl.textContent = filename.length > 16 ? filename.slice(0,14)+'…' : filename;
+  }
+
+  /* معالجة الملفات */
+  function _processFiles(files) {
+    var found = [], unknown = [];
+    Array.from(files).forEach(function(f) {
+      var type = _detectType(f.name);
+      if (type) {
+        _guideFiles[type] = f;
+        _updateSlot(type, f.name);
+        found.push(type);
+        // مزامنة مع الـ input الرئيسي
+        var inp = document.getElementById('csvInput_' + type);
+        if (inp) {
+          var dt = new DataTransfer();
+          dt.items.add(f);
+          inp.files = dt.files;
+          setCsvFile(type, inp);
+        }
+      } else {
+        unknown.push(f.name);
+      }
+    });
+
+    var msg = document.getElementById('guideDropMsg');
+    if (found.length) {
+      msg.style.color = 'var(--accent2)';
+      msg.textContent = '✅ تم التعرف على: ' + found.join(' · ') +
+        (unknown.length ? ' | ⚠️ غير معروف: ' + unknown.join(', ') : '');
+      var bar = document.getElementById('guideApplyBar');
+      if (bar) bar.style.display = 'block';
+    } else {
+      msg.style.color = 'var(--red)';
+      msg.textContent = '⚠️ لم يُتعرف على الملفات — تأكد أن الاسم يحتوي على: مبيعات · تحصيل · مديونية · تصنيف';
+    }
+  }
+
+  /* Drag events */
+  window._guideDragEnter = function(e) {
+    e.preventDefault();
+    document.getElementById('guideDrop').classList.add('drag-over');
+  };
+  window._guideDragOver = function(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+    document.getElementById('guideDrop').classList.add('drag-over');
+  };
+  window._guideDragLeave = function(e) {
+    if (!document.getElementById('guideDrop').contains(e.relatedTarget))
+      document.getElementById('guideDrop').classList.remove('drag-over');
+  };
+  window._guideDrop = function(e) {
+    e.preventDefault();
+    document.getElementById('guideDrop').classList.remove('drag-over');
+    var files = e.dataTransfer.files;
+    if (files && files.length) _processFiles(files);
+  };
+
+  /* اختيار يدوي */
+  window._guidePickFiles = function() {
+    var inp = document.getElementById('guideFileInput');
+    if (inp) inp.click();
+  };
+  window._guideFilesChosen = function(files) {
+    if (files && files.length) _processFiles(files);
+  };
+
+  /* زر التطبيق */
+  window._guideApply = function() {
+    var applyMsg = document.getElementById('guideApplyMsg');
+    if (!Object.keys(_guideFiles).length) {
+      applyMsg.textContent = '⚠️ لا توجد ملفات مرفوعة بعد';
+      return;
+    }
+    // استدعاء applyCsvData الموجودة في الكود الرئيسي
+    if (typeof applyCsvData === 'function') {
+      applyMsg.textContent = '⏳ جارٍ التطبيق…';
+      setTimeout(function() {
+        applyCsvData();
+        applyMsg.textContent = '✅ تم التطبيق بنجاح!';
+        // فتح اللوحة إذا كانت مغلقة
+        if (typeof closeCsvModal === 'function') closeCsvModal();
+      }, 200);
+    } else {
+      // fallback: فتح نافذة الرفع الرئيسية
+      var btn = document.getElementById('csvApplyBtn');
+      if (btn) btn.click();
+    }
+  };
+})();
 
 // ── Wire up product filter events with addEventListener ─────────────────
 (function() {
