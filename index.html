@@ -7807,7 +7807,7 @@ function initItemsPanels() {
 
   // ── أدنى 5 صافي مبيعات (أضعف أداءً) ──
   const botNS = [...itemsData].filter(d=>d.ns>0).sort((a,b)=>a.ns-b.ns).slice(0,5);
-  const maxBotNS = botNS[botNS.length-1].ns || 1;
+  const maxBotNS = (botNS.length > 0 && botNS[botNS.length-1]?.ns) || 1;
   const topNetSalesEl = document.getElementById('topNetSales');
   if (topNetSalesEl) topNetSalesEl.innerHTML = botNS.map((d,i)=>{
     const short = d.name;
@@ -11662,8 +11662,14 @@ async function gsDirectFetchAndUpdate() {
     const url = `https://docs.google.com/spreadsheets/d/${id}/export?format=csv&gid=${gid}`;
     const r   = await fetch(url, { headers: { Authorization: 'Bearer ' + _gsDirectToken } });
     if (!r.ok) throw new Error('HTTP ' + r.status);
-    const text = await r.text();
-    return { key, file: new File([text], key + '.csv', { type: 'text/csv' }) };
+    // استخدام arrayBuffer ثم TextDecoder لضمان قراءة UTF-8 بشكل صحيح من Google Sheets
+    const buffer = await r.arrayBuffer();
+    const decoder = new TextDecoder('utf-8');
+    const text = decoder.decode(buffer);
+    
+    // إضافة BOM (Byte Order Mark) لضمان تعرف المتصفح على الملف كـ UTF-8 عند معالجته لاحقاً
+    const blob = new Blob(['\ufeff', text], { type: 'text/csv;charset=utf-8' });
+    return { key, file: new File([blob], key + '.csv', { type: 'text/csv' }) };
   }));
 
   let hasErr = false;
