@@ -2384,7 +2384,7 @@ input.df-d.df-active { border-color: rgba(0,212,255,.5); background: rgba(0,212,
 </nav>
 
 <!-- MAIN AREA -->
-<div class="main-area" style="padding-top: 210px;">
+<div class="main-area" style="padding-top: 211px;">
 
 
 
@@ -7041,8 +7041,12 @@ function _buildProductBubble(data) {
 }
 
 function initItemsPanels() {
+  if (!itemsData || itemsData.length === 0) { console.warn('[Items] initItemsPanels: itemsData فارغ — تخطّي'); return; }
+  // تنقية: إزالة أي عنصر undefined أو بدون ns
+  const cleanItems = itemsData.filter(d => d && typeof d.ns === 'number');
+  if (cleanItems.length === 0) { console.warn('[Items] initItemsPanels: لا توجد عناصر صالحة بخاصية ns'); return; }
   // ── أعلى 5 صافي مبيعات ──
-  const byNS = [...itemsData].sort((a,b)=>b.ns-a.ns).slice(0,5);
+  const byNS = [...cleanItems].sort((a,b)=>b.ns-a.ns).slice(0,5);
   const maxNS = byNS[0]?.ns || 1;
   const topItemsEl = document.getElementById('topItems');
   if (topItemsEl) topItemsEl.innerHTML = byNS.map((d,i)=>{
@@ -7064,7 +7068,7 @@ function initItemsPanels() {
   }).join('');
 
   // ── أعلى 5 قيمة مرتجع ──
-  const byRV = [...itemsData].sort((a,b)=>b.retVal-a.retVal).slice(0,5);
+  const byRV = [...cleanItems].sort((a,b)=>b.retVal-a.retVal).slice(0,5);
   const maxRV = byRV[0]?.retVal || 1;
   const topRetValEl = document.getElementById('topRetVal');
   if (topRetValEl) topRetValEl.innerHTML = byRV.map((d,i)=>{
@@ -7086,7 +7090,7 @@ function initItemsPanels() {
   }).join('');
 
   // ── أعلى 5 نسبة مرتجع ──
-  const byRP = [...itemsData].filter(d=>d.sales>1000).sort((a,b)=>b.retPct-a.retPct).slice(0,5);
+  const byRP = [...cleanItems].filter(d=>d.sales>1000).sort((a,b)=>b.retPct-a.retPct).slice(0,5);
   const topMarginEl = document.getElementById('topMargin');
   if (topMarginEl) topMarginEl.innerHTML = byRP.map((d,i)=>{
     const medals=['🔴','🟠','🟡','4️⃣','5️⃣'];
@@ -7107,7 +7111,7 @@ function initItemsPanels() {
   }).join('');
 
   // ── أعلى 5 كمية مرتجعات ──
-  const byRQ = [...itemsData].filter(d=>d.sales>1000).sort((a,b)=>b.retQty-a.retQty).slice(0,5);
+  const byRQ = [...cleanItems].filter(d=>d.sales>1000).sort((a,b)=>b.retQty-a.retQty).slice(0,5);
   const maxRQ = byRQ[0]?.retQty || 1;
   const topRetQtyEl = document.getElementById('topRetQty');
   if (topRetQtyEl) topRetQtyEl.innerHTML = byRQ.map((d,i)=>{
@@ -13422,25 +13426,44 @@ async function applyCsvData(fromGS) {
       
       // اكتشاف مرن لأسماء الأعمدة — يقبل أسماء متعددة ممكنة
       const _findCol = (hdrs, ...names) => {
+        // تنظيف الرؤوس من BOM ومسافات إضافية
+        const cleanHdrs = hdrs.map(h => String(h||'').replace(/^\uFEFF/, '').replace(/\s+/g,' ').trim());
         for (const n of names) {
-          const idx = hdrs.findIndex(h => String(h||'').trim() === n);
+          const idx = cleanHdrs.findIndex(h => h === n);
           if (idx >= 0) return idx;
         }
         // بحث جزئي إذا لم يوجد تطابق كامل
         for (const n of names) {
-          const idx = hdrs.findIndex(h => String(h||'').trim().includes(n) || n.includes(String(h||'').trim()));
+          const idx = cleanHdrs.findIndex(h => h.includes(n) || n.includes(h));
+          if (idx >= 0) return idx;
+        }
+        // بحث بدون تشكيل وتطبيع
+        const normalize = s => s.replace(/[\u064B-\u065F\u0670]/g, '').replace(/[أإآ]/g, 'ا');
+        for (const n of names) {
+          const nn = normalize(n);
+          const idx = cleanHdrs.findIndex(h => normalize(h) === nn || normalize(h).includes(nn));
           if (idx >= 0) return idx;
         }
         return -1;
       };
       const iInvoice= _findCol(salesHeaders, 'رقم الفاتورة', 'الفاتورة', 'رقم', 'invoice');
       const iType   = _findCol(salesHeaders, 'النوع', 'نوع', 'type');
-      const iMaterial=_findCol(salesHeaders, 'المادة', 'الصنف', 'اسم المادة', 'المنتج', 'الصنف/المادة', 'item');
+      const iMaterial=_findCol(salesHeaders, 'المادة', 'الصنف', 'اسم المادة', 'المنتج', 'الصنف/المادة', 'item', 'اسم الصنف');
       const iQtyOut = _findCol(salesHeaders, 'الكمية الخارجة', 'الكمية', 'كمية', 'qty', 'quantity');
-      const iTotal  = _findCol(salesHeaders, 'الاجمالي الصافي', 'الإجمالي الصافي', 'صافي المبيعات', 'الصافي', 'الإجمالي', 'total', 'net');
+      const iTotal  = _findCol(salesHeaders, 'الاجمالي الصافي', 'الإجمالي الصافي', 'صافي المبيعات', 'الصافي', 'الإجمالي', 'total', 'net', 'الاجمالي');
       const iCust   = _findCol(salesHeaders, 'اسم الزبون', 'الزبون', 'العميل', 'اسم العميل', 'customer');
       const iRep    = _findCol(salesHeaders, 'المندوب', 'اسم المندوب', 'rep', 'salesman');
       const iDateS  = _findCol(salesHeaders, 'التاريخ', 'تاريخ', 'date');
+
+      // ── تسجيل تشخيصي: أسماء الأعمدة المكتشفة ──
+      console.log('[CSV Debug] salesHeaders:', JSON.stringify(salesHeaders));
+      console.log('[CSV Debug] أعمدة مكتشفة:', { iInvoice, iType, iMaterial, iQtyOut, iTotal, iCust, iRep, iDateS });
+      if (iMaterial < 0) console.error('[CSV Debug] ❌ لم يتم العثور على عمود المادة/الصنف! تحقق من أسماء الأعمدة في الشيت');
+      if (iType < 0) console.error('[CSV Debug] ❌ لم يتم العثور على عمود النوع!');
+      if (iRep < 0) console.error('[CSV Debug] ❌ لم يتم العثور على عمود المندوب!');
+      if (iTotal < 0) console.error('[CSV Debug] ❌ لم يتم العثور على عمود الإجمالي!');
+      // عرض أول 3 صفوف كعينة
+      console.log('[CSV Debug] عينة صفوف (أول 3):', salesRows.slice(0,3).map(r => JSON.stringify(r)));
 
       const repMap  = {};
       const custMap = {};
