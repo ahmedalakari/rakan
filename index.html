@@ -11831,36 +11831,22 @@ function parseCSVContent(text) {
     if (row.length > 0) result.push(row);
   }
 
-  if (result.length > 1) {
-    const headerCols = result[0].length;
-    const headerLooksWrapped = headerCols === 1 && ['index', 'value', 'data'].includes(String(result[0][0] || '').trim().toLowerCase());
-
-    for (let i = 1; i < result.length; i++) {
+  // ── إعادة تحليل أي صف (بما فيه الأول) يحتوي على عمود واحد بداخله فواصل ──
+  if (result.length > 0) {
+    for (let i = 0; i < result.length; i++) {
       if (result[i].length !== 1) continue;
       const inner = result[i][0];
       if (typeof inner !== 'string') continue;
-      if (inner.indexOf(',') === -1 && inner.indexOf('\\"') === -1) continue;
-
+      if (inner.indexOf(',') === -1) continue;
       const reparsed = normalizeEmbeddedRow(inner);
       if (reparsed.length > 1) result[i] = reparsed;
     }
 
-    if (headerLooksWrapped) {
-      const nextRow = result[1] || [];
-      const reparsedHeader = nextRow.length === 1 ? normalizeEmbeddedRow(nextRow[0]) : nextRow;
-      if (reparsedHeader.length > 1) {
-        result[0] = reparsedHeader;
-        result.splice(1, 1);
-      }
-    }
-
-    const singleColRows = result.slice(1).filter(r => r.length === 1).length;
-    if (headerCols > 1 && singleColRows > 0) {
-      for (let i = 1; i < result.length; i++) {
-        if (result[i].length !== 1) continue;
-        const reparsed = normalizeEmbeddedRow(result[i][0]);
-        if (reparsed.length > 1) result[i] = reparsed;
-      }
+    // إذا كان الصف الأول wrapper مثل "index" → استبدله بالصف التالي كرؤوس
+    const headerCols = result[0].length;
+    const headerLooksWrapped = headerCols === 1 && ['index', 'value', 'data'].includes(String(result[0][0] || '').trim().toLowerCase());
+    if (headerLooksWrapped && result.length > 1) {
+      result.splice(0, 1); // حذف صف index
     }
   }
 
@@ -13298,20 +13284,44 @@ async function applyCsvData(fromGS) {
       salesHeaders = salesResult[0];
       // تنظيف الرؤوس: إزالة BOM وتبييض المسافات
       salesHeaders = salesHeaders.map(h => String(h||'').replace(/^\uFEFF/, '').replace(/\s+/g,' ').trim());
+
+      // ── اكتشاف تلقائي: هل أول صف رؤوس فعلية أم بيانات؟ ──
+      // إذا كان أول عنصر يبدو كتاريخ (YYYY-MM-DD) فهو بيانات وليس رؤوساً
+      const _firstCell = salesHeaders[0] || '';
+      const _looksLikeData = /^\d{4}-\d{2}-\d{2}$/.test(_firstCell.trim());
+      if (_looksLikeData) {
+        console.warn('[CSV Debug] ⚠️ أول صف يبدو بيانات وليس رؤوساً — إضافة رؤوس افتراضية');
+        // الأعمدة الافتراضية حسب ترتيب Google Sheets المعتاد
+        const defaultHeaders = ['التاريخ','رقم الفاتورة','النوع','المادة','المرتجع','الكمية الخارجة','السعر','الاجمالي الصافي','الاجمالي','اسم الزبون','المندوب','ملاحظات'];
+        // استخدم عدد الأعمدة الفعلي من أول صف
+        salesHeaders = defaultHeaders.slice(0, salesResult[0].length);
+        // أعد أول صف كبيانات (لا تحذفه)
+        salesRows = salesResult.filter(r => r.length > 2 && String(r[0]||'').trim() !== '' && String(r[0]||'').trim() !== '#' && String(r[0]||'').trim() !== 'م' && String(r[0]||'').trim() !== 'رقم');
+      } else {
+        // فلتر مرن: نقبل أي صف غير فارغ ليس صف رأس مكرر
+        salesRows = salesResult.slice(1).filter(r => r.length > 2 && String(r[0]||'').trim() !== '' && String(r[0]||'').trim() !== '#' && String(r[0]||'').trim() !== 'م' && String(r[0]||'').trim() !== 'رقم');
+      }
+
       // ── تسجيل تشخيصي مبكر — أسماء الأعمدة كما وصلت من المصدر ──
       console.log('%c[CSV Debug] رؤوس المبيعات:', 'color:#00d4ff;font-weight:bold', JSON.stringify(salesHeaders));
-      console.log('%c[CSV Debug] عدد الصفوف الخام:', 'color:#00d4ff', salesResult.length - 1);
-      console.log('%c[CSV Debug] أول صف بيانات:', 'color:#00d4ff', JSON.stringify(salesResult[1]));
-      // فلتر مرن: نقبل أي صف غير فارغ ليس صف رأس مكرر
-      salesRows = salesResult.slice(1).filter(r => r.length > 2 && String(r[0]||'').trim() !== '' && String(r[0]||'').trim() !== '#' && String(r[0]||'').trim() !== 'م' && String(r[0]||'').trim() !== 'رقم');
-      console.log('%c[CSV Debug] صفوف بعد الفلترة:', 'color:#00d4ff', salesRows.length);
+      console.log('%c[CSV Debug] عدد الصفوف:', 'color:#00d4ff', salesRows.length);
+      console.log('%c[CSV Debug] أول صف بيانات:', 'color:#00d4ff', JSON.stringify(salesRows[0]));
       if (salesRows.length === 0 && salesResult.length > 1) {
-        console.error('[CSV Debug] ❌ كل الصفوف تمت فلترتها! أول عمود في الصفوف:', salesResult.slice(1,6).map(r => JSON.stringify(r[0])));
+        console.error('[CSV Debug] ❌ كل الصفوف تمت فلترتها! أول عمود في الصفوف:', salesResult.slice(0,6).map(r => JSON.stringify(r[0])));
       }
     }
     if (colResult) {
       colHeaders = colResult[0].map(h=>String(h||'').replace(/^\uFEFF/,'').replace(/\s+/g,' ').trim());
-      colRows = colResult.slice(1).filter(r => r.length > 2);
+      // اكتشاف: إذا أول عنصر يبدو كتاريخ → لا يوجد صف رؤوس
+      const _colFirstCell = (colHeaders[0] || '').trim();
+      const _colLooksLikeData = /^\d{4}-\d{2}-\d{2}$/.test(_colFirstCell);
+      if (_colLooksLikeData) {
+        console.warn('[CSV Debug] ⚠️ تحصيل: أول صف يبدو بيانات — إضافة رؤوس افتراضية');
+        colHeaders = ['التاريخ','رقم السند','النوع','اسم الحساب','مدين','دائن','الرصيد','البيان','المندوب','الحساب المقابل'].slice(0, colResult[0].length);
+        colRows = colResult.filter(r => r.length > 2);
+      } else {
+        colRows = colResult.slice(1).filter(r => r.length > 2);
+      }
       console.log('%c[CSV Debug] رؤوس التحصيل:', 'color:#00ff88;font-weight:bold', JSON.stringify(colHeaders), '| صفوف:', colRows.length);
     }
     if (debtResult) {
