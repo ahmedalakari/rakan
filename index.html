@@ -7133,7 +7133,8 @@ function initItemsPanels() {
   }).join('');
 
   // ── أدنى 5 صافي مبيعات (أضعف أداءً) ──
-  const botNS = [...itemsData].filter(d=>d.ns>0).sort((a,b)=>a.ns-b.ns).slice(0,5);
+  const botNS = [...cleanItems].filter(d=>d.ns>0).sort((a,b)=>a.ns-b.ns).slice(0,5);
+  if (botNS.length === 0) { console.warn('[Items] initItemsPanels: لا توجد عناصر بقيمة ns > 0'); return; }
   const maxBotNS = botNS[botNS.length-1].ns || 1;
   const topNetSalesEl = document.getElementById('topNetSales');
   if (topNetSalesEl) topNetSalesEl.innerHTML = botNS.map((d,i)=>{
@@ -11891,18 +11892,13 @@ function parseCSVContent(text) {
   // باقي الأسطر: كل سطر ملفوف في حقل CSV واحد مقتبس
   const headerCols = result[0].length;
 
-  // إذا كان الرأس عمود واحد بعنوان عام → تخطيه واستخدم أول صف بيانات كرأس
+  // إذا كان الرأس عمود واحد ويحتوي فواصل → هو نفسه ملفوف ويحتاج إعادة تحليل
   if (headerCols === 1) {
-    const h0 = String(result[0][0] || '').trim().toLowerCase();
-    if (['index', 'value', 'data', ''].includes(h0)) {
-      // أول صف بيانات يصبح الرأس
-      const firstData = result[1] || [];
-      if (firstData.length === 1 && String(firstData[0] || '').indexOf(',') > -1) {
-        const reparsed = parseLine(String(firstData[0]).replace(/""/g, '"'));
-        if (reparsed.length > 1) {
-          result[0] = reparsed;
-          result.splice(1, 1);
-        }
+    const h0raw = String(result[0][0] || '');
+    if (h0raw.indexOf(',') > -1) {
+      const reparsedH = parseLine(h0raw.replace(/""/g, '"'));
+      if (reparsedH.length > 1) {
+        result[0] = reparsedH;
       }
     }
   }
@@ -11930,11 +11926,12 @@ function parseCSVContent(text) {
 
   // ══ تنظيف: إزالة الحقول الفارغة الزائدة في نهاية كل صف ══
   // (ناتجة عن الفاصلة الأخيرة في بعض التصديرات)
-  if (result.length > 1 && headerCols > 1) {
+  const finalHeaderCols = result[0].length;
+  if (result.length > 1 && finalHeaderCols > 1) {
     for (let i = 1; i < result.length; i++) {
       const row = result[i];
       // إذا كان الصف أطول من الرأس بحقل فارغ واحد أو اثنين → قصه
-      while (row.length > headerCols && String(row[row.length - 1] || '').trim() === '') {
+      while (row.length > finalHeaderCols && String(row[row.length - 1] || '').trim() === '') {
         row.pop();
       }
     }
