@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- إعداد Cross-Origin-Opener-Policy للسماح بنوافذ Google OAuth -->
+<meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
 <title>لوحة تحليل الأداء الاستراتيجي</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
@@ -11340,7 +11342,7 @@ function updateSectionTitle(elId, baseTitle, filters) {
 // ═════════════════════════════════════════════════════════════
 
 const _GS_CLIENT_ID  = '191503304260-l3i0g101u2r2v1be55nt5ung7kthvku9.apps.googleusercontent.com';
-const _GS_SCOPE      = 'https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/drive.readonly';
+const _GS_SCOPE      = 'openid profile email https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/drive.readonly';
 const _GS_LS_DIRECT  = 'dashboard_gs_direct_v1';
 
 let _gsDirectToken   = null;
@@ -11383,6 +11385,7 @@ function _gsInitGSI() {
   _gsTokenClient = google.accounts.oauth2.initTokenClient({
     client_id: _GS_CLIENT_ID,
     scope:     _GS_SCOPE,
+    ux_mode:   'popup',
     callback:  (resp) => {
       if (_gsTokenMode === 'refresh') {
         // وضع التجديد الصامت — حفظ التوكن فقط بدون إعادة بناء الواجهة
@@ -11452,21 +11455,33 @@ function _gsDirectHandleToken(resp) {
   _gsStoreToken(resp);
   _gsShowDirectMsg('⏳ جارٍ تحميل الشيتات...', 'info');
 
-  // جلب معلومات المستخدم والشيتات بالتوازي
-  Promise.all([
-    fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: 'Bearer ' + _gsDirectToken } })
-      .then(r => r.ok ? r.json() : Promise.reject(new Error('userinfo ' + r.status))),
-    fetch('https://www.googleapis.com/drive/v3/files?q=mimeType%3D%22application%2Fvnd.google-apps.spreadsheet%22&fields=files(id,name)&pageSize=50&orderBy=modifiedTime+desc', { headers: { Authorization: 'Bearer ' + _gsDirectToken } })
-      .then(r => r.ok ? r.json() : Promise.reject(new Error('drive ' + r.status)))
-  ]).then(([user, drive]) => {
+  // استخراج معلومات المستخدم من id_token إن وُجد (بدون استدعاء userinfo)
+  function _parseIdToken(token) {
+    try {
+      const payload = token.split('.')[1];
+      return JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+    } catch(e) { return null; }
+  }
+
+  // جلب معلومات المستخدم: نحاول id_token أولاً، ثم userinfo كبديل
+  const userPromise = resp.id_token
+    ? Promise.resolve(_parseIdToken(resp.id_token) || {})
+    : fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: 'Bearer ' + _gsDirectToken } })
+        .then(r => r.ok ? r.json() : {}).catch(() => {});
+
+  const drivePromise = fetch('https://www.googleapis.com/drive/v3/files?q=mimeType%3D%22application%2Fvnd.google-apps.spreadsheet%22&fields=files(id,name)&pageSize=50&orderBy=modifiedTime+desc', { headers: { Authorization: 'Bearer ' + _gsDirectToken } })
+    .then(r => r.ok ? r.json() : Promise.reject(new Error('drive ' + r.status)));
+
+  Promise.all([userPromise, drivePromise]).then(([user, drive]) => {
+    user = user || {};
     // عرض معلومات المستخدم
     const nameEl  = document.getElementById('gsDirectName');
     const emailEl = document.getElementById('gsDirectEmail');
-    if (nameEl)  nameEl.textContent  = user.name  || '';
+    if (nameEl)  nameEl.textContent  = user.name  || user.given_name || '';
     if (emailEl) emailEl.textContent = user.email || '';
 
     // حفظ البريد
-    try { const s = JSON.parse(localStorage.getItem(_GS_LS_DIRECT)||'{}'); s.email = user.email; s.name = user.name||''; s.picture = user.picture||''; localStorage.setItem(_GS_LS_DIRECT, JSON.stringify(s)); } catch(e) {}
+    try { const s = JSON.parse(localStorage.getItem(_GS_LS_DIRECT)||'{}'); s.email = user.email||''; s.name = user.name||user.given_name||''; s.picture = user.picture||''; localStorage.setItem(_GS_LS_DIRECT, JSON.stringify(s)); } catch(e) {}
 
     // تحديث قائمة الشيتات
     _gsDirectFiles = drive.files || [];
@@ -11669,7 +11684,7 @@ async function gsDirectFetchAndUpdate() {
   keys.forEach(k => { if (!active.includes(k)) csvFiles[k] = null; });
   try {
     _gsShowDirectMsg('⚡ جارٍ تطبيق البيانات...', 'info');
-    await applyCsvData('pub');
+    await applyCsvData('sync');
     _gsShowDirectMsg('✅ تمت المزامنة — ' + new Date().toLocaleTimeString('ar'), 'ok');
   } catch(e) {
     _gsShowDirectMsg('❌ خطأ: ' + e.message, 'error');
