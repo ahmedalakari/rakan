@@ -13274,12 +13274,28 @@ async function applyCsvData(fromGS) {
     if (salesResult) {
       salesHeaders = salesResult[0];
       // تنظيف الرؤوس: إزالة BOM وتبييض المسافات
-      salesHeaders = salesHeaders.map(h => String(h||'').replace(/^\uFEFF/, '').trim());
+      salesHeaders = salesHeaders.map(h => String(h||'').replace(/^\uFEFF/, '').replace(/\s+/g,' ').trim());
+      // ── تسجيل تشخيصي مبكر — أسماء الأعمدة كما وصلت من المصدر ──
+      console.log('%c[CSV Debug] رؤوس المبيعات:', 'color:#00d4ff;font-weight:bold', JSON.stringify(salesHeaders));
+      console.log('%c[CSV Debug] عدد الصفوف الخام:', 'color:#00d4ff', salesResult.length - 1);
+      console.log('%c[CSV Debug] أول صف بيانات:', 'color:#00d4ff', JSON.stringify(salesResult[1]));
       // فلتر مرن: نقبل أي صف غير فارغ ليس صف رأس مكرر
       salesRows = salesResult.slice(1).filter(r => r.length > 2 && String(r[0]||'').trim() !== '' && String(r[0]||'').trim() !== '#' && String(r[0]||'').trim() !== 'م' && String(r[0]||'').trim() !== 'رقم');
+      console.log('%c[CSV Debug] صفوف بعد الفلترة:', 'color:#00d4ff', salesRows.length);
+      if (salesRows.length === 0 && salesResult.length > 1) {
+        console.error('[CSV Debug] ❌ كل الصفوف تمت فلترتها! أول عمود في الصفوف:', salesResult.slice(1,6).map(r => JSON.stringify(r[0])));
+      }
     }
-    if (colResult) { colHeaders = colResult[0].map(h=>String(h||'').replace(/^\uFEFF/,'').trim()); colRows = colResult.slice(1).filter(r => r.length > 2); }
-    if (debtResult) { debtHeaders = debtResult[0].map(h=>String(h||'').replace(/^\uFEFF/,'').trim()); debtRows = debtResult.slice(1).filter(r => r.length > 2); }
+    if (colResult) {
+      colHeaders = colResult[0].map(h=>String(h||'').replace(/^\uFEFF/,'').replace(/\s+/g,' ').trim());
+      colRows = colResult.slice(1).filter(r => r.length > 2);
+      console.log('%c[CSV Debug] رؤوس التحصيل:', 'color:#00ff88;font-weight:bold', JSON.stringify(colHeaders), '| صفوف:', colRows.length);
+    }
+    if (debtResult) {
+      debtHeaders = debtResult[0].map(h=>String(h||'').replace(/^\uFEFF/,'').replace(/\s+/g,' ').trim());
+      debtRows = debtResult.slice(1).filter(r => r.length > 2);
+      console.log('%c[CSV Debug] رؤوس المديونية:', 'color:#ffd700;font-weight:bold', JSON.stringify(debtHeaders), '| صفوف:', debtRows.length);
+    }
 
     // إظهار إحصائيات التحميل
     { const _p=[];if(salesRows.length>0)_p.push('مبيعات: '+salesRows.length.toLocaleString('ar')+' صف');if(colRows.length>0)_p.push('تحصيل: '+colRows.length.toLocaleString('ar')+' صف');if(debtRows.length>0)_p.push('مديونية: '+debtRows.length.toLocaleString('ar')+' صف');if(_p.length)msg.textContent='✅ تم تحميل: '+_p.join(' | ');}
@@ -13532,6 +13548,21 @@ async function applyCsvData(fromGS) {
           if (isSale) { it.sales += total; it.qty += qty; }
           if (isRet)  { it.returns += total; it.retQty += qty; }
         }
+      }
+
+      // ── تسجيل تشخيصي بعد الحلقة ──
+      console.log('%c[CSV Debug] نتائج الحلقة:', 'color:#ff6b35;font-weight:bold', {
+        reps: Object.keys(repMap).length,
+        customers: Object.keys(custMap).length,
+        items: Object.keys(itemMap).length,
+        allCusts: allCustSet.size,
+        salesRows: nSalesRows
+      });
+      if (Object.keys(custMap).length === 0) {
+        console.error('[CSV Debug] ❌ لم يتم العثور على أي زبون! iCust=' + iCust + ', عينة قيم الزبون:', salesRows.slice(0,5).map(r => r[iCust]));
+      }
+      if (Object.keys(itemMap).length === 0) {
+        console.error('[CSV Debug] ❌ لم يتم العثور على أي صنف! iMaterial=' + iMaterial + ', عينة قيم الصنف:', salesRows.slice(0,5).map(r => r[iMaterial]));
       }
       
       // تحصيل
