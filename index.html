@@ -756,6 +756,7 @@ body.dark tbody td{color:var(--text)}
     <div class="topbar-right">
       <span class="last-update" id="last-update">—</span>
       <button id="gf-toggle-btn" onclick="toggleGlobalFilter()">🔍 فلتر شامل <span id="gf-active-badge" class="gf-active-badge">نشط</span></button>
+      <button id="topbar-refresh-btn" onclick="_autoSyncQuiet()" title="تحديث البيانات الآن" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text2);border-radius:var(--r-md);width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;transition:all .2s;flex-shrink:0">🔄</button>
       <button id="theme-toggle" onclick="toggleTheme()" title="تبديل الوضع المظلم">🌙</button>
       <button class="btn success" onclick="openUploadModal()">⬆ رفع / مزامنة</button>
       <button class="btn" onclick="exportCurrentTable()">⬇ تصدير CSV</button>
@@ -1395,10 +1396,29 @@ body.dark tbody td{color:var(--text)}
         <input class="gs-input" id="gs-inventory" placeholder="https://docs.google.com/spreadsheets/...">
         <label style="font-size:11px;color:var(--gold);display:block;margin-bottom:4px;margin-top:8px">👥 تصنيف المندوبين والأهداف (CSV)</label>
         <input class="gs-input" id="gs-reps" placeholder="https://docs.google.com/spreadsheets/..." style="border-color:rgba(255,215,0,.4)">
+
+        <!-- فترة التحديث التلقائي -->
+        <div style="margin-top:14px;padding:12px;background:var(--surface2);border-radius:var(--r-md);border:1px solid var(--border)">
+          <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px">⏱ التحديث التلقائي</div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <select id="gs-interval" style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-md);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;padding:6px 10px;flex:1">
+              <option value="0">بدون تحديث تلقائي</option>
+              <option value="1">كل دقيقة</option>
+              <option value="2">كل دقيقتين</option>
+              <option value="5" selected>كل 5 دقائق</option>
+              <option value="10">كل 10 دقائق</option>
+              <option value="15">كل 15 دقيقة</option>
+              <option value="30">كل 30 دقيقة</option>
+              <option value="60">كل ساعة</option>
+            </select>
+          </div>
+          <div style="font-size:10px;color:var(--muted);margin-top:6px" id="auto-refresh-status">🔄 تحديث تلقائي كل 5 دقائق</div>
+        </div>
+
         <div style="margin-top:6px"><div class="progress-bar-wrap"><div class="progress-bar" id="gs-progress"></div></div></div>
         <div style="margin-top:14px;display:flex;gap:10px">
           <button class="btn primary" onclick="syncGoogleSheets()" style="flex:1">🔄 مزامنة الآن</button>
-          <button class="btn" onclick="saveGsUrls()">💾 حفظ الروابط</button>
+          <button class="btn" onclick="saveGsUrls()">💾 حفظ</button>
         </div>
         <div id="gs-status" style="margin-top:10px;font-size:11px;color:var(--muted)"></div>
       </div>
@@ -1411,21 +1431,32 @@ body.dark tbody td{color:var(--text)}
 
 <script>
 // ══════════════════════════════════════════════════════
-//  EMBEDDED DATA — يتم الاستبدال التلقائي عند الرفع
+//  CONFIG — روابط Google Sheets مضمّنة مباشرة
+// ══════════════════════════════════════════════════════
+const GS_STORAGE_KEY = 'ndGsUrls_v2';
+const AUTO_REFRESH_KEY = 'ndAutoRefresh';
+let _autoRefreshTimer = null;
+
+// ── الروابط المضمّنة — تُستخدم تلقائياً عند التحميل ──
+const GS_URLS_EMBEDDED = {
+  sales:      'https://docs.google.com/spreadsheets/d/1TXtv9VPciMz474soeyV8sdyuPEnCrZRE/export?format=csv&gid=220916455',
+  collection: 'https://docs.google.com/spreadsheets/d/1yrQLca-MiCyxrXNSJ_GqFiw5d1QN1i3Y/export?format=csv&gid=556704038',
+  debt:       'https://docs.google.com/spreadsheets/d/1PexDCIHXFSyxdwvzhN4CgMD-ZvqUDAO-/export?format=csv&gid=742356649',
+  inventory:  'https://docs.google.com/spreadsheets/d/1AC7ifj_KGAit8SQqjLYBNznekHQjr70q/export?format=csv&gid=1372061526',
+  reps:       'https://docs.google.com/spreadsheets/d/1zHJ8xYqsnWwTHtR8BsDp8D-rh2FkbqMo/export?format=csv&gid=883595607',
+  aging:      'https://docs.google.com/spreadsheets/d/1g17IduM2pisXsHsTQBuXf8ZQ1qQKrFew/export?format=csv&gid=1432141854',
+};
+
+// ══════════════════════════════════════════════════════
+//  EMPTY DATA STRUCTURE — لا بيانات افتراضية
 // ══════════════════════════════════════════════════════
 const EMBEDDED = {
-  kpis:{total_sales:12581069.85,total_returns:1148716.38,net_sales:11432353.47,total_invoices:3536,total_debt:7206371.31,total_collected:9609778.79,total_inventory:159534,total_customers:1989},
-  sales_by_rep:{"زياد الحنش":1749958,"محمد العباني":1411081,"هيتم الصادق":941217,"عبدالرؤوف بريم":899682.89,"فراس المشبك":691368,"هيتم الصغير":676760,"مصطفي بلقاسم":526983,"مندر الخويلدي":501283,"عمر النمروش":408977,"علاء الكور":399202,"علي غزيل":332026.5,"عصام التميمي":321626,"احمد ابو ضوة":305071.64,"محمد الصادق":291317,"حسن الكردي":272461,"جلال رحال":261058,"معاد الشوشان":258338,"سيف يونس":240707,"محمد عريبي":230611,"محمد العزابي":188528.5,"احمد نوري":183325.24,"عبد المجيد الطير":179256,"احمد عصام":162220.27,"سند":162087.5,"محمد عبد القادر":130779,"حسين الباروني":119616,"مبروك رجب":118466,"محمود العزري":118071,"علي سليمان":113309,"احمد عبدالحميد":88422,"فؤاد مسعود":81597,"رضوان اسماعيل":71799,"عبد الرؤوف نصر":67959,"طلال":22833,"عبد الله ابو فيس":18024,"الادارية":11291.69,"رضا ابو كتير":2000},
-  returns_by_rep:{"مصطفي بلقاسم":229704,"زياد الحنش":144034,"عبدالرؤوف بريم":116708.22,"فراس المشبك":86251,"محمد العباني":64881,"احمد عصام":49941,"هيتم الصادق":49298,"عصام التميمي":30186,"حسين الباروني":24407,"عمر النمروش":24137,"علي سليمان":24036,"هيتم الصغير":20184,"علي غزيل":17515.67,"مبروك رجب":16150,"مندر الخويلدي":15901,"علاء الكور":15640.05,"جلال رحال":15612,"محمد العزابي":15524,"محمد الصادق":15465},
-  sales_by_month:{"1":3051.5,"2":6065770.17,"3":6051775.09,"4":810390},
-  collection_by_month:{"1":88796,"2":4740868.29,"3":4588263,"4":191851.5},
-  collection_by_rep:{"زياد الحنش":1282000,"محمد العباني":1212349,"هيتم الصادق":835678,"هيتم الصغير":630446,"مندر الخويلدي":427737,"فراس المشبك":397731.5,"عمر النمروش":336969,"علاء الكور":336268,"احمد ابو ضوة":267497,"محمد الصادق":264965,"حسن الكردي":256783,"عصام التميمي":254178,"مصطفي بلقاسم":254064,"معاد الشوشان":228793.5,"علي غزيل":223818.19,"عبدالرؤوف بريم":216304.78,"محمد عريبي":209660,"محمد العزابي":196767.33,"سيف يونس":182963,"احمد نوري":167366.29,"جلال رحال":156487,"حسين الباروني":155681,"عبد المجيد الطير":140608,"احمد عصام":140519.2,"محمد عبد القادر":132362.5,"سند":106411,"مبروك رجب":97301.5,"محمود العزري":93767,"احمد عبدالحميد":85330,"علي سليمان":79788,"عبد الرؤوف نصر":61202,"فؤاد مسعود":57588,"رضوان اسماعيل":26802,"طلال":20873,"عبد الله ابو فيس":5006,"رضا ابو كتير":2900,"الادارية":499},
-  top_products:{"الندى بتر صودا زجاج 175 مل*18":5232126.37,"الندى عصير عنب زجاج 250 مل*18":1390947.98,"الندى مشروب شعير رمان زجاج 330 مل*18":698242.58,"الندى بتر صودا بلاستيك 1 لتر*6":691540.29,"الندى مشروب شعير تفاح زجاج 330 مل*18":628521.88,"الندى بتر صودا زجاج 250 مل*18":546242.7,"الندى مشروب شعير أناناس زجاج 330 مل*18":457607.72,"الندى عصير ليمون وزنجبيل زجاج 250 مل*18":457518.17,"الندى مشروب غازي لوز زجاج 250 مل*18":385742.87,"الندى بتر صودا دايت زجاج 175 مل*18":348695.08,"الندى بتر صودا ليمون زجاج 175 مل*18":183523,"الندى بتر صودا كرز زجاج 175 مل*18":176780,"الندى بتر صودا كيني زجاج 175 مل*18":143462,"الندى عصير مانجو زجاج 250 مل*18":131050,"الندى مشروب غازي نعناع زجاج 250 مل*18":120000},
-  top_customers:{"سوق غوط الديس 1":242757.89,"سوق غوط الديس (2) البيفي":194729,"البداية/فرحات الشكيري":180700,"سوق مرمر مول/حمزة":161922,"ايمن الصعيدي دبي 884":137262,"صالة الانوار/طه الصعيدي":122520,"رائد الخير/الاخيار/السامبا":114171,"العقيق-اشرف الجبالي السامبا":108600,"علاء الفيتوري دبي":104500,"جملة البستان/هيثم":102888,"الهادي ابو جرادة":102600,"شرف الدين نوم-السامبا":101000,"صالة اركنو احمد كامل":89700,"الصديق شلوف/السامبا":86400},
-  top_debtors:{"سوق مرمر مول/حمزة":214255.12,"سوق غوط الديس (2) البيفي":190160,"سوق غوط الديس 1":188459.58,"رائد الخير/الاخيار/السامبا":187498,"البداية/فرحات الشكيري":183435,"ايمن الصعيدي دبي 884":140225,"خالد الجرار/النجيلة":136480.03,"سوق جهاد مول الهضبة":127279.7,"جهاد ابو سليم":118398.03,"صالة الانوار/طه الصعيدي":95546,"يسري الصعيدي دبي 33":75758,"صالة الانيق سالم الزعلوك":69864,"الصديق شلوف/السامبا":69746,"العقيق-اشرف الجبالي":64071,"شرف الدين نوم السامبا":63634},
-  inventory_by_warehouse:{"التجزئة":40927,"الجملة":36543,"اعادة التغليف":933,"طلال المشبك":430,"عبد الرؤوف مسعود نصر":366,"جملة تاجوراء":304,"عبد الله ابو فيس":243,"المبروك الخمسي":13,"المستودع الرئيسي":6,"رضوان اسماعيل":2},
-  aging_buckets:{"30 يوم":1280473.75,"60 يوم":3476379.56,"90 يوم":19,"أقل من 10":2798897.35,"أقل من 15":118148.34,"120 يوم+":0},
-  reps:["احمد ابو ضوة","احمد عبدالحميد","احمد عصام","احمد نوري","الادارية","الخويلدي","جلال رحال","حسن الكردي","حسين الباروني","رضا ابو كتير","رضوان اسماعيل","رضى الجعدوني","زياد الحنش","سند","سيف يونس","طلال","عبد الله ابو فيس","عبد المجيد الطير","عبد الرؤوف نصر","عبدالرؤوف بريم","علاء الكور","علي غزيل","علي سليمان","عصام التميمي","عمر النمروش","فراس المشبك","فؤاد مسعود","مبروك رجب","محمد الصادق","محمد العباني","محمد العزابي","محمد عبد القادر","محمد عريبي","محمود العزري","معاد الشوشان","مصطفي بلقاسم","مندر الخويلدي","هيتم الصادق","هيتم الصغير"],
+  kpis:{total_sales:0,total_returns:0,net_sales:0,total_invoices:0,total_debt:0,total_collected:0,total_inventory:0,total_customers:0},
+  sales_by_rep:{},returns_by_rep:{},
+  sales_by_month:{},collection_by_month:{},collection_by_rep:{},
+  top_products:{},top_customers:{},top_debtors:{},
+  inventory_by_warehouse:{},aging_buckets:{},
+  reps:[],
   sales_table:[],debt_table:[],aging_table:[],collection_table:[],inventory_table:[]
 };
 
@@ -1433,7 +1464,7 @@ const EMBEDDED = {
 //  STATE — مصدر الحقيقة الوحيد
 // ══════════════════════════════════════════════════════
 let D = JSON.parse(JSON.stringify(EMBEDDED)); // deep clone
-let lastUpdateTs = 'البيانات الافتراضية المضمّنة';
+let lastUpdateTs = '—';
 
 // ══════════════════════════════════════════════════════
 //  CHART REGISTRY
@@ -4339,58 +4370,232 @@ function addFileStatus(container,name,status,msg){
 }
 
 // ══════════════════════════════════════════════════════
-//  GOOGLE SHEETS SYNC
+//  GOOGLE SHEETS SYNC + AUTO-REFRESH
 // ══════════════════════════════════════════════════════
-const GS_STORAGE_KEY='dashboard_gs_urls';
 function saveGsUrls(){
-  const urls={sales:document.getElementById('gs-sales').value,debt:document.getElementById('gs-debt').value,aging:document.getElementById('gs-aging').value,collection:document.getElementById('gs-collection').value,inventory:document.getElementById('gs-inventory').value,reps:document.getElementById('gs-reps').value};
-  try{localStorage.setItem(GS_STORAGE_KEY,JSON.stringify(urls));toast('✅ تم حفظ الروابط','success')}catch(e){toast('⚠ تعذّر الحفظ','error')}
+  const urls={
+    sales:    document.getElementById('gs-sales')?.value||'',
+    debt:     document.getElementById('gs-debt')?.value||'',
+    aging:    document.getElementById('gs-aging')?.value||'',
+    collection:document.getElementById('gs-collection')?.value||'',
+    inventory: document.getElementById('gs-inventory')?.value||'',
+    reps:     document.getElementById('gs-reps')?.value||''
+  };
+  const interval=document.getElementById('gs-interval')?.value||'5';
+  try{
+    localStorage.setItem(GS_STORAGE_KEY,JSON.stringify(urls));
+    localStorage.setItem(AUTO_REFRESH_KEY,interval);
+    toast('✅ تم حفظ الروابط والإعدادات','success');
+    _startAutoRefresh();
+  }catch(e){toast('⚠ تعذّر الحفظ','error')}
 }
+
 function loadGsUrls(){
   try{
     const saved=localStorage.getItem(GS_STORAGE_KEY);
-    if(!saved)return;
+    if(!saved)return false;
     const urls=JSON.parse(saved);
     ['sales','debt','aging','collection','inventory','reps'].forEach(k=>{
       const el=document.getElementById('gs-'+k);
       if(el&&urls[k])el.value=urls[k];
     });
-  }catch(e){}
+    const savedInterval=localStorage.getItem(AUTO_REFRESH_KEY)||'5';
+    const intEl=document.getElementById('gs-interval');
+    if(intEl)intEl.value=savedInterval;
+    return Object.values(urls).some(v=>v&&v.trim());
+  }catch(e){return false;}
 }
 
+// ── التحديث التلقائي ─────────────────────────────────
+function _startAutoRefresh(){
+  if(_autoRefreshTimer)clearInterval(_autoRefreshTimer);
+  const mins=parseInt(localStorage.getItem(AUTO_REFRESH_KEY)||'5');
+  if(mins<=0)return;
+  _autoRefreshTimer=setInterval(async()=>{
+    await _autoSyncQuiet();
+  }, mins*60*1000);
+  _updateRefreshStatus();
+}
+
+function _updateRefreshStatus(){
+  const mins=parseInt(localStorage.getItem(AUTO_REFRESH_KEY)||'5');
+  const el=document.getElementById('auto-refresh-status');
+  if(el)el.textContent=mins>0?`🔄 تحديث تلقائي كل ${mins} دقيقة`:'⏸ التحديث التلقائي متوقف';
+}
+
+async function _autoSyncQuiet(){
+  // استخدم الروابط المضمّنة مباشرة
+  const urls = GS_URLS_EMBEDDED;
+  const keys = ['sales','collection','debt','inventory','reps','aging'];
+  const typeLabels={sales:'مبيعات',debt:'مديونية',aging:'أعمار الذمم',collection:'تحصيل',inventory:'جرد المخازن',reps:'تصنيف المندوبين'};
+  let synced=0;
+
+  // تحديث رسالة التحميل
+  const msgEl=document.getElementById('loading-msg');
+
+  for(const key of keys){
+    const url=urls[key];
+    if(!url)continue;
+    try{
+      if(msgEl)msgEl.textContent=`جاري جلب ${typeLabels[key]}...`;
+      const resp=await fetch(url+'&t='+Date.now());
+      if(!resp.ok)continue;
+      const text=await resp.text();
+      const rows=csvToRows(text);
+      processNewData(key,rows);
+      synced++;
+    }catch(e){
+      console.warn('خطأ في جلب',key,e.message);
+    }
+  }
+
+  if(synced>0){
+    _invalidatePageCache();
+    const p=window.currentPage||'overview';
+    if(PAGE_RENDERS[p])PAGE_RENDERS[p]();
+    const ts=new Date().toLocaleTimeString('ar-LY');
+    const lastEl=document.getElementById('last-update');
+    if(lastEl)lastEl.textContent=`آخر تحديث: ${ts}`;
+    const dot=document.getElementById('status-dot');
+    if(dot)dot.style.background='var(--accent2)';
+  }
+  return synced;
+}
+
+// ── المزامنة اليدوية (مع شريط تقدم) ──────────────────
 async function syncGoogleSheets(){
   const prog=document.getElementById('gs-progress');
   const statusEl=document.getElementById('gs-status');
   const keys=['sales','debt','aging','collection','inventory','reps'];
   const typeLabels={sales:'مبيعات',debt:'مديونية',aging:'أعمار الذمم',collection:'تحصيل',inventory:'جرد المخازن',reps:'تصنيف المندوبين والأهداف'};
   let synced=0,errors=0;
-
   statusEl.textContent='جاري المزامنة...';
-  prog.style.width='0%';
+  if(prog)prog.style.width='0%';
 
   for(let i=0;i<keys.length;i++){
     const key=keys[i];
-    const url=document.getElementById('gs-'+key)?.value?.trim();
+    // استخدم القيمة من الحقل أو الرابط المضمّن
+    const url=(document.getElementById('gs-'+key)?.value?.trim())||GS_URLS_EMBEDDED[key]||'';
     if(!url)continue;
     try{
-      statusEl.textContent=`جاري جلب ${typeLabels[key]}...`;
-      prog.style.width=((i+1)/keys.length*80)+'%';
-      const resp=await fetch(url);
+      statusEl.textContent=`⏳ جاري جلب ${typeLabels[key]}...`;
+      if(prog)prog.style.width=((i+1)/keys.length*80)+'%';
+      const resp=await fetch(url+'&t='+Date.now());
       if(!resp.ok)throw new Error(`HTTP ${resp.status}`);
       const text=await resp.text();
       const rows=csvToRows(text);
       processNewData(key,rows);
       synced++;
-      toast(`✅ ${typeLabels[key]} — تمت المزامنة`,'success');
+      toast(`✅ ${typeLabels[key]}`,'success');
     }catch(err){
       errors++;
-      toast(`❌ خطأ في ${typeLabels[key]}: ${err.message}`,'error');
+      toast(`❌ ${typeLabels[key]}: ${err.message}`,'error');
     }
   }
 
-  prog.style.width='100%';
+  if(prog)prog.style.width='100%';
   statusEl.textContent=`✅ تمت المزامنة: ${synced} ملف${errors?` — ❌ ${errors} خطأ`:''}`;
-  setTimeout(()=>prog.style.width='0',1000);
+  setTimeout(()=>{if(prog)prog.style.width='0'},1000);
+
+  if(synced>0){
+    _invalidatePageCache();
+    const p=window.currentPage||'overview';
+    if(PAGE_RENDERS[p])PAGE_RENDERS[p]();
+    const ts=new Date().toLocaleString('ar-LY');
+    const lastEl=document.getElementById('last-update');
+    if(lastEl)lastEl.textContent=`آخر تحديث: ${ts}`;
+    setTimeout(()=>closeUploadModal(),1200);
+  }
+}
+
+// ── التحميل التلقائي عند بدء التشغيل ────────────────
+async function autoLoadOnStartup(){
+  // استخدم الروابط المضمّنة مباشرة — لا حاجة لإدخال يدوي
+  _hideSetupScreen();
+  _showLoadingOverlay();
+
+  // ملء حقول الواجهة بالروابط المضمّنة (للمزامنة اليدوية من المودال)
+  Object.entries(GS_URLS_EMBEDDED).forEach(([k,v])=>{
+    const el=document.getElementById('gs-'+k);
+    if(el)el.value=v;
+  });
+
+  await _autoSyncQuiet();
+  _hideLoadingOverlay();
+  _startAutoRefresh();
+}
+
+function _showSetupScreen(){
+  let overlay=document.getElementById('setup-overlay');
+  if(overlay){overlay.style.display='flex';return;}
+  overlay=document.createElement('div');
+  overlay.id='setup-overlay';
+  overlay.style.cssText=`
+    position:fixed;inset:0;z-index:9998;
+    background:var(--bg);display:flex;align-items:center;justify-content:center;
+    flex-direction:column;gap:20px;padding:24px;
+  `;
+  overlay.innerHTML=`
+    <div style="max-width:520px;width:100%;text-align:center">
+      <div style="font-size:48px;margin-bottom:16px">📊</div>
+      <h2 style="font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px">مرحباً بك في لوحة الندى</h2>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.7">
+        لم يتم إعداد مصادر البيانات بعد.<br>
+        اضغط على الزر أدناه لإدخال روابط Google Sheets أو رفع الملفات يدوياً.
+      </p>
+      <button onclick="closeSetupAndOpenUpload()" style="
+        background:var(--accent);color:#fff;border:none;border-radius:10px;
+        padding:14px 32px;font-size:14px;font-weight:700;font-family:'Cairo',sans-serif;
+        cursor:pointer;transition:opacity .2s;width:100%;max-width:300px;
+      ">⚙️ إعداد مصادر البيانات</button>
+      <div style="margin-top:16px;font-size:11px;color:var(--muted)">
+        يمكنك أيضاً رفع الملفات مباشرة من القائمة
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function closeSetupAndOpenUpload(){
+  _hideSetupScreen();
+  // افتح تبويب Google Sheets مباشرة
+  openUploadModal();
+  setTimeout(()=>switchModalTab('gsheet'),100);
+}
+
+function _hideSetupScreen(){
+  const el=document.getElementById('setup-overlay');
+  if(el)el.style.display='none';
+}
+
+function _showLoadingOverlay(){
+  let el=document.getElementById('loading-overlay');
+  if(!el){
+    el=document.createElement('div');
+    el.id='loading-overlay';
+    el.style.cssText=`
+      position:fixed;inset:0;z-index:9997;
+      background:var(--bg);display:flex;align-items:center;justify-content:center;
+      flex-direction:column;gap:16px;
+    `;
+    el.innerHTML=`
+      <div style="font-size:40px;animation:float 1.5s ease-in-out infinite">📡</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text)">جاري تحميل البيانات...</div>
+      <div style="width:200px;background:var(--surface2);border-radius:999px;height:4px;overflow:hidden">
+        <div id="loading-bar" style="height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:999px;animation:loadingAnim 1.5s ease-in-out infinite"></div>
+      </div>
+      <div style="font-size:11px;color:var(--muted)" id="loading-msg">جاري الاتصال بـ Google Sheets...</div>
+      <style>
+        @keyframes loadingAnim{0%{width:0;margin-right:100%}50%{width:60%;margin-right:20%}100%{width:0;margin-right:0}}
+      </style>
+    `;
+    document.body.appendChild(el);
+  }else{el.style.display='flex';}
+}
+
+function _hideLoadingOverlay(){
+  const el=document.getElementById('loading-overlay');
+  if(el)el.style.display='none';
 }
 
 function csvToRows(text){
@@ -5401,7 +5606,7 @@ function populateRepSelectsAndCats(){
 // ══════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
   Chart.register(ChartDataLabels);
-  // الوضع الفاتح هو الافتراضي — فقط نُطبّق الداكن إذا اختاره المستخدم
+  // الوضع المحفوظ للثيم
   const savedTheme=localStorage.getItem('ndTheme');
   if(savedTheme==='dark'){
     document.body.classList.add('dark');
@@ -5410,9 +5615,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   _assignRepCategories();
   populateRepSelects();
-  loadGsUrls();
-  document.getElementById('last-update').textContent=lastUpdateTs;
-  renderOverviewPage();
+  // التحميل التلقائي عند البدء
+  autoLoadOnStartup();
 });
 </script>
 </body>
