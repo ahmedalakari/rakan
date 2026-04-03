@@ -440,123 +440,9 @@ tfoot td{padding:8px 13px;white-space:nowrap}
 }
 
 /* ══════════════════════════════════════════════
-   RESPONSIVE — MOBILE (≤768px)
-══════════════════════════════════════════════ */
-@media(max-width:768px){
-  /* Sidebar: overlay mode on mobile */
-  #sidebar{
-    width:0!important;border:none;
-    transform:translateX(100%);
-    transition:transform .3s ease,width .3s ease;
-    box-shadow:none;
-  }
-  #sidebar.mobile-open{
-    width:var(--nav-w)!important;
-    transform:translateX(0);
-    box-shadow:-4px 0 24px rgba(0,0,0,.15);
-  }
-  #main{margin-right:0!important}
-  body.nav-collapsed #main{margin-right:0}
-
-  /* Mobile overlay when sidebar open */
-  #sidebar-overlay{
-    display:none;position:fixed;inset:0;z-index:199;
-    background:rgba(0,0,0,.4);backdrop-filter:blur(2px);
-  }
-  #sidebar.mobile-open~#sidebar-overlay,
-  body.sidebar-mobile-open #sidebar-overlay{display:block}
-
-  /* Topbar */
-  #topbar{padding:0 10px;height:50px;gap:6px}
-  #mobile-menu-btn{display:flex}
-  .page-title{font-size:13px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .topbar-right{gap:5px}
-  .topbar-right .last-update{display:none}
-  .topbar-right #btn-export-csv{display:none}
-  .btn{padding:5px 10px;font-size:11px;gap:4px}
-  #gf-toggle-btn{display:none}
-  .topbar-right .btn:not(.success):not(#theme-toggle){display:none}
-
-  /* Page content */
-  .page{padding:10px}
-  #global-filter-bar{padding:6px 10px;gap:6px;top:50px}
-
-  /* KPI cards: 2 columns on mobile */
-  .kpi-grid{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
-  .kpi-card{padding:12px 14px 10px}
-  .kpi-value{font-size:clamp(13px,4vw,20px)}
-  .kpi-label{font-size:10px}
-  .kpi-icon{width:30px;height:30px;font-size:15px}
-
-  /* Cards */
-  .card{padding:12px;gap:10px}
-  .card-title{font-size:12px}
-
-  /* Filter bars: wrap and smaller */
-  .filter-bar{padding:8px;gap:6px;flex-wrap:wrap}
-  .filter-bar select,.filter-bar input{
-    min-width:0;width:calc(50% - 6px);font-size:11px;padding:5px 8px;
-  }
-  .filter-bar input[type="date"]{min-width:0;width:calc(50% - 6px)}
-  .filter-bar input[type="text"]{min-width:0;width:calc(50% - 6px)}
-  .filter-label{width:100%;margin-bottom:2px}
-
-  /* Tables */
-  .table-wrap{max-height:350px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-  table{font-size:11px;min-width:600px}
-  thead th{padding:7px 8px;font-size:10px}
-  tbody td{padding:6px 8px}
-  tfoot td{padding:6px 8px!important;font-size:10px}
-
-  /* Charts */
-  .chart-wrap{height:200px}
-  .chart-wrap.tall{height:240px}
-
-  /* Aging buckets */
-  .aging-buckets{grid-template-columns:repeat(3,1fr);gap:8px}
-
-  /* Modal */
-  .modal-box{width:97vw;max-height:95vh}
-  .modal-body{padding:14px}
-
-  /* Upload dropzone */
-  #smart-dropzone{padding:20px 14px}
-  .sdz-title{font-size:13px}
-
-  /* Toast */
-  #toast-container{left:10px;bottom:10px}
-  .toast{min-width:200px;padding:9px 12px;font-size:11px}
-
-  /* Charts section */
-  .charts-section-title{font-size:12px}
-}
-
-/* ══════════════════════════════════════════════
-   RESPONSIVE — SMALL MOBILE (≤480px)
-══════════════════════════════════════════════ */
-@media(max-width:480px){
-  .kpi-grid{grid-template-columns:1fr 1fr;gap:6px}
-  .kpi-value{font-size:13px}
-  .aging-buckets{grid-template-columns:repeat(2,1fr)}
-  #sdz-cards{grid-template-columns:repeat(2,1fr)}
-  .filter-bar select,.filter-bar input,
-  .filter-bar input[type="date"],
-  .filter-bar input[type="text"]{width:100%}
-  .chart-wrap{height:170px}
-  .chart-wrap.tall{height:200px}
-  .page-title{max-width:100px}
-}
-
-/* ══════════════════════════════════════════════
    MOBILE MENU BUTTON (hidden on desktop)
 ══════════════════════════════════════════════ */
-#mobile-menu-btn{
-  display:none;background:none;border:none;color:var(--text2);
-  cursor:pointer;font-size:20px;padding:6px;flex-shrink:0;
-  align-items:center;justify-content:center;
-  transition:color .2s;
-}
-#mobile-menu-btn:hover{color:var(--accent)}
+#mobile-menu-btn{display:none}
 #sidebar-overlay{display:none}
 
 /* ── تحسين تجاوب الرسوم ── */
@@ -566,19 +452,174 @@ tfoot td{padding:8px 13px;white-space:nowrap}
 body:not(.dark) .filter-bar input[type="date"]{color-scheme:light}
 body.dark .filter-bar input[type="date"]{color-scheme:dark}
 
-/* ── Filter bar mobile toggle ── */
-.filter-toggle-btn{
-  display:none;width:100%;padding:8px 12px;background:var(--surface2);
-  border:1px solid var(--border);border-radius:var(--r-md);
-  color:var(--text2);font-family:'Cairo',sans-serif;font-size:12px;
-  font-weight:600;cursor:pointer;text-align:right;margin-bottom:8px;
-  align-items:center;justify-content:space-between;
-}
+.ov-row2-grid{display:grid;grid-template-columns:repeat(3,1fr) 1.2fr;gap:var(--gap);margin-bottom:var(--gap)}
+@media(max-width:1024px){.ov-row2-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.ov-row2-grid{grid-template-columns:1fr}}
+
 @media(max-width:768px){
-  .filter-toggle-btn{display:flex}
-  .filter-bar.collapsed .filter-bar-inner{display:none}
-  .filter-bar-inner{display:flex;flex-wrap:wrap;gap:6px;width:100%}
+  #inv-expiry-cards{grid-template-columns:repeat(2,1fr)!important}
 }
+@media(max-width:480px){
+  #inv-expiry-cards{grid-template-columns:1fr 1fr!important}
+}
+
+/* ══════════════════════════════════════════════
+   MOBILE BOTTOM NAVIGATION BAR
+══════════════════════════════════════════════ */
+#mobile-bottom-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;z-index:300;
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  box-shadow:0 -4px 20px rgba(0,0,0,.12);
+  padding:0;
+  height:64px;
+}
+.mob-nav-scroll{
+  display:flex;align-items:stretch;
+  overflow-x:auto;overflow-y:hidden;
+  height:100%;
+  scrollbar-width:none;-ms-overflow-style:none;
+  padding:0 4px;
+}
+.mob-nav-scroll::-webkit-scrollbar{display:none}
+.mob-nav-item{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;padding:6px 10px;min-width:60px;flex:1;
+  cursor:pointer;border:none;background:none;
+  color:var(--muted);font-family:'Cairo',sans-serif;
+  font-size:9px;font-weight:700;
+  transition:all .18s;border-radius:12px;margin:5px 2px;
+  position:relative;white-space:nowrap;
+  -webkit-tap-highlight-color:transparent;
+}
+.mob-nav-item .mn-icon{font-size:19px;line-height:1;transition:transform .2s}
+.mob-nav-item:hover,.mob-nav-item.active{
+  color:var(--accent);
+  background:color-mix(in srgb,var(--accent) 10%,transparent);
+}
+.mob-nav-item.active .mn-icon{transform:scale(1.15)}
+.mob-nav-item .mn-dot{
+  position:absolute;top:6px;right:8px;
+  width:6px;height:6px;border-radius:50%;
+  background:var(--accent);opacity:0;transition:opacity .2s;
+}
+.mob-nav-item.active .mn-dot{opacity:1}
+
+/* Upload FAB button for mobile */
+#mob-upload-fab{
+  display:none;
+  position:fixed;bottom:76px;left:16px;z-index:299;
+  width:46px;height:46px;border-radius:50%;
+  background:var(--accent2);border:none;
+  color:#fff;font-size:20px;
+  box-shadow:0 4px 16px rgba(10,184,122,.4);
+  cursor:pointer;transition:all .2s;
+  align-items:center;justify-content:center;
+}
+#mob-upload-fab:hover{transform:scale(1.05);box-shadow:0 6px 20px rgba(10,184,122,.5)}
+
+@media(max-width:768px){
+  #mobile-bottom-nav{display:block}
+  #mob-upload-fab{display:flex}
+  /* Add bottom padding to main content so it doesn't hide behind nav */
+  #main{padding-bottom:64px;margin-right:0!important}
+  /* Hide sidebar completely on mobile - use bottom nav instead */
+  #sidebar{display:none!important}
+  #sidebar-overlay{display:none!important}
+  #mobile-menu-btn{display:none!important}
+  /* Topbar simplified on mobile */
+  #topbar{padding:0 12px;height:52px;justify-content:space-between}
+  .page-title{font-size:13px;flex:1;max-width:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0 8px}
+  .topbar-right{margin-right:0;gap:6px}
+  .topbar-right .last-update{display:none}
+  .topbar-right #btn-export-csv{display:none}
+  .topbar-right #gf-toggle-btn{display:flex;padding:5px 8px;font-size:11px}
+  /* Show theme toggle always */
+  #theme-toggle{display:flex!important}
+  /* Hide upload button from topbar on mobile (use FAB) */
+  .topbar-right .btn.success:not(#btn-export-collection){display:none!important}
+  /* Keep export collection btn visible */
+  #btn-export-collection{display:none}
+  /* Global filter bar on mobile */
+  #global-filter-bar{top:52px;padding:8px 10px;gap:6px}
+  #global-filter-bar .gf-select,
+  #global-filter-bar .gf-input{height:32px;font-size:11px;padding:4px 8px}
+  #global-filter-bar .gf-date-wrap{flex-wrap:wrap;gap:4px}
+  /* Page padding */
+  .page{padding:10px 10px 10px}
+  /* KPI grid: 2 columns */
+  .kpi-grid{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+  .kpi-card{padding:12px 12px 10px}
+  .kpi-value{font-size:clamp(13px,3.5vw,20px)}
+  .kpi-label{font-size:10px}
+  .kpi-icon{width:28px;height:28px;font-size:14px}
+  .kpi-sub{font-size:10px}
+  /* Overview row2: stack vertically */
+  #ov-row2{grid-template-columns:1fr 1fr!important}
+  /* Cards */
+  .card{padding:12px;gap:8px}
+  .card-title{font-size:12px}
+  /* Charts */
+  .chart-wrap{height:180px}
+  .chart-wrap.tall{height:220px}
+  .chart-wrap.short{height:150px}
+  /* Grids */
+  .grid-2,.grid-3,.grid-65,.grid-56{grid-template-columns:1fr}
+  /* Filter bars */
+  .filter-bar{padding:8px;gap:6px;flex-wrap:wrap}
+  .filter-bar select,.filter-bar input{min-width:0;font-size:11px;padding:5px 8px}
+  .filter-bar input[type="date"]{min-width:0}
+  .filter-label{width:100%;margin-bottom:2px;font-size:11px}
+  /* Tables */
+  .table-wrap{max-height:320px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{font-size:11px;min-width:520px}
+  thead th{padding:7px 8px;font-size:10px}
+  tbody td{padding:6px 8px}
+  tfoot td{padding:6px 8px!important;font-size:10px}
+  /* Aging */
+  .aging-buckets{grid-template-columns:repeat(3,1fr);gap:8px}
+  /* Modal */
+  .modal-box{width:97vw;max-height:94vh}
+  .modal-body{padding:14px}
+  .modal-tabs{gap:2px}
+  .modal-tab{font-size:11px;padding:6px 8px}
+  /* Dropzone */
+  #smart-dropzone{padding:18px 12px}
+  .sdz-title{font-size:12px}
+  /* sdz-cards: 3 cols on mobile */
+  #sdz-cards{grid-template-columns:repeat(3,1fr)!important}
+  /* Toast */
+  #toast-container{left:10px;bottom:70px}
+  .toast{min-width:200px;padding:9px 12px;font-size:11px}
+  /* Section title */
+  .charts-section-title{font-size:12px}
+  /* collection rank area */
+  #page-collection > div:nth-child(2){flex-direction:column!important;gap:10px!important}
+  #page-collection .btn.primary{width:100%}
+}
+
+@media(max-width:480px){
+  .kpi-grid{grid-template-columns:1fr 1fr;gap:6px}
+  .kpi-value{font-size:13px}
+  #ov-row2{grid-template-columns:1fr!important}
+  .aging-buckets{grid-template-columns:repeat(2,1fr)}
+  #sdz-cards{grid-template-columns:repeat(2,1fr)!important}
+  .filter-bar select,.filter-bar input,
+  .filter-bar input[type="date"],
+  .filter-bar input[type="text"]{width:100%}
+  .chart-wrap{height:160px}
+  .chart-wrap.tall{height:190px}
+  .page-title{font-size:12px}
+  .mob-nav-item{min-width:52px;font-size:8px;padding:6px 6px}
+  .mob-nav-item .mn-icon{font-size:17px}
+  /* Filter bar in cards: full width selects */
+  .card .filter-bar select,
+  .card .filter-bar input{width:calc(50% - 4px);min-width:0}
+}
+
+/* ── Filter bar mobile toggle ── */
+.filter-toggle-btn{display:none}
 /* ── تباين النصوص الوضع الفاتح ── */
 body:not(.dark) .kpi-label{color:#4a5568}
 body:not(.dark) .kpi-sub{color:#6b7280}
@@ -650,6 +691,60 @@ body.dark tbody td{color:var(--text)}
   </div>
 </nav>
 
+<!-- ═══════════ MOBILE BOTTOM NAV ═══════════ -->
+<nav id="mobile-bottom-nav">
+  <div class="mob-nav-scroll">
+    <button class="mob-nav-item active" onclick="showPage('overview')" id="mnav-overview">
+      <span class="mn-dot"></span>
+      <span class="mn-icon">📈</span>
+      <span>نظرة عامة</span>
+    </button>
+    <button class="mob-nav-item" onclick="showPage('sales')" id="mnav-sales">
+      <span class="mn-dot"></span>
+      <span class="mn-icon">📊</span>
+      <span>المبيعات</span>
+    </button>
+    <button class="mob-nav-item" onclick="showPage('reps')" id="mnav-reps">
+      <span class="mn-dot"></span>
+      <span class="mn-icon">👥</span>
+      <span>المندوبون</span>
+    </button>
+    <button class="mob-nav-item" onclick="showPage('customers')" id="mnav-customers">
+      <span class="mn-dot"></span>
+      <span class="mn-icon">🏪</span>
+      <span>الزبائن</span>
+    </button>
+    <button class="mob-nav-item" onclick="showPage('products')" id="mnav-products">
+      <span class="mn-dot"></span>
+      <span class="mn-icon">📦</span>
+      <span>الأصناف</span>
+    </button>
+    <button class="mob-nav-item" onclick="showPage('debt')" id="mnav-debt">
+      <span class="mn-dot"></span>
+      <span class="mn-icon">💳</span>
+      <span>المديونية</span>
+    </button>
+    <button class="mob-nav-item" onclick="showPage('aging')" id="mnav-aging">
+      <span class="mn-dot"></span>
+      <span class="mn-icon">⏳</span>
+      <span>الذمم</span>
+    </button>
+    <button class="mob-nav-item" onclick="showPage('collection')" id="mnav-collection">
+      <span class="mn-dot"></span>
+      <span class="mn-icon">💰</span>
+      <span>التحصيل</span>
+    </button>
+    <button class="mob-nav-item" onclick="showPage('inventory')" id="mnav-inventory">
+      <span class="mn-dot"></span>
+      <span class="mn-icon">🏭</span>
+      <span>المخازن</span>
+    </button>
+  </div>
+</nav>
+
+<!-- FAB upload button for mobile -->
+<button id="mob-upload-fab" onclick="openUploadModal()" title="رفع البيانات">⬆</button>
+
 <!-- ═══════════ MAIN ═══════════ -->
 <div id="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
 <div id="main">
@@ -697,10 +792,10 @@ body.dark tbody td{color:var(--text)}
   <div class="page active" id="page-overview">
 
     <!-- ── صف البطاقات الرئيسية ── -->
-    <div class="kpi-grid" id="kpi-overview" style="grid-template-columns:repeat(auto-fill,minmax(190px,1fr))"></div>
+    <div class="kpi-grid" id="kpi-overview"></div>
 
     <!-- ── صف ثانٍ: مرتجعات / بنك / كاش ── -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr) 1.2fr;gap:var(--gap);margin-bottom:var(--gap)" id="ov-row2">
+    <div class="ov-row2-grid" id="ov-row2">
       <div class="card ov-mini-card" id="ov-mc-returns">
         <div class="ovm-strip" style="background:var(--red)"></div>
         <div class="ovm-icon">↩️</div>
@@ -1169,6 +1264,15 @@ body.dark tbody td{color:var(--text)}
   <div class="page" id="page-inventory">
     <div class="kpi-grid" id="kpi-inventory"></div>
     <div class="inv-grid" id="inv-wh-cards"></div>
+
+    <!-- ملخص الصلاحيات -->
+    <div id="inv-expiry-summary" style="display:none;margin-bottom:var(--gap)">
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:8px">
+        <span>⏰</span> ملخص الصلاحيات
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px" id="inv-expiry-cards"></div>
+    </div>
+
     <div class="card" style="margin-bottom:var(--gap)">
       <div class="card-header"><span class="card-title">🗂 جدول جرد المخازن</span></div>
       <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--r-md)">
@@ -1462,31 +1566,28 @@ let currentPage='overview';
 const _renderedPages=new Set(); // تتبّع الصفحات المرسومة
 
 function showPage(p){
-  if(currentPage===p&&_renderedPages.has(p))return; // لا إعادة رسم إذا لم يتغير
+  if(currentPage===p&&_renderedPages.has(p))return;
   document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.mob-nav-item').forEach(el=>el.classList.remove('active'));
   document.getElementById('page-'+p).classList.add('active');
-  const idx=['overview','sales','reps','customers','products','debt','aging','collection','inventory'].indexOf(p);
+  const pages=['overview','sales','reps','customers','products','debt','aging','collection','inventory'];
+  const idx=pages.indexOf(p);
   if(idx>=0)document.querySelectorAll('.nav-item')[idx]?.classList.add('active');
+  const mnavItem=document.getElementById('mnav-'+p);
+  if(mnavItem){
+    mnavItem.classList.add('active');
+    mnavItem.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  }
   document.getElementById('topbar-title').textContent=PAGE_TITLES[p]||p;
   const prev=currentPage;
   currentPage=p;
   window.currentPage=p;
   document.getElementById('btn-export-collection').style.display=p==='collection'?'':'none';
-  // إغلاق الـ sidebar على الجوال عند التنقل
-  if(window.innerWidth<=768){
-    const sb=document.getElementById('sidebar');
-    const ov=document.getElementById('sidebar-overlay');
-    sb?.classList.remove('mobile-open');
-    if(ov)ov.style.display='none';
-    document.body.classList.remove('sidebar-mobile-open');
-  }
-  // أعد الرسم فقط إذا لم يُرسم بعد أو تغيّرت البيانات
   if(PAGE_RENDERS[p]&&(!_renderedPages.has(p)||p==='overview')){
     PAGE_RENDERS[p]();
     _renderedPages.add(p);
   }
-  // نافذة للـ chart.js كي يُعيد حساب الأبعاد بعد ظهور الـ canvas
   requestAnimationFrame(()=>{
     Object.values(CHARTS).forEach(ch=>{try{ch.resize();}catch(e){}});
   });
@@ -1520,10 +1621,20 @@ function toggleTheme(){
 function showPage(p){
   document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.mob-nav-item').forEach(el=>el.classList.remove('active'));
   document.getElementById('page-'+p).classList.add('active');
-  document.querySelectorAll('.nav-item')[['overview','sales','reps','customers','products','debt','aging','collection','inventory'].indexOf(p)].classList.add('active');
+  const pages=['overview','sales','reps','customers','products','debt','aging','collection','inventory'];
+  const idx=pages.indexOf(p);
+  if(idx>=0)document.querySelectorAll('.nav-item')[idx]?.classList.add('active');
+  const mnavItem=document.getElementById('mnav-'+p);
+  if(mnavItem){
+    mnavItem.classList.add('active');
+    // scroll into view in bottom nav
+    mnavItem.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  }
   document.getElementById('topbar-title').textContent=PAGE_TITLES[p]||p;
   currentPage=p;
+  window.currentPage=p;
   document.getElementById('btn-export-collection').style.display=p==='collection'?'':'none';
   if(PAGE_RENDERS[p])PAGE_RENDERS[p]();
 }
@@ -2104,20 +2215,98 @@ function renderCustomersPage(){
   const top10=src.slice(0,10);
   hbarChart('ch-top-customers',top10.map(c=>c.n.substring(0,22)),top10.map(c=>c.ns));
 
-  // Stats panel
+  // Stats panel — بطاقة تفصيلية لكل زبون (أفضل 20)
   const statsEl=document.getElementById('cust-stats');
-  const top5Net=src.slice(0,5).reduce((s,c)=>s+c.ns,0);
-  const top10Net=src.slice(0,10).reduce((s,c)=>s+c.ns,0);
-  statsEl.innerHTML=[
-    ['أعلى زبون صافي مبيعات',(src[0]?.n||'—'),'var(--gold)'],
-    ['مجموع أفضل 5 زبائن',fmt(top5Net),'var(--accent)'],
-    ['مجموع أفضل 10 زبائن',fmt(top10Net),'var(--accent2)'],
-    ['نسبة أفضل 10 من الإجمالي',totalNet>0?((top10Net/totalNet)*100).toFixed(1)+'%':'—','var(--purple)'],
-    ['زبائن بتحصيل ممتاز ≥80%',src.filter(c=>c.cp>=80).length,'var(--accent2)'],
-  ].map(([l,v,c])=>`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
-    <span style="color:var(--text2);font-size:12px">${l}</span>
-    <span style="color:${c};font-weight:700;font-size:13px">${v}</span>
-  </div>`).join('');
+  const displaySrc=filtered.length?filtered:src;
+  const top20=displaySrc.slice(0,20);
+
+  statsEl.innerHTML=`
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;padding:4px 0">
+    ${top20.map((c,i)=>{
+      const roiColor=c.cp>=80?'var(--accent2)':c.cp>=60?'var(--gold)':'var(--red)';
+      const retColor=c.rp>=15?'var(--red)':c.rp>=8?'var(--accent3)':'var(--accent2)';
+      const gapColor=c.g>0?'var(--red)':'var(--accent2)';
+      const catColors={'ممتاز':'var(--accent2)','جيد':'var(--accent)','متوسط':'var(--gold)','مخاطرة':'var(--accent3)','مخاطرة عالية':'var(--red)'};
+      const catColor=catColors[c.cat]||'var(--muted)';
+      const bar=v=>Math.min(Math.round(v),100);
+      return `<div style="
+        background:var(--surface2);border:1px solid var(--border);border-radius:12px;
+        padding:14px 16px;position:relative;overflow:hidden;
+        border-right:3px solid ${roiColor};
+      ">
+        <!-- الرقم والاسم -->
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
+            <span style="
+              width:26px;height:26px;border-radius:8px;
+              background:color-mix(in srgb,${roiColor} 15%,transparent);
+              color:${roiColor};font-size:11px;font-weight:900;
+              display:flex;align-items:center;justify-content:center;flex-shrink:0
+            ">${i+1}</span>
+            <div style="min-width:0">
+              <div style="font-size:12px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${c.n}">${c.n}</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:1px">
+                ${c.rep||'—'} · ${c.inv} فاتورة · ${c.itm} صنف
+              </div>
+            </div>
+          </div>
+          <span style="
+            font-size:9px;font-weight:700;padding:3px 8px;border-radius:999px;flex-shrink:0;margin-right:6px;
+            background:color-mix(in srgb,${catColor} 12%,transparent);
+            color:${catColor};border:1px solid color-mix(in srgb,${catColor} 25%,transparent)
+          ">${c.cat}</span>
+        </div>
+
+        <!-- الأرقام الرئيسية -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+          <div style="text-align:center;background:var(--surface);border-radius:8px;padding:7px 4px">
+            <div style="font-size:9px;color:var(--muted);margin-bottom:2px">صافي المبيعات</div>
+            <div style="font-size:11px;font-weight:800;color:var(--accent)">${fmtShort(c.ns)}</div>
+          </div>
+          <div style="text-align:center;background:var(--surface);border-radius:8px;padding:7px 4px">
+            <div style="font-size:9px;color:var(--muted);margin-bottom:2px">التحصيل</div>
+            <div style="font-size:11px;font-weight:800;color:var(--accent2)">${fmtShort(c.c)}</div>
+          </div>
+          <div style="text-align:center;background:var(--surface);border-radius:8px;padding:7px 4px">
+            <div style="font-size:9px;color:var(--muted);margin-bottom:2px">الفجوة</div>
+            <div style="font-size:11px;font-weight:800;color:${gapColor}">${fmtShort(c.g)}</div>
+          </div>
+        </div>
+
+        <!-- شريط التحصيل -->
+        <div style="margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+            <span style="font-size:10px;color:var(--text2)">نسبة التحصيل</span>
+            <span style="font-size:11px;font-weight:800;color:${roiColor}">${c.cp.toFixed(1)}%</span>
+          </div>
+          <div style="background:var(--surface);border-radius:999px;height:6px;overflow:hidden">
+            <div style="width:${bar(c.cp)}%;height:100%;background:${roiColor};border-radius:999px;transition:width .6s ease"></div>
+          </div>
+        </div>
+
+        <!-- شريط المرتجعات -->
+        <div style="margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+            <span style="font-size:10px;color:var(--text2)">نسبة المرتجعات</span>
+            <span style="font-size:10px;font-weight:700;color:${retColor}">${c.rp.toFixed(1)}%</span>
+          </div>
+          <div style="background:var(--surface);border-radius:999px;height:4px;overflow:hidden">
+            <div style="width:${bar(c.rp*3)}%;height:100%;background:${retColor};border-radius:999px"></div>
+          </div>
+        </div>
+
+        <!-- الذمم -->
+        ${(c.age30>0||c.age60>0||c.ageOld>0)?`
+        <div style="display:flex;gap:6px;font-size:10px;flex-wrap:wrap">
+          ${c.age30>0?`<span style="background:color-mix(in srgb,var(--accent2) 10%,transparent);color:var(--accent2);padding:2px 7px;border-radius:999px;font-weight:700">≤30 يوم: ${fmtShort(c.age30)}</span>`:''}
+          ${c.age60>0?`<span style="background:color-mix(in srgb,var(--accent3) 10%,transparent);color:var(--accent3);padding:2px 7px;border-radius:999px;font-weight:700">≤60 يوم: ${fmtShort(c.age60)}</span>`:''}
+          ${c.ageOld>0?`<span style="background:color-mix(in srgb,var(--red) 10%,transparent);color:var(--red);padding:2px 7px;border-radius:999px;font-weight:700">>60 يوم: ${fmtShort(c.ageOld)}</span>`:''}
+        </div>`:''}
+      </div>`;
+    }).join('')}
+  </div>
+  ${displaySrc.length>20?`<div style="text-align:center;padding:10px;font-size:11px;color:var(--muted)">يعرض أفضل 20 زبوناً — استخدم جدول الزبائن أدناه لعرض الكل (${displaySrc.length} زبون)</div>`:''}
+  `;
 
   pagState('cust',filtered,true);
   _renderCustTable();
@@ -3065,11 +3254,29 @@ function _renderAdjTable(){
 function renderInventoryPage(){
   const whF=document.getElementById('f-inv-wh')?.value||'';
   const search=(document.getElementById('f-inv-search')?.value||'').toLowerCase();
+  const _n=v=>{const n=parseFloat(String(v||'').replace(/,/g,''));return isNaN(n)?0:n};
+  const _c=s=>String(s||'').trim();
+
+  // اكتشاف أعمدة الصلاحية من البيانات
+  const allRows=D.inventory_table||[];
+  const sampleRow=allRows[0]||{};
+  const allKeys=Object.keys(sampleRow);
+  const exp30Col =allKeys.find(k=>_c(k)==='صلاحية 1')||null;
+  const exp60Col =allKeys.find(k=>_c(k)==='صلاحية 2')||null;
+  const exp90Col =allKeys.find(k=>_c(k)==='صلاحية 3')||null;
+  const exp120Col=allKeys.find(k=>_c(k)==='صلاحية 4')||null;
+
+  const total30 =exp30Col ?allRows.reduce((s,r)=>s+_n(r[exp30Col] ),0):0;
+  const total60 =exp60Col ?allRows.reduce((s,r)=>s+_n(r[exp60Col] ),0):0;
+  const total90 =exp90Col ?allRows.reduce((s,r)=>s+_n(r[exp90Col] ),0):0;
+  const total120=exp120Col?allRows.reduce((s,r)=>s+_n(r[exp120Col]),0):0;
+  const urgentItems=allRows.filter(r=>_n(r[exp30Col||'']||0)>0||_n(r[exp60Col||'']||0)>0).length;
 
   document.getElementById('kpi-inventory').innerHTML=
     kpiCard('🏭','إجمالي المخزون',D.kpis.total_inventory,'var(--accent)','وحدة مخزنة')+
     kpiCard('📦','عدد المستودعات',Object.keys(D.inventory_by_warehouse).length,'var(--gold)')+
-    kpiCard('🏆','أكبر مستودع',Object.keys(D.inventory_by_warehouse)[0],'var(--accent2)',fmt(Object.values(D.inventory_by_warehouse)[0])+' وحدة');
+    kpiCard('🏆','أكبر مستودع',Object.keys(D.inventory_by_warehouse)[0],'var(--accent2)',fmt(Object.values(D.inventory_by_warehouse)[0])+' وحدة')+
+    (total30>0||total60>0?kpiCard('⚠','أصناف تستحق انتباهاً',urgentItems,'var(--red)','صلاحية ≤60 يوم'):'');
 
   // By warehouse bar
   const wh=Object.entries(D.inventory_by_warehouse||{});
@@ -3085,6 +3292,40 @@ function renderInventoryPage(){
       <div class="ic-label">وحدة</div>
     </div>`).join('');
 
+  // بطاقات ملخص الصلاحيات
+  const expSummaryEl=document.getElementById('inv-expiry-summary');
+  const expCardsEl=document.getElementById('inv-expiry-cards');
+  if(total30>0||total60>0||total90>0||total120>0){
+    expSummaryEl.style.display='block';
+    const expData=[
+      {label:'تنتهي صلاحيتها خلال 30 يوم',val:total30,color:'var(--accent2)',icon:'🟢',risk:'عاجل'},
+      {label:'تنتهي صلاحيتها خلال 60 يوم',val:total60,color:'var(--accent3)',icon:'🟡',risk:'تنبيه'},
+      {label:'تنتهي صلاحيتها خلال 90 يوم',val:total90,color:'var(--red)',icon:'🔴',risk:'خطر'},
+      {label:'صلاحية أكثر من 90 يوم',val:total120,color:'var(--purple)',icon:'⚫',risk:'آمن'},
+    ];
+    expCardsEl.innerHTML=expData.map(e=>`
+      <div style="
+        background:var(--surface);border:1px solid var(--border);
+        border-radius:12px;padding:14px 16px;
+        border-top:3px solid ${e.color};
+        box-shadow:var(--shadow);
+      ">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:16px">${e.icon}</span>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;
+            background:color-mix(in srgb,${e.color} 12%,transparent);
+            color:${e.color};border:1px solid color-mix(in srgb,${e.color} 25%,transparent)
+          ">${e.risk}</span>
+        </div>
+        <div style="font-size:11px;color:var(--text2);margin-bottom:6px;line-height:1.4">${e.label}</div>
+        <div style="font-size:20px;font-weight:800;color:${e.color}">${e.val>0?fmt(e.val):'—'}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">وحدة</div>
+      </div>
+    `).join('');
+  } else {
+    expSummaryEl.style.display='none';
+  }
+
   // Table
   let rows=D.inventory_table||[];
   if(whF)rows=rows.filter(r=>r['المستودع']===whF);
@@ -3097,32 +3338,93 @@ function _renderInvTable(){
   const wrap=document.getElementById('inv-table-wrap');
   if(!rows.length){wrap.innerHTML='<div style="padding:24px;text-align:center;color:var(--muted)">ارفع ملف جرد_المخازن.xlsx لعرض التفاصيل</div>';return}
   const _n=v=>{const n=parseFloat(String(v||'').replace(/,/g,''));return isNaN(n)?0:n};
-  // حساب نسبة كل صنف من إجمالي المستودع
-  const totalInv=rows.reduce((s,r)=>s+_n(r['الكمية']),0)||1;
+  const _c=s=>String(s||'').trim();
+
+  // اكتشاف أعمدة الصلاحية من الملف
+  const sampleRow=rows[0]||{};
+  const allKeys=Object.keys(sampleRow);
+  const exp30Col =allKeys.find(k=>_c(k)==='صلاحية 1')||null;
+  const exp60Col =allKeys.find(k=>_c(k)==='صلاحية 2')||null;
+  const exp90Col =allKeys.find(k=>_c(k)==='صلاحية 3')||null;
+  const exp120Col=allKeys.find(k=>_c(k)==='صلاحية 4')||null;
+  const hasExpiry=exp30Col||exp60Col||exp90Col||exp120Col;
+
+  // حساب نسبة كل صنف من إجمالي الصفحة الحالية
+  const allInvRows=PAG_STATE['inv']?.data||[];
+  const totalInv=allInvRows.reduce((s,r)=>s+_n(r['الكمية']),0)||1;
+
+  // مجاميع أعمدة الصلاحية
+  const tExp30 =exp30Col ?allInvRows.reduce((s,r)=>s+_n(r[exp30Col] ),0):0;
+  const tExp60 =exp60Col ?allInvRows.reduce((s,r)=>s+_n(r[exp60Col] ),0):0;
+  const tExp90 =exp90Col ?allInvRows.reduce((s,r)=>s+_n(r[exp90Col] ),0):0;
+  const tExp120=exp120Col?allInvRows.reduce((s,r)=>s+_n(r[exp120Col]),0):0;
+
   wrap.innerHTML=`<table>
     <thead><tr>
       <th>#</th><th>م</th><th>المادة</th><th>الكمية</th>
-      <th>% من المخزون</th><th>المستودع</th>
+      <th>% من المخزون</th>
+      ${hasExpiry?`
+      <th style="color:var(--accent2);background:color-mix(in srgb,var(--accent2) 8%,transparent)">🟢 صلاحية ≤30 يوم</th>
+      <th style="color:var(--accent3);background:color-mix(in srgb,var(--accent3) 8%,transparent)">🟡 صلاحية ≤60 يوم</th>
+      <th style="color:var(--red);background:color-mix(in srgb,var(--red) 8%,transparent)">🔴 صلاحية ≤90 يوم</th>
+      <th style="color:var(--purple);background:color-mix(in srgb,var(--purple) 8%,transparent)">⚫ صلاحية >90 يوم</th>
+      `:`
+      <th style="color:var(--accent2);background:color-mix(in srgb,var(--accent2) 8%,transparent)">🟢 صلاحية ≤30 يوم</th>
+      <th style="color:var(--accent3);background:color-mix(in srgb,var(--accent3) 8%,transparent)">🟡 صلاحية ≤60 يوم</th>
+      <th style="color:var(--red);background:color-mix(in srgb,var(--red) 8%,transparent)">🔴 صلاحية ≤90 يوم</th>
+      <th style="color:var(--purple);background:color-mix(in srgb,var(--purple) 8%,transparent)">⚫ صلاحية >90 يوم</th>
+      `}
+      <th>المستودع</th>
     </tr></thead>
     <tbody>${rows.map((r,i)=>{
       const qty=_n(r['الكمية']);
       const pct=(qty/totalInv*100).toFixed(2);
+      const v30 =exp30Col ?_n(r[exp30Col] ):null;
+      const v60 =exp60Col ?_n(r[exp60Col] ):null;
+      const v90 =exp90Col ?_n(r[exp90Col] ):null;
+      const v120=exp120Col?_n(r[exp120Col]):null;
+      // إذا لم توجد أعمدة في الملف نعرض خلايا فارغة قابلة للإدخال اليدوي
+      const cellExp=(val,color,icon)=>{
+        if(val===null)return `<td style="text-align:center;color:var(--muted);font-size:11px">—</td>`;
+        if(val===0)return `<td style="text-align:center;color:var(--muted);font-size:11px">—</td>`;
+        return `<td style="text-align:center">
+          <span style="
+            background:color-mix(in srgb,${color} 12%,transparent);
+            color:${color};font-weight:700;font-size:11px;
+            padding:2px 8px;border-radius:999px;
+            border:1px solid color-mix(in srgb,${color} 25%,transparent)
+          ">${fmt(val)}</span>
+        </td>`;
+      };
       return `<tr>
         <td class="td-num">${(PAG_STATE['inv'].page-1)*PAGE_SIZE+i+1}</td>
         <td class="td-num td-muted">${r['#']||''}</td>
-        <td style="max-width:250px;overflow:hidden;text-overflow:ellipsis">${r['المادة']||''}</td>
-        <td class="td-num td-accent" style="font-weight:700">${fmt(qty)}</td>
-        <td style="text-align:center">
+        <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;font-weight:600">${r['المادة']||''}</td>
+        <td class="td-num td-accent" style="font-weight:800">${fmt(qty)}</td>
+        <td style="min-width:100px">
           <div style="display:flex;align-items:center;gap:6px">
             <div style="flex:1;background:var(--surface2);border-radius:3px;height:5px;overflow:hidden">
               <div style="width:${Math.min(+pct*5,100)}%;height:100%;background:var(--accent);border-radius:3px"></div>
             </div>
-            <span style="font-size:10px;color:var(--muted);width:35px">${pct}%</span>
+            <span style="font-size:10px;color:var(--muted);width:35px;text-align:left">${pct}%</span>
           </div>
         </td>
-        <td style="color:var(--accent2)">${r['المستودع']||'—'}</td>
+        ${cellExp(v30,'var(--accent2)','🟢')}
+        ${cellExp(v60,'var(--accent3)','🟡')}
+        ${cellExp(v90,'var(--red)','🔴')}
+        ${cellExp(v120,'var(--purple)','⚫')}
+        <td style="color:var(--accent2);white-space:nowrap">${r['المستودع']||'—'}</td>
       </tr>`;
     }).join('')}</tbody>
+    <tfoot><tr style="background:var(--surface2);font-weight:700;font-size:11px;position:sticky;bottom:0">
+      <td colspan="4" style="padding:8px 13px;color:var(--text2)">📊 المجموع (${allInvRows.length} صنف)</td>
+      <td></td>
+      <td style="padding:8px 13px;text-align:center;color:var(--accent2)">${tExp30>0?fmt(tExp30):'—'}</td>
+      <td style="padding:8px 13px;text-align:center;color:var(--accent3)">${tExp60>0?fmt(tExp60):'—'}</td>
+      <td style="padding:8px 13px;text-align:center;color:var(--red)">${tExp90>0?fmt(tExp90):'—'}</td>
+      <td style="padding:8px 13px;text-align:center;color:var(--purple)">${tExp120>0?fmt(tExp120):'—'}</td>
+      <td></td>
+    </tr></tfoot>
   </table>`;
   renderPag('inv',_renderInvTable);
 }
