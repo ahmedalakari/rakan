@@ -3923,7 +3923,7 @@ function processNewData(type,rows){
     case 'sales':{
       // ── المرور الواحد على كل الصفوف ──
       const _cn=s=>String(s||'').replace(/^\uFEFF/,'').trim();
-      const _n=v=>{const n=parseFloat(String(v||'').replace(/,/g,''));return isNaN(n)?0:n};
+      const _n=v=>_parseNum(v);
       // كشف أعمدة مرن
       const hdrs=Object.keys(rows[0]||{});
       const _fc=(...ns)=>{for(const n of ns){const h=hdrs.find(h=>_cn(h)===n||_cn(h).includes(n));if(h)return h}return ns[0]};
@@ -4058,7 +4058,7 @@ function processNewData(type,rows){
       break;
     }
     case 'debt':{
-      const _n3=v=>{const n=parseFloat(String(v||'').replace(/,/g,''));return isNaN(n)?0:n};
+      const _n3=v=>_parseNum(v);
       const _c3=s=>String(s||'').trim();
       // بناء خريطة المناديب من ملف المديونية
       const repDebtMap={};
@@ -4088,12 +4088,8 @@ function processNewData(type,rows){
       break;
     }
     case 'aging':{
-      // دالة تحويل آمنة — تتعامل مع strings وأرقام وقيم null
-      const _nA=v=>{
-        if(v===null||v===undefined||v==='')return 0;
-        const n=parseFloat(String(v).replace(/,/g,'').trim());
-        return isNaN(n)?0:n;
-      };
+      // استخدام دالة التحليل العالمية التي تتعامل مع "لنا" و "علينا"
+      const _nA=v=>_parseNum(v);
       // الأعمدة الرقمية قد تكون كـ '30' أو 30 في الـ rows
       const agingCols=['10','15','30','60','90','120'];
       const bk={};
@@ -4898,23 +4894,45 @@ function _hideLoadingOverlay(){
   if(el)el.style.display='none';
 }
 
+// ── دالة تحليل الأرقام القوية — تتعامل مع "1,234.56 لنا" و "1,234.56 علينا" ──
+function _parseNum(v){
+  if(v===null||v===undefined||v==='')return 0;
+  const s=String(v)
+    .replace(/,/g,'')
+    .replace(/لنا|علينا|CR|DR/gi,'')
+    .replace(/[^\d.\-]/g,'')
+    .trim();
+  const n=parseFloat(s);
+  return isNaN(n)?0:n;
+}
+
 function csvToRows(text){
-  const lines=text.split('\n').filter(l=>l.trim());
+  // إزالة BOM + توحيد نهايات الأسطر
+  const clean=text.replace(/^\uFEFF/,'').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+  const lines=clean.split('\n').filter(l=>l.trim());
   if(!lines.length)return[];
-  const headers=parseCsvLine(lines[0]);
+  const headers=parseCsvLine(lines[0]).map(h=>h.trim().replace(/^\uFEFF/,''));
   return lines.slice(1).map(line=>{
     const vals=parseCsvLine(line);
     const row={};
-    headers.forEach((h,i)=>row[h.trim()]=vals[i]?.trim()||null);
+    headers.forEach((h,i)=>{
+      // trim القيمة وتحويل '' إلى null
+      const raw=vals[i]!==undefined?vals[i].trim():null;
+      row[h]=raw===''?null:raw;
+    });
     return row;
-  });
+  }).filter(r=>Object.values(r).some(v=>v!==null&&v!==''));
 }
+
 function parseCsvLine(line){
   const res=[];let cur='';let inQ=false;
   for(let i=0;i<line.length;i++){
-    if(line[i]==='"')inQ=!inQ;
-    else if(line[i]===','&&!inQ){res.push(cur);cur=''}
-    else cur+=line[i];
+    const ch=line[i];
+    if(ch==='"'){
+      if(inQ&&line[i+1]==='"'){cur+='"';i++;}
+      else inQ=!inQ;
+    } else if(ch===','&&!inQ){res.push(cur);cur='';}
+    else cur+=ch;
   }
   res.push(cur);return res;
 }
@@ -5701,7 +5719,7 @@ function _reprocessCollection(rows){
     if(D._custMap)_rebuildCustData();
     return;
   }
-  const _n2=v=>{const n=parseFloat(String(v||'').replace(/,/g,''));return isNaN(n)?0:n};
+  const _n2=v=>_parseNum(v);
   const _c=s=>String(s||'').trim();
 
   // ── فلترة صفوف السلف وبلا مندوب (غير حقيقية) ─────────────────────────────
@@ -5856,7 +5874,7 @@ function _reprocessDebt(rows){
     if(D._repMap)_rebuildRepData();
     return;
   }
-  const _n3=v=>{const n=parseFloat(String(v||'').replace(/,/g,''));return isNaN(n)?0:n};
+  const _n3=v=>_parseNum(v);
   const _c3=s=>String(s||'').trim();
   const repDebtMap={};
   const debtDetailArr=[];
