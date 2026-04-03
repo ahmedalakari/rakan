@@ -3914,7 +3914,25 @@ function _rebuildItemData(){
   D.top_products=Object.fromEntries(D.item_full.slice(0,20).map(p=>[p.name,p.ns]));
 }
 
+// ── تطبيع مفاتيح صفوف CSV: إزالة BOM والأحرف الخفية من أسماء الأعمدة ──
+function _normalizeRowKeys(rows){
+  if(!rows||!rows.length)return rows;
+  const firstKeys=Object.keys(rows[0]);
+  const needsNorm=firstKeys.some(k=>/[\uFEFF\u200B-\u200F\u202A-\u202E\u2060\u00A0]/.test(k)||k!==k.trim());
+  if(!needsNorm)return rows;
+  return rows.map(r=>{
+    const nr={};
+    Object.keys(r).forEach(k=>{
+      const nk=k.replace(/^\uFEFF/,'').replace(/[\u200B-\u200F\u202A-\u202E\u2060\u00A0]/g,'').trim();
+      nr[nk]=r[k];
+    });
+    return nr;
+  });
+}
+
 function processNewData(type,rows){
+  // تطبيع أسماء الأعمدة فور استلام البيانات (سواء من CSV أو Excel)
+  rows=_normalizeRowKeys(rows);
   _invalidatePageCache(); // مسح كاش الرسوم عند وصول بيانات جديدة
   // ── حفظ البيانات الخام للفلتر الشامل ──
   const _rawKey = type+'_table';
@@ -3922,11 +3940,16 @@ function processNewData(type,rows){
   switch(type){
     case 'sales':{
       // ── المرور الواحد على كل الصفوف ──
-      const _cn=s=>String(s||'').replace(/^\uFEFF/,'').trim();
+      // تطبيع أسماء الأعمدة: إزالة BOM والأحرف الخفية والمسافات الزائدة
+      const _cn=s=>String(s||'').replace(/^\uFEFF/,'').replace(/[\u200B-\u200F\u202A-\u202E\u2060\u00A0]/g,'').trim();
       const _n=v=>_parseNum(v);
-      // كشف أعمدة مرن
-      const hdrs=Object.keys(rows[0]||{});
-      const _fc=(...ns)=>{for(const n of ns){const h=hdrs.find(h=>_cn(h)===n||_cn(h).includes(n));if(h)return h}return ns[0]};
+      // كشف أعمدة مرن — مع تطبيع أسماء الأعمدة الفعلية
+      const hdrs=Object.keys(rows[0]||{}).map(h=>_cn(h));
+      // إعادة تطبيع مفاتيح كل صف بالأعمدة المنظّفة
+      if(rows.length&&Object.keys(rows[0]).some(k=>k!==_cn(k))){
+        rows.forEach((r,i)=>{const nr={};Object.keys(r).forEach(k=>{nr[_cn(k)]=r[k];});rows[i]=nr;});
+      }
+      const _fc=(...ns)=>{for(const n of ns){const h=hdrs.find(h=>h===n||h.includes(n));if(h)return h}return ns[0]};
       const kInv=_fc('رقم الفاتورة','الفاتورة');
       const kType=_fc('النوع','نوع');
       const kMat=_fc('المادة','الصنف','المنتج');
@@ -4080,9 +4103,10 @@ function processNewData(type,rows){
       }
       D._repDebtMap=repDebtMap;
       D._debtDetailArr=debtDetailArr;
-      D.kpis.total_debt=rows.reduce((s,r)=>s+_n3(r['الرصيد']||r['رصيد حالي مدين']||0),0);
+      // جمع الأرصدة الموجبة فقط (لنا) وتجاهل الصفوف السالبة (علينا)
+      D.kpis.total_debt=rows.reduce((s,r)=>{const v=_n3(r['الرصيد']||r['رصيد حالي مدين']||0);return s+(v>0?v:0);},0);
       const sorted=[...rows].sort((a,b)=>_n3(b['الرصيد']||b['رصيد حالي مدين'])-_n3(a['الرصيد']||a['رصيد حالي مدين']));
-      D.top_debtors=Object.fromEntries(sorted.slice(0,20).map(r=>[r['اسم الحساب']||r['اسم العميل']||'',_n3(r['الرصيد']||r['رصيد حالي مدين']||0)]));
+      D.top_debtors=Object.fromEntries(sorted.filter(r=>_n3(r['الرصيد']||r['رصيد حالي مدين']||0)>0).slice(0,20).map(r=>[r['اسم الحساب']||r['اسم العميل']||'',_n3(r['الرصيد']||r['رصيد حالي مدين']||0)]));
       D.debt_table=rows;
       _rebuildRepData();
       break;
@@ -4126,9 +4150,9 @@ function processNewData(type,rows){
     }
     case 'inventory':{
       const byWh={};
-      rows.forEach(r=>{const w=r['المستودع']||'غير محدد';const v=+r['الكمية']||0;byWh[w]=(byWh[w]||0)+v});
+      rows.forEach(r=>{const w=String(r['المستودع']||'غير محدد').trim();const v=_parseNum(r['الكمية']);byWh[w]=(byWh[w]||0)+v});
       D.inventory_by_warehouse=Object.fromEntries(Object.entries(byWh).sort((a,b)=>b[1]-a[1]));
-      D.kpis.total_inventory=rows.reduce((s,r)=>s+(+r['الكمية']||0),0);
+      D.kpis.total_inventory=rows.reduce((s,r)=>s+_parseNum(r['الكمية']),0);
       D.inventory_table=rows;
       break;
     }
@@ -4458,6 +4482,9 @@ async function _autoSyncQuiet(){
       if(!resp.ok)throw new Error(`HTTP ${resp.status}`);
       const text=await resp.text();
       if(!text||text.trim().length<10)throw new Error('بيانات فارغة');
+      // كشف صفحة HTML (خطأ Google Sheets بدلاً من CSV حقيقي)
+      if(text.trim().startsWith('<!DOCTYPE')||text.trim().startsWith('<html'))
+        throw new Error('الرابط يُعيد صفحة HTML وليس CSV — تأكد من المشاركة العامة');
       // تحديث الأيقونة عند النجاح
       const ic=document.getElementById(iconMap[key]);
       if(ic)ic.className='ld-icon-box loaded';
@@ -4522,6 +4549,9 @@ async function syncGoogleSheets(){
       const resp=await fetch(url+'&t='+Date.now());
       if(!resp.ok)throw new Error(`HTTP ${resp.status}`);
       const text=await resp.text();
+      if(!text||text.trim().length<10)throw new Error('بيانات فارغة');
+      if(text.trim().startsWith('<!DOCTYPE')||text.trim().startsWith('<html'))
+        throw new Error('الرابط يُعيد صفحة HTML — تأكد من المشاركة العامة');
       return {key, rows: csvToRows(text)};
     })
   );
@@ -4896,45 +4926,75 @@ function _hideLoadingOverlay(){
 
 // ── دالة تحليل الأرقام القوية — تتعامل مع "1,234.56 لنا" و "1,234.56 علينا" ──
 function _parseNum(v){
-  if(v===null||v===undefined||v==='')return 0;
-  const s=String(v)
-    .replace(/,/g,'')
-    .replace(/لنا|علينا|CR|DR/gi,'')
+  if(v===null||v===undefined)return 0;
+  let s=String(v)
+    // إزالة BOM وأحرف Unicode غير المرئية والمسافات الخاصة
+    .replace(/^\uFEFF/,'')
+    .replace(/[\u200B-\u200F\u202A-\u202E\u2060\uFEFF\u00A0]/g,'')
+    .trim();
+  if(s==='')return 0;
+  // دعم الأرقام السالبة بصيغة القوسين: (500) → -500
+  const negParen=/^\(([0-9,.\s]+)\)$/.exec(s);
+  if(negParen) s='-'+negParen[1];
+  s=s
+    // إزالة الكلمات المحاسبية العربية والإنجليزية
+    .replace(/لنا|علينا|مدين|دائن|CR|DR|debit|credit/gi,'')
+    // إزالة فواصل الآلاف (فاصلة عادية أو فاصلة عربية ،)
+    .replace(/[,،]/g,'')
+    // إبقاء الأرقام والنقطة العشرية والإشارة السالبة فقط
     .replace(/[^\d.\-]/g,'')
     .trim();
+  if(s===''||s==='-'||s==='.')return 0;
   const n=parseFloat(s);
   return isNaN(n)?0:n;
 }
 
 function csvToRows(text){
-  // إزالة BOM + توحيد نهايات الأسطر
-  const clean=text.replace(/^\uFEFF/,'').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+  // إزالة BOM + توحيد نهايات الأسطر + أحرف Unicode غير المرئية
+  const clean=text
+    .replace(/^\uFEFF/,'')
+    .replace(/[\u200B-\u200F\u202A-\u202E\u2060]/g,'')
+    .replace(/\r\n/g,'\n')
+    .replace(/\r/g,'\n');
   const lines=clean.split('\n').filter(l=>l.trim());
   if(!lines.length)return[];
-  const headers=parseCsvLine(lines[0]).map(h=>h.trim().replace(/^\uFEFF/,''));
+  const delim=_detectDelimiter(lines[0]);
+  const headers=parseCsvLine(lines[0],delim).map(h=>h.trim().replace(/^\uFEFF/,'').replace(/[\u200B-\u200F\u202A-\u202E\u2060]/g,''));
   return lines.slice(1).map(line=>{
-    const vals=parseCsvLine(line);
+    const vals=parseCsvLine(line,delim);
     const row={};
     headers.forEach((h,i)=>{
-      // trim القيمة وتحويل '' إلى null
-      const raw=vals[i]!==undefined?vals[i].trim():null;
-      row[h]=raw===''?null:raw;
+      // تنظيف القيمة من أحرف Unicode الخفية والمسافات غير القياسية
+      let raw=vals[i]!==undefined
+        ? vals[i].replace(/[\u200B-\u200F\u202A-\u202E\u2060\u00A0]/g,' ').trim()
+        : null;
+      row[h]=(raw===null||raw==='')?null:raw;
     });
     return row;
   }).filter(r=>Object.values(r).some(v=>v!==null&&v!==''));
 }
 
-function parseCsvLine(line){
+function parseCsvLine(line, delim){
+  // اكتشاف الفاصل تلقائياً إن لم يُحدَّد: فاصلة منقوطة أو فاصلة عادية
+  if(!delim) delim=',';
   const res=[];let cur='';let inQ=false;
   for(let i=0;i<line.length;i++){
     const ch=line[i];
     if(ch==='"'){
       if(inQ&&line[i+1]==='"'){cur+='"';i++;}
       else inQ=!inQ;
-    } else if(ch===','&&!inQ){res.push(cur);cur='';}
+    } else if(ch===delim&&!inQ){res.push(cur);cur='';}
     else cur+=ch;
   }
   res.push(cur);return res;
+}
+
+// اكتشاف الفاصل المستخدم في ملف CSV
+function _detectDelimiter(text){
+  const firstLine=(text.replace(/^\uFEFF/,'').split('\n')[0]||'');
+  const commas=(firstLine.match(/,/g)||[]).length;
+  const semicolons=(firstLine.match(/;/g)||[]).length;
+  return semicolons>commas?';':',';
 }
 
 // ══════════════════════════════════════════════════════
