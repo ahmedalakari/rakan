@@ -1,645 +1,1111 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لوحة التحليل الاستراتيجي — الندى</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="./1_files/chart.umd.min.js.تنزيل"></script>
+<script src="./1_files/chartjs-plugin-datalabels.min.js.تنزيل"></script>
+<script src="./1_files/xlsx.full.min.js.تنزيل"></script>
+<script src="./1_files/exceljs.min.js.تنزيل"></script>
 <style>
 /* ══════════════════════════════════════════════
-   THEME VARIABLES — Light mode (default)
+   DESIGN SYSTEM — Impeccable Principles
+   Direction: Refined Minimal × Editorial
+   Anti-patterns avoided:
+   - No Inter/system fonts → IBM Plex Arabic
+   - No purple-blue gradients → Slate + Indigo accent
+   - No card-on-card chaos → clean spatial rhythm
+   - No generic shadows → precise elevation
 ══════════════════════════════════════════════ */
-:root{
-  --bg:#f0f4f8;--surface:#ffffff;--surface2:#f7f9fc;--surface3:#eef2f7;
-  --border:#dde3ec;--border2:#c8d2e0;
-  --accent:#1a6ef5;--accent2:#0ab87a;--accent3:#f5820a;--gold:#d4a017;
-  --red:#e53e3e;--purple:#7c3aed;--pink:#db2777;
-  --text:#1a2332;--text2:#4a5568;--muted:#8a95a3;
-  --r-sm:6px;--r-md:8px;--r-lg:12px;--r-xl:16px;
-  --gap:16px;--nav-w:220px;
-  --shadow:0 1px 4px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);
-  --shadow-lg:0 4px 24px rgba(0,0,0,.10);
-}
-/* Dark mode */
-body.dark{
-  --bg:#0b1220;--surface:#111928;--surface2:#162033;--surface3:#1c2a42;
-  --border:#1e3350;--border2:#2a4570;
-  --accent:#3b8ef8;--accent2:#10c981;--accent3:#f97316;--gold:#f0b429;
-  --red:#f87171;--purple:#a78bfa;--pink:#f472b6;
-  --text:#e2e8f2;--text2:#8fa8c0;--muted:#4f6882;
-  --shadow:0 1px 4px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
-  --shadow-lg:0 4px 24px rgba(0,0,0,.4);
+
+:root {
+  /* Palette — cool slate with warm amber accent */
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --surface2: #f0f2f5;
+  --surface3: #e8ebf0;
+  --border: rgba(0,0,0,.07);
+  --border-md: rgba(0,0,0,.12);
+
+  /* Accent — Indigo, not the clichéd blue */
+  --accent: #4f46e5;
+  --accent-light: rgba(79,70,229,.08);
+  --accent-mid: rgba(79,70,229,.2);
+
+  /* Status */
+  --green: #059669;
+  --green-light: rgba(5,150,105,.1);
+  --red: #dc2626;
+  --red-light: rgba(220,38,38,.08);
+  --amber: #d97706;
+  --amber-light: rgba(217,119,6,.1);
+  --violet: #7c3aed;
+  --violet-light: rgba(124,58,237,.1);
+
+  /* Text — high contrast, no grey soup */
+  --text: #0f172a;
+  --text2: #475569;
+  --muted: #94a3b8;
+
+  /* Layout */
+  --nav-w: 228px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --gap: 16px;
+
+  /* Typography */
+  --font: 'IBM Plex Sans Arabic', 'Cairo', system-ui, sans-serif;
+
+  /* Shadows — precise, not blown-out */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.05), 0 1px 8px rgba(0,0,0,.04);
+  --shadow: 0 2px 4px rgba(0,0,0,.04), 0 4px 20px rgba(0,0,0,.06);
 }
 
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{
-  background:var(--bg);color:var(--text);
-  font-family:'Cairo',sans-serif;font-size:13px;line-height:1.6;
-  min-height:100vh;direction:rtl;
-  transition:background .25s,color .25s;
+body.dark {
+  --bg: #090e1a;
+  --surface: #0f1623;
+  --surface2: #151e2f;
+  --surface3: #1a2540;
+  --border: rgba(255,255,255,.06);
+  --border-md: rgba(255,255,255,.12);
+
+  --accent: #6366f1;
+  --accent-light: rgba(99,102,241,.1);
+  --accent-mid: rgba(99,102,241,.25);
+
+  --green: #10b981;
+  --green-light: rgba(16,185,129,.12);
+  --red: #f87171;
+  --red-light: rgba(248,113,113,.1);
+  --amber: #fbbf24;
+  --amber-light: rgba(251,191,36,.1);
+  --violet: #a78bfa;
+  --violet-light: rgba(167,139,250,.1);
+
+  --text: #e2e8f0;
+  --text2: #94a3b8;
+  --muted: #475569;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.3);
+  --shadow: 0 2px 4px rgba(0,0,0,.2), 0 4px 20px rgba(0,0,0,.3);
+}
+
+*,*::before,*::after { margin:0;padding:0;box-sizing:border-box }
+html { scroll-behavior:smooth }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  line-height: 1.6;
+  min-height: 100vh;
+  direction: rtl;
+  transition: background .2s, color .2s;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* ══════════════════════════════════════════════
-   SIDEBAR
+   SIDEBAR — Refined, editorial
 ══════════════════════════════════════════════ */
-#sidebar{
-  position:fixed;top:0;right:0;width:var(--nav-w);height:100vh;
-  background:var(--surface);border-left:1px solid var(--border);
-  display:flex;flex-direction:column;z-index:200;overflow:hidden;
-  transition:width .3s ease;box-shadow:var(--shadow);
+#sidebar {
+  position: fixed;
+  top: 0; right: 0;
+  width: var(--nav-w);
+  height: 100vh;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 200;
+  overflow: hidden;
+  transition: width .28s cubic-bezier(.4,0,.2,1);
 }
-#sidebar.collapsed{width:54px}
-.sidebar-header{
-  padding:14px 12px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:10px;min-height:60px;
-}
-.sidebar-logo{
-  width:30px;height:30px;border-radius:8px;flex-shrink:0;
-  background:var(--accent);
-  display:flex;align-items:center;justify-content:center;
-  font-weight:900;font-size:13px;color:#fff;
-}
-.sidebar-title{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;transition:opacity .2s;color:var(--text)}
-#sidebar.collapsed .sidebar-title{opacity:0;pointer-events:none}
-.sidebar-toggle{
-  margin-right:auto;background:none;border:none;color:var(--muted);
-  cursor:pointer;font-size:15px;padding:4px;flex-shrink:0;
-  transition:transform .3s,color .2s;
-}
-.sidebar-toggle:hover{color:var(--accent)}
-#sidebar.collapsed .sidebar-toggle{transform:rotate(180deg)}
+#sidebar.collapsed { width: 56px }
 
-.nav-section{padding:12px 12px 4px;font-size:10px;color:var(--muted);font-weight:700;
-  letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;overflow:hidden;
-  transition:opacity .2s}
-#sidebar.collapsed .nav-section{opacity:0}
-.nav-item{
-  display:flex;align-items:center;gap:10px;padding:8px 12px;
-  cursor:pointer;border-radius:var(--r-md);margin:1px 6px;
-  color:var(--text2);font-weight:600;font-size:12px;
-  transition:all .15s;white-space:nowrap;overflow:hidden;
-  border:1px solid transparent;
+.sidebar-header {
+  padding: 18px 14px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 64px;
 }
-.nav-item:hover{background:var(--surface2);color:var(--text)}
-.nav-item.active{
-  background:color-mix(in srgb,var(--accent) 10%,transparent);
-  color:var(--accent);border-color:color-mix(in srgb,var(--accent) 25%,transparent);
+.sidebar-logo {
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  background: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px; color: #fff;
+  flex-shrink: 0;
+  letter-spacing: -.5px;
 }
-.nav-item .icon{font-size:15px;flex-shrink:0;width:20px;text-align:center}
-.nav-label{transition:opacity .2s}
-#sidebar.collapsed .nav-label{opacity:0;pointer-events:none}
+.sidebar-title {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  transition: opacity .2s;
+}
+#sidebar.collapsed .sidebar-title { opacity: 0; pointer-events: none }
 
-.sidebar-footer{margin-top:auto;padding:10px 6px;border-top:1px solid var(--border);}
-.sync-status{
-  display:flex;align-items:center;gap:8px;padding:7px 10px;
-  border-radius:var(--r-md);background:var(--surface2);font-size:11px;
-  white-space:nowrap;overflow:hidden;
+.sidebar-toggle {
+  margin-right: auto;
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 5px;
+  flex-shrink: 0;
+  transition: transform .28s, color .15s;
+  border-radius: 6px;
 }
-.status-dot{width:7px;height:7px;border-radius:50%;background:var(--accent2);flex-shrink:0;
-  animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.sidebar-toggle:hover { color: var(--accent); background: var(--accent-light) }
+#sidebar.collapsed .sidebar-toggle { transform: rotate(180deg) }
+
+/* Nav sections */
+.nav-section {
+  padding: 16px 14px 6px;
+  font-size: 9.5px;
+  color: var(--muted);
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: opacity .2s;
+}
+#sidebar.collapsed .nav-section { opacity: 0 }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  cursor: pointer;
+  border-radius: 8px;
+  margin: 1px 6px;
+  color: var(--text2);
+  font-weight: 500;
+  font-size: 12.5px;
+  transition: all .15s;
+  white-space: nowrap;
+  overflow: hidden;
+  border: 1px solid transparent;
+  position: relative;
+}
+.nav-item:hover { background: var(--surface2); color: var(--text) }
+.nav-item.active {
+  background: var(--accent-light);
+  color: var(--accent);
+  border-color: var(--accent-mid);
+  font-weight: 600;
+}
+.nav-item .icon {
+  font-size: 15px;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+.nav-label { transition: opacity .2s }
+#sidebar.collapsed .nav-label { opacity: 0; pointer-events: none }
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 12px 8px;
+  border-top: 1px solid var(--border);
+}
+.sync-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--surface2);
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  color: var(--text2);
+}
+.status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  flex-shrink: 0;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
 
 /* ══════════════════════════════════════════════
-   MAIN + TOPBAR
+   TOPBAR
 ══════════════════════════════════════════════ */
-#main{margin-right:var(--nav-w);min-height:100vh;transition:margin-right .3s ease;}
-body.nav-collapsed #main{margin-right:54px}
+#main { margin-right: var(--nav-w); min-height: 100vh; transition: margin-right .28s cubic-bezier(.4,0,.2,1) }
+body.nav-collapsed #main { margin-right: 56px }
 
-#topbar{
-  position:sticky;top:0;z-index:100;
-  background:var(--surface);border-bottom:1px solid var(--border);
-  padding:0 20px;height:54px;
-  display:flex;align-items:center;gap:12px;
-  box-shadow:var(--shadow);
+#topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-.page-title{font-size:14px;font-weight:700;color:var(--text)}
-.topbar-right{margin-right:auto;display:flex;align-items:center;gap:8px}
-
-/* Dark mode toggle button */
-#theme-toggle{
-  background:var(--surface2);border:1px solid var(--border2);
-  color:var(--text2);border-radius:var(--r-md);
-  width:34px;height:34px;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;font-size:15px;transition:all .2s;flex-shrink:0;
+.page-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -.2px;
 }
-#theme-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.topbar-right { margin-right: auto; display: flex; align-items: center; gap: 8px }
 
-.btn{
-  display:inline-flex;align-items:center;gap:5px;padding:6px 12px;
-  border-radius:var(--r-md);border:1px solid var(--border2);
-  background:var(--surface2);color:var(--text2);font-family:'Cairo',sans-serif;
-  font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;
+#theme-toggle {
+  background: var(--surface2);
+  border: 1px solid var(--border-md);
+  color: var(--text2);
+  border-radius: 8px;
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 15px;
+  transition: all .15s;
 }
-.btn:hover{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,transparent)}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-.btn.primary:hover{opacity:.9}
-.btn.danger{border-color:color-mix(in srgb,var(--red) 35%,transparent);color:var(--red)}
-.btn.success{border-color:color-mix(in srgb,var(--accent2) 35%,transparent);color:var(--accent2)}
-.btn.success:hover{background:color-mix(in srgb,var(--accent2) 8%,transparent)}
-.last-update{font-size:11px;color:var(--muted);white-space:nowrap}
+#theme-toggle:hover { border-color: var(--accent); color: var(--accent) }
 
-/* filter bar btn override */
-.card .filter-bar .btn{
-  padding:5px 9px;font-size:11px;min-width:auto;
-  background:transparent;border-color:var(--border);color:var(--muted);
-  border-radius:var(--r-sm);gap:4px;
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 13px;
+  border-radius: 8px;
+  border: 1px solid var(--border-md);
+  background: var(--surface2);
+  color: var(--text2);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
 }
-.card .filter-bar .btn:hover{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,transparent)}
-.reset-icon{display:inline-block;transition:transform .4s cubic-bezier(.34,1.56,.64,1);width:14px;height:14px;vertical-align:middle}
-.card .filter-bar .btn:hover .reset-icon{transform:rotate(-180deg)}
-
-/* ══════════════════════════════════════════════
-   CONTENT
-══════════════════════════════════════════════ */
-.page{display:none;padding:20px}
-.page.active{display:block}
-
-/* ══════════════════════════════════════════════
-   KPI CARDS
-══════════════════════════════════════════════ */
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:var(--gap);margin-bottom:var(--gap)}
-.kpi-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);
-  padding:18px 20px 14px;position:relative;overflow:hidden;
-  transition:transform .2s,box-shadow .2s,border-color .2s;cursor:default;
-  display:flex;flex-direction:column;box-shadow:var(--shadow);
-}
-.kpi-card:hover{transform:translateY(-2px);border-color:var(--kpi-color,var(--accent));box-shadow:var(--shadow-lg)}
-.kpi-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  background:var(--kpi-color,var(--accent));opacity:.7;
-}
-.kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.kpi-icon{
-  font-size:18px;width:36px;height:36px;border-radius:9px;
-  background:color-mix(in srgb,var(--kpi-color,var(--accent)) 12%,transparent);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
-.kpi-label{font-size:11px;color:var(--text2);font-weight:600;letter-spacing:.3px;margin-bottom:5px}
-.kpi-value{font-size:clamp(14px,2vw,24px);font-weight:800;color:var(--kpi-color,var(--accent));line-height:1.1;letter-spacing:-.5px}
-.kpi-sub{font-size:11px;color:var(--muted);margin-top:6px;border-top:1px solid var(--border);padding-top:6px}
-.kpi-badge{font-size:10px;padding:2px 7px;border-radius:999px;font-weight:700;
-  background:color-mix(in srgb,var(--accent2) 14%,transparent);
-  color:var(--accent2);border:1px solid color-mix(in srgb,var(--accent2) 28%,transparent)}
-
-/* ══════════════════════════════════════════════
-   GRID LAYOUTS
-══════════════════════════════════════════════ */
-.section-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.section-title span{color:var(--accent);font-size:15px}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);margin-bottom:var(--gap)}
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--gap);margin-bottom:var(--gap)}
-.grid-65{display:grid;grid-template-columns:1.6fr 1fr;gap:var(--gap);margin-bottom:var(--gap)}
-.grid-56{display:grid;grid-template-columns:1fr 1.6fr;gap:var(--gap);margin-bottom:var(--gap)}
-@media(max-width:1100px){.grid-2,.grid-3,.grid-65,.grid-56{grid-template-columns:1fr}}
-
-/* ══════════════════════════════════════════════
-   CARD
-══════════════════════════════════════════════ */
-.card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r-xl);padding:18px;
-  display:flex;flex-direction:column;gap:12px;
-  box-shadow:var(--shadow);
-}
-.card-header{display:flex;align-items:center;justify-content:space-between}
-.card-title{font-size:13px;font-weight:700;color:var(--text)}
-.chart-wrap{position:relative;height:240px}
-.chart-wrap.tall{height:300px}
-.chart-wrap.short{height:180px}
-
-/* ══════════════════════════════════════════════
-   FILTER BAR
-══════════════════════════════════════════════ */
-.filter-bar{
-  display:flex;flex-wrap:wrap;gap:8px;
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:var(--r-lg);padding:10px 14px;margin-bottom:var(--gap);
-  align-items:center;
-}
-.card .filter-bar{background:transparent;border:none;border-top:1px solid var(--border);border-radius:0;margin:0;padding:8px 14px;margin-bottom:0}
-.filter-bar select,.filter-bar input{
-  background:var(--surface);border:1px solid var(--border2);
-  border-radius:var(--r-md);color:var(--text);font-family:'Cairo',sans-serif;
-  font-size:12px;padding:6px 11px;min-width:120px;outline:none;transition:border-color .2s;
-}
-.filter-bar input[type="date"]{min-width:130px}
-.filter-bar input[type="text"]{min-width:130px}
-.filter-bar select:focus,.filter-bar input:focus{border-color:var(--accent)}
-.filter-bar option{background:var(--surface)}
-.filter-label{font-size:11px;color:var(--text2);font-weight:600;white-space:nowrap}
-
-/* ══════════════════════════════════════════════
-   TABLE
-══════════════════════════════════════════════ */
-.table-wrap{overflow-x:auto;border-radius:var(--r-lg);border:1px solid var(--border);max-height:460px}
-table{width:100%;border-collapse:collapse;font-size:12px}
-thead tr{background:var(--surface2);position:sticky;top:0;z-index:2}
-thead th{padding:9px 13px;text-align:right;color:var(--text2);font-weight:700;font-size:11px;border-bottom:1px solid var(--border);white-space:nowrap}
-tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
-tbody tr:hover{background:var(--surface2)}
-tbody td{padding:8px 13px;color:var(--text);white-space:nowrap}
-tbody tr:last-child{border-bottom:none}
-.td-num{font-weight:700;font-variant-numeric:tabular-nums}
-.td-accent{color:var(--accent);font-weight:700}
-.td-green{color:var(--accent2)}
-.td-red{color:var(--red)}
-.td-gold{color:var(--gold)}
-.td-muted{color:var(--muted)}
-.badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:10px;font-weight:700}
-.badge-sale{background:color-mix(in srgb,var(--accent2) 12%,transparent);color:var(--accent2);border:1px solid color-mix(in srgb,var(--accent2) 22%,transparent)}
-.badge-ret{background:color-mix(in srgb,var(--red) 12%,transparent);color:var(--red);border:1px solid color-mix(in srgb,var(--red) 22%,transparent)}
-.badge-warn{background:color-mix(in srgb,var(--gold) 12%,transparent);color:var(--gold);border:1px solid color-mix(in srgb,var(--gold) 22%,transparent)}
-
-.table-pagination{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:9px 13px;background:var(--surface);border:1px solid var(--border);
-  border-top:none;border-radius:0 0 var(--r-lg) var(--r-lg);font-size:11px;color:var(--text2);
-}
-.pag-btns{display:flex;gap:5px}
-.pag-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--text2);border-radius:var(--r-sm);padding:3px 9px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:11px;transition:all .15s}
-.pag-btn:hover,.pag-btn.active{border-color:var(--accent);color:var(--accent)}
-.pag-btn:disabled{opacity:.3;pointer-events:none}
-
-/* ══════════════════════════════════════════════
-   UPLOAD MODAL
-══════════════════════════════════════════════ */
-#upload-modal{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);align-items:center;justify-content:center}
-#upload-modal.open{display:flex}
-.modal-box{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-xl);width:min(600px,95vw);max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
-.modal-header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.modal-title{font-size:14px;font-weight:700}
-.modal-close{background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;line-height:1;transition:color .2s}
-.modal-close:hover{color:var(--red)}
-.modal-body{padding:22px}
-.modal-tabs{display:flex;gap:4px;margin-bottom:18px;background:var(--surface2);padding:4px;border-radius:var(--r-md)}
-.modal-tab{flex:1;text-align:center;padding:7px;border-radius:var(--r-sm);cursor:pointer;font-size:12px;font-weight:600;color:var(--text2);transition:all .2s}
-.modal-tab.active{background:var(--surface);color:var(--accent);box-shadow:var(--shadow)}
-.modal-panel{display:none}
-.modal-panel.active{display:block}
-
-.upload-zone{border:2px dashed var(--border2);border-radius:var(--r-lg);padding:28px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:14px}
-.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 5%,transparent)}
-.upload-zone .icon{font-size:32px;margin-bottom:8px}
-.upload-zone p{color:var(--text2);font-size:12px}
-.upload-zone strong{color:var(--accent)}
-.file-list{display:flex;flex-direction:column;gap:8px}
-.file-item{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-md);font-size:12px}
-.file-item .fi-icon{font-size:17px;flex-shrink:0}
-.file-item .fi-name{flex:1;color:var(--text)}
-.file-item .fi-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px}
-.fi-ok{background:color-mix(in srgb,var(--accent2) 12%,transparent);color:var(--accent2)}
-.fi-err{background:color-mix(in srgb,var(--red) 12%,transparent);color:var(--red)}
-.fi-wait{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent)}
-
-.gs-input{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-md);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;padding:9px 13px;outline:none;margin-bottom:10px}
-.gs-input:focus{border-color:var(--accent)}
-.gs-help{font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.8}
-.gs-help code{background:var(--surface2);padding:1px 6px;border-radius:4px;color:var(--accent);font-family:monospace}
-
-/* ══════════════════════════════════════════════
-   PROGRESS + DROPZONE
-══════════════════════════════════════════════ */
-.progress-bar-wrap{background:var(--surface2);border-radius:999px;height:5px;overflow:hidden}
-.progress-bar{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .5s ease;width:0}
-
-#smart-dropzone{border:2px dashed var(--border2);border-radius:var(--r-xl);padding:32px 22px;text-align:center;cursor:pointer;transition:all .25s;background:var(--surface2);position:relative;overflow:hidden}
-#smart-dropzone:hover,#smart-dropzone.drag-over{border-color:var(--accent);border-style:solid;background:color-mix(in srgb,var(--accent) 5%,transparent)}
-#smart-dropzone.drag-over::after{content:'اتركها الآن ✨';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent);border-radius:var(--r-xl)}
-.sdz-folder{font-size:40px;margin-bottom:10px;animation:float 3s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-.sdz-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px}
-.sdz-sub{font-size:12px;color:var(--text2);line-height:1.6}
-
-.sdz-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:12px 8px;text-align:center;transition:all .25s}
-.sdz-card.loaded{border-color:color-mix(in srgb,var(--accent2) 40%,transparent);background:color-mix(in srgb,var(--accent2) 6%,transparent)}
-.sdz-card.loading{border-color:color-mix(in srgb,var(--accent) 40%,transparent);background:color-mix(in srgb,var(--accent) 6%,transparent);animation:cardPulse 1s infinite}
-.sdz-card.error{border-color:color-mix(in srgb,var(--red) 40%,transparent);background:color-mix(in srgb,var(--red) 6%,transparent)}
-.sdz-card.unknown{border-color:color-mix(in srgb,var(--accent3) 40%,transparent);background:color-mix(in srgb,var(--accent3) 6%,transparent)}
-@keyframes cardPulse{0%,100%{opacity:1}50%{opacity:.6}}
-.scard-icon{font-size:20px;margin-bottom:4px}
-.scard-name{font-size:11px;color:var(--text2);font-weight:700;margin-bottom:4px}
-.scard-status{font-size:10px;color:var(--muted);line-height:1.4;min-height:26px}
-.sdz-card.loaded .scard-status{color:var(--accent2)}
-.sdz-card.loading .scard-status{color:var(--accent)}
-.sdz-card.error .scard-status{color:var(--red)}
-.sdz-card.unknown .scard-status{color:var(--accent3)}
-@media(max-width:600px){#sdz-cards{grid-template-columns:repeat(3,1fr)}}
-
-/* ══════════════════════════════════════════════
-   TOAST
-══════════════════════════════════════════════ */
-#toast-container{position:fixed;bottom:20px;left:20px;z-index:9999;display:flex;flex-direction:column;gap:7px}
-.toast{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-lg);padding:11px 16px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:10px;min-width:240px;box-shadow:var(--shadow-lg);animation:slideIn .25s ease}
-@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.toast.success{border-color:color-mix(in srgb,var(--accent2) 35%,transparent);color:var(--accent2)}
-.toast.error{border-color:color-mix(in srgb,var(--red) 35%,transparent);color:var(--red)}
-.toast.info{border-color:color-mix(in srgb,var(--accent) 35%,transparent);color:var(--accent)}
+.btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light) }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600 }
+.btn.primary:hover { opacity: .9 }
+.btn.danger { border-color: var(--red-light); color: var(--red) }
+.btn.danger:hover { background: var(--red-light) }
+.btn.success { border-color: var(--green-light); color: var(--green) }
+.btn.success:hover { background: var(--green-light) }
+.last-update { font-size: 11px; color: var(--muted); white-space: nowrap }
 
 /* ══════════════════════════════════════════════
    GLOBAL FILTER BAR
 ══════════════════════════════════════════════ */
-#global-filter-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:8px 20px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;position:sticky;top:54px;z-index:99;transition:all .3s}
-#global-filter-bar.hidden{display:none}
-.gf-label{font-size:11px;color:var(--accent);font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:5px}
-.gf-select,.gf-input{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-md);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;padding:5px 10px;outline:none;transition:border-color .2s;height:30px}
-.gf-select:focus,.gf-input:focus{border-color:var(--accent)}
-.gf-select option{background:var(--surface)}
-.gf-date-wrap{display:flex;align-items:center;gap:6px}
-.gf-sep{color:var(--muted);font-size:11px}
-.gf-active-badge{background:color-mix(in srgb,var(--accent) 15%,transparent);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);color:var(--accent);border-radius:999px;font-size:10px;font-weight:700;padding:2px 9px;white-space:nowrap;display:none}
-.gf-active-badge.visible{display:inline-block}
-#gf-toggle-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--text2);border-radius:var(--r-md);padding:5px 11px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:12px;font-weight:600;transition:all .2s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
-#gf-toggle-btn:hover{border-color:var(--accent);color:var(--accent)}
-#gf-toggle-btn.active{border-color:color-mix(in srgb,var(--accent) 40%,transparent);color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
+#global-filter-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  position: sticky;
+  top: 56px;
+  z-index: 99;
+}
+#global-filter-bar.hidden { display: none }
+.gf-label {
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 600;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.gf-select,.gf-input {
+  background: var(--surface2);
+  border: 1px solid var(--border-md);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 12px;
+  padding: 5px 10px;
+  outline: none;
+  height: 30px;
+  transition: border-color .15s;
+}
+.gf-select:focus,.gf-input:focus { border-color: var(--accent) }
+.gf-select option { background: var(--surface) }
+.gf-date-wrap { display: flex; align-items: center; gap: 6px }
+.gf-sep { color: var(--muted); font-size: 11px }
+.gf-active-badge {
+  background: var(--accent-light);
+  border: 1px solid var(--accent-mid);
+  color: var(--accent);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  white-space: nowrap;
+  display: none;
+}
+.gf-active-badge.visible { display: inline-block }
+
+#gf-toggle-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border-md);
+  color: var(--text2);
+  border-radius: 8px;
+  padding: 5px 11px;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 500;
+  transition: all .15s;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+#gf-toggle-btn:hover { border-color: var(--accent); color: var(--accent) }
+#gf-toggle-btn.active { border-color: var(--accent-mid); color: var(--accent); background: var(--accent-light) }
+
+/* ══════════════════════════════════════════════
+   PAGES
+══════════════════════════════════════════════ */
+.page { display: none; padding: 20px }
+.page.active { display: block }
+
+/* ══════════════════════════════════════════════
+   KPI CARDS — precise, confident
+══════════════════════════════════════════════ */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+  gap: var(--gap);
+  margin-bottom: var(--gap);
+}
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px 16px;
+  position: relative;
+  overflow: hidden;
+  transition: transform .2s, border-color .2s;
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+}
+.kpi-card:hover { transform: translateY(-1px); border-color: var(--kpi-color, var(--accent)) }
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; left: 0;
+  height: 2px;
+  background: var(--kpi-color, var(--accent));
+  opacity: .6;
+}
+.kpi-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px }
+.kpi-icon {
+  font-size: 16px;
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--kpi-color, var(--accent)) 10%, transparent);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.kpi-label {
+  font-size: 11px;
+  color: var(--text2);
+  font-weight: 500;
+  letter-spacing: .2px;
+  margin-bottom: 4px;
+}
+.kpi-value {
+  font-size: clamp(15px, 2vw, 22px);
+  font-weight: 700;
+  color: var(--kpi-color, var(--accent));
+  line-height: 1.1;
+  letter-spacing: -.5px;
+}
+.kpi-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 7px;
+  border-top: 1px solid var(--border);
+  padding-top: 7px;
+}
+.kpi-badge {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-weight: 600;
+  background: var(--green-light);
+  color: var(--green);
+}
+.ov-kpi-bar {
+  margin-top: 8px;
+  background: var(--surface2);
+  border-radius: 999px;
+  height: 3px;
+  overflow: hidden;
+}
+.ov-kpi-bar-fill { height: 100%; border-radius: 999px; transition: width 1s ease }
+
+/* ══════════════════════════════════════════════
+   GRID LAYOUTS
+══════════════════════════════════════════════ */
+.section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: .3px;
+}
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); margin-bottom: var(--gap) }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--gap); margin-bottom: var(--gap) }
+.grid-65 { display: grid; grid-template-columns: 1.6fr 1fr; gap: var(--gap); margin-bottom: var(--gap) }
+.grid-56 { display: grid; grid-template-columns: 1fr 1.6fr; gap: var(--gap); margin-bottom: var(--gap) }
+@media(max-width:1100px) { .grid-2,.grid-3,.grid-65,.grid-56 { grid-template-columns: 1fr } }
+
+/* ══════════════════════════════════════════════
+   CARD — clean, breathing
+══════════════════════════════════════════════ */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.card-header { display: flex; align-items: center; justify-content: space-between }
+.card-title { font-size: 13px; font-weight: 600; color: var(--text) }
+.chart-wrap { position: relative; height: 240px }
+.chart-wrap.tall { height: 300px }
+.chart-wrap.short { height: 180px }
+
+/* ══════════════════════════════════════════════
+   FILTER BAR — organized, not cluttered
+══════════════════════════════════════════════ */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: var(--gap);
+  align-items: center;
+}
+.card .filter-bar {
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  margin: 0;
+  padding: 8px 0;
+  margin-bottom: 0;
+}
+.filter-bar select, .filter-bar input {
+  background: var(--surface);
+  border: 1px solid var(--border-md);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 12px;
+  padding: 6px 10px;
+  min-width: 120px;
+  outline: none;
+  transition: border-color .15s;
+}
+.filter-bar input[type="date"] { min-width: 130px }
+.filter-bar input[type="text"] { min-width: 130px }
+.filter-bar select:focus, .filter-bar input:focus { border-color: var(--accent) }
+.filter-bar option { background: var(--surface) }
+.filter-label { font-size: 11px; color: var(--text2); font-weight: 600; white-space: nowrap }
+
+/* Override for card filter buttons */
+.card .filter-bar .btn {
+  padding: 5px 9px;
+  font-size: 11px;
+  background: transparent;
+  border-color: var(--border-md);
+  color: var(--muted);
+  border-radius: 7px;
+  gap: 4px;
+}
+.card .filter-bar .btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light) }
+.reset-icon { display: inline-block; transition: transform .4s cubic-bezier(.34,1.56,.64,1); width: 14px; height: 14px; vertical-align: middle }
+.card .filter-bar .btn:hover .reset-icon { transform: rotate(-180deg) }
+
+/* ══════════════════════════════════════════════
+   TABLE — clean data, clear hierarchy
+══════════════════════════════════════════════ */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  max-height: 460px;
+}
+table { width: 100%; border-collapse: collapse; font-size: 12px }
+thead tr { background: var(--surface2); position: sticky; top: 0; z-index: 2 }
+thead th {
+  padding: 10px 14px;
+  text-align: right;
+  color: var(--text2);
+  font-weight: 600;
+  font-size: 11px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  letter-spacing: .3px;
+}
+tbody tr { border-bottom: 1px solid var(--border); transition: background .1s }
+tbody tr:hover { background: var(--surface2) }
+tbody td { padding: 9px 14px; color: var(--text); white-space: nowrap }
+tbody tr:last-child { border-bottom: none }
+.td-num { font-weight: 600; font-variant-numeric: tabular-nums }
+.td-accent { color: var(--accent); font-weight: 600 }
+.td-green { color: var(--green) }
+.td-red { color: var(--red) }
+.td-gold { color: var(--amber) }
+.td-muted { color: var(--muted) }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+}
+.badge-sale { background: var(--green-light); color: var(--green) }
+.badge-ret { background: var(--red-light); color: var(--red) }
+.badge-warn { background: var(--amber-light); color: var(--amber) }
+
+/* Pagination */
+.table-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  font-size: 11px;
+  color: var(--text2);
+}
+.pag-btns { display: flex; gap: 4px }
+.pag-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border-md);
+  color: var(--text2);
+  border-radius: 6px;
+  padding: 3px 9px;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 11px;
+  transition: all .15s;
+}
+.pag-btn:hover, .pag-btn.active { border-color: var(--accent); color: var(--accent) }
+.pag-btn:disabled { opacity: .3; pointer-events: none }
+
+/* ══════════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════════ */
+#upload-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgba(0,0,0,.4);
+  backdrop-filter: blur(8px);
+  align-items: center;
+  justify-content: center;
+}
+#upload-modal.open { display: flex }
+.modal-box {
+  background: var(--surface);
+  border: 1px solid var(--border-md);
+  border-radius: 16px;
+  width: min(600px, 95vw);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-title { font-size: 14px; font-weight: 700 }
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text2);
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+  transition: color .15s;
+  border-radius: 6px;
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-close:hover { color: var(--red); background: var(--red-light) }
+.modal-body { padding: 22px }
+.modal-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 18px;
+  background: var(--surface2);
+  padding: 4px;
+  border-radius: 10px;
+}
+.modal-tab {
+  flex: 1;
+  text-align: center;
+  padding: 7px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text2);
+  transition: all .15s;
+}
+.modal-tab.active { background: var(--surface); color: var(--accent); font-weight: 600 }
+.modal-panel { display: none }
+.modal-panel.active { display: block }
+
+/* Upload zone */
+.upload-zone {
+  border: 2px dashed var(--border-md);
+  border-radius: 12px;
+  padding: 28px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .2s;
+  margin-bottom: 14px;
+}
+.upload-zone:hover, .upload-zone.drag {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+.upload-zone .icon { font-size: 32px; margin-bottom: 8px }
+.upload-zone p { color: var(--text2); font-size: 12px }
+.upload-zone strong { color: var(--accent) }
+
+.file-list { display: flex; flex-direction: column; gap: 8px }
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 12px;
+}
+.file-item .fi-icon { font-size: 17px; flex-shrink: 0 }
+.file-item .fi-name { flex: 1; color: var(--text) }
+.file-item .fi-status {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.fi-ok { background: var(--green-light); color: var(--green) }
+.fi-err { background: var(--red-light); color: var(--red) }
+.fi-wait { background: var(--accent-light); color: var(--accent) }
+
+.gs-input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border-md);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 12px;
+  padding: 9px 13px;
+  outline: none;
+  margin-bottom: 10px;
+}
+.gs-input:focus { border-color: var(--accent) }
+.gs-help { font-size: 11px; color: var(--muted); margin-bottom: 14px; line-height: 1.8 }
+.gs-help code {
+  background: var(--surface2);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--accent);
+  font-family: monospace;
+}
+
+/* ══════════════════════════════════════════════
+   PROGRESS + DROPZONE
+══════════════════════════════════════════════ */
+.progress-bar-wrap { background: var(--surface2); border-radius: 999px; height: 4px; overflow: hidden }
+.progress-bar {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--green));
+  transition: width .5s ease;
+  width: 0;
+}
+
+#smart-dropzone {
+  border: 2px dashed var(--border-md);
+  border-radius: 14px;
+  padding: 32px 22px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .25s;
+  background: var(--surface2);
+  position: relative;
+  overflow: hidden;
+}
+#smart-dropzone:hover, #smart-dropzone.drag-over {
+  border-color: var(--accent);
+  border-style: solid;
+  background: var(--accent-light);
+}
+#smart-dropzone.drag-over::after {
+  content: 'اتركها الآن ✨';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-light);
+  border-radius: 14px;
+}
+.sdz-folder { font-size: 40px; margin-bottom: 10px; animation: float 3s ease-in-out infinite }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+.sdz-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px }
+.sdz-sub { font-size: 12px; color: var(--text2); line-height: 1.6 }
+
+.sdz-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 8px;
+  text-align: center;
+  transition: all .25s;
+}
+.sdz-card.loaded { border-color: var(--green); background: var(--green-light) }
+.sdz-card.loading { border-color: var(--accent); background: var(--accent-light); animation: cardPulse 1s infinite }
+.sdz-card.error { border-color: var(--red); background: var(--red-light) }
+.sdz-card.unknown { border-color: var(--amber); background: var(--amber-light) }
+@keyframes cardPulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+.scard-icon { font-size: 20px; margin-bottom: 4px }
+.scard-name { font-size: 11px; color: var(--text2); font-weight: 600; margin-bottom: 4px }
+.scard-status { font-size: 10px; color: var(--muted); line-height: 1.4; min-height: 26px }
+.sdz-card.loaded .scard-status { color: var(--green) }
+.sdz-card.loading .scard-status { color: var(--accent) }
+.sdz-card.error .scard-status { color: var(--red) }
+.sdz-card.unknown .scard-status { color: var(--amber) }
+
+/* ══════════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════════ */
+#toast-container {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.toast {
+  background: var(--surface);
+  border: 1px solid var(--border-md);
+  border-radius: 12px;
+  padding: 11px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 240px;
+  box-shadow: var(--shadow);
+  animation: slideIn .25s ease;
+}
+@keyframes slideIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.toast.success { border-color: var(--green); color: var(--green) }
+.toast.error { border-color: var(--red); color: var(--red) }
+.toast.info { border-color: var(--accent); color: var(--accent) }
 
 /* ══════════════════════════════════════════════
    RANKING BARS
 ══════════════════════════════════════════════ */
-.rank-list{display:flex;flex-direction:column;gap:7px}
-.rank-item{display:flex;align-items:center;gap:9px;font-size:12px}
-.rank-num{width:18px;font-weight:700;color:var(--muted);text-align:center;flex-shrink:0}
-.rank-name{flex:1;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rank-bar-wrap{width:90px;flex-shrink:0}
-.rank-bar{height:5px;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
-.rank-val{width:75px;text-align:left;color:var(--accent);font-weight:700;flex-shrink:0}
+.rank-list { display: flex; flex-direction: column; gap: 8px }
+.rank-item { display: flex; align-items: center; gap: 9px; font-size: 12px }
+.rank-num { width: 18px; font-weight: 700; color: var(--muted); text-align: center; flex-shrink: 0 }
+.rank-name { flex: 1; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.rank-bar-wrap { width: 90px; flex-shrink: 0 }
+.rank-bar {
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--green));
+}
+.rank-val { width: 75px; text-align: left; color: var(--accent); font-weight: 600; flex-shrink: 0 }
 
 /* ══════════════════════════════════════════════
-   AGING
+   AGING BUCKETS
 ══════════════════════════════════════════════ */
-.aging-buckets{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
-@media(max-width:900px){.aging-buckets{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:600px){.aging-buckets{grid-template-columns:repeat(2,1fr)}}
-.aging-bucket{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-lg);padding:13px;text-align:center}
-.aging-bucket .ab-days{font-size:11px;color:var(--muted);margin-bottom:4px}
-.aging-bucket .ab-val{font-size:17px;font-weight:800;color:var(--gold)}
-.aging-bucket .ab-pct{font-size:10px;color:var(--text2);margin-top:2px}
+.aging-buckets { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px }
+@media(max-width:900px) { .aging-buckets { grid-template-columns: repeat(3, 1fr) } }
+@media(max-width:600px) { .aging-buckets { grid-template-columns: repeat(2, 1fr) } }
+.aging-bucket {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+}
+.aging-bucket .ab-days { font-size: 11px; color: var(--muted); margin-bottom: 4px }
+.aging-bucket .ab-val { font-size: 17px; font-weight: 700; color: var(--amber) }
+.aging-bucket .ab-pct { font-size: 10px; color: var(--text2); margin-top: 2px }
 
 /* ══════════════════════════════════════════════
    OVERVIEW MINI CARDS
 ══════════════════════════════════════════════ */
-.ov-mini-card{padding:14px 18px;position:relative;overflow:hidden}
-.ovm-strip{position:absolute;top:0;right:0;width:3px;height:100%;border-radius:0 var(--r-xl) var(--r-xl) 0}
-.ovm-icon{font-size:18px;margin-bottom:5px}
-.ovm-label{font-size:11px;color:var(--text2);font-weight:600;margin-bottom:4px}
-.ovm-val{font-size:20px;font-weight:800;line-height:1.1;margin-bottom:3px}
-.ovm-sub{font-size:10px;color:var(--muted);line-height:1.5}
-.ov-kpi-bar{margin-top:7px;background:var(--surface2);border-radius:999px;height:4px;overflow:hidden}
-.ov-kpi-bar-fill{height:100%;border-radius:999px;transition:width 1s ease}
+.ov-mini-card { padding: 16px 18px; position: relative; overflow: hidden }
+.ovm-strip { position: absolute; top: 0; right: 0; width: 3px; height: 100% }
+.ovm-icon { font-size: 18px; margin-bottom: 5px }
+.ovm-label { font-size: 11px; color: var(--text2); font-weight: 500; margin-bottom: 4px }
+.ovm-val { font-size: 20px; font-weight: 700; line-height: 1.1; margin-bottom: 3px }
+.ovm-sub { font-size: 10px; color: var(--muted); line-height: 1.5 }
 
-.month-card{background:var(--surface);border-radius:var(--r-xl);padding:16px;border:1px solid var(--border);position:relative;overflow:hidden;box-shadow:var(--shadow)}
-.month-card .mc-month{font-size:12px;font-weight:700;margin-bottom:9px}
-.month-card .mc-row{display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px}
-.month-card .mc-label{color:var(--text2)}
-.month-card .mc-val{font-weight:700}
-.month-card .mc-bar-bg{background:var(--surface2);border-radius:999px;height:4px;margin-top:7px;overflow:hidden}
-.month-card .mc-bar{height:100%;border-radius:999px}
-.month-card .mc-roi{font-size:15px;font-weight:800;margin-top:7px}
+.ov-row2-grid { display: grid; grid-template-columns: repeat(3, 1fr) 1.2fr; gap: var(--gap); margin-bottom: var(--gap) }
+@media(max-width:1024px) { .ov-row2-grid { grid-template-columns: 1fr 1fr } }
+@media(max-width:480px) { .ov-row2-grid { grid-template-columns: 1fr } }
+
+/* Month cards */
+.month-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.month-card .mc-month { font-size: 12px; font-weight: 600; margin-bottom: 9px }
+.month-card .mc-row { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px }
+.month-card .mc-label { color: var(--text2) }
+.month-card .mc-val { font-weight: 600 }
+.month-card .mc-bar-bg { background: var(--surface2); border-radius: 999px; height: 3px; margin-top: 7px; overflow: hidden }
+.month-card .mc-bar { height: 100%; border-radius: 999px }
+.month-card .mc-roi { font-size: 15px; font-weight: 700; margin-top: 7px }
 
 /* ══════════════════════════════════════════════
    INVENTORY
 ══════════════════════════════════════════════ */
-.inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-bottom:var(--gap)}
-.inv-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-lg);padding:13px}
-.inv-card .ic-name{font-size:11px;color:var(--text2);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.inv-card .ic-qty{font-size:19px;font-weight:800;color:var(--accent2)}
-.inv-card .ic-label{font-size:10px;color:var(--muted)}
+.inv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 10px;
+  margin-bottom: var(--gap);
+}
+.inv-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 13px;
+}
+.inv-card .ic-name { font-size: 11px; color: var(--text2); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.inv-card .ic-qty { font-size: 19px; font-weight: 700; color: var(--green) }
+.inv-card .ic-label { font-size: 10px; color: var(--muted) }
 
 /* ══════════════════════════════════════════════
-   SCROLLBAR
+   CHARTS SECTION
 ══════════════════════════════════════════════ */
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-track{background:var(--surface2)}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--accent)}
-
-tfoot tr{border-top:2px solid var(--border2)}
-tfoot td{padding:8px 13px;white-space:nowrap}
+.charts-section { margin-top: var(--gap); padding-top: var(--gap); border-top: 1px solid var(--border) }
+.charts-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: var(--gap);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  letter-spacing: .3px;
+}
 
 /* ══════════════════════════════════════════════
-   CHARTS SECTION AT BOTTOM
+   SCROLLBAR — refined
 ══════════════════════════════════════════════ */
-.charts-section{margin-top:var(--gap);padding-top:var(--gap);border-top:1px solid var(--border)}
-.charts-section-title{font-size:13px;font-weight:700;color:var(--text2);margin-bottom:var(--gap);display:flex;align-items:center;gap:7px;letter-spacing:.3px}
+::-webkit-scrollbar { width: 5px; height: 5px }
+::-webkit-scrollbar-track { background: transparent }
+::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 3px }
+::-webkit-scrollbar-thumb:hover { background: var(--accent) }
 
+/* Table footer */
+tfoot tr { border-top: 2px solid var(--border-md) }
+tfoot td { padding: 8px 14px; white-space: nowrap; font-weight: 600 }
+
+/* ══════════════════════════════════════════════
+   MOBILE BOTTOM NAV
+══════════════════════════════════════════════ */
+#mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 300;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  height: 64px;
+}
+.mob-nav-scroll {
+  display: flex;
+  align-items: stretch;
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 100%;
+  scrollbar-width: none;
+  padding: 0 4px;
+}
+.mob-nav-scroll::-webkit-scrollbar { display: none }
+.mob-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 6px 10px;
+  min-width: 60px;
+  flex: 1;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-family: var(--font);
+  font-size: 9px;
+  font-weight: 600;
+  transition: all .15s;
+  border-radius: 10px;
+  margin: 5px 2px;
+  position: relative;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+.mob-nav-item .mn-icon { font-size: 19px; line-height: 1; transition: transform .2s }
+.mob-nav-item:hover, .mob-nav-item.active { color: var(--accent); background: var(--accent-light) }
+.mob-nav-item.active .mn-icon { transform: scale(1.15) }
+.mob-nav-item .mn-dot {
+  position: absolute;
+  top: 6px; right: 8px;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity .2s;
+}
+.mob-nav-item.active .mn-dot { opacity: 1 }
+
+#mob-upload-fab { display: none!important }
 
 /* ══════════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════════ */
-/* ══════════════════════════════════════════════
-   RESPONSIVE — TABLET (≤1024px)
-══════════════════════════════════════════════ */
-@media(max-width:1024px){
-  .grid-2,.grid-3,.grid-65,.grid-56{grid-template-columns:1fr}
-  .kpi-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+#mobile-menu-btn { display: none }
+#sidebar-overlay { display: none }
+.chart-wrap canvas { display: block; max-width: 100% }
+body:not(.dark) .filter-bar input[type="date"] { color-scheme: light }
+body.dark .filter-bar input[type="date"] { color-scheme: dark }
+
+@media(max-width:1024px) {
+  .grid-2,.grid-3,.grid-65,.grid-56 { grid-template-columns: 1fr }
+  .kpi-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) }
+}
+
+@media(max-width:768px) {
+  #mobile-bottom-nav { display: block }
+  #main { padding-bottom: 64px; margin-right: 0!important }
+  #sidebar { display: none!important }
+  #topbar { padding: 0 12px; height: 52px }
+  .page-title { font-size: 13px; flex: 1; max-width: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 0 8px }
+  .topbar-right { margin-right: 0; gap: 6px }
+  .topbar-right .last-update { display: none }
+  .topbar-right #btn-export-csv { display: none }
+  #gf-toggle-btn { display: flex; padding: 5px 8px; font-size: 11px }
+  #theme-toggle { display: flex!important }
+  .topbar-right .btn.success:not(#btn-export-collection) { display: none!important }
+  #btn-export-collection { display: none }
+  #global-filter-bar { top: 52px; padding: 8px 10px; gap: 6px }
+  .page { padding: 10px }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px }
+  .kpi-card { padding: 12px 12px 10px }
+  .kpi-value { font-size: clamp(13px, 3.5vw, 18px) }
+  .kpi-label { font-size: 10px }
+  .kpi-icon { width: 28px; height: 28px; font-size: 14px }
+  .card { padding: 12px }
+  .card-title { font-size: 12px }
+  .chart-wrap { height: 180px }
+  .chart-wrap.tall { height: 220px }
+  .chart-wrap.short { height: 150px }
+  .table-wrap { max-height: 320px; overflow-x: auto }
+  table { font-size: 11px; min-width: 520px }
+  thead th { padding: 7px 8px; font-size: 10px }
+  tbody td { padding: 6px 8px }
+  .aging-buckets { grid-template-columns: repeat(3, 1fr); gap: 8px }
+  .modal-box { width: 97vw; max-height: 94vh }
+  .modal-body { padding: 14px }
+  #ov-row2 { grid-template-columns: 1fr 1fr!important }
+  #inv-expiry-cards { grid-template-columns: repeat(2, 1fr)!important }
+}
+
+@media(max-width:480px) {
+  .mob-nav-item { min-width: 52px; font-size: 8px; padding: 6px }
+  .mob-nav-item .mn-icon { font-size: 17px }
+  .card .filter-bar select, .card .filter-bar input { width: calc(50% - 4px); min-width: 0 }
+  #inv-expiry-cards { grid-template-columns: 1fr 1fr!important }
 }
 
 /* ══════════════════════════════════════════════
-   MOBILE MENU BUTTON (hidden on desktop)
+   TEXT CONTRAST — Light mode
 ══════════════════════════════════════════════ */
-#mobile-menu-btn{display:none}
-#sidebar-overlay{display:none}
+body:not(.dark) .kpi-label { color: #475569 }
+body:not(.dark) .kpi-sub { color: #64748b }
+body:not(.dark) .card-title { color: #0f172a }
+body:not(.dark) thead th { color: #475569 }
+body:not(.dark) tbody td { color: #0f172a }
+body:not(.dark) .filter-label { color: #374151 }
+body:not(.dark) .nav-item { color: #475569 }
+body:not(.dark) .nav-item.active { color: var(--accent) }
+body:not(.dark) .page-title { color: #0f172a }
+body:not(.dark) .sync-status { color: #475569 }
+body:not(.dark) #status-text { color: #475569 }
+body:not(.dark) .section-title { color: #0f172a }
+body:not(.dark) .muted, body:not(.dark) .td-muted { color: #94a3b8 }
 
-/* ── تحسين تجاوب الرسوم ── */
-.chart-wrap canvas{display:block;max-width:100%}
-
-/* ── input date theme ── */
-body:not(.dark) .filter-bar input[type="date"]{color-scheme:light}
-body.dark .filter-bar input[type="date"]{color-scheme:dark}
-
-.ov-row2-grid{display:grid;grid-template-columns:repeat(3,1fr) 1.2fr;gap:var(--gap);margin-bottom:var(--gap)}
-@media(max-width:1024px){.ov-row2-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:480px){.ov-row2-grid{grid-template-columns:1fr}}
-
-@media(max-width:768px){
-  #inv-expiry-cards{grid-template-columns:repeat(2,1fr)!important}
-}
-@media(max-width:480px){
-  #inv-expiry-cards{grid-template-columns:1fr 1fr!important}
-}
-
-/* ══════════════════════════════════════════════
-   MOBILE BOTTOM NAVIGATION BAR
-══════════════════════════════════════════════ */
-#mobile-bottom-nav{
-  display:none;
-  position:fixed;bottom:0;left:0;right:0;z-index:300;
-  background:var(--surface);
-  border-top:1px solid var(--border);
-  box-shadow:0 -4px 20px rgba(0,0,0,.12);
-  padding:0;
-  height:64px;
-}
-.mob-nav-scroll{
-  display:flex;align-items:stretch;
-  overflow-x:auto;overflow-y:hidden;
-  height:100%;
-  scrollbar-width:none;-ms-overflow-style:none;
-  padding:0 4px;
-}
-.mob-nav-scroll::-webkit-scrollbar{display:none}
-.mob-nav-item{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:3px;padding:6px 10px;min-width:60px;flex:1;
-  cursor:pointer;border:none;background:none;
-  color:var(--muted);font-family:'Cairo',sans-serif;
-  font-size:9px;font-weight:700;
-  transition:all .18s;border-radius:12px;margin:5px 2px;
-  position:relative;white-space:nowrap;
-  -webkit-tap-highlight-color:transparent;
-}
-.mob-nav-item .mn-icon{font-size:19px;line-height:1;transition:transform .2s}
-.mob-nav-item:hover,.mob-nav-item.active{
-  color:var(--accent);
-  background:color-mix(in srgb,var(--accent) 10%,transparent);
-}
-.mob-nav-item.active .mn-icon{transform:scale(1.15)}
-.mob-nav-item .mn-dot{
-  position:absolute;top:6px;right:8px;
-  width:6px;height:6px;border-radius:50%;
-  background:var(--accent);opacity:0;transition:opacity .2s;
-}
-.mob-nav-item.active .mn-dot{opacity:1}
-
-/* Upload FAB button for mobile */
-#mob-upload-fab{
-  display:none;
-  position:fixed;bottom:76px;left:16px;z-index:299;
-  width:46px;height:46px;border-radius:50%;
-  background:var(--accent2);border:none;
-  color:#fff;font-size:20px;
-  box-shadow:0 4px 16px rgba(10,184,122,.4);
-  cursor:pointer;transition:all .2s;
-  align-items:center;justify-content:center;
-}
-#mob-upload-fab{display:none!important}
-
-@media(max-width:768px){
-  #mobile-bottom-nav{display:block}
-  #mob-upload-fab{display:flex}
-  /* Add bottom padding to main content so it doesn't hide behind nav */
-  #main{padding-bottom:64px;margin-right:0!important}
-  /* Hide sidebar completely on mobile - use bottom nav instead */
-  #sidebar{display:none!important}
-  #sidebar-overlay{display:none!important}
-  #mobile-menu-btn{display:none!important}
-  /* Topbar simplified on mobile */
-  #topbar{padding:0 12px;height:52px;justify-content:space-between}
-  .page-title{font-size:13px;flex:1;max-width:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0 8px}
-  .topbar-right{margin-right:0;gap:6px}
-  .topbar-right .last-update{display:none}
-  .topbar-right #btn-export-csv{display:none}
-  .topbar-right #gf-toggle-btn{display:flex;padding:5px 8px;font-size:11px}
-  /* Show theme toggle always */
-  #theme-toggle{display:flex!important}
-  /* Hide upload button from topbar on mobile (use FAB) */
-  .topbar-right .btn.success:not(#btn-export-collection){display:none!important}
-  /* Keep export collection btn visible */
-  #btn-export-collection{display:none}
-  /* Global filter bar on mobile */
-  #global-filter-bar{top:52px;padding:8px 10px;gap:6px}
-  #global-filter-bar .gf-select,
-  #global-filter-bar .gf-input{height:32px;font-size:11px;padding:4px 8px}
-  #global-filter-bar .gf-date-wrap{flex-wrap:wrap;gap:4px}
-  /* Page padding */
-  .page{padding:10px 10px 10px}
-  /* KPI grid: 2 columns */
-  .kpi-grid{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
-  .kpi-card{padding:12px 12px 10px}
-  .kpi-value{font-size:clamp(13px,3.5vw,20px)}
-  .kpi-label{font-size:10px}
-  .kpi-icon{width:28px;height:28px;font-size:14px}
-  .kpi-sub{font-size:10px}
-  /* Overview row2: stack vertically */
-  #ov-row2{grid-template-columns:1fr 1fr!important}
-  /* Cards */
-  .card{padding:12px;gap:8px}
-  .card-title{font-size:12px}
-  /* Charts */
-  .chart-wrap{height:180px}
-  .chart-wrap.tall{height:220px}
-  .chart-wrap.short{height:150px}
-  /* Grids */
-  .grid-2,.grid-3,.grid-65,.grid-56{grid-template-columns:1fr}
-  /* Filter bars */
-  .filter-bar{padding:8px;gap:6px;flex-wrap:wrap}
-  .filter-bar select,.filter-bar input{min-width:0;font-size:11px;padding:5px 8px}
-  .filter-bar input[type="date"]{min-width:0}
-  .filter-label{width:100%;margin-bottom:2px;font-size:11px}
-  /* Tables */
-  .table-wrap{max-height:320px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-  table{font-size:11px;min-width:520px}
-  thead th{padding:7px 8px;font-size:10px}
-  tbody td{padding:6px 8px}
-  tfoot td{padding:6px 8px!important;font-size:10px}
-  /* Aging */
-  .aging-buckets{grid-template-columns:repeat(3,1fr);gap:8px}
-  /* Modal */
-  .modal-box{width:97vw;max-height:94vh}
-  .modal-body{padding:14px}
-  .modal-tabs{gap:2px}
-  .modal-tab{font-size:11px;padding:6px 8px}
-  /* Dropzone */
-  #smart-dropzone{padding:18px 12px}
-  .sdz-title{font-size:12px}
-  /* sdz-cards: 3 cols on mobile */
-  #sdz-cards{grid-template-columns:repeat(3,1fr)!important}
-  /* Toast */
-  #toast-container{left:10px;bottom:70px}
-  .toast{min-width:200px;padding:9px 12px;font-size:11px}
-  /* Section title */
-  .charts-section-title{font-size:12px}
-  /* collection rank area */
-  #page-collection > div:nth-child(2){flex-direction:column!important;gap:10px!important}
-  #page-collection .btn.primary{width:100%}
-}
-
-@media(max-width:480px){
-  .kpi-grid{grid-template-columns:1fr 1fr;gap:6px}
-  .kpi-value{font-size:13px}
-  #ov-row2{grid-template-columns:1fr!important}
-  .aging-buckets{grid-template-columns:repeat(2,1fr)}
-  #sdz-cards{grid-template-columns:repeat(2,1fr)!important}
-  .filter-bar select,.filter-bar input,
-  .filter-bar input[type="date"],
-  .filter-bar input[type="text"]{width:100%}
-  .chart-wrap{height:160px}
-  .chart-wrap.tall{height:190px}
-  .page-title{font-size:12px}
-  .mob-nav-item{min-width:52px;font-size:8px;padding:6px 6px}
-  .mob-nav-item .mn-icon{font-size:17px}
-  /* Filter bar in cards: full width selects */
-  .card .filter-bar select,
-  .card .filter-bar input{width:calc(50% - 4px);min-width:0}
-}
-
-/* ── Filter bar mobile toggle ── */
-.filter-toggle-btn{display:none}
-/* ── تباين النصوص الوضع الفاتح ── */
-body:not(.dark) .kpi-label{color:#4a5568}
-body:not(.dark) .kpi-sub{color:#6b7280}
-body:not(.dark) .card-title{color:#1a2332}
-body:not(.dark) thead th{color:#374151}
-body:not(.dark) tbody td{color:#1a2332}
-body:not(.dark) .filter-label{color:#374151}
-body:not(.dark) .nav-item{color:#4a5568}
-body:not(.dark) .nav-item.active{color:var(--accent)}
-body:not(.dark) .page-title{color:#1a2332}
-body:not(.dark) .section-title{color:#1a2332}
-body:not(.dark) .muted,body:not(.dark) .td-muted{color:#6b7280}
-body:not(.dark) .sync-status{color:#4a5568}
-body:not(.dark) #status-text{color:#4a5568}
-
-/* ── الوضع الداكن: تجاوز للنصوص ── */
-body.dark .kpi-label{color:var(--text2)}
-body.dark .card-title{color:var(--text)}
-body.dark thead th{color:var(--text2)}
-body.dark tbody td{color:var(--text)}
+/* Dark mode overrides */
+body.dark .kpi-label { color: var(--text2) }
+body.dark .card-title { color: var(--text) }
+body.dark thead th { color: var(--text2) }
+body.dark tbody td { color: var(--text) }
+</style>
+<style>
+  .imageye-selected {
+    outline: 2px solid black !important;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5) !important;
+  }
 </style>
 </head>
 <body>
@@ -685,7 +1151,7 @@ body.dark tbody td{color:var(--text)}
   </div>
   <div class="sidebar-footer">
     <div class="sync-status">
-      <div class="status-dot" id="status-dot"></div>
+      <div class="status-dot" id="status-dot" style="background: var(--green);"></div>
       <span id="status-text" class="nav-label">متصل — بيانات محلية</span>
     </div>
   </div>
@@ -742,7 +1208,6 @@ body.dark tbody td{color:var(--text)}
   </div>
 </nav>
 
-<!-- FAB upload button for mobile -->
 <button id="mob-upload-fab" onclick="openUploadModal()" title="رفع البيانات">⬆</button>
 
 <!-- ═══════════ MAIN ═══════════ -->
@@ -754,13 +1219,13 @@ body.dark tbody td{color:var(--text)}
     <button id="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="القائمة">☰</button>
     <div class="page-title" id="topbar-title">📊 تحليل المبيعات</div>
     <div class="topbar-right">
-      <span class="last-update" id="last-update">—</span>
+      <span class="last-update" id="last-update">آخر تحديث: 11:23:20 م</span>
       <button id="gf-toggle-btn" onclick="toggleGlobalFilter()">🔍 فلتر شامل <span id="gf-active-badge" class="gf-active-badge">نشط</span></button>
-      <button id="topbar-refresh-btn" onclick="_autoSyncQuiet()" title="تحديث البيانات الآن" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text2);border-radius:var(--r-md);width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;transition:all .2s;flex-shrink:0">🔄</button>
+      <button id="topbar-refresh-btn" onclick="_autoSyncQuiet()" title="تحديث البيانات الآن" style="background:var(--surface2);border:1px solid var(--border-md);color:var(--text2);border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;transition:all .2s;flex-shrink:0">🔄</button>
       <button id="theme-toggle" onclick="toggleTheme()" title="تبديل الوضع المظلم">🌙</button>
       <button class="btn success" onclick="openUploadModal()">⬆ رفع / مزامنة</button>
-      <button class="btn" onclick="exportCurrentTable()">⬇ تصدير CSV</button>
-      <button class="btn success" id="btn-export-collection" onclick="exportCollectionExcel()" style="display:none">📊 تصدير التحصيلات Excel</button>
+      <button class="btn" id="btn-export-csv" onclick="exportCurrentTable()">⬇ تصدير CSV</button>
+      <button class="btn success" id="btn-export-collection" onclick="exportCollectionExcel()" style="display:none">📊 تصدير Excel</button>
     </div>
   </div>
 
@@ -769,19 +1234,13 @@ body.dark tbody td{color:var(--text)}
     <span class="gf-label">🔍 فلتر شامل:</span>
 
     <span class="gf-label" style="color:var(--text2);font-size:11px">المندوب:</span>
-    <select class="gf-select" id="gf-rep" onchange="onGfRepChange()">
-      <option value="">كل المندوبين</option>
-    </select>
+    <select class="gf-select" id="gf-rep" onchange="onGfRepChange()"><option value="">كل المندوبين</option></select>
 
     <span class="gf-label" style="color:var(--text2);font-size:11px">فئة المندوب:</span>
-    <select class="gf-select" id="gf-cat" onchange="onGfCatChange()">
-      <option value="">كل الفئات</option>
-    </select>
+    <select class="gf-select" id="gf-cat" onchange="onGfCatChange()"><option value="">كل الفئات</option></select>
 
     <span class="gf-label" style="color:var(--text2);font-size:11px">الشهر:</span>
-    <select class="gf-select" id="gf-month" onchange="applyGlobalFilter()">
-      <option value="">كل الأشهر</option>
-    </select>
+    <select class="gf-select" id="gf-month" onchange="applyGlobalFilter()"><option value="">كل الأشهر</option></select>
 
     <span class="gf-label" style="color:var(--text2);font-size:11px">التاريخ:</span>
     <div class="gf-date-wrap">
@@ -797,41 +1256,86 @@ body.dark tbody td{color:var(--text)}
   <!-- ═══ PAGE: OVERVIEW ═══ -->
   <div class="page active" id="page-overview">
 
-    <!-- ── صف البطاقات الرئيسية ── -->
-    <div class="kpi-grid" id="kpi-overview"></div>
+    <div class="kpi-grid" id="kpi-overview">
+    <div class="kpi-card" style="--kpi-color:var(--accent)">
+      <div class="kpi-top"><div class="kpi-icon">📦</div></div>
+      <div class="kpi-label">إجمالي المبيعات</div>
+      <div class="kpi-value">0</div>
+      <div class="kpi-sub">قبل المرتجعات</div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:var(--red)">
+      <div class="kpi-top"><div class="kpi-icon">↩️</div></div>
+      <div class="kpi-label">إجمالي المرتجعات</div>
+      <div class="kpi-value">0</div>
+      <div class="kpi-sub">0.00% من المبيعات</div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:var(--green)">
+      <div class="kpi-top"><div class="kpi-icon">💰</div></div>
+      <div class="kpi-label">صافي المبيعات</div>
+      <div class="kpi-value">0</div>
+      <div class="kpi-sub">بعد المرتجعات</div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:var(--green)">
+      <div class="kpi-top"><div class="kpi-icon">✅</div></div>
+      <div class="kpi-label">إجمالي التحصيلات</div>
+      <div class="kpi-value">0</div>
+      <div class="kpi-sub"><span style="color:#7c6fff">🏦 0 (0.0%)</span> &nbsp; <span style="color:var(--amber)">💵 0 (0.0%)</span></div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:var(--red)">
+      <div class="kpi-top"><div class="kpi-icon">📊</div></div>
+      <div class="kpi-label">نسبة التحصيل ROI</div>
+      <div class="kpi-value">0.00%</div>
+      <div class="kpi-sub">من صافي المبيعات</div>
+      <div class="ov-kpi-bar"><div class="ov-kpi-bar-fill" style="width:0.0%;background:var(--red)"></div></div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:var(--amber)">
+      <div class="kpi-top"><div class="kpi-icon">⚠️</div></div>
+      <div class="kpi-label">صافي المديونيات</div>
+      <div class="kpi-value">0</div>
+      <div class="kpi-sub">دينار</div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:var(--green)">
+      <div class="kpi-top"><div class="kpi-icon">🔴</div></div>
+      <div class="kpi-label">الفجوة غير المحصّلة</div>
+      <div class="kpi-value">0</div>
+      <div class="kpi-sub">📈 تحصيل فائض</div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:var(--violet)">
+      <div class="kpi-top"><div class="kpi-icon">👤</div></div>
+      <div class="kpi-label">المناديب النشطون</div>
+      <div class="kpi-value">0</div>
+      <div class="kpi-sub">0 إجمالي</div>
+    </div></div>
 
-    <!-- ── صف ثانٍ: مرتجعات / بنك / كاش ── -->
     <div class="ov-row2-grid" id="ov-row2">
       <div class="card ov-mini-card" id="ov-mc-returns">
         <div class="ovm-strip" style="background:var(--red)"></div>
         <div class="ovm-icon">↩️</div>
         <div class="ovm-label">إجمالي المرتجعات</div>
-        <div class="ovm-val" id="ov-returns-main" style="color:var(--red)">—</div>
-        <div class="ovm-sub" id="ov-returns-sub">—</div>
+        <div class="ovm-val" id="ov-returns-main" style="color:var(--red)">0</div>
+        <div class="ovm-sub" id="ov-returns-sub">0 — 0.00% 🔴</div>
       </div>
       <div class="card ov-mini-card" id="ov-mc-bank">
         <div class="ovm-strip" style="background:#7c6fff"></div>
         <div class="ovm-icon">🏦</div>
         <div class="ovm-label">تحصيلات بنكية (حوالات)</div>
-        <div class="ovm-val" id="ov-bank-main" style="color:#7c6fff">—</div>
-        <div class="ovm-sub" id="ov-bank-sub">—</div>
+        <div class="ovm-val" id="ov-bank-main" style="color:#7c6fff">0</div>
+        <div class="ovm-sub" id="ov-bank-sub">0 — 0.0%</div>
       </div>
       <div class="card ov-mini-card" id="ov-mc-cash">
-        <div class="ovm-strip" style="background:var(--gold)"></div>
+        <div class="ovm-strip" style="background:var(--amber)"></div>
         <div class="ovm-icon">💵</div>
         <div class="ovm-label">تحصيلات نقدية (كاش)</div>
-        <div class="ovm-val" id="ov-cash-main" style="color:var(--gold)">—</div>
-        <div class="ovm-sub" id="ov-cash-sub">—</div>
+        <div class="ovm-val" id="ov-cash-main" style="color:var(--amber)">0</div>
+        <div class="ovm-sub" id="ov-cash-sub">0 — 0.0%</div>
       </div>
-      <!-- دائرة توزيع طرق التحصيل -->
       <div class="card" style="padding:18px">
         <div class="card-header"><span class="card-title">🥧 توزيع طرق التحصيل</span></div>
-        <div class="chart-sub" id="ov-pay-sub" style="font-size:11px;color:var(--muted);margin-bottom:8px">—</div>
+        <div class="chart-sub" id="ov-pay-sub" style="font-size:11px;color:var(--muted);margin-bottom:8px">نسبة كل طريقة من إجمالي 0</div>
         <div style="position:relative;height:150px"><canvas id="ov-paymentPie"></canvas></div>
       </div>
     </div>
 
-    <!-- ── صف الرسوم الكبيرة ── -->
     <div class="grid-2" style="margin-bottom:var(--gap)">
       <div class="card">
         <div class="card-header">
@@ -842,7 +1346,7 @@ body.dark tbody td{color:var(--text)}
       <div class="card">
         <div class="card-header">
           <span class="card-title">📊 توزيع نسب تحصيل المناديب (ROI %)</span>
-          <span id="ov-roi-sub" style="font-size:11px;color:var(--muted)">—</span>
+          <span id="ov-roi-sub" style="font-size:11px;color:var(--muted)">0 مندوب نشط — مجموعات الأداء</span>
         </div>
         <div class="chart-wrap tall"><canvas id="ov-roiDist"></canvas></div>
       </div>
@@ -859,7 +1363,7 @@ body.dark tbody td{color:var(--text)}
       <div class="card">
         <div class="card-header">
           <span class="card-title">🏪 تصنيف العملاء حسب نسبة التحصيل</span>
-          <span id="ov-cust-sub" style="font-size:11px;color:var(--muted)">—</span>
+          <span id="ov-cust-sub" style="font-size:11px;color:var(--muted)">0 تصنيفات — 0 عميل</span>
         </div>
         <div class="chart-wrap tall"><canvas id="ov-custPie"></canvas></div>
       </div>
@@ -880,10 +1384,9 @@ body.dark tbody td{color:var(--text)}
       </div>
     </div>
 
-    <!-- ── التحليل الشهري التفصيلي ── -->
     <div class="card" style="margin-bottom:var(--gap)">
       <div class="card-header">
-        <span class="card-title" style="color:var(--gold)">📅 التحليل الشهري التفصيلي</span>
+        <span class="card-title" style="color:var(--amber)">📅 التحليل الشهري التفصيلي</span>
         <span id="ov-tbl-sub" style="font-size:11px;color:var(--muted)">—</span>
       </div>
       <div class="table-wrap">
@@ -892,57 +1395,30 @@ body.dark tbody td{color:var(--text)}
           <tbody id="ov-monthly-tbody"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">ارفع ملفات البيانات لعرض التحليل الشهري</td></tr></tbody>
         </table>
       </div>
-      <!-- ملاحظات تحليلية -->
-      <div id="ov-insights" style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px"></div>
+      <div id="ov-notes" style="padding:4px;margin-top:4px"></div>
     </div>
 
-    <!-- ── لوحة البطاقات الشهرية ── -->
-    <div id="ov-monthly-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--gap);margin-bottom:var(--gap)"></div>
-
+    <div class="grid-2" id="ov-month-cards-wrap" style="margin-bottom:var(--gap);display:none">
+      <div id="ov-month-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;grid-column:1/-1"></div>
+    </div>
   </div>
 
   <!-- ═══ PAGE: SALES ═══ -->
   <div class="page" id="page-sales">
     <div class="kpi-grid" id="kpi-sales"></div>
+
     <div class="card" style="margin-bottom:var(--gap)">
-      <div class="card-header">
-        <span class="card-title">📋 مقارنة الأداء الشهري</span>
-        <span style="font-size:11px;color:var(--muted)">بالدينار الليبي</span>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead id="monthly-thead"></thead>
-          <tbody id="monthly-tbody"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">ارفع ملف المبيعات لعرض المقارنة الشهرية</td></tr></tbody>
-        </table>
-      </div>
-    </div>
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-header"><span class="card-title">🏆 أفضل المندوبين — مبيعات</span></div>
-        <div id="rep-rank-list" class="rank-list"></div>
-      </div>
-      <div class="card">
-        <div class="card-header"><span class="card-title">⚠ أعلى المرتجعات</span></div>
-        <div id="ret-rank-list" class="rank-list"></div>
-      </div>
-    </div>
-    <div class="card" style="margin-bottom:var(--gap)">
-      <div class="card-header"><span class="card-title">🗂 جدول فواتير المبيعات</span></div>
-      <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--r-md)">
+      <div class="card-header"><span class="card-title">🗂 جدول المبيعات التفصيلي</span></div>
+      <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--radius)">
         <span class="filter-label">فلتر:</span>
         <select id="f-sales-rep" onchange="renderSalesPage()"><option value="">كل المندوبين</option></select>
+        <select id="f-sales-cat" onchange="renderSalesPage()"><option value="">كل الفئات</option></select>
         <select id="f-sales-month" onchange="renderSalesPage()"><option value="">كل الأشهر</option></select>
-        <select id="f-sales-type" onchange="renderSalesPage()">
-          <option value="">مبيعات + مرتجعات</option>
-          <option value="مبيع">مبيعات فقط</option>
-          <option value="مرتجع مبيع">مرتجعات فقط</option>
-        </select>
         <input type="text" id="f-sales-cust" placeholder="🔍 اسم العميل..." oninput="renderSalesPage()">
-        <input type="text" id="f-sales-item" placeholder="🔍 اسم الصنف..." oninput="renderSalesPage()">
-        <select id="f-sales-month-q" onchange="renderSalesPage()"><option value="">كل الأشهر</option></select>
+        <input type="text" id="f-sales-prod" placeholder="🔍 اسم الصنف..." oninput="renderSalesPage()">
         <input type="date" id="f-sales-from" onchange="renderSalesPage()" title="من تاريخ">
-        <input type="date" id="f-sales-to"   onchange="renderSalesPage()" title="إلى تاريخ">
-        <button class="btn" onclick="resetSalesFilters()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+        <input type="date" id="f-sales-to" onchange="renderSalesPage()" title="إلى تاريخ">
+        <button class="btn" onclick="['f-sales-rep','f-sales-cat','f-sales-month','f-sales-cust','f-sales-prod','f-sales-from','f-sales-to'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});renderSalesPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap" id="sales-table-wrap"></div>
       <div class="table-pagination">
@@ -950,17 +1426,17 @@ body.dark tbody td{color:var(--text)}
         <div class="pag-btns" id="sales-pag-btns"></div>
       </div>
     </div>
-    <!-- الرسوم البيانية في الأسفل -->
+
     <div class="charts-section">
       <div class="charts-section-title">📊 الرسوم البيانية</div>
-      <div class="grid-65">
+      <div class="grid-2">
         <div class="card">
-          <div class="card-header"><span class="card-title">📈 المبيعات الشهرية</span></div>
-          <div class="chart-wrap"><canvas id="ch-sales-monthly"></canvas></div>
+          <div class="card-header"><span class="card-title">📅 المبيعات الشهرية</span></div>
+          <div class="chart-wrap tall"><canvas id="ch-sales-monthly"></canvas></div>
         </div>
         <div class="card">
-          <div class="card-header"><span class="card-title">🥧 توزيع المبيعات والمرتجعات</span></div>
-          <div class="chart-wrap"><canvas id="ch-sales-donut"></canvas></div>
+          <div class="card-header"><span class="card-title">📦 أفضل 10 منتجات بالمبيعات</span></div>
+          <div class="chart-wrap tall"><canvas id="ch-sales-products"></canvas></div>
         </div>
       </div>
     </div>
@@ -970,18 +1446,14 @@ body.dark tbody td{color:var(--text)}
   <div class="page" id="page-reps">
     <div class="kpi-grid" id="kpi-reps"></div>
 
-    <div class="card" id="card-rep-target" style="display:none;margin-bottom:var(--gap)">
-      <div class="card-header"><span class="card-title">🎯 نسبة تحقق الأهداف</span></div>
-      <div class="chart-wrap tall"><canvas id="ch-rep-target"></canvas></div>
-    </div>
     <div class="card" style="margin-bottom:var(--gap)">
-      <div class="card-header"><span class="card-title">🗂 تفصيل فواتير المندوب</span></div>
-      <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--r-md)">
+      <div class="card-header"><span class="card-title">🗂 جدول المندوبين</span></div>
+      <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--radius)">
         <span class="filter-label">فلتر:</span>
-        <select id="f-rep-select" onchange="renderRepPage()"><option value="">كل المندوبين</option></select>
-        <select id="f-rep-cat" onchange="renderRepPage()"><option value="">كل التصنيفات</option></select>
-        <select id="f-rep-month" onchange="renderRepPage()"><option value="">كل الأشهر</option></select>
-        <button class="btn" onclick="document.getElementById('f-rep-select').value='';document.getElementById('f-rep-cat').value='';document.getElementById('f-rep-month').value='';renderRepPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+        <select id="f-reps-cat" onchange="renderRepsPage()"><option value="">كل الفئات</option></select>
+        <select id="f-reps-month" onchange="renderRepsPage()"><option value="">كل الأشهر</option></select>
+        <input type="text" id="f-reps-search" placeholder="🔍 اسم المندوب..." oninput="renderRepsPage()">
+        <button class="btn" onclick="document.getElementById('f-reps-cat').value='';document.getElementById('f-reps-month').value='';document.getElementById('f-reps-search').value='';renderRepsPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap" id="reps-table-wrap"></div>
       <div class="table-pagination">
@@ -989,7 +1461,7 @@ body.dark tbody td{color:var(--text)}
         <div class="pag-btns" id="reps-pag-btns"></div>
       </div>
     </div>
-    <!-- الرسوم البيانية في الأسفل -->
+
     <div class="charts-section">
       <div class="charts-section-title">📊 الرسوم البيانية</div>
       <div class="grid-2">
@@ -1011,7 +1483,7 @@ body.dark tbody td{color:var(--text)}
 
     <div class="card" style="margin-bottom:var(--gap)">
       <div class="card-header"><span class="card-title">🗂 جدول الزبائن</span></div>
-      <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--r-md)">
+      <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--radius)">
         <span class="filter-label">فلتر:</span>
         <input type="text" id="f-cust-search" placeholder="🔍 اسم الزبون..." oninput="renderCustomersPage()">
         <select id="f-cust-rep" onchange="renderCustomersPage()"><option value="">كل المندوبين</option></select>
@@ -1025,10 +1497,10 @@ body.dark tbody td{color:var(--text)}
           <option value="">كل أعمار الذمم</option>
           <option value="30">ذمة ≤ 30 يوم</option>
           <option value="60">ذمة ≤ 60 يوم</option>
-          <option value="old">ذمة > 60 يوم</option>
+          <option value="old">ذمة &gt; 60 يوم</option>
           <option value="any">لديه ذمم</option>
         </select>
-        <button class="btn" onclick="document.getElementById('f-cust-search').value='';document.getElementById('f-cust-rep').value='';document.getElementById('f-cust-cat').value='';document.getElementById('f-cust-aging').value='';renderCustomersPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+        <button class="btn" onclick="document.getElementById('f-cust-search').value='';document.getElementById('f-cust-rep').value='';document.getElementById('f-cust-cat').value='';document.getElementById('f-cust-aging').value='';renderCustomersPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap" id="cust-table-wrap"></div>
       <div class="table-pagination">
@@ -1037,18 +1509,14 @@ body.dark tbody td{color:var(--text)}
       </div>
     </div>
 
-    <!-- الرسوم البيانية + إحصائيات الزبائن في الأسفل -->
     <div class="charts-section">
       <div class="charts-section-title">📊 الرسوم البيانية</div>
       <div class="card" style="margin-bottom:var(--gap)">
         <div class="card-header"><span class="card-title">🏆 أفضل 10 زبائن بالمبيعات</span></div>
         <div class="chart-wrap tall"><canvas id="ch-top-customers"></canvas></div>
       </div>
-      <!-- إحصائيات أفضل 10 زبائن -->
       <div class="card">
-        <div class="card-header">
-          <span class="card-title">🔢 إحصائيات أفضل 10 زبائن</span>
-        </div>
+        <div class="card-header"><span class="card-title">🔢 إحصائيات أفضل 10 زبائن</span></div>
         <div id="cust-stats" style="padding:4px"></div>
       </div>
     </div>
@@ -1060,7 +1528,7 @@ body.dark tbody td{color:var(--text)}
 
     <div class="card" style="margin-bottom:var(--gap)">
       <div class="card-header"><span class="card-title">🗂 جدول الأصناف</span></div>
-      <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--r-md)">
+      <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--radius)">
         <span class="filter-label">فلتر:</span>
         <input type="text" id="f-prod-search" placeholder="🔍 اسم الصنف..." oninput="renderProductsPage()">
         <select id="f-prod-rep" onchange="renderProductsPage()"><option value="">كل المندوبين</option></select>
@@ -1068,8 +1536,8 @@ body.dark tbody td{color:var(--text)}
         <input type="text" id="f-prod-cust" placeholder="🔍 اسم العميل..." oninput="renderProductsPage()">
         <select id="f-prod-month" onchange="renderProductsPage()"><option value="">كل الأشهر</option></select>
         <input type="date" id="f-prod-from" onchange="renderProductsPage()" title="من تاريخ">
-        <input type="date" id="f-prod-to"   onchange="renderProductsPage()" title="إلى تاريخ">
-        <button class="btn" onclick="['f-prod-search','f-prod-rep','f-prod-cat','f-prod-cust','f-prod-month','f-prod-from','f-prod-to'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});renderProductsPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+        <input type="date" id="f-prod-to" onchange="renderProductsPage()" title="إلى تاريخ">
+        <button class="btn" onclick="['f-prod-search','f-prod-rep','f-prod-cat','f-prod-cust','f-prod-month','f-prod-from','f-prod-to'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});renderProductsPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap" id="prod-table-wrap"></div>
       <div class="table-pagination">
@@ -1077,7 +1545,6 @@ body.dark tbody td{color:var(--text)}
         <div class="pag-btns" id="prod-pag-btns"></div>
       </div>
     </div>
-    <!-- الرسوم البيانية في الأسفل -->
     <div class="charts-section">
       <div class="charts-section-title">📊 الرسوم البيانية</div>
       <div class="grid-2">
@@ -1103,14 +1570,14 @@ body.dark tbody td{color:var(--text)}
     </div>
     <div class="card" style="margin-bottom:var(--gap)">
       <div class="card-header"><span class="card-title">🗂 جدول المديونية التفصيلي</span></div>
-      <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--r-md)">
+      <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--radius)">
         <span class="filter-label">فلتر:</span>
         <input type="text" id="f-debt-search" placeholder="🔍 اسم الحساب..." oninput="renderDebtPage()">
         <select id="f-debt-rep" onchange="renderDebtPage()"><option value="">كل المندوبين</option></select>
         <select id="f-debt-type" onchange="renderDebtPage()">
           <option value="">الكل</option><option value="debit">مدين فقط</option>
         </select>
-        <button class="btn" onclick="document.getElementById('f-debt-search').value='';document.getElementById('f-debt-rep').value='';document.getElementById('f-debt-type').value='';renderDebtPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+        <button class="btn" onclick="document.getElementById('f-debt-search').value='';document.getElementById('f-debt-rep').value='';document.getElementById('f-debt-type').value='';renderDebtPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap" id="debt-table-wrap"></div>
       <div class="table-pagination">
@@ -1118,7 +1585,6 @@ body.dark tbody td{color:var(--text)}
         <div class="pag-btns" id="debt-pag-btns"></div>
       </div>
     </div>
-    <!-- الرسوم البيانية في الأسفل -->
     <div class="charts-section">
       <div class="charts-section-title">📊 الرسوم البيانية</div>
       <div class="grid-2">
@@ -1141,7 +1607,7 @@ body.dark tbody td{color:var(--text)}
 
     <div class="card" style="margin-bottom:var(--gap)">
       <div class="card-header"><span class="card-title">🗂 جدول أعمار الذمم</span></div>
-      <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--r-md)">
+      <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--radius)">
         <span class="filter-label">فلتر:</span>
         <select id="f-aging-rep" onchange="renderAgingPage()"><option value="">كل المندوبين</option></select>
         <select id="f-aging-bucket" onchange="renderAgingPage()">
@@ -1154,7 +1620,7 @@ body.dark tbody td{color:var(--text)}
           <option value="120">120+ يوم</option>
         </select>
         <input type="text" id="f-aging-search" placeholder="🔍 اسم العميل..." oninput="renderAgingPage()">
-        <button class="btn" onclick="document.getElementById('f-aging-rep').value='';document.getElementById('f-aging-bucket').value='';document.getElementById('f-aging-search').value='';renderAgingPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+        <button class="btn" onclick="document.getElementById('f-aging-rep').value='';document.getElementById('f-aging-bucket').value='';document.getElementById('f-aging-search').value='';renderAgingPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap" id="aging-table-wrap"></div>
       <div class="table-pagination">
@@ -1162,7 +1628,6 @@ body.dark tbody td{color:var(--text)}
         <div class="pag-btns" id="aging-pag-btns"></div>
       </div>
     </div>
-    <!-- الرسوم البيانية في الأسفل -->
     <div class="charts-section">
       <div class="charts-section-title">📊 الرسوم البيانية</div>
       <div class="grid-2">
@@ -1182,10 +1647,9 @@ body.dark tbody td{color:var(--text)}
   <div class="page" id="page-collection">
     <div class="kpi-grid" id="kpi-collection"></div>
 
-    <!-- زر فتح ملخص التحصيل + أفضل المحصّلين -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--gap)">
-    <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:16px 18px;box-shadow:var(--shadow)">
-        <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px;letter-spacing:.3px">🏆 أفضل المحصّلين</div>
+      <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px;letter-spacing:.3px">🏆 أفضل المحصّلين</div>
         <div id="coll-rank-list" class="rank-list"></div>
       </div>
       <div style="margin-right:var(--gap)">
@@ -1196,10 +1660,8 @@ body.dark tbody td{color:var(--text)}
     </div>
 
     <div class="card" style="margin-bottom:var(--gap)">
-      <div class="card-header">
-        <span class="card-title">&#x1F5C2; جدول سندات التحصيل</span>
-      </div>
-      <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--r-md)">
+      <div class="card-header"><span class="card-title">🗂 جدول سندات التحصيل</span></div>
+      <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--radius)">
         <span class="filter-label">فلتر:</span>
         <select id="f-coll-rep" onchange="renderCollectionPage()"><option value="">كل المندوبين</option></select>
         <select id="f-coll-cat" onchange="renderCollectionPage()"><option value="">كل الفئات</option></select>
@@ -1213,8 +1675,8 @@ body.dark tbody td{color:var(--text)}
         </select>
         <select id="f-coll-month-q" onchange="renderCollectionPage()"><option value="">كل الأشهر</option></select>
         <input type="date" id="f-coll-from" onchange="renderCollectionPage()" title="من تاريخ">
-        <input type="date" id="f-coll-to"   onchange="renderCollectionPage()" title="إلى تاريخ">
-        <button class="btn" onclick="['f-coll-rep','f-coll-cat','f-coll-month','f-coll-type','f-coll-from','f-coll-to'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});renderCollectionPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+        <input type="date" id="f-coll-to" onchange="renderCollectionPage()" title="إلى تاريخ">
+        <button class="btn" onclick="['f-coll-rep','f-coll-cat','f-coll-month','f-coll-type','f-coll-from','f-coll-to'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});renderCollectionPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap" id="coll-table-wrap"></div>
       <div class="table-pagination">
@@ -1222,7 +1684,6 @@ body.dark tbody td{color:var(--text)}
         <div class="pag-btns" id="coll-pag-btns"></div>
       </div>
     </div>
-    <!-- الرسوم البيانية في الأسفل -->
     <div class="charts-section">
       <div class="charts-section-title">📊 الرسوم البيانية</div>
       <div class="card">
@@ -1233,17 +1694,16 @@ body.dark tbody td{color:var(--text)}
   </div>
 
   <!-- ═══ MODAL: ملخص التحصيل التفصيلي ═══ -->
-  <div id="coll-summary-modal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);align-items:center;justify-content:center">
+  <div id="coll-summary-modal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);align-items:center;justify-content:center">
     <div class="modal-box" style="width:min(820px,97vw);max-height:92vh">
       <div class="modal-header">
         <span class="modal-title">📋 ملخص التحصيل التفصيلي</span>
         <button class="modal-close" onclick="closeCollSummaryModal()">✕</button>
       </div>
       <div class="modal-body" style="padding:16px">
-        <!-- فلاتر النافذة -->
         <div class="filter-bar" style="margin-bottom:14px">
           <span class="filter-label">فلتر:</span>
-          <select id="f-summary-month" onchange="renderCollectionSummary()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-md);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;padding:6px 10px">
+          <select id="f-summary-month" onchange="renderCollectionSummary()" style="background:var(--surface2);border:1px solid var(--border-md);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12px;padding:6px 10px">
             <option value="">كل الأشهر</option>
             <option value="1">يناير</option><option value="2">فبراير</option>
             <option value="3">مارس</option><option value="4">أبريل</option>
@@ -1252,13 +1712,11 @@ body.dark tbody td{color:var(--text)}
             <option value="9">سبتمبر</option><option value="10">أكتوبر</option>
             <option value="11">نوفمبر</option><option value="12">ديسمبر</option>
           </select>
-          <select id="f-summary-rep" onchange="renderCollectionSummary()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-md);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;padding:6px 10px">
-            <option value="">كل المناديب</option>
-          </select>
-          <select id="f-summary-cat" onchange="renderCollectionSummary()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-md);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;padding:6px 10px">
+          <select id="f-summary-rep" onchange="renderCollectionSummary()" style="background:var(--surface2);border:1px solid var(--border-md);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12px;padding:6px 10px"><option value="">كل المندوبين</option></select>
+          <select id="f-summary-cat" onchange="renderCollectionSummary()" style="background:var(--surface2);border:1px solid var(--border-md);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12px;padding:6px 10px">
             <option value="">كل الفئات</option>
           </select>
-          <button class="btn" onclick="['f-summary-month','f-summary-rep','f-summary-cat'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});renderCollectionSummary()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+          <button class="btn" onclick="['f-summary-month','f-summary-rep','f-summary-cat'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});renderCollectionSummary()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
         </div>
         <div id="coll-summary-table" style="padding:0"></div>
       </div>
@@ -1270,9 +1728,8 @@ body.dark tbody td{color:var(--text)}
     <div class="kpi-grid" id="kpi-inventory"></div>
     <div class="inv-grid" id="inv-wh-cards"></div>
 
-    <!-- ملخص الصلاحيات -->
     <div id="inv-expiry-summary" style="display:none;margin-bottom:var(--gap)">
-      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:8px">
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:8px">
         <span>⏰</span> ملخص الصلاحيات
       </div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px" id="inv-expiry-cards"></div>
@@ -1280,11 +1737,18 @@ body.dark tbody td{color:var(--text)}
 
     <div class="card" style="margin-bottom:var(--gap)">
       <div class="card-header"><span class="card-title">🗂 جدول جرد المخازن</span></div>
-      <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--r-md)">
+      <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--radius)">
         <span class="filter-label">فلتر:</span>
-        <select id="f-inv-wh" onchange="renderInventoryPage()"><option value="">كل المستودعات</option></select>
+        <select id="f-inv-wh" onchange="renderInventoryPage()"><option value="">كل المستودعات</option><option value="غير محدد">غير محدد</option><option value="التجزئة">التجزئة</option><option value="الجملة">الجملة</option><option value="اعادة التغليف">اعادة التغليف</option><option value="طلال المشبك">طلال المشبك</option><option value="عبد الرؤوف مسعود نصر">عبد الرؤوف مسعود نصر</option><option value="جملة تاجوراء">جملة تاجوراء</option><option value="عبد الله ابو فيس">عبد الله ابو فيس</option><option value="المبروك الخمسي">المبروك الخمسي</option><option value="المستودع الرئيسي">المستودع الرئيسي</option><option value="رضوان اسماعيل">رضوان اسماعيل</option></select>
         <input type="text" id="f-inv-search" placeholder="🔍 اسم المادة..." oninput="renderInventoryPage()">
-        <button class="btn" onclick="document.getElementById('f-inv-wh').value='';document.getElementById('f-inv-search').value='';renderInventoryPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+        <select id="f-inv-expire" onchange="renderInventoryPage()">
+          <option value="">كل الصلاحيات</option>
+          <option value="expired">منتهي الصلاحية</option>
+          <option value="soon">ينتهي قريباً (30 يوم)</option>
+          <option value="ok">صالح</option>
+          <option value="none">بدون تاريخ</option>
+        </select>
+        <button class="btn" onclick="['f-inv-wh','f-inv-search','f-inv-expire'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});renderInventoryPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap" id="inv-table-wrap"></div>
       <div class="table-pagination">
@@ -1292,123 +1756,67 @@ body.dark tbody td{color:var(--text)}
         <div class="pag-btns" id="inv-pag-btns"></div>
       </div>
     </div>
-    <!-- الرسوم البيانية في الأسفل -->
+
     <div class="charts-section">
       <div class="charts-section-title">📊 الرسوم البيانية</div>
       <div class="grid-2">
         <div class="card">
-          <div class="card-header"><span class="card-title">🏭 الكميات حسب المستودع</span></div>
+          <div class="card-header"><span class="card-title">🏭 المخزون حسب المستودع</span></div>
           <div class="chart-wrap"><canvas id="ch-inv-wh"></canvas></div>
         </div>
         <div class="card">
-          <div class="card-header"><span class="card-title">📦 توزيع المستودعات</span></div>
-          <div class="chart-wrap"><canvas id="ch-inv-pie"></canvas></div>
+          <div class="card-header"><span class="card-title">📦 أكثر 10 مواد كمية</span></div>
+          <div class="chart-wrap"><canvas id="ch-inv-top"></canvas></div>
         </div>
       </div>
     </div>
   </div>
 
-</div><!-- /main -->
-
-<!-- ═══════════ UPLOAD MODAL ═══════════ -->
-<div id="upload-modal">
-  <div class="modal-box">
-    <div class="modal-header">
-      <span class="modal-title">⬆ رفع البيانات / المزامنة</span>
-      <button class="modal-close" onclick="closeUploadModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="modal-tabs">
-        <div class="modal-tab active" onclick="switchModalTab('local')">📁 رفع محلي</div>
-        <div class="modal-tab" onclick="switchModalTab('gsheet')">🔗 Google Sheets</div>
+  <!-- ═══ UPLOAD MODAL ═══ -->
+  <div id="upload-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span class="modal-title">⬆ رفع البيانات / مزامنة</span>
+        <button class="modal-close" onclick="closeUploadModal()">✕</button>
       </div>
-      <!-- LOCAL PANEL -->
-      <div class="modal-panel active" id="panel-local">
-        <!-- ══ منطقة الإسقاط الموحّدة ══ -->
-        <div id="smart-dropzone"
-          onclick="document.getElementById('file-input-multi').click()"
-          ondragover="smartDzOver(event)"
-          ondragleave="smartDzLeave(event)"
-          ondrop="smartDzDrop(event)">
-          <div class="sdz-folder">📁</div>
-          <div class="sdz-title">اسحب الملفات هنا أو اضغط للاختيار</div>
-          <div class="sdz-sub">يمكنك إلقاء عدة ملفات دفعة واحدة — تُوزَّع تلقائياً حسب الاسم</div>
+      <div class="modal-body">
+        <div class="modal-tabs">
+          <div class="modal-tab active" onclick="switchModalTab('local')">📂 رفع ملفات</div>
+          <div class="modal-tab" onclick="switchModalTab('sheets')">🔗 Google Sheets</div>
         </div>
-        <!-- ملف متعدد -->
-        <input type="file" id="file-input-multi" accept=".xlsx,.xls" multiple style="display:none" onchange="handleMultiFileSelect(event)">
-        <!-- ملف مفرد (للتوافق مع القديم) -->
-        <input type="file" id="file-input" accept=".xlsx,.xls" style="display:none" onchange="handleFileSelect(event)">
-
-        <!-- بطاقات الحالة المعروفة -->
-        <div id="sdz-cards" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px">
-          <div class="sdz-card" id="scard-sales">
-            <div class="scard-icon">📊</div>
-            <div class="scard-name">مبيعات</div>
-            <div class="scard-status" id="ss-sales">⬜ لم يُرفع</div>
+        <div class="modal-panel active" id="modal-panel-local">
+          <div id="smart-dropzone" onclick="document.getElementById('bulk-file-input').click()"
+               ondragover="event.preventDefault();this.classList.add('drag-over')"
+               ondragleave="this.classList.remove('drag-over')"
+               ondrop="event.preventDefault();this.classList.remove('drag-over');handleSmartDrop(event.dataTransfer.files)">
+            <div class="sdz-folder">📁</div>
+            <div class="sdz-title">اسحب ملفاتك هنا أو انقر للتصفح</div>
+            <div class="sdz-sub">يدعم: مبيعات، تحصيل، مديونية، ذمم، مخزون، مناديب<br>صيغ: xlsx, csv</div>
+            <input type="file" id="bulk-file-input" multiple accept=".xlsx,.csv" style="display:none" onchange="handleSmartDrop(this.files)">
           </div>
-          <div class="sdz-card" id="scard-debt">
-            <div class="scard-icon">💳</div>
-            <div class="scard-name">مديونية</div>
-            <div class="scard-status" id="ss-debt">⬜ لم يُرفع</div>
-          </div>
-          <div class="sdz-card" id="scard-aging">
-            <div class="scard-icon">⏳</div>
-            <div class="scard-name">أعمار الذمم</div>
-            <div class="scard-status" id="ss-aging">⬜ لم يُرفع</div>
-          </div>
-          <div class="sdz-card" id="scard-collection">
-            <div class="scard-icon">💰</div>
-            <div class="scard-name">تحصيل</div>
-            <div class="scard-status" id="ss-collection">⬜ لم يُرفع</div>
-          </div>
-          <div class="sdz-card" id="scard-inventory">
-            <div class="scard-icon">🏭</div>
-            <div class="scard-name">جرد المخازن</div>
-            <div class="scard-status" id="ss-inventory">⬜ لم يُرفع</div>
-          </div>
-        </div>
-
-        <!-- سجل العمليات -->
-        <div id="file-status" class="file-list" style="margin-top:12px;max-height:200px;overflow-y:auto"></div>
-        <!-- شريط التقدم -->
-        <div style="margin-top:8px">
-          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:4px">
-            <span id="sdz-progress-label"></span>
-            <span id="sdz-progress-pct"></span>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px" id="sdz-cards">
+            <div class="sdz-card" id="scard-sales"><div class="scard-icon">📊</div><div class="scard-name">مبيعات</div><div class="scard-status">لم يُحمَّل</div></div>
+            <div class="sdz-card" id="scard-collection"><div class="scard-icon">💰</div><div class="scard-name">تحصيل</div><div class="scard-status">لم يُحمَّل</div></div>
+            <div class="sdz-card" id="scard-debt"><div class="scard-icon">💳</div><div class="scard-name">مديونية</div><div class="scard-status">لم يُحمَّل</div></div>
+            <div class="sdz-card" id="scard-aging"><div class="scard-icon">⏳</div><div class="scard-name">أعمار الذمم</div><div class="scard-status">لم يُحمَّل</div></div>
+            <div class="sdz-card" id="scard-inventory"><div class="scard-icon">🏭</div><div class="scard-name">المخازن</div><div class="scard-status">لم يُحمَّل</div></div>
+            <div class="sdz-card" id="scard-reps"><div class="scard-icon">👥</div><div class="scard-name">المناديب</div><div class="scard-status">لم يُحمَّل</div></div>
           </div>
           <div class="progress-bar-wrap"><div class="progress-bar" id="upload-progress"></div></div>
+          <div id="upload-status" style="font-size:11px;color:var(--muted);margin-top:8px;text-align:center"></div>
         </div>
-      </div>
-      <!-- GOOGLE SHEETS PANEL -->
-      <div class="modal-panel" id="panel-gsheet">
-        <div class="gs-help">
-          <strong style="color:var(--accent)">كيفية الإعداد:</strong><br>
-          1. افتح Google Sheets وشارك الملف (عرض لأي شخص)<br>
-          2. انسخ رابط الملف أو معرّف الورقة<br>
-          3. أدخل رابط CSV المباشر بالشكل:<br>
-          <code>https://docs.google.com/spreadsheets/d/ID/export?format=csv&gid=SHEET_ID</code>
-        </div>
-        <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px">رابط المبيعات (CSV)</label>
-        <input class="gs-input" id="gs-sales" placeholder="https://docs.google.com/spreadsheets/...">
-        <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px">رابط المديونية (CSV)</label>
-        <input class="gs-input" id="gs-debt" placeholder="https://docs.google.com/spreadsheets/...">
-        <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px">رابط أعمار الذمم (CSV)</label>
-        <input class="gs-input" id="gs-aging" placeholder="https://docs.google.com/spreadsheets/...">
-        <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px">رابط التحصيل (CSV)</label>
-        <input class="gs-input" id="gs-collection" placeholder="https://docs.google.com/spreadsheets/...">
-        <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px">رابط جرد المخازن (CSV)</label>
-        <input class="gs-input" id="gs-inventory" placeholder="https://docs.google.com/spreadsheets/...">
-        <label style="font-size:11px;color:var(--gold);display:block;margin-bottom:4px;margin-top:8px">👥 تصنيف المندوبين والأهداف (CSV)</label>
-        <input class="gs-input" id="gs-reps" placeholder="https://docs.google.com/spreadsheets/..." style="border-color:rgba(255,215,0,.4)">
-
-        <!-- فترة التحديث التلقائي -->
-        <div style="margin-top:14px;padding:12px;background:var(--surface2);border-radius:var(--r-md);border:1px solid var(--border)">
-          <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px">⏱ التحديث التلقائي</div>
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-            <select id="gs-interval" style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-md);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;padding:6px 10px;flex:1">
-              <option value="0">بدون تحديث تلقائي</option>
-              <option value="1">كل دقيقة</option>
-              <option value="2">كل دقيقتين</option>
+        <div class="modal-panel" id="modal-panel-sheets">
+          <p class="gs-help">أدخل روابط تصدير CSV من Google Sheets. مثال: <code>https://docs.google.com/spreadsheets/d/ID/export?format=csv&gid=0</code></p>
+          <input class="gs-input" id="gs-url-sales" placeholder="رابط ملف المبيعات (CSV)">
+          <input class="gs-input" id="gs-url-collection" placeholder="رابط ملف التحصيل (CSV)">
+          <input class="gs-input" id="gs-url-debt" placeholder="رابط ملف المديونية (CSV)">
+          <input class="gs-input" id="gs-url-aging" placeholder="رابط ملف أعمار الذمم (CSV)">
+          <input class="gs-input" id="gs-url-inventory" placeholder="رابط ملف المخازن (CSV)">
+          <input class="gs-input" id="gs-url-reps" placeholder="رابط ملف المناديب (CSV)">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+            <label style="font-size:12px;color:var(--text2);font-weight:500">تحديث تلقائي:</label>
+            <select id="auto-refresh-interval" onchange="setAutoRefresh(this.value)" style="background:var(--surface2);border:1px solid var(--border-md);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12px;padding:5px 10px">
+              <option value="0">بدون تحديث</option>
               <option value="5" selected>كل 5 دقائق</option>
               <option value="10">كل 10 دقائق</option>
               <option value="15">كل 15 دقيقة</option>
@@ -1417,14 +1825,13 @@ body.dark tbody td{color:var(--text)}
             </select>
           </div>
           <div style="font-size:10px;color:var(--muted);margin-top:6px" id="auto-refresh-status">🔄 تحديث تلقائي كل 5 دقائق</div>
+          <div style="margin-top:6px"><div class="progress-bar-wrap"><div class="progress-bar" id="gs-progress"></div></div></div>
+          <div style="margin-top:14px;display:flex;gap:10px">
+            <button class="btn primary" onclick="syncGoogleSheets()" style="flex:1">🔄 مزامنة الآن</button>
+            <button class="btn" onclick="saveGsUrls()">💾 حفظ</button>
+          </div>
+          <div id="gs-status" style="margin-top:10px;font-size:11px;color:var(--muted)"></div>
         </div>
-
-        <div style="margin-top:6px"><div class="progress-bar-wrap"><div class="progress-bar" id="gs-progress"></div></div></div>
-        <div style="margin-top:14px;display:flex;gap:10px">
-          <button class="btn primary" onclick="syncGoogleSheets()" style="flex:1">🔄 مزامنة الآن</button>
-          <button class="btn" onclick="saveGsUrls()">💾 حفظ</button>
-        </div>
-        <div id="gs-status" style="margin-top:10px;font-size:11px;color:var(--muted)"></div>
       </div>
     </div>
   </div>
@@ -1497,7 +1904,7 @@ function _cv(name){return getComputedStyle(document.documentElement).getProperty
 function _chartColors(){
   return {
     text:   _cv('--text2')   || '#4a5568',
-    muted:  _cv('--muted')   || '#8a95a3',
+    muted:  _cv('--muted')   || 'var(--muted)',
     grid:   _cv('--border')  || '#dde3ec',
     bg:     _cv('--surface') || '#ffffff',
     border: _cv('--border2') || '#c8d2e0',
@@ -1511,7 +1918,7 @@ const fmt=n=>isNaN(n)?'—':(+n).toLocaleString('ar-LY',{minimumFractionDigits:0
 const fmtShort=n=>{if(!n||isNaN(n))return'—';n=+n;if(n>=1e6)return(n/1e6).toFixed(2)+'م';if(n>=1e3)return(n/1e3).toFixed(1)+'ك';return n.toFixed(0)};
 const monthNames={1:'يناير',2:'فبراير',3:'مارس',4:'أبريل',5:'مايو',6:'يونيو',7:'يوليو',8:'أغسطس',9:'سبتمبر',10:'أكتوبر',11:'نوفمبر',12:'ديسمبر'};
 
-const COLORS=['#1a6ef5','#0ab87a','#f5820a','#7c3aed','#d4a017','#e53e3e','#db2777','#0ea5e9','#22d3ee','#84cc16','#f59e0b','#ef4444','#8b5cf6','#14b8a6','#f97316'];
+const COLORS=['var(--accent)','#059669','#f5820a','#7c3aed','#d4a017','#e53e3e','#db2777','#0ea5e9','#22d3ee','#84cc16','#f59e0b','#ef4444','#8b5cf6','#14b8a6','#f97316'];
 
 function _chartDefaults(){
   const c=_chartColors();
@@ -4631,11 +5038,11 @@ function _showLoadingError(){
     </div>
     <button onclick="document.getElementById('loading-error').style.display='none';autoLoadOnStartup()" style="
       background:var(--accent);color:#fff;border:none;border-radius:8px;
-      padding:10px 24px;font-size:13px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer
+      padding:10px 24px;font-size:13px;font-weight:700;font-family:'IBM Plex Sans Arabic','Cairo',sans-serif;cursor:pointer
     ">🔄 إعادة المحاولة</button>
     <button onclick="document.getElementById('loading-error').style.display='none'" style="
       background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:8px;
-      padding:8px 20px;font-size:12px;font-family:'Cairo',sans-serif;cursor:pointer
+      padding:8px 20px;font-size:12px;font-family:'IBM Plex Sans Arabic','Cairo',sans-serif;cursor:pointer
     ">تخطي وعرض اللوحة فارغة</button>
   `;
   document.body.appendChild(el);
@@ -4661,7 +5068,7 @@ function _showSetupScreen(){
       </p>
       <button onclick="closeSetupAndOpenUpload()" style="
         background:var(--accent);color:#fff;border:none;border-radius:10px;
-        padding:14px 32px;font-size:14px;font-weight:700;font-family:'Cairo',sans-serif;
+        padding:14px 32px;font-size:14px;font-weight:700;font-family:'IBM Plex Sans Arabic','Cairo',sans-serif;
         cursor:pointer;transition:opacity .2s;width:100%;max-width:300px;
       ">⚙️ إعداد مصادر البيانات</button>
       <div style="margin-top:16px;font-size:11px;color:var(--muted)">
@@ -4693,8 +5100,8 @@ function _showLoadingOverlay(){
     el.innerHTML=`
 <style>
 #loading-overlay{
-  background:#f8faff;
-  font-family:'Cairo',sans-serif;
+  background:var(--bg);
+  font-family:'IBM Plex Sans Arabic','Cairo',sans-serif;
 }
 .ld-wrap{
   display:flex;flex-direction:column;align-items:center;
@@ -4722,7 +5129,7 @@ function _showLoadingOverlay(){
 /* النصوص */
 .ld-title{
   font-size:18px;font-weight:800;
-  color:#1a2332;
+  color:var(--text);
   margin-bottom:5px;
   letter-spacing:-.3px;
   text-align:center;
@@ -4730,22 +5137,22 @@ function _showLoadingOverlay(){
 }
 .ld-company{
   font-size:13px;font-weight:600;
-  color:#1a6ef5;
+  color:var(--accent);
   margin-bottom:4px;
   text-align:center;
 }
 .ld-author{
   font-size:11px;
-  color:#8a95a3;
+  color:var(--muted);
   margin-bottom:24px;
   text-align:center;
 }
-.ld-author span{color:#1a2332;font-weight:700}
+.ld-author span{color:var(--text);font-weight:700}
 
 /* الفاصل */
 .ld-divider{
   width:40px;height:3px;
-  background:linear-gradient(90deg,#1a6ef5,#0ab87a);
+  background:linear-gradient(90deg,var(--accent),#0ab87a);
   border-radius:999px;
   margin:0 auto 24px;
 }
@@ -4769,7 +5176,7 @@ function _showLoadingOverlay(){
   display:flex;align-items:center;justify-content:center;
   font-size:clamp(14px,3.5vw,19px);
   transition:all .3s;
-  border:1.5px solid #eef2f7;
+  border:1.5px solid var(--surface2);
   position:relative;overflow:hidden;
 }
 .ld-icon-box::after{
@@ -4784,13 +5191,13 @@ function _showLoadingOverlay(){
 }
 .ld-icon-box.loaded::after{opacity:1;background:linear-gradient(135deg,rgba(10,184,122,.1),transparent)}
 .ld-icon-box.loading{
-  border-color:#1a6ef5;
+  border-color:var(--accent);
   animation:ldIconPulse .8s ease-in-out infinite;
 }
 @keyframes ldIconPulse{0%,100%{box-shadow:0 2px 12px rgba(26,110,245,.1)}50%{box-shadow:0 2px 20px rgba(26,110,245,.25)}}
 .ld-icon-lbl{
   font-size:clamp(8px,2vw,9px);
-  color:#8a95a3;font-weight:600;
+  color:var(--muted);font-weight:600;
   text-align:center;
   white-space:nowrap;
   overflow:hidden;
@@ -4801,14 +5208,14 @@ function _showLoadingOverlay(){
 /* شريط التقدم */
 .ld-progress-wrap{
   width:100%;height:3px;
-  background:#eef2f7;
+  background:var(--surface2);
   border-radius:999px;
   overflow:hidden;
   margin-bottom:12px;
 }
 .ld-progress-bar{
   height:100%;width:0%;
-  background:linear-gradient(90deg,#1a6ef5,#0ab87a);
+  background:linear-gradient(90deg,var(--accent),#0ab87a);
   border-radius:999px;
   transition:width .4s ease;
 }
@@ -4824,7 +5231,7 @@ function _showLoadingOverlay(){
 
 /* الرسالة */
 .ld-msg{
-  font-size:11px;color:#8a95a3;
+  font-size:11px;color:var(--muted);
   text-align:center;min-height:16px;
   transition:opacity .3s;
 }
@@ -4832,7 +5239,7 @@ function _showLoadingOverlay(){
 /* الفوتر */
 .ld-footer{
   margin-top:28px;
-  font-size:10px;color:#c0cad6;
+  font-size:10px;color:var(--muted);
   text-align:center;
 }
 
@@ -6043,5 +6450,231 @@ document.addEventListener('DOMContentLoaded',()=>{
   autoLoadOnStartup();
 });
 </script>
-</body>
-</html>
+</script>
+
+
+<div id="loading-overlay" style="position: fixed; inset: 0px; z-index: 9997; display: none; align-items: center; justify-content: center;">
+<style>
+#loading-overlay{
+  background:var(--bg);
+  font-family:'IBM Plex Sans Arabic','Cairo',sans-serif;
+}
+.ld-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  width:100%;max-width:420px;padding:0 24px;
+  animation:ldFadeIn .5s ease;
+}
+@keyframes ldFadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* الشعار */
+.ld-logo-wrap{
+  width:120px;height:120px;
+  background:#fff;
+  border-radius:24px;
+  box-shadow:0 8px 32px rgba(26,95,212,.10), 0 2px 8px rgba(0,0,0,.06);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:22px;
+  padding:14px;
+  flex-shrink:0;
+}
+.ld-logo-wrap img{
+  width:100%;height:auto;
+  object-fit:contain;
+}
+
+/* النصوص */
+.ld-title{
+  font-size:18px;font-weight:800;
+  color:var(--text);
+  margin-bottom:5px;
+  letter-spacing:-.3px;
+  text-align:center;
+  line-height:1.3;
+}
+.ld-company{
+  font-size:13px;font-weight:600;
+  color:var(--accent);
+  margin-bottom:4px;
+  text-align:center;
+}
+.ld-author{
+  font-size:11px;
+  color:var(--muted);
+  margin-bottom:24px;
+  text-align:center;
+}
+.ld-author span{color:var(--text);font-weight:700}
+
+/* الفاصل */
+.ld-divider{
+  width:40px;height:3px;
+  background:linear-gradient(90deg,var(--accent),#0ab87a);
+  border-radius:999px;
+  margin:0 auto 24px;
+}
+
+/* الأيقونات الست */
+.ld-icons{
+  display:flex;gap:8px;margin-bottom:24px;
+  flex-wrap:nowrap;justify-content:center;
+  width:100%;
+}
+.ld-icon-item{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  flex:1;min-width:0;max-width:56px;
+}
+.ld-icon-box{
+  width:100%;aspect-ratio:1;
+  max-width:44px;min-width:34px;
+  border-radius:10px;
+  background:#fff;
+  box-shadow:0 2px 12px rgba(0,0,0,.07);
+  display:flex;align-items:center;justify-content:center;
+  font-size:clamp(14px,3.5vw,19px);
+  transition:all .3s;
+  border:1.5px solid var(--surface2);
+  position:relative;overflow:hidden;
+}
+.ld-icon-box::after{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(26,110,245,.08),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.ld-icon-box.loaded{
+  border-color:#0ab87a;
+  box-shadow:0 2px 12px rgba(10,184,122,.15);
+}
+.ld-icon-box.loaded::after{opacity:1;background:linear-gradient(135deg,rgba(10,184,122,.1),transparent)}
+.ld-icon-box.loading{
+  border-color:var(--accent);
+  animation:ldIconPulse .8s ease-in-out infinite;
+}
+@keyframes ldIconPulse{0%,100%{box-shadow:0 2px 12px rgba(26,110,245,.1)}50%{box-shadow:0 2px 20px rgba(26,110,245,.25)}}
+.ld-icon-lbl{
+  font-size:clamp(8px,2vw,9px);
+  color:var(--muted);font-weight:600;
+  text-align:center;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  width:100%;
+}
+
+/* شريط التقدم */
+.ld-progress-wrap{
+  width:100%;height:3px;
+  background:var(--surface2);
+  border-radius:999px;
+  overflow:hidden;
+  margin-bottom:12px;
+}
+.ld-progress-bar{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--accent),#0ab87a);
+  border-radius:999px;
+  transition:width .4s ease;
+}
+.ld-progress-bar.indeterminate{
+  width:40%!important;
+  animation:ldIndeterminate 1.4s ease-in-out infinite;
+}
+@keyframes ldIndeterminate{
+  0%  {margin-right:100%;width:30%}
+  50% {margin-right:20%; width:50%}
+  100%{margin-right:0%;  width:30%}
+}
+
+/* الرسالة */
+.ld-msg{
+  font-size:11px;color:var(--muted);
+  text-align:center;min-height:16px;
+  transition:opacity .3s;
+}
+
+/* الفوتر */
+.ld-footer{
+  margin-top:28px;
+  font-size:10px;color:var(--muted);
+  text-align:center;
+}
+
+/* ── جوال صغير ≤380px ── */
+@media(max-width:380px){
+  .ld-wrap{padding:0 16px}
+  .ld-logo-wrap{width:90px;height:90px;border-radius:18px;padding:10px;margin-bottom:16px}
+  .ld-title{font-size:15px;margin-bottom:4px}
+  .ld-company{font-size:12px}
+  .ld-author{font-size:10px;margin-bottom:18px}
+  .ld-divider{margin-bottom:18px}
+  .ld-icons{gap:6px}
+  .ld-icon-box{border-radius:8px;min-width:28px}
+  .ld-footer{margin-top:20px;font-size:9px}
+}
+
+/* ── جوال متوسط 381-480px ── */
+@media(min-width:381px) and (max-width:480px){
+  .ld-logo-wrap{width:100px;height:100px;margin-bottom:18px}
+  .ld-title{font-size:16px}
+  .ld-author{margin-bottom:20px}
+  .ld-divider{margin-bottom:20px}
+}
+
+/* ── شاشة قصيرة (landscape) ── */
+@media(max-height:600px){
+  .ld-logo-wrap{width:70px;height:70px;border-radius:16px;padding:8px;margin-bottom:12px}
+  .ld-title{font-size:14px;margin-bottom:3px}
+  .ld-company{font-size:11px;margin-bottom:2px}
+  .ld-author{font-size:10px;margin-bottom:14px}
+  .ld-divider{margin-bottom:14px;width:32px}
+  .ld-icons{margin-bottom:14px;gap:6px}
+  .ld-icon-box{min-width:30px;border-radius:8px}
+  .ld-footer{margin-top:14px;font-size:9px}
+}
+</style>
+
+<div class="ld-wrap">
+  <div class="ld-logo-wrap">
+    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIbGNtcwIQAABtbnRyUkdCIFhZWiAH4gADABQACQAOAB1hY3NwTVNGVAAAAABzYXdzY3RybAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWhhbmSdkQA9QICwPUB0LIGepSKOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAABxjcHJ0AAABDAAAAAx3dHB0AAABGAAAABRyWFlaAAABLAAAABRnWFlaAAABQAAAABRiWFlaAAABVAAAABRyVFJDAAABaAAAAGBnVFJDAAABaAAAAGBiVFJDAAABaAAAAGBkZXNjAAAAAAAAAAV1UkdCAAAAAAAAAAAAAAAAdGV4dAAAAABDQzAAWFlaIAAAAAAAAPNUAAEAAAABFslYWVogAAAAAAAAb6AAADjyAAADj1hZWiAAAAAAAABilgAAt4kAABjaWFlaIAAAAAAAACSgAAAPhQAAtsRjdXJ2AAAAAAAAACoAAAB8APgBnAJ1A4MEyQZOCBIKGAxiDvQRzxT2GGocLiBDJKwpai5+M+s5sz/WRldNNlR2XBdkHWyGdVZ+jYgskjacq6eMstu+mcrH12Xkd/H5////2wBDAAkGBwgHBgkICAgKCgkLDhcPDg0NDhwUFREXIh4jIyEeICAlKjUtJScyKCAgLj8vMjc5PDw8JC1CRkE6RjU7PDn/2wBDAQoKCg4MDhsPDxs5JiAmOTk5OTk5OTk5OTk5OTk5OTk5OTk5OTk5OTk5OTk5OTk5OTk5OTk5OTk5OTk5OTk5OTn/wAARCAMgAyADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD3GiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAoo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ACiiigAooooAbWZfaFpl+5e5tEZz1YEqT9SME1p4pcVMoxkrSRUJyg7xdmYK+EdEU5+ys2OxkbH8617S1gs4Vht41jjXoqjgVPik5qYU4Q+FJFVK1Sp8cmx1FFFaGYUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAH//Z" alt="Rakan">
+  </div>
+
+  <div class="ld-title">لوحة التحليل الاستراتيجي</div>
+  <div class="ld-company">شركة ركان المتوسط</div>
+  <div class="ld-author">إعداد: <span>المحاسب أحمد العكاري</span></div>
+  <div class="ld-divider"></div>
+
+  <div class="ld-icons" id="ld-icons">
+    <div class="ld-icon-item">
+      <div class="ld-icon-box loading" id="ldi-sales" style="border-color: var(--red);">📊</div>
+      <div class="ld-icon-lbl">مبيعات</div>
+    </div>
+    <div class="ld-icon-item">
+      <div class="ld-icon-box loading" id="ldi-collection" style="border-color: var(--red);">💰</div>
+      <div class="ld-icon-lbl">تحصيل</div>
+    </div>
+    <div class="ld-icon-item">
+      <div class="ld-icon-box loaded" id="ldi-debt">💳</div>
+      <div class="ld-icon-lbl">مديونية</div>
+    </div>
+    <div class="ld-icon-item">
+      <div class="ld-icon-box loaded" id="ldi-aging">⏳</div>
+      <div class="ld-icon-lbl">الذمم</div>
+    </div>
+    <div class="ld-icon-item">
+      <div class="ld-icon-box loaded" id="ldi-inventory">🏭</div>
+      <div class="ld-icon-lbl">المخازن</div>
+    </div>
+    <div class="ld-icon-item">
+      <div class="ld-icon-box loading" id="ldi-reps" style="border-color: var(--red);">👥</div>
+      <div class="ld-icon-lbl">المناديب</div>
+    </div>
+  </div>
+
+  <div class="ld-progress-wrap">
+    <div class="ld-progress-bar" id="ld-progress" style="width: 100%;"></div>
+  </div>
+  <div class="ld-msg" id="loading-msg">✅ تم تحميل البيانات بنجاح</div>
+
+  <div class="ld-footer">© 2026 شركة ركان المتوسط — جميع الحقوق محفوظة</div>
+</div>
+    </div></body></html>
