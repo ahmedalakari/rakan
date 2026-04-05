@@ -5082,14 +5082,13 @@ function _rebuildItemData(){
 // ── تطبيع مفاتيح صفوف CSV: إزالة BOM والأحرف الخفية من أسماء الأعمدة ──
 function _normalizeRowKeys(rows){
   if(!rows||!rows.length)return rows;
+  const firstKeys=Object.keys(rows[0]);
+  const needsNorm=firstKeys.some(k=>/[\uFEFF\u200B-\u200F\u202A-\u202E\u2060\u00A0]/.test(k)||k!==k.trim());
+  if(!needsNorm)return rows;
   return rows.map(r=>{
     const nr={};
     Object.keys(r).forEach(k=>{
-      let nk=k.replace(/^\uFEFF/,'').replace(/[\u200B-\u200F\u202A-\u202E\u2060\u00A0]/g,'').trim();
-      // تحويل الشرطة السفلية إلى مسافة (من Supabase)
-      nk=nk.replace(/_/g,' ');
-      // تجاهل أعمدة Supabase الداخلية
-      if(nk==='id'||nk==='synced at')return;
+      const nk=k.replace(/^\uFEFF/,'').replace(/[\u200B-\u200F\u202A-\u202E\u2060\u00A0]/g,'').trim();
       nr[nk]=r[k];
     });
     return nr;
@@ -5575,144 +5574,279 @@ function addFileStatus(container,name,status,msg){
 // ══════════════════════════════════════════════════════
 //  GOOGLE SHEETS SYNC + AUTO-REFRESH
 // ══════════════════════════════════════════════════════
-// ══════════════════════════════════════════════════════
-// SUPABASE — الاتصال المباشر
-// ══════════════════════════════════════════════════════
-const SB_URL='https://tldhmgjnkezunvisyqft.supabase.co';
-const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsZGhtZ2pua2V6dW52aXN5cWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMzQ3MzksImV4cCI6MjA5MDkxMDczOX0.5VC0q2c_V0z78kD9kR4yl-HV6iYWEOW-cExy-fqwFZQ';
-async function _sbFetch(table,limit=200000){
-  const r=await fetch(`${SB_URL}/rest/v1/${encodeURIComponent(table)}?select=*&limit=${limit}`,{
-    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Accept':'application/json'}
-  });
-  if(!r.ok)throw new Error(`${table}: HTTP ${r.status}`);
-  return r.json();
+function saveGsUrls(){
+  const urls={
+    sales:    document.getElementById('gs-sales')?.value||'',
+    debt:     document.getElementById('gs-debt')?.value||'',
+    aging:    document.getElementById('gs-aging')?.value||'',
+    collection:document.getElementById('gs-collection')?.value||'',
+    inventory: document.getElementById('gs-inventory')?.value||'',
+    reps:     document.getElementById('gs-reps')?.value||''
+  };
+  const interval=document.getElementById('gs-interval')?.value||'5';
+  try{
+    localStorage.setItem(GS_STORAGE_KEY,JSON.stringify(urls));
+    localStorage.setItem(AUTO_REFRESH_KEY,interval);
+    toast('✅ تم حفظ الروابط والإعدادات','success');
+    _startAutoRefresh();
+  }catch(e){toast('⚠ تعذّر الحفظ','error')}
 }
-function saveGsUrls(){toast('✅ البيانات تُحمَّل من Supabase تلقائياً','info');}
 
-function loadGsUrls(){return false;}
+function loadGsUrls(){
+  try{
+    const saved=localStorage.getItem(GS_STORAGE_KEY);
+    if(!saved)return false;
+    const urls=JSON.parse(saved);
+    ['sales','debt','aging','collection','inventory','reps'].forEach(k=>{
+      const el=document.getElementById('gs-'+k);
+      if(el&&urls[k])el.value=urls[k];
+    });
+    const savedInterval=localStorage.getItem(AUTO_REFRESH_KEY)||'5';
+    const intEl=document.getElementById('gs-interval');
+    if(intEl)intEl.value=savedInterval;
+    return Object.values(urls).some(v=>v&&v.trim());
+  }catch(e){return false;}
+}
 
+// ── التحديث التلقائي ─────────────────────────────────
 function _startAutoRefresh(){
   if(_autoRefreshTimer)clearInterval(_autoRefreshTimer);
-  _autoRefreshTimer=setInterval(async()=>{await _autoSyncQuiet();},5*60*1000);
-  const el=document.getElementById('auto-refresh-status');
-  if(el)el.textContent='🔄 تحديث تلقائي كل 5 دقائق';
+  const mins=parseInt(localStorage.getItem(AUTO_REFRESH_KEY)||'5');
+  if(mins<=0)return;
+  _autoRefreshTimer=setInterval(async()=>{
+    await _autoSyncQuiet();
+  }, mins*60*1000);
+  _updateRefreshStatus();
 }
+
 function _updateRefreshStatus(){
+  const mins=parseInt(localStorage.getItem(AUTO_REFRESH_KEY)||'5');
   const el=document.getElementById('auto-refresh-status');
-  if(el)el.textContent='🔄 تحديث تلقائي كل 5 دقائق';
+  if(el)el.textContent=mins>0?`🔄 تحديث تلقائي كل ${mins} دقيقة`:'⏸ التحديث التلقائي متوقف';
 }
 
 async function _autoSyncQuiet(){
+  const urls = GS_URLS_EMBEDDED;
+  const keys = ['sales','collection','debt','inventory','reps','aging'];
   const msgEl=document.getElementById('loading-msg');
   const progBar=document.getElementById('ld-progress');
   const iconMap={sales:'ldi-sales',collection:'ldi-collection',debt:'ldi-debt',inventory:'ldi-inventory',reps:'ldi-reps',aging:'ldi-aging'};
-  const CACHE_KEY='rakan_sb_v2';
-  const CACHE_TS='rakan_sb_ts_v2';
-  const CACHE_TTL=5*60*1000;
+  const CACHE_KEY='rakan_data_cache_v2';
+  const CACHE_TS_KEY='rakan_cache_ts_v2';
+  const CACHE_TTL=15*60*1000; // 15 دقيقة
 
+  /* ── 1. أظهر Cache المحلي فوراً إن كان موجوداً ── */
   let cacheShown=false;
   try{
     const cached=localStorage.getItem(CACHE_KEY);
-    const ts=parseInt(localStorage.getItem(CACHE_TS)||'0');
-    if(cached&&(Date.now()-ts)<CACHE_TTL){
-      const d=JSON.parse(cached);
-      if(Object.keys(d).length>0){
-        Object.entries(d).forEach(([k,rows])=>processNewData(k,rows));
+    const ts=parseInt(localStorage.getItem(CACHE_TS_KEY)||'0');
+    if(cached && (Date.now()-ts)<CACHE_TTL){
+      const cachedData=JSON.parse(cached);
+      if(Object.keys(cachedData).length>0){
+        Object.entries(cachedData).forEach(([key,rows])=>{
+          processNewData(key,rows);
+        });
         cacheShown=true;
-        if(msgEl)msgEl.textContent='⚡ تم تحميل البيانات فوراً';
-        _invalidatePageCache();populateMonthSelects();
+        if(msgEl)msgEl.textContent='⚡ تم تحميل البيانات المحفوظة — جاري التحديث...';
+        _invalidatePageCache();
+        populateMonthSelects();
         const p=window.currentPage||'overview';
         if(PAGE_RENDERS[p])PAGE_RENDERS[p]();
-        setTimeout(()=>_hideLoadingOverlay(),200);
+        /* أخفِ شاشة التحميل مبكراً بعد 300ms */
+        setTimeout(()=>_hideLoadingOverlay(),300);
       }
     }
-  }catch(e){}
+  }catch(e){/* localStorage unavailable */}
 
-  if(msgEl)msgEl.textContent=cacheShown?'🔄 جاري التحديث...':'⚡ جاري تحميل البيانات...';
+  /* ── 2. ابدأ fetch كل الملفات بالتوازي مع timeout ── */
+  if(msgEl)msgEl.textContent=cacheShown?'🔄 جاري تحديث البيانات...':'⬇ جاري تحميل البيانات...';
 
-  const tables=[
-    {key:'sales',      table:'مبيعات'},
-    {key:'collection', table:'تحصيل'},
-    {key:'debt',       table:'مديونية'},
-    {key:'aging',      table:'اعمار_الذمم'},
-    {key:'inventory',  table:'مخازن'},
-    {key:'reps',       table:'مناديب'},
-  ];
+  keys.forEach(k=>{
+    const ic=document.getElementById(iconMap[k]);
+    if(ic){ic.className='ld-icon-box loading';ic.removeAttribute('style');}
+  });
+  if(progBar&&!cacheShown){progBar.className='ld-progress-bar indeterminate';}
 
+  const TIMEOUT_MS=8000; /* 8 ثوان كحد أقصى لكل ملف */
   let completed=0;
   const freshData={};
-  const promises=tables.map(async({key,table})=>{
+
+  /* ── 3. كل ملف يُعالج فور وصوله (لا انتظار للكل) ── */
+  const promises=keys.map(async key=>{
+    const url=urls[key];
+    if(!url)return null;
+    const fetchUrl=url.includes('?')?url+'&t='+Date.now():url+'?t='+Date.now();
     try{
-      const raw=await _sbFetch(table);
-      // البيانات تُطبَّع في processNewData عبر _normalizeRowKeys
-      freshData[key]=raw;
-      processNewData(key,raw);
+      /* fetch مع timeout */
+      const controller=new AbortController();
+      const timer=setTimeout(()=>controller.abort(),TIMEOUT_MS);
+      const resp=await fetch(fetchUrl,{method:'GET',cache:'no-store',signal:controller.signal});
+      clearTimeout(timer);
+      if(!resp.ok)throw new Error(`HTTP ${resp.status}`);
+      const text=await resp.text();
+      if(!text||text.trim().length<10)throw new Error('فارغ');
+      if(text.trim().startsWith('<!DOCTYPE')||text.trim().startsWith('<html'))
+        throw new Error('HTML بدلاً من CSV');
+
+      /* ── عالج وعرض فوراً بدون انتظار الملفات الأخرى ── */
+      const rows=csvToRows(text);
+      freshData[key]=rows;
+      processNewData(key,rows);
       completed++;
+
+      /* تحديث UI فوري */
       const ic=document.getElementById(iconMap[key]);
       if(ic)ic.className='ld-icon-box loaded';
-      if(progBar){progBar.className='ld-progress-bar';progBar.style.width=(completed/tables.length*100)+'%';}
-      if(msgEl)msgEl.textContent=`تم تحميل ${completed} من ${tables.length}...`;
+      if(progBar){
+        progBar.className='ld-progress-bar';
+        progBar.style.width=(completed/keys.length*100)+'%';
+      }
+      if(msgEl)msgEl.textContent=`تم تحميل ${completed} من ${keys.length}...`;
+
+      /* عرض البيانات فوراً عند أول ملف ناجح */
       if(completed===1&&!cacheShown){
-        _invalidatePageCache();populateMonthSelects();
+        _invalidatePageCache();
+        populateMonthSelects();
         const p=window.currentPage||'overview';
         if(PAGE_RENDERS[p])PAGE_RENDERS[p]();
-        setTimeout(()=>_hideLoadingOverlay(),150);
-      }else if(completed>1){
+        /* أخفِ شاشة التحميل بعد أول ملف */
+        setTimeout(()=>_hideLoadingOverlay(),200);
+      } else if(completed>1){
+        /* تحديث صامت للصفحة الحالية */
         const p=window.currentPage||'overview';
         if(PAGE_RENDERS[p])PAGE_RENDERS[p]();
       }
-      return {key,rows:raw};
+      return {key,rows};
     }catch(err){
       const ic=document.getElementById(iconMap[key]);
       if(ic)ic.style.borderColor='var(--red)';
-      console.warn('فشل',table,err.message);
+      console.warn('فشل جلب',key,err.message);
       return null;
     }
   });
 
+  /* انتظر انتهاء الكل */
   await Promise.allSettled(promises);
 
-  if(completed>0){
-    try{localStorage.setItem(CACHE_KEY,JSON.stringify(freshData));localStorage.setItem(CACHE_TS,Date.now().toString());}catch(e){}
+  const synced=completed;
+
+  /* ── 4. حفظ في Cache المحلي ── */
+  if(synced>0){
+    try{
+      localStorage.setItem(CACHE_KEY,JSON.stringify(freshData));
+      localStorage.setItem(CACHE_TS_KEY,Date.now().toString());
+    }catch(e){/* localStorage full */}
+
     if(progBar){progBar.className='ld-progress-bar';progBar.style.width='100%';}
-    if(msgEl)msgEl.textContent='✅ البيانات محدّثة';
-    _invalidatePageCache();populateMonthSelects();
+    if(msgEl)msgEl.textContent='✅ تم تحميل البيانات بنجاح';
+
+    /* إعادة عرض نهائية بكل البيانات */
+    _invalidatePageCache();
+    populateMonthSelects();
     const p=window.currentPage||'overview';
     if(PAGE_RENDERS[p])PAGE_RENDERS[p]();
-    const luEl=document.getElementById('last-update');
-    if(luEl)luEl.textContent='آخر تحديث: '+(_getLastDataDate()||new Date().toLocaleTimeString('ar-LY'));
+
+    const _luEl=document.getElementById('last-update');
+    if(_luEl)_luEl.textContent='آخر تحديث: '+(_getLastDataDate()||new Date().toLocaleTimeString('ar-LY'));
     const dot=document.getElementById('status-dot');
     if(dot)dot.style.background='var(--accent2)';
+
+    /* إخفاء شاشة التحميل إن لم تُخفَ بعد */
     _hideLoadingOverlay();
-  }else if(!cacheShown){_hideLoadingOverlay();}
-  return completed;
+  } else if(!cacheShown){
+    /* فشل كل شيء + لا cache */
+    _hideLoadingOverlay();
+  }
+
+  if(synced===0&&!cacheShown){
+    console.warn('كل الملفات فشلت');
+  }
+  return synced;
 }
 
+// ── المزامنة اليدوية (مع شريط تقدم) ──────────────────
 async function syncGoogleSheets(){
   const prog=document.getElementById('gs-progress');
   const statusEl=document.getElementById('gs-status');
-  if(statusEl)statusEl.textContent='⏳ جاري التحديث من Supabase...';
-  if(prog)prog.style.width='30%';
-  try{
-    const synced=await _autoSyncQuiet();
-    if(prog)prog.style.width='100%';
-    if(statusEl)statusEl.textContent=synced>0?`✅ تمت المزامنة: ${synced} جداول`:'❌ تعذّرت المزامنة';
-    setTimeout(()=>{if(prog)prog.style.width='0';},800);
-    if(synced>0)setTimeout(()=>closeUploadModal(),1000);
-  }catch(e){if(statusEl)statusEl.textContent='❌ خطأ: '+e.message;}
+  const keys=['sales','debt','aging','collection','inventory','reps'];
+  const typeLabels={sales:'مبيعات',debt:'مديونية',aging:'أعمار الذمم',collection:'تحصيل',inventory:'جرد المخازن',reps:'تصنيف المندوبين والأهداف'};
+
+  statusEl.textContent='⏳ جاري جلب البيانات...';
+  if(prog)prog.style.width='20%';
+
+  // ── تحميل كل الملفات بالتوازي ──
+  const results = await Promise.allSettled(
+    keys.map(async key=>{
+      const url=(document.getElementById('gs-'+key)?.value?.trim())||GS_URLS_EMBEDDED[key]||'';
+      if(!url)return null;
+      const resp=await fetch(url+'&t='+Date.now());
+      if(!resp.ok)throw new Error(`HTTP ${resp.status}`);
+      const text=await resp.text();
+      if(!text||text.trim().length<10)throw new Error('بيانات فارغة');
+      if(text.trim().startsWith('<!DOCTYPE')||text.trim().startsWith('<html'))
+        throw new Error('الرابط يُعيد صفحة HTML — تأكد من المشاركة العامة');
+      return {key, rows: csvToRows(text)};
+    })
+  );
+
+  if(prog)prog.style.width='80%';
+  let synced=0, errors=0;
+  results.forEach((r,i)=>{
+    if(r.status==='fulfilled'&&r.value){
+      processNewData(r.value.key, r.value.rows);
+      synced++;
+      toast(`✅ ${typeLabels[keys[i]]}`,'success');
+    } else if(r.status==='rejected'){
+      errors++;
+      toast(`❌ ${typeLabels[keys[i]]}: ${r.reason?.message||'خطأ'}`,'error');
+    }
+  });
+
+  if(prog)prog.style.width='100%';
+  statusEl.textContent=`✅ تمت المزامنة: ${synced} ملف${errors?` — ❌ ${errors} خطأ`:''}`;
+  setTimeout(()=>{if(prog)prog.style.width='0'},800);
+
+  if(synced>0){
+    _invalidatePageCache();
+    populateMonthSelects();
+    const p=window.currentPage||'overview';
+    if(PAGE_RENDERS[p])PAGE_RENDERS[p]();
+    const ts=new Date().toLocaleString('ar-LY');
+    const lastEl=document.getElementById('last-update');
+    if(lastEl)lastEl.textContent='آخر تحديث: '+(_getLastDataDate()||ts);
+    setTimeout(()=>closeUploadModal(),1000);
+  }
 }
 
+// ── التحميل التلقائي عند بدء التشغيل ────────────────
 async function autoLoadOnStartup(){
   _hideSetupScreen();
   _showLoadingOverlay();
+
+  // ملء حقول الواجهة بالروابط المضمّنة
+  Object.entries(GS_URLS_EMBEDDED).forEach(([k,v])=>{
+    const el=document.getElementById('gs-'+k);
+    if(el)el.value=v;
+  });
+
+  const msgEl=document.getElementById('loading-msg');
+
   try{
-    const synced=await _autoSyncQuiet();
+    const synced = await _autoSyncQuiet();
     _hideLoadingOverlay();
-    if(synced===0){_showLoadingError();}
-    else{_startAutoRefresh();if(PAGE_RENDERS['overview'])PAGE_RENDERS['overview']();}
-  }catch(e){
-    console.error('خطأ في التحميل:',e);
-    _hideLoadingOverlay();_showLoadingError();
+
+    if(synced===0){
+      // فشلت كل الملفات — أظهر رسالة خطأ
+      _showLoadingError();
+    } else {
+      _startAutoRefresh();
+      // عرض الصفحة الرئيسية
+      if(PAGE_RENDERS['overview']) PAGE_RENDERS['overview']();
+    }
+  } catch(e){
+    console.error('خطأ في التحميل:', e);
+    _hideLoadingOverlay();
+    _showLoadingError();
   }
 }
 
