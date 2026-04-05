@@ -5082,13 +5082,14 @@ function _rebuildItemData(){
 // ── تطبيع مفاتيح صفوف CSV: إزالة BOM والأحرف الخفية من أسماء الأعمدة ──
 function _normalizeRowKeys(rows){
   if(!rows||!rows.length)return rows;
-  const firstKeys=Object.keys(rows[0]);
-  const needsNorm=firstKeys.some(k=>/[\uFEFF\u200B-\u200F\u202A-\u202E\u2060\u00A0]/.test(k)||k!==k.trim());
-  if(!needsNorm)return rows;
   return rows.map(r=>{
     const nr={};
     Object.keys(r).forEach(k=>{
-      const nk=k.replace(/^\uFEFF/,'').replace(/[\u200B-\u200F\u202A-\u202E\u2060\u00A0]/g,'').trim();
+      let nk=k.replace(/^\uFEFF/,'').replace(/[\u200B-\u200F\u202A-\u202E\u2060\u00A0]/g,'').trim();
+      // تحويل الشرطة السفلية إلى مسافة (من Supabase)
+      nk=nk.replace(/_/g,' ');
+      // تجاهل أعمدة Supabase الداخلية
+      if(nk==='id'||nk==='synced at')return;
       nr[nk]=r[k];
     });
     return nr;
@@ -5575,32 +5576,28 @@ function addFileStatus(container,name,status,msg){
 //  GOOGLE SHEETS SYNC + AUTO-REFRESH
 // ══════════════════════════════════════════════════════
 // ══════════════════════════════════════════════════════
-// SUPABASE — الاتصال المباشر بقاعدة البيانات
+// SUPABASE — الاتصال المباشر
 // ══════════════════════════════════════════════════════
-const SB_URL = 'https://tldhmgjnkezunvisyqft.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsZGhtZ2pua2V6dW52aXN5cWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMzQ3MzksImV4cCI6MjA5MDkxMDczOX0.5VC0q2c_V0z78kD9kR4yl-HV6iYWEOW-cExy-fqwFZQ';
-
-async function _sbFetch(table, limit=100000){
+const SB_URL='https://tldhmgjnkezunvisyqft.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsZGhtZ2pua2V6dW52aXN5cWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMzQ3MzksImV4cCI6MjA5MDkxMDczOX0.5VC0q2c_V0z78kD9kR4yl-HV6iYWEOW-cExy-fqwFZQ';
+async function _sbFetch(table,limit=200000){
   const r=await fetch(`${SB_URL}/rest/v1/${encodeURIComponent(table)}?select=*&limit=${limit}`,{
     headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Accept':'application/json'}
   });
   if(!r.ok)throw new Error(`${table}: HTTP ${r.status}`);
   return r.json();
 }
+function saveGsUrls(){toast('✅ البيانات تُحمَّل من Supabase تلقائياً','info');}
 
-function _sbToSales(rows){return rows.map(r=>({'التاريخ':r['التاريخ']||'','رقم الفاتورة':r['رقم_الفاتورة']||'','النوع':r['النوع']||'','المادة':r['المادة']||'','الكمية الداخلة':+r['الكمية_الداخلة']||0,'الكمية الخارجة':+r['الكمية_الخارجة']||0,'السعر الافرادي':+r['السعر_الافرادي']||0,'الحسم':+r['الحسم']||0,'الاجمالي الصافي':+r['الاجمالي_الصافي']||0,'اسم الزبون':r['اسم_الزبون']||'','المندوب':r['المندوب']||''}));}
-function _sbToCollection(rows){return rows.map(r=>({'التاريخ':r['التاريخ']||'','رقم السند':r['رقم_السند']||'','النوع':r['النوع']||'','اسم الحساب':r['اسم_الحساب']||'','مدين':+r['مدين']||0,'دائن':+r['دائن']||0,'الرصيد':r['الرصيد']||'','البيان':r['البيان']||'','المندوب':r['المندوب']||'','الحساب المقابل':r['الحساب_المقابل']||''}));}
-function _sbToDebt(rows){return rows.map(r=>({'رمز الحساب':r['رمز_الحساب']||'','اسم الحساب':r['اسم_الحساب']||'','رصيد حالي مدين':+r['رصيد_حالي_مدين']||0,'رصيد حالي دائن':+r['رصيد_حالي_دائن']||0,'الرصيد':+r['الرصيد']||0,'المندوب':r['المندوب']||''}));}
-function _sbToAging(rows){return rows.map(r=>({'رمز الحساب':r['رمز_الحساب']||'','اسم الحساب':r['اسم_الحساب']||'','المندوب':r['المندوب']||'','الرصيد':r['الرصيد']||'',30:+r['يوم_30']||0,60:+r['يوم_60']||0,90:+r['يوم_90']||0,10:+r['يوم_10']||0,15:+r['يوم_15']||0,120:+r['يوم_120']||0}));}
-function _sbToInventory(rows){return rows.map(r=>({'#':r['الرقم']||'','المادة':r['المادة']||'','الكمية':+r['الكمية']||0,'المستودع':r['المستودع']||'','صلاحية 1':r['صلاحية_1']||'','صلاحية 2':r['صلاحية_2']||'','صلاحية 3':r['صلاحية_3']||'','صلاحية 4':r['صلاحية_4']||''}));}
-function _sbToReps(rows){return rows.map(r=>({'المندوب':r['المندوب']||'','تصنيف':r['تصنيف']||'','هدف المبيعات':+r['هدف_المبيعات']||0,'هدف الكمية':+r['هدف_الكمية']||0,'هدف التحصيل':+r['هدف_التحصيل']||0}));}
-
-function saveGsUrls(){ toast('✅ البيانات تُحمَّل من Supabase تلقائياً','info'); }
-function loadGsUrls(){ return false; }
+function loadGsUrls(){return false;}
 
 function _startAutoRefresh(){
   if(_autoRefreshTimer)clearInterval(_autoRefreshTimer);
-  _autoRefreshTimer=setInterval(async()=>{ await _autoSyncQuiet(); },5*60*1000);
+  _autoRefreshTimer=setInterval(async()=>{await _autoSyncQuiet();},5*60*1000);
+  const el=document.getElementById('auto-refresh-status');
+  if(el)el.textContent='🔄 تحديث تلقائي كل 5 دقائق';
+}
+function _updateRefreshStatus(){
   const el=document.getElementById('auto-refresh-status');
   if(el)el.textContent='🔄 تحديث تلقائي كل 5 دقائق';
 }
@@ -5609,15 +5606,14 @@ async function _autoSyncQuiet(){
   const msgEl=document.getElementById('loading-msg');
   const progBar=document.getElementById('ld-progress');
   const iconMap={sales:'ldi-sales',collection:'ldi-collection',debt:'ldi-debt',inventory:'ldi-inventory',reps:'ldi-reps',aging:'ldi-aging'};
-  const CACHE_KEY='rakan_sb_cache_v1';
-  const CACHE_TS_KEY='rakan_sb_ts_v1';
+  const CACHE_KEY='rakan_sb_v2';
+  const CACHE_TS='rakan_sb_ts_v2';
   const CACHE_TTL=5*60*1000;
 
-  // 1. اعرض Cache فوراً
   let cacheShown=false;
   try{
     const cached=localStorage.getItem(CACHE_KEY);
-    const ts=parseInt(localStorage.getItem(CACHE_TS_KEY)||'0');
+    const ts=parseInt(localStorage.getItem(CACHE_TS)||'0');
     if(cached&&(Date.now()-ts)<CACHE_TTL){
       const d=JSON.parse(cached);
       if(Object.keys(d).length>0){
@@ -5632,41 +5628,40 @@ async function _autoSyncQuiet(){
     }
   }catch(e){}
 
-  if(msgEl)msgEl.textContent=cacheShown?'🔄 جاري التحديث من Supabase...':'⚡ جاري تحميل البيانات...';
+  if(msgEl)msgEl.textContent=cacheShown?'🔄 جاري التحديث...':'⚡ جاري تحميل البيانات...';
 
-  const tableMap=[
-    {key:'sales',      table:'مبيعات',      conv:_sbToSales},
-    {key:'collection', table:'تحصيل',       conv:_sbToCollection},
-    {key:'debt',       table:'مديونية',     conv:_sbToDebt},
-    {key:'aging',      table:'اعمار_الذمم', conv:_sbToAging},
-    {key:'inventory',  table:'مخازن',       conv:_sbToInventory},
-    {key:'reps',       table:'مناديب',      conv:_sbToReps},
+  const tables=[
+    {key:'sales',      table:'مبيعات'},
+    {key:'collection', table:'تحصيل'},
+    {key:'debt',       table:'مديونية'},
+    {key:'aging',      table:'اعمار_الذمم'},
+    {key:'inventory',  table:'مخازن'},
+    {key:'reps',       table:'مناديب'},
   ];
 
   let completed=0;
   const freshData={};
-
-  const promises=tableMap.map(async({key,table,conv})=>{
+  const promises=tables.map(async({key,table})=>{
     try{
       const raw=await _sbFetch(table);
-      const rows=conv(raw);
-      freshData[key]=rows;
-      processNewData(key,rows);
+      // البيانات تُطبَّع في processNewData عبر _normalizeRowKeys
+      freshData[key]=raw;
+      processNewData(key,raw);
       completed++;
       const ic=document.getElementById(iconMap[key]);
       if(ic)ic.className='ld-icon-box loaded';
-      if(progBar){progBar.className='ld-progress-bar';progBar.style.width=(completed/tableMap.length*100)+'%';}
-      if(msgEl)msgEl.textContent=`تم تحميل ${completed} من ${tableMap.length}...`;
+      if(progBar){progBar.className='ld-progress-bar';progBar.style.width=(completed/tables.length*100)+'%';}
+      if(msgEl)msgEl.textContent=`تم تحميل ${completed} من ${tables.length}...`;
       if(completed===1&&!cacheShown){
         _invalidatePageCache();populateMonthSelects();
         const p=window.currentPage||'overview';
         if(PAGE_RENDERS[p])PAGE_RENDERS[p]();
         setTimeout(()=>_hideLoadingOverlay(),150);
-      } else if(completed>1){
+      }else if(completed>1){
         const p=window.currentPage||'overview';
         if(PAGE_RENDERS[p])PAGE_RENDERS[p]();
       }
-      return {key,rows};
+      return {key,rows:raw};
     }catch(err){
       const ic=document.getElementById(iconMap[key]);
       if(ic)ic.style.borderColor='var(--red)';
@@ -5678,7 +5673,7 @@ async function _autoSyncQuiet(){
   await Promise.allSettled(promises);
 
   if(completed>0){
-    try{localStorage.setItem(CACHE_KEY,JSON.stringify(freshData));localStorage.setItem(CACHE_TS_KEY,Date.now().toString());}catch(e){}
+    try{localStorage.setItem(CACHE_KEY,JSON.stringify(freshData));localStorage.setItem(CACHE_TS,Date.now().toString());}catch(e){}
     if(progBar){progBar.className='ld-progress-bar';progBar.style.width='100%';}
     if(msgEl)msgEl.textContent='✅ البيانات محدّثة';
     _invalidatePageCache();populateMonthSelects();
@@ -5689,9 +5684,7 @@ async function _autoSyncQuiet(){
     const dot=document.getElementById('status-dot');
     if(dot)dot.style.background='var(--accent2)';
     _hideLoadingOverlay();
-  } else if(!cacheShown){
-    _hideLoadingOverlay();
-  }
+  }else if(!cacheShown){_hideLoadingOverlay();}
   return completed;
 }
 
