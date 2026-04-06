@@ -2866,9 +2866,14 @@ function renderSalesPage(){
     const fInv=new Set(saleRows.map(r=>r[kInv])).size;
     const fCust=new Set(saleRows.map(r=>r[kCust])).size;
     const isFiltered=!!(repF||monthF||typeF);
+    const kQtyF=_fc('الكمية الخارجة','الكمية');
+    const fQtySale=saleRows.reduce((s,r)=>s+_n(r[kQtyF]),0);
+    const fQtyRet=retRows.reduce((s,r)=>s+_n(r[kQtyF]),0);
+    const fNetQty=fQtySale-fQtyRet;
     document.getElementById('kpi-sales').innerHTML=
       kpiCard('💵','إجمالي المبيعات',fSales,'var(--accent)',(isFiltered?'(مفلتر) ':'')+'قبل المرتجعات')+
       kpiCard('✅','صافي المبيعات',fNet,'var(--accent2)','بعد المرتجعات')+
+      kpiCard('🔢','صافي مبيعات الكميات',fNetQty.toLocaleString('ar-LY',{minimumFractionDigits:0,maximumFractionDigits:0}),'var(--accent)','وحدة (مبيع − مرتجع)')+
       kpiCard('↩','المرتجعات',fRet,'var(--red)',fRetPct+'% من المبيعات')+
       kpiCard('💰','التحصيلات',fCol,'var(--accent2)',fColPct+'% ROI')+
       kpiCard('🔴','الفجوة غير محصّل',fGap,'var(--accent3)',fGap<0?'📈 زيادة تحصيل':'')+
@@ -2879,9 +2884,14 @@ function renderSalesPage(){
     const retPct=k.total_sales>0?(k.total_returns/k.total_sales*100).toFixed(1):0;
     const colPct=k.net_sales>0?(k.total_collected/k.net_sales*100).toFixed(1):0;
     const gap=k.net_sales-k.total_collected;
+    const _repsF=D.reps_full||[];
+    const _allQty=_repsF.reduce((s,r)=>s+(r.qty||0),0);
+    const _allRetQty=_repsF.reduce((s,r)=>s+(r.retQty||0),0);
+    const _allNetQty=_allQty-_allRetQty;
     document.getElementById('kpi-sales').innerHTML=
       kpiCard('💵','إجمالي المبيعات',k.total_sales,'var(--accent)','قبل المرتجعات')+
       kpiCard('✅','صافي المبيعات',k.net_sales,'var(--accent2)','بعد المرتجعات')+
+      kpiCard('🔢','صافي مبيعات الكميات',_allNetQty.toLocaleString('ar-LY',{minimumFractionDigits:0,maximumFractionDigits:0}),'var(--accent)','وحدة (مبيع − مرتجع)')+
       kpiCard('↩','المرتجعات',k.total_returns,'var(--red)',retPct+'% من المبيعات')+
       kpiCard('💰','التحصيلات',k.total_collected,'var(--accent2)',colPct+'% ROI')+
       kpiCard('🔴','الفجوة غير محصّل',gap,'var(--accent3)',gap<0?'📈 زيادة تحصيل':'')+
@@ -3589,9 +3599,11 @@ function renderProductsPage(){
   const totalRet=items.reduce((s,p)=>s+p.retVal,0);
   const retPct=items.reduce((s,p)=>s+p.sales,0)>0?totalRet/items.reduce((s,p)=>s+p.sales,0)*100:0;
 
+  const totalNetQtyProd=items.reduce((s,p)=>s+(p.nqty||0),0);
   document.getElementById('kpi-products').innerHTML=
     kpiCard('📦','عدد الأصناف',items.length,'var(--accent)',isFiltered?'(مفلتر)':'صنف مباع')+
     kpiCard('💵','إجمالي صافي المبيعات',totalNet,'var(--accent2)','')+
+    kpiCard('🔢','صافي مبيعات الكميات',totalNetQtyProd.toLocaleString('ar-LY',{minimumFractionDigits:0,maximumFractionDigits:0}),'var(--accent)','وحدة (مبيع − مرتجع)')+
     kpiCard('↩','إجمالي المرتجعات',totalRet,'var(--red)',retPct.toFixed(1)+'%')+
     kpiCard('🏆','أفضل صنف',items[0]?.ns||0,'var(--gold)',items[0]?.name.substring(0,20)||'—')+
     kpiCard('📊','مساهمة أفضل صنف',totalNet>0?((items[0]?.ns||0)/totalNet*100).toFixed(1)+'%':'—','var(--purple)','من صافي المبيعات');
@@ -4631,6 +4643,9 @@ function renderOverviewPage(){
   const totalNet     = totalSales - totalReturns;
   const totalCol     = D.kpis.total_collected || reps.reduce((s,r)=>s+r.col, 0);
   const totalDebtNet = D.kpis.total_debt || reps.reduce((s,r)=>s+(r.debtNet>0?r.debtNet:0), 0);
+  const totalQtyGross  = reps.reduce((s,r)=>s+(r.qty    ||0), 0);
+  const totalRetQty    = reps.reduce((s,r)=>s+(r.retQty ||0), 0);
+  const totalNetQty    = totalQtyGross - totalRetQty;
 
   // ── حساب الحوالات والكاش مباشرة من collection_table (نفس معادلة صفحة التحصيل) ──
   const _ovN=v=>_parseNum(v);
@@ -4664,6 +4679,7 @@ function renderOverviewPage(){
     {icon:'📦',label:'إجمالي المبيعات',val:totalSales,sub:'قبل المرتجعات',color:'var(--accent)',bar:null},
     {icon:'↩️',label:'إجمالي المرتجعات',val:totalReturns,sub:retPct.toFixed(2)+'% من المبيعات',color:'var(--red)',bar:null},
     {icon:'💰',label:'صافي المبيعات',val:totalNet,sub:'بعد المرتجعات',color:'var(--accent2)',bar:null},
+    {icon:'🔢',label:'صافي مبيعات الكميات',val:totalNetQty.toLocaleString('ar-LY',{minimumFractionDigits:0,maximumFractionDigits:0}),sub:'وحدة (مبيع − مرتجع)',color:'var(--accent)',bar:null},
     {icon:'✅',label:'إجمالي التحصيلات',val:totalCol,
       sub:`<span style="color:#7c6fff">🏦 ${Math.round(totalBank).toLocaleString('ar-LY')} (${bankPct.toFixed(1)}%)</span> &nbsp; <span style="color:var(--gold)">💵 ${Math.round(totalCash).toLocaleString('ar-LY')} (${cashPct.toFixed(1)}%)</span>`,
       color:'var(--accent2)',bar:null},
@@ -8633,234 +8649,119 @@ function _frmPrint(){
 <title>تقرير الأداء المالي</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
-/* ══ متغيرات الألوان من شعار ركان ══ */
 :root{
-  --brand-blue:#003f8c;
-  --brand-blue2:#0050b3;
-  --brand-blue-lt:#e8f0fb;
-  --brand-blue-mid:#c5d7f0;
-  --brand-orange:#e04400;
-  --brand-orange-lt:#fff1eb;
-  --text-dark:#1a1f2e;
-  --text-mid:#44506b;
-  --text-muted:#8896ae;
-  --border:#d8e2f0;
-  --row-alt:#f4f7fc;
+  --blue:#003f8c;
+  --blue2:#0050b3;
+  --blue-lt:#eaf1fb;
+  --blue-mid:#b8d0f0;
+  --orange:#e04400;
+  --orange-lt:#fef3ee;
+  --ink:#111827;
+  --ink2:#374151;
+  --muted:#9ca3af;
+  --border:#e5eaf5;
+  --strip:#f7f9fd;
 }
-
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 @page{size:A4 portrait;margin:0}
 html,body{
-  font-family:'Cairo',sans-serif;
-  font-size:10pt;
-  color:var(--text-dark);
-  background:#fff;
-  direction:rtl;
-  -webkit-print-color-adjust:exact!important;
-  print-color-adjust:exact!important;
+  font-family:'Cairo',sans-serif;font-size:8.5pt;
+  color:var(--ink);background:#fff;direction:rtl;
+  -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;
 }
-body{padding:16mm 18mm 20mm 18mm}
+body{padding:8mm 12mm 8mm 12mm}
 
-/* ── رأس الصفحة ── */
+/* ━━ رأس الصفحة ━━ */
 .head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding-bottom:13px;
-  margin-bottom:16px;
-  border-bottom:3px solid var(--brand-blue);
-  position:relative;
+  background:#fff;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 0;
+  border-bottom:2px solid var(--blue);
+  margin-bottom:0;
 }
-.head::after{
-  content:'';
-  position:absolute;
-  bottom:-6px;left:0;right:0;
-  height:2px;
-  background:var(--brand-orange);
-  opacity:.45;
-}
-.head-logo{
-  width:54px;height:54px;
-  flex-shrink:0;
-  border-radius:8px;overflow:hidden;
-  box-shadow:0 2px 8px rgba(0,63,140,.18);
-}
+.head-right{display:flex;align-items:center;gap:10px}
+.head-logo{width:38px;height:38px;border-radius:5px;overflow:hidden;flex-shrink:0}
 .head-logo img{width:100%;height:100%;object-fit:contain}
-.head-title{
-  font-size:21pt;
-  font-weight:900;
-  color:var(--brand-blue);
-  letter-spacing:-.4px;
-  flex:1;
-  padding:0 14px;
-}
-.head-meta{
-  text-align:left;
-  font-size:8.5pt;
-  color:var(--text-mid);
-  line-height:1.9;
-  border-right:2px solid var(--brand-blue-mid);
-  padding-right:14px;
-}
-.head-meta strong{color:var(--brand-blue)}
+.head-company{font-size:7pt;color:var(--blue);font-weight:700;letter-spacing:.4px}
+.head-title{font-size:14pt;font-weight:900;color:#111;line-height:1.15;letter-spacing:-.2px}
+.head-accent{width:100%;height:2px;background:linear-gradient(to left,var(--blue) 70%,var(--orange) 100%);margin-bottom:8px}
+.head-meta{text-align:left;font-size:7pt;color:#888;line-height:1.9}
+.head-meta strong{color:var(--blue);font-weight:700}
 
-/* ── جدول بيانات المراسلة ── */
-.letter-info{
-  width:100%;
-  border-collapse:collapse;
-  margin-bottom:14px;
-  font-size:9.5pt;
-}
-.letter-info td{
-  padding:4px 0;
-  line-height:1.7;
-  vertical-align:top;
-}
-.letter-info .lbl{
-  color:var(--text-muted);
-  font-weight:700;
-  white-space:nowrap;
-  padding-left:20px;
-  width:80px;
-}
-.letter-info .sep{
-  color:var(--brand-blue-mid);
-  padding-left:10px;
-  width:10px;
-}
-.letter-info .val{color:var(--text-dark)}
+/* ━━ جدول المراسلة ━━ */
+.letter-info{width:100%;border-collapse:collapse;margin-bottom:6px;font-size:8pt}
+.letter-info td{padding:2px 0;line-height:1.6;vertical-align:top}
+.letter-info .lbl{color:var(--muted);font-weight:700;white-space:nowrap;padding-left:14px;width:72px}
+.letter-info .sep{color:var(--blue-mid);padding-left:6px;width:10px}
+.letter-info .val{color:var(--ink)}
 
-/* ── خط رفيع ── */
-.rule{
-  border:none;
-  border-top:1px solid var(--border);
-  margin:12px 0;
-}
+/* ━━ فاصل ━━ */
+.rule{border:none;border-top:1px solid var(--border);margin:6px 0}
 
-/* ── الافتتاحية ── */
+/* ━━ الافتتاحية ━━ */
 .intro{
-  font-size:9.5pt;
-  color:var(--text-mid);
-  line-height:1.95;
-  margin-bottom:16px;
-  padding:10px 14px;
-  border-right:3px solid var(--brand-orange);
-  background:var(--brand-orange-lt);
-  border-radius:0 4px 4px 0;
+  font-size:8pt;color:var(--ink2);line-height:1.75;
+  margin-bottom:8px;
+  padding:6px 10px 6px 8px;
+  border-right:3px solid var(--orange);
+  background:var(--orange-lt);
 }
 
-/* ── الجدول الرئيسي ── */
-.tbl{
-  width:100%;
-  border-collapse:collapse;
-  margin-bottom:16px;
-  font-size:9.5pt;
-  border:1px solid var(--border);
-  border-radius:6px;
-  overflow:hidden;
-}
-/* رأس الجدول */
+/* ━━ الجدول الرئيسي ━━ */
+.tbl{width:100%;border-collapse:collapse;margin-bottom:8px;font-size:8.5pt}
+
 .tbl thead th{
-  background:var(--brand-blue);
-  color:#fff;
-  padding:9px 14px;
-  font-size:9pt;
-  font-weight:700;
-  white-space:nowrap;
-  letter-spacing:.2px;
+  background:var(--blue);color:#fff;
+  padding:6px 11px;font-size:8pt;font-weight:700;
+  white-space:nowrap;letter-spacing:.1px;
 }
-.tbl thead th:first-child{border-left:3px solid var(--brand-orange)}
 .tbl thead th.th-r{text-align:right}
 .tbl thead th.th-c{text-align:center}
+.tbl thead tr th:first-child{border-right:4px solid var(--orange)}
 
-/* صفوف الأقسام */
+/* صفوف العناوين */
 .tbl .sec td{
-  background:var(--brand-blue-lt);
-  color:var(--brand-blue);
-  font-weight:800;
-  font-size:9pt;
-  padding:6px 14px;
-  border-top:1px solid var(--brand-blue-mid);
-  border-bottom:1px solid var(--brand-blue-mid);
-  letter-spacing:.1px;
+  background:var(--blue-lt);color:var(--blue);
+  font-weight:800;font-size:8pt;
+  padding:4px 11px;
+  border-top:1.5px solid var(--blue-mid);
+  border-bottom:1px solid var(--blue-mid);
 }
-.tbl .sec td:first-child{
-  border-right:3px solid var(--brand-orange);
-}
+.tbl .sec td:first-child{border-right:4px solid var(--orange)}
 
-/* صفوف البيانات — تظليل متبادل */
+/* صفوف البيانات */
 .tbl .row td{
-  padding:7px 14px;
+  padding:5px 11px;
   border-bottom:1px solid var(--border);
-  vertical-align:middle;
-  color:var(--text-dark);
+  vertical-align:middle;color:var(--ink);
 }
-.tbl .row:nth-child(even) td{background:var(--row-alt)}
-.tbl .row:last-child td{
-  border-bottom:2px solid var(--brand-blue);
-}
+.tbl tbody .row:nth-child(even) td{background:var(--strip)}
+.tbl .row:last-child td{border-bottom:2px solid var(--blue)}
 
 /* خلايا */
 .td-r{text-align:right}
-.td-c{text-align:center;font-variant-numeric:tabular-nums}
-.td-num{
-  text-align:center;
-  font-weight:700;
-  font-variant-numeric:tabular-nums;
-  direction:rtl;
-  color:var(--brand-blue);
-}
-.td-qty{
-  text-align:center;
-  font-weight:700;
-  font-variant-numeric:tabular-nums;
-  direction:ltr;
-  color:var(--brand-orange);
-}
-.td-pct{
-  text-align:center;
-  font-weight:800;
-  direction:rtl;
-  color:var(--brand-blue2);
-}
-.td-dim{color:var(--text-muted);text-align:center}
-.td-sub{font-size:8pt;color:var(--text-muted);font-weight:400}
+.td-num{text-align:center;font-weight:700;font-variant-numeric:tabular-nums;direction:rtl;color:var(--blue)}
+.td-qty{text-align:center;font-weight:600;font-variant-numeric:tabular-nums;direction:ltr;color:var(--orange)}
+.td-pct{text-align:center;font-weight:800;direction:rtl;color:var(--blue2)}
+.td-dim{color:var(--muted);text-align:center}
+.td-sub{font-size:7pt;color:var(--muted);font-weight:400}
 
-/* ── الخاتمة ── */
-.closing{
-  font-size:9.5pt;
-  color:var(--text-mid);
-  line-height:2;
-  margin-bottom:14px;
-}
-.closing .sign{
-  margin-top:6px;
-  font-weight:700;
-  color:var(--brand-blue);
-  font-size:10pt;
-}
+/* ━━ الخاتمة ━━ */
+.closing{font-size:8pt;color:var(--ink2);line-height:1.8;margin-bottom:6px}
+.closing .sign{margin-top:3px;font-weight:700;color:var(--blue);font-size:8.5pt}
 
-/* ── الفوتر ── */
+/* ━━ الفوتر ━━ */
 .footer{
-  font-size:8pt;
-  color:var(--text-muted);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding-top:8px;
-  border-top:2px solid var(--brand-blue-mid);
+  display:flex;justify-content:space-between;align-items:center;
+  padding-top:5px;border-top:1px solid var(--border);
+  font-size:7pt;color:var(--muted);
 }
-.footer strong{color:var(--brand-blue)}
+.footer strong{color:var(--blue2);font-weight:700}
 
 @media print{
   .tbl .row{page-break-inside:avoid}
   .tbl .sec{page-break-after:avoid}
-  .footer{
-    position:fixed;
-    bottom:10mm;left:18mm;right:18mm;
-    background:#fff;
-  }
-  body{padding-bottom:24mm!important}
+  body{padding:8mm 12mm 8mm 12mm!important}
 }
 </style>
 </head>
@@ -8869,15 +8770,21 @@ body{padding:16mm 18mm 20mm 18mm}
 
   <!-- رأس الصفحة -->
   <div class="head">
-    <div class="head-logo">
-      ${logoSrc ? `<img src="${logoSrc}" alt="شعار">` : ''}
+    <div class="head-right">
+      <div class="head-logo">
+        ${logoSrc ? `<img src="${logoSrc}" alt="شعار">` : ''}
+      </div>
+      <div>
+        <div class="head-company">شركة ركان المتوسط</div>
+        <div class="head-title">تقرير الأداء المالي</div>
+      </div>
     </div>
-    <div class="head-title">تقرير الأداء المالي</div>
     <div class="head-meta">
       <div>${printDate}</div>
       <div><strong>إعداد:</strong> المحاسب أحمد العكاري</div>
     </div>
   </div>
+  <div class="head-accent"></div>
 
   <!-- بيانات المراسلة -->
   <table class="letter-info">
