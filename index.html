@@ -4,11 +4,11 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لوحة التحليل الاستراتيجي — الندى</title>
-<link href="./لوحة التحليل الاستراتيجي — الندى_files/css2" rel="stylesheet">
-<script src="./لوحة التحليل الاستراتيجي — الندى_files/chart.umd.min.js.تنزيل"></script>
-<script src="./لوحة التحليل الاستراتيجي — الندى_files/chartjs-plugin-datalabels.min.js.تنزيل"></script>
-<script src="./لوحة التحليل الاستراتيجي — الندى_files/xlsx.full.min.js.تنزيل"></script>
-<script src="./لوحة التحليل الاستراتيجي — الندى_files/exceljs.min.js.تنزيل"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <style>
 /* ══════════════════════════════════════════════
    DURALUX THEME — Light mode (default)
@@ -1277,7 +1277,7 @@ tbody tr:last-child{border-bottom:none}
       <span class="sidebar-subtitle">لوحة التحليل الاستراتيجي</span>
     </div>
     <button class="sidebar-toggle" onclick="toggleSidebar()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
     </button>
   </div>
 
@@ -1289,37 +1289,37 @@ tbody tr:last-child{border-bottom:none}
       <div class="nav-section">التنقل</div>
 
       <!-- نظرة عامة -->
-      <div class="nav-item" onclick="showPage(&#39;overview&#39;)" data-page="overview" data-tooltip="نظرة عامة">
+      <div class="nav-item active" onclick="showPage('overview')" data-page="overview" data-tooltip="نظرة عامة">
         <div class="nav-icon-wrap">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         </div>
         <span class="nav-label">نظرة عامة</span>
       </div>
 
       <!-- التقارير -->
       <div class="nav-item nav-parent open" data-tooltip="التقارير">
-        <div class="nav-icon-wrap" onclick="showPage(&#39;reps&#39;)">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        <div class="nav-icon-wrap" onclick="showPage('reps')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         </div>
-        <span class="nav-label" onclick="showPage(&#39;reps&#39;)">التقارير</span>
+        <span class="nav-label" onclick="showPage('reps')">التقارير</span>
         <button class="nav-arrow-btn" onclick="navToggleSub(this)" aria-label="فتح/إغلاق">
-          <svg class="nav-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          <svg class="nav-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
       </div>
       <div class="nav-sub open">
-        <div class="nav-item nav-sub-item" onclick="showPage(&#39;sales&#39;)" data-page="sales">
+        <div class="nav-item nav-sub-item" onclick="showPage('sales')" data-page="sales">
           <span class="nav-sub-dot"></span>
           <span class="nav-label">المبيعات</span>
         </div>
-        <div class="nav-item nav-sub-item" onclick="showPage(&#39;reps&#39;)" data-page="reps">
+        <div class="nav-item nav-sub-item" onclick="showPage('reps')" data-page="reps">
           <span class="nav-sub-dot"></span>
           <span class="nav-label">تقرير المندوبين</span>
         </div>
-        <div class="nav-item nav-sub-item" onclick="showPage(&#39;customers&#39;)" data-page="customers">
+        <div class="nav-item nav-sub-item" onclick="showPage('customers')" data-page="customers">
           <span class="nav-sub-dot"></span>
           <span class="nav-label">تقرير الزبائن</span>
         </div>
-        <div class="nav-item nav-sub-item" onclick="showPage(&#39;products&#39;)" data-page="products">
+        <div class="nav-item nav-sub-item" onclick="showPage('products')" data-page="products">
           <span class="nav-sub-dot"></span>
           <span class="nav-label">تقرير الأصناف</span>
         </div>
@@ -1332,24 +1332,24 @@ tbody tr:last-child{border-bottom:none}
 
       <!-- المالية — قابل للطي -->
       <div class="nav-item nav-parent open" data-tooltip="المالية">
-        <div class="nav-icon-wrap" onclick="showPage(&#39;debt&#39;)">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+        <div class="nav-icon-wrap" onclick="showPage('debt')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
         </div>
-        <span class="nav-label" onclick="showPage(&#39;debt&#39;)">المالية</span>
+        <span class="nav-label" onclick="showPage('debt')">المالية</span>
         <button class="nav-arrow-btn" onclick="navToggleSub(this)" aria-label="فتح/إغلاق">
-          <svg class="nav-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          <svg class="nav-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
       </div>
       <div class="nav-sub open">
-        <div class="nav-item nav-sub-item" onclick="showPage(&#39;debt&#39;)" data-page="debt">
+        <div class="nav-item nav-sub-item" onclick="showPage('debt')" data-page="debt">
           <span class="nav-sub-dot"></span>
           <span class="nav-label">المديونية</span>
         </div>
-        <div class="nav-item nav-sub-item active" onclick="showPage(&#39;aging&#39;)" data-page="aging">
+        <div class="nav-item nav-sub-item" onclick="showPage('aging')" data-page="aging">
           <span class="nav-sub-dot"></span>
           <span class="nav-label">أعمار الذمم</span>
         </div>
-        <div class="nav-item nav-sub-item" onclick="showPage(&#39;collection&#39;)" data-page="collection">
+        <div class="nav-item nav-sub-item" onclick="showPage('collection')" data-page="collection">
           <span class="nav-sub-dot"></span>
           <span class="nav-label">التحصيل <span class="nav-badge" style="font-size:8px;padding:1px 5px">جديد</span></span>
         </div>
@@ -1362,16 +1362,16 @@ tbody tr:last-child{border-bottom:none}
 
       <!-- المستودع — قابل للطي -->
       <div class="nav-item nav-parent open" data-tooltip="المستودع">
-        <div class="nav-icon-wrap" onclick="showPage(&#39;inventory&#39;)">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+        <div class="nav-icon-wrap" onclick="showPage('inventory')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
         </div>
-        <span class="nav-label" onclick="showPage(&#39;inventory&#39;)">المستودع</span>
+        <span class="nav-label" onclick="showPage('inventory')">المستودع</span>
         <button class="nav-arrow-btn" onclick="navToggleSub(this)" aria-label="فتح/إغلاق">
-          <svg class="nav-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          <svg class="nav-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
       </div>
       <div class="nav-sub open">
-        <div class="nav-item nav-sub-item" onclick="showPage(&#39;inventory&#39;)" data-page="inventory">
+        <div class="nav-item nav-sub-item" onclick="showPage('inventory')" data-page="inventory">
           <span class="nav-sub-dot"></span>
           <span class="nav-label">جرد المخازن</span>
         </div>
@@ -1392,47 +1392,47 @@ tbody tr:last-child{border-bottom:none}
 <!-- ═══════════ MOBILE BOTTOM NAV ═══════════ -->
 <nav id="mobile-bottom-nav">
   <div class="mob-nav-scroll">
-    <button class="mob-nav-item" onclick="showPage(&#39;overview&#39;)" id="mnav-overview">
+    <button class="mob-nav-item active" onclick="showPage('overview')" id="mnav-overview">
       <span class="mn-dot"></span>
       <span class="mn-icon-wrap"><span class="mn-icon">📈</span></span>
       <span>نظرة عامة</span>
     </button>
-    <button class="mob-nav-item" onclick="showPage(&#39;sales&#39;)" id="mnav-sales">
+    <button class="mob-nav-item" onclick="showPage('sales')" id="mnav-sales">
       <span class="mn-dot"></span>
       <span class="mn-icon-wrap"><span class="mn-icon">📊</span></span>
       <span>المبيعات</span>
     </button>
-    <button class="mob-nav-item" onclick="showPage(&#39;reps&#39;)" id="mnav-reps">
+    <button class="mob-nav-item" onclick="showPage('reps')" id="mnav-reps">
       <span class="mn-dot"></span>
       <span class="mn-icon-wrap"><span class="mn-icon">👥</span></span>
       <span>المندوبون</span>
     </button>
-    <button class="mob-nav-item" onclick="showPage(&#39;customers&#39;)" id="mnav-customers">
+    <button class="mob-nav-item" onclick="showPage('customers')" id="mnav-customers">
       <span class="mn-dot"></span>
       <span class="mn-icon-wrap"><span class="mn-icon">🏪</span></span>
       <span>الزبائن</span>
     </button>
-    <button class="mob-nav-item" onclick="showPage(&#39;products&#39;)" id="mnav-products">
+    <button class="mob-nav-item" onclick="showPage('products')" id="mnav-products">
       <span class="mn-dot"></span>
       <span class="mn-icon-wrap"><span class="mn-icon">📦</span></span>
       <span>الأصناف</span>
     </button>
-    <button class="mob-nav-item" onclick="showPage(&#39;debt&#39;)" id="mnav-debt">
+    <button class="mob-nav-item" onclick="showPage('debt')" id="mnav-debt">
       <span class="mn-dot"></span>
       <span class="mn-icon-wrap"><span class="mn-icon">💳</span></span>
       <span>المديونية</span>
     </button>
-    <button class="mob-nav-item active" onclick="showPage(&#39;aging&#39;)" id="mnav-aging">
+    <button class="mob-nav-item" onclick="showPage('aging')" id="mnav-aging">
       <span class="mn-dot"></span>
       <span class="mn-icon-wrap"><span class="mn-icon">⏳</span></span>
       <span>الذمم</span>
     </button>
-    <button class="mob-nav-item" onclick="showPage(&#39;collection&#39;)" id="mnav-collection">
+    <button class="mob-nav-item" onclick="showPage('collection')" id="mnav-collection">
       <span class="mn-dot"></span>
       <span class="mn-icon-wrap"><span class="mn-icon">💰</span></span>
       <span>التحصيل</span>
     </button>
-    <button class="mob-nav-item" onclick="showPage(&#39;inventory&#39;)" id="mnav-inventory">
+    <button class="mob-nav-item" onclick="showPage('inventory')" id="mnav-inventory">
       <span class="mn-dot"></span>
       <span class="mn-icon-wrap"><span class="mn-icon">🏭</span></span>
       <span>المخازن</span>
@@ -1452,11 +1452,11 @@ tbody tr:last-child{border-bottom:none}
     <!-- اليمين: أيقونة القائمة + عنوان الصفحة -->
     <div class="tb-left">
       <button id="mobile-menu-btn" class="tb-icon-btn" onclick="toggleMobileSidebar()" aria-label="القائمة">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
       <!-- عنوان الصفحة الحالية -->
-      <span class="tb-page-icon" id="topbar-icon">⏳</span>
-      <span class="tb-bread-current" id="topbar-title">⏳ أعمار الذمم</span>
+      <span class="tb-page-icon" id="topbar-icon">📊</span>
+      <span class="tb-bread-current" id="topbar-title">نظرة عامة</span>
       <!-- Page title — mobile only -->
       <div class="page-title tb-mobile-only" id="topbar-title-mob">📊 تحليل المبيعات</div>
     </div>
@@ -1464,15 +1464,15 @@ tbody tr:last-child{border-bottom:none}
     <!-- اليسار: الأزرار الوظيفية فقط -->
     <div class="topbar-right">
       <!-- أزرار التحكم -->
-      <button id="btn-today-filter" onclick="toggleTodayFilter()" title="عرض بيانات اليوم فقط" class="active">📅 اليوم <span style="font-size:10px;opacity:.7">2026-04-06</span></button>
+      <button id="btn-today-filter" onclick="toggleTodayFilter()" title="عرض بيانات اليوم فقط">📅 اليوم</button>
       <button id="btn-hide-charts" onclick="toggleChartsVisibility()" title="إخفاء/إظهار الرسوم البيانية">📊 الرسوم</button>
-      <button id="gf-toggle-btn" onclick="toggleGlobalFilter()" class="active">🔍 فلتر شامل <span id="gf-active-badge" class="gf-active-badge visible">نشط</span></button>
+      <button id="gf-toggle-btn" onclick="toggleGlobalFilter()">🔍 فلتر شامل <span id="gf-active-badge" class="gf-active-badge">نشط</span></button>
 
       <div class="tb-divider"></div>
 
       <!-- أيقونات الأدوات -->
       <button id="topbar-refresh-btn" class="tb-icon-btn" onclick="_autoSyncQuiet()" title="تحديث البيانات">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
       </button>
       <button id="theme-toggle" class="tb-icon-btn" onclick="toggleTheme()" title="الوضع المظلم">🌙</button>
 
@@ -1489,17 +1489,17 @@ tbody tr:last-child{border-bottom:none}
   </div>
 
   <!-- ═══════════ GLOBAL FILTER BAR ═══════════ -->
-  <div id="global-filter-bar" class="">
+  <div id="global-filter-bar" class="hidden">
     <span class="gf-label">🔍 فلتر شامل:</span>
 
     <span class="gf-label" style="color:var(--text2);font-size:11px">المندوب:</span>
-    <select class="gf-select" id="gf-rep" onchange="onGfRepChange()"><option value="">كل المندوبين</option><option value="هيتم الصغير">هيتم الصغير</option><option value="محمد العباني">محمد العباني</option><option value="علي غزيل">علي غزيل</option><option value="عمر النمروش">عمر النمروش</option><option value="زياد الحنش">زياد الحنش</option><option value="فراس المشبك">فراس المشبك</option><option value="جلال رحال">جلال رحال</option><option value="عبد المجيد الطير">عبد المجيد الطير</option><option value="حسن الكردي">حسن الكردي</option><option value="علاء الكور">علاء الكور</option><option value="محمد الصادق">محمد الصادق</option><option value="احمد ابو ضوة">احمد ابو ضوة</option><option value="عصام التميمي">عصام التميمي</option><option value="محمد عريبي">محمد عريبي</option><option value="فؤاد مسعود">فؤاد مسعود</option><option value="رضوان اسماعيل">رضوان اسماعيل</option><option value="معاد الشوشان">معاد الشوشان</option><option value="سند">سند</option><option value="علي سليمان">علي سليمان</option><option value="محمود العزري">محمود العزري</option><option value="هيتم الصادق">هيتم الصادق</option><option value="محمد العزابي">محمد العزابي</option><option value="مندر الخويلدي">مندر الخويلدي</option><option value="رضا ابو كتير">رضا ابو كتير</option></select>
+    <select class="gf-select" id="gf-rep" onchange="onGfRepChange()"><option value="">كل المندوبين</option></select>
 
     <span class="gf-label" style="color:var(--text2);font-size:11px">فئة المندوب:</span>
-    <select class="gf-select" id="gf-cat" onchange="onGfCatChange()"><option value="">كل الفئات</option><option value="أخرى">أخرى</option><option value="اسواق">اسواق</option><option value="تجزئة">تجزئة</option><option value="جملة">جملة</option><option value="مقاهي ومطاعم">مقاهي ومطاعم</option></select>
+    <select class="gf-select" id="gf-cat" onchange="onGfCatChange()"><option value="">كل الفئات</option></select>
 
     <span class="gf-label" style="color:var(--text2);font-size:11px">الشهر:</span>
-    <select class="gf-select" id="gf-month" onchange="applyGlobalFilter()"><option value="">كل الأشهر</option><option value="1">يناير</option><option value="2">فبراير</option><option value="3">مارس</option><option value="4">أبريل</option></select>
+    <select class="gf-select" id="gf-month" onchange="applyGlobalFilter()"><option value="">كل الأشهر</option></select>
 
     <span class="gf-label" style="color:var(--text2);font-size:11px">التاريخ:</span>
     <div class="gf-date-wrap">
@@ -1509,69 +1509,62 @@ tbody tr:last-child{border-bottom:none}
     </div>
 
     <button class="btn" style="height:32px;padding:0 12px;font-size:11px" onclick="resetGlobalFilter()">↺ إلغاء الفلتر</button>
-    <span id="gf-status" style="font-size:11px;color:var(--muted)">● من: 2026-04-06 | إلى: 2026-04-06</span>
+    <span id="gf-status" style="font-size:11px;color:var(--muted)"></span>
   </div>
 
   <!-- ═══ PAGE: OVERVIEW ═══ -->
-  <div class="page" id="page-overview">
+  <div class="page active" id="page-overview">
 
     <!-- ── صف البطاقات الرئيسية ── -->
     <div class="kpi-grid" id="kpi-overview">
     <div class="kpi-card" style="--kpi-color:var(--accent)">
-      <div class="kpi-top"><div class="kpi-icon">📦</div></div>
+      <div class="kpi-top"><div class="kpi-icon">📦</div><span class="kpi-top-menu">⋯</span></div>
       <div class="kpi-label">إجمالي المبيعات</div>
-      <div class="kpi-value">306.640</div>
+      <div class="kpi-value">0</div>
       <div class="kpi-sub">قبل المرتجعات</div>
-      
     </div>
     <div class="kpi-card" style="--kpi-color:var(--red)">
-      <div class="kpi-top"><div class="kpi-icon">↩️</div></div>
+      <div class="kpi-top"><div class="kpi-icon">↩️</div><span class="kpi-top-menu">⋯</span></div>
       <div class="kpi-label">إجمالي المرتجعات</div>
-      <div class="kpi-value">58.154</div>
-      <div class="kpi-sub">18.96% من المبيعات</div>
-      
+      <div class="kpi-value">0</div>
+      <div class="kpi-sub">0.00% من المبيعات</div>
     </div>
     <div class="kpi-card" style="--kpi-color:var(--accent2)">
-      <div class="kpi-top"><div class="kpi-icon">💰</div></div>
+      <div class="kpi-top"><div class="kpi-icon">💰</div><span class="kpi-top-menu">⋯</span></div>
       <div class="kpi-label">صافي المبيعات</div>
-      <div class="kpi-value">248.486</div>
+      <div class="kpi-value">0</div>
       <div class="kpi-sub">بعد المرتجعات</div>
-      
     </div>
     <div class="kpi-card" style="--kpi-color:var(--accent2)">
-      <div class="kpi-top"><div class="kpi-icon">✅</div></div>
+      <div class="kpi-top"><div class="kpi-icon">✅</div><span class="kpi-top-menu">⋯</span></div>
       <div class="kpi-label">إجمالي التحصيلات</div>
-      <div class="kpi-value">527.563</div>
-      <div class="kpi-sub"><span style="color:#7c6fff">🏦 521.113 (98.8%)</span> &nbsp; <span style="color:var(--gold)">💵 6.450 (1.2%)</span></div>
-      
+      <div class="kpi-value">0</div>
+      <div class="kpi-sub"><span style="color:#7c6fff">🏦 0 (0.0%)</span> &nbsp; <span style="color:var(--gold)">💵 0 (0.0%)</span></div>
     </div>
-    <div class="kpi-card" style="--kpi-color:var(--accent2)">
-      <div class="kpi-top"><div class="kpi-icon">📊</div></div>
+    <div class="kpi-card" style="--kpi-color:var(--red)">
+      <div class="kpi-top"><div class="kpi-icon">📊</div><span class="kpi-top-menu">⋯</span></div>
       <div class="kpi-label">نسبة التحصيل ROI</div>
-      <div class="kpi-value">212.31%</div>
+      <div class="kpi-value">0.00%</div>
       <div class="kpi-sub">من صافي المبيعات</div>
-      <div class="ov-kpi-bar"><div class="ov-kpi-bar-fill" style="width:100.0%;background:var(--accent2)"></div></div>
+      <div class="ov-kpi-bar"><div class="ov-kpi-bar-fill" style="width:0.0%;background:var(--red)"></div></div>
     </div>
     <div class="kpi-card" style="--kpi-color:var(--accent3)">
-      <div class="kpi-top"><div class="kpi-icon">⚠️</div></div>
+      <div class="kpi-top"><div class="kpi-icon">⚠️</div><span class="kpi-top-menu">⋯</span></div>
       <div class="kpi-label">صافي المديونيات</div>
-      <div class="kpi-value">7.437.509,96</div>
-      <div class="kpi-sub">رصيد مدين صافي</div>
-      
+      <div class="kpi-value">0</div>
+      <div class="kpi-sub">دينار</div>
     </div>
     <div class="kpi-card" style="--kpi-color:var(--accent2)">
-      <div class="kpi-top"><div class="kpi-icon">🔴</div></div>
+      <div class="kpi-top"><div class="kpi-icon">🔴</div><span class="kpi-top-menu">⋯</span></div>
       <div class="kpi-label">الفجوة غير المحصّلة</div>
-      <div class="kpi-value">‎-279.077</div>
+      <div class="kpi-value">0</div>
       <div class="kpi-sub">📈 تحصيل فائض</div>
-      
     </div>
     <div class="kpi-card" style="--kpi-color:var(--purple)">
-      <div class="kpi-top"><div class="kpi-icon">👤</div></div>
+      <div class="kpi-top"><div class="kpi-icon">👤</div><span class="kpi-top-menu">⋯</span></div>
       <div class="kpi-label">المناديب النشطون</div>
-      <div class="kpi-value">20</div>
-      <div class="kpi-sub">24 إجمالي</div>
-      
+      <div class="kpi-value">0</div>
+      <div class="kpi-sub">0 إجمالي</div>
     </div></div>
 
     <!-- ── صف ثانٍ: مرتجعات / بنك / كاش ── -->
@@ -1580,28 +1573,28 @@ tbody tr:last-child{border-bottom:none}
         <div class="ovm-strip" style="background:var(--red)"></div>
         <div class="ovm-icon">↩️</div>
         <div class="ovm-label">إجمالي المرتجعات</div>
-        <div class="ovm-val" id="ov-returns-main" style="color:var(--red)">58.154</div>
-        <div class="ovm-sub" id="ov-returns-sub">58.154 — 18.96% 🔴</div>
+        <div class="ovm-val" id="ov-returns-main" style="color:var(--red)">0</div>
+        <div class="ovm-sub" id="ov-returns-sub">0 — 0.00% 🔴</div>
       </div>
       <div class="card ov-mini-card" id="ov-mc-bank">
         <div class="ovm-strip" style="background:#7c6fff"></div>
         <div class="ovm-icon">🏦</div>
         <div class="ovm-label">تحصيلات بنكية (حوالات)</div>
-        <div class="ovm-val" id="ov-bank-main" style="color:#7c6fff">521.113</div>
-        <div class="ovm-sub" id="ov-bank-sub">521.113 — 98.8%</div>
+        <div class="ovm-val" id="ov-bank-main" style="color:#7c6fff">0</div>
+        <div class="ovm-sub" id="ov-bank-sub">0 — 0.0%</div>
       </div>
       <div class="card ov-mini-card" id="ov-mc-cash">
         <div class="ovm-strip" style="background:var(--gold)"></div>
         <div class="ovm-icon">💵</div>
         <div class="ovm-label">تحصيلات نقدية (كاش)</div>
-        <div class="ovm-val" id="ov-cash-main" style="color:var(--gold)">6.450</div>
-        <div class="ovm-sub" id="ov-cash-sub">6.450 — 1.2%</div>
+        <div class="ovm-val" id="ov-cash-main" style="color:var(--gold)">0</div>
+        <div class="ovm-sub" id="ov-cash-sub">0 — 0.0%</div>
       </div>
       <!-- دائرة توزيع طرق التحصيل -->
       <div class="card" style="padding:18px">
         <div class="card-header"><span class="card-title">🥧 توزيع طرق التحصيل</span></div>
-        <div class="chart-sub" id="ov-pay-sub" style="font-size:11px;color:var(--muted);margin-bottom:8px">نسبة كل طريقة من إجمالي 527.563</div>
-        <div style="position:relative;height:150px"><canvas id="ov-paymentPie" width="375" height="187" style="display: block; box-sizing: border-box; height: 150px; width: 300px;"></canvas></div>
+        <div class="chart-sub" id="ov-pay-sub" style="font-size:11px;color:var(--muted);margin-bottom:8px">نسبة كل طريقة من إجمالي 0</div>
+        <div style="position:relative;height:150px"><canvas id="ov-paymentPie"></canvas></div>
       </div>
     </div>
 
@@ -1610,42 +1603,25 @@ tbody tr:last-child{border-bottom:none}
       <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
         <div style="display:flex;align-items:center;gap:10px">
           <span class="card-title" style="color:var(--gold)">📅 التحليل الشهري التفصيلي</span>
-          <span id="ov-tbl-sub" style="font-size:11px;color:var(--muted)">مؤشرات الأداء — أبريل 2026</span>
+          <span id="ov-tbl-sub" style="font-size:11px;color:var(--muted)">—</span>
         </div>
         <button class="btn-print-a4" onclick="printOverviewMonthly()" title="طباعة A4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
           طباعة A4
         </button>
       </div>
       <div class="table-wrap" id="ov-monthly-static-wrap">
         <table>
-          <thead id="ov-monthly-thead"><tr><th style="min-width:160px">المؤشر</th><th style="text-align:center;min-width:120px;color:#b39dff">❄️ أبريل 2026</th><th style="text-align:center;color:var(--gold);min-width:120px;background:rgba(255,215,0,.04)">📋 الإجمالي</th></tr></thead>
-          <tbody id="ov-monthly-tbody"><tr><td style="font-weight:700">💵 المبيعات (الإجمالي)</td><td class="td-num " style="text-align:right">306.640</td><td class="td-num td-gold" style="text-align:right;font-weight:900;background:rgba(255,215,0,.04)">306.640</td></tr><tr><td style="font-weight:700">↩ المرتجعات</td><td class="td-num td-red" style="text-align:right">58.154</td><td class="td-num td-red" style="text-align:right;font-weight:900;background:rgba(255,215,0,.04)">58.154</td></tr><tr><td style="font-weight:700">✅ صافي المبيعات</td><td class="td-num td-accent" style="text-align:right">248.486</td><td class="td-num td-accent" style="text-align:right;font-weight:900;background:rgba(255,215,0,.04)">248.486</td></tr><tr><td style="font-weight:700">💰 التحصيلات</td><td class="td-num td-green" style="text-align:right">527.563</td><td class="td-num td-green" style="text-align:right;font-weight:900;background:rgba(255,215,0,.04)">527.563</td></tr><tr><td style="font-weight:700">🔴 الفجوة (غير محصّل)</td><td class="td-num td-red" style="text-align:right">‎-279.077</td><td class="td-num td-red" style="text-align:right;font-weight:900;background:rgba(255,215,0,.04)">‎-279.077</td></tr><tr><td style="font-weight:700;color:var(--gold)">📊 نسبة التحصيل %</td><td style="text-align:center"><span class="td-green" style="font-weight:700">212.3%</span></td><td style="text-align:center;background:rgba(255,215,0,.04)"><span class="td-green" style="font-weight:900">212.3%</span></td></tr><tr><td style="font-weight:700;color:var(--muted)">نسبة المرتجعات %</td><td style="text-align:center"><span class="td-red">19.0%</span></td><td style="text-align:center"><span class="td-red">19.0%</span></td></tr></tbody>
+          <thead id="ov-monthly-thead"></thead>
+          <tbody id="ov-monthly-tbody"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">ارفع ملفات البيانات لعرض التحليل الشهري</td></tr></tbody>
         </table>
       </div>
       <!-- ملاحظات تحليلية -->
-      <div id="ov-insights" style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
-    <div style="background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.2);border-radius:var(--r-md);padding:12px 14px">
-      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:4px">📊 ملخص أبريل 2026</div>
-      <div style="font-size:11px;color:var(--text2);line-height:1.7">مبيعات 306.640 | صافي 248.486<br>تحصيل 527.563 | ROI 212.3%</div>
-    </div>
-    <div style="background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);border-radius:var(--r-md);padding:12px 14px">
-      <div style="font-size:12px;font-weight:700;color:var(--accent2);margin-bottom:4px">💡 تحصيل ديون سابقة</div>
-      <div style="font-size:11px;color:var(--text2);line-height:1.7">التحصيل يتجاوز مبيعات الشهر — معظمه استرداد من فترات سابقة</div>
-    </div></div>
+      <div id="ov-insights" style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px"></div>
     </div>
 
     <!-- ── لوحة البطاقات الشهرية ── -->
-    <div id="ov-monthly-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--gap);margin-bottom:var(--gap)"><div class="month-card" style="border-top:3px solid #7c6fff">
-      <div class="mc-month" style="color:#7c6fff">❄️ أبريل 2026</div>
-      <div class="mc-row"><span class="mc-label">إجمالي المبيعات</span><span class="mc-val">306.640</span></div>
-      <div class="mc-row"><span class="mc-label">↩ المرتجعات</span><span class="mc-val" style="color:var(--red)">58.154 <span style="color:var(--muted);font-size:10px">(19.0%)</span></span></div>
-      <div class="mc-row"><span class="mc-label">صافي المبيعات</span><span class="mc-val" style="color:var(--accent)">248.486</span></div>
-      <div class="mc-row"><span class="mc-label">التحصيلات</span><span class="mc-val" style="color:var(--accent2)">527.563</span></div>
-      <div class="mc-row"><span class="mc-label">الفجوة</span><span class="mc-val" style="color:var(--accent2)">‎-279.077</span></div>
-      <div class="mc-bar-bg"><div class="mc-bar" style="width:100.0%;background:#7c6fff"></div></div>
-      <div class="mc-roi td-green" style="color:var(--accent2)">212.3% ROI</div>
-    </div></div>
+    <div id="ov-monthly-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--gap);margin-bottom:var(--gap)"></div>
 
     <!-- ── الرسوم البيانية (أسفل الصفحة) ── -->
     <div class="charts-section">
@@ -1655,30 +1631,30 @@ tbody tr:last-child{border-bottom:none}
           <div class="card-header">
             <span class="card-title">👥 مقارنة المبيعات والتحصيلات — أفضل 10 مناديب</span>
           </div>
-          <div class="chart-wrap tall"><canvas id="ov-repChart" width="702" height="367" style="display: block; box-sizing: border-box; height: 294px; width: 562px;"></canvas></div>
+          <div class="chart-wrap tall"><canvas id="ov-repChart"></canvas></div>
         </div>
         <div class="card">
           <div class="card-header">
             <span class="card-title">📊 توزيع نسب تحصيل المناديب (ROI %)</span>
-            <span id="ov-roi-sub" style="font-size:11px;color:var(--muted)">5 مندوب نشط — مجموعات الأداء</span>
+            <span id="ov-roi-sub" style="font-size:11px;color:var(--muted)">0 مندوب نشط — مجموعات الأداء</span>
           </div>
-          <div class="chart-wrap tall"><canvas id="ov-roiDist" width="702" height="367" style="display: block; box-sizing: border-box; height: 294px; width: 562px;"></canvas></div>
+          <div class="chart-wrap tall"><canvas id="ov-roiDist"></canvas></div>
         </div>
       </div>
       <div class="grid-2" style="margin-bottom:var(--gap)">
         <div class="card">
           <div class="card-header">
             <span class="card-title">📅 الأداء الشهري — المبيعات والتحصيلات والمرتجعات</span>
-            <span id="ov-monthly-sub" style="font-size:11px;color:var(--muted)">أبريل 2026</span>
+            <span id="ov-monthly-sub" style="font-size:11px;color:var(--muted)">—</span>
           </div>
-          <div class="chart-wrap tall"><canvas id="ov-monthlyChart" width="702" height="367" style="display: block; box-sizing: border-box; height: 294px; width: 562px;"></canvas></div>
+          <div class="chart-wrap tall"><canvas id="ov-monthlyChart"></canvas></div>
         </div>
         <div class="card">
           <div class="card-header">
             <span class="card-title">🏪 تصنيف العملاء حسب نسبة التحصيل</span>
-            <span id="ov-cust-sub" style="font-size:11px;color:var(--muted)">4 تصنيفات — 86 عميل</span>
+            <span id="ov-cust-sub" style="font-size:11px;color:var(--muted)">0 تصنيفات — 0 عميل</span>
           </div>
-          <div class="chart-wrap tall"><canvas id="ov-custPie" width="702" height="367" style="display: block; box-sizing: border-box; height: 294px; width: 562px;"></canvas></div>
+          <div class="chart-wrap tall"><canvas id="ov-custPie"></canvas></div>
         </div>
       </div>
       <div class="grid-2" style="margin-bottom:var(--gap)">
@@ -1686,13 +1662,13 @@ tbody tr:last-child{border-bottom:none}
           <div class="card-header">
             <span class="card-title">📦 توزيع صافي مبيعات الأصناف الرئيسية</span>
           </div>
-          <div class="chart-wrap tall"><canvas id="ov-productChart" width="702" height="367" style="display: block; box-sizing: border-box; height: 294px; width: 562px;"></canvas></div>
+          <div class="chart-wrap tall"><canvas id="ov-productChart"></canvas></div>
         </div>
         <div class="card">
           <div class="card-header">
             <span class="card-title">🏭 مبيعات حسب فئة المندوب</span>
           </div>
-          <div class="chart-wrap tall"><canvas id="ov-catChart" width="702" height="367" style="display: block; box-sizing: border-box; height: 294px; width: 562px;"></canvas></div>
+          <div class="chart-wrap tall"><canvas id="ov-catChart"></canvas></div>
         </div>
       </div>
     </div>
@@ -1709,7 +1685,7 @@ tbody tr:last-child{border-bottom:none}
           <span style="font-size:11px;color:var(--muted)">بالدينار الليبي</span>
         </div>
         <button class="btn-print-a4" onclick="printMonthlyTable()" title="طباعة A4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
           طباعة A4
         </button>
       </div>
@@ -1734,14 +1710,14 @@ tbody tr:last-child{border-bottom:none}
       <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
         <span class="card-title">🗂 جدول فواتير المبيعات</span>
         <button class="btn-print-a4" onclick="printSalesTable()" title="طباعة A4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
           طباعة A4
         </button>
       </div>
       <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--r-md)">
         <span class="filter-label">فلتر:</span>
-        <select id="f-sales-rep" onchange="renderSalesPage()"><option value="">كل المندوبين</option><option value="هيتم الصغير">هيتم الصغير</option><option value="محمد العباني">محمد العباني</option><option value="علي غزيل">علي غزيل</option><option value="عمر النمروش">عمر النمروش</option><option value="زياد الحنش">زياد الحنش</option><option value="فراس المشبك">فراس المشبك</option><option value="جلال رحال">جلال رحال</option><option value="عبد المجيد الطير">عبد المجيد الطير</option><option value="حسن الكردي">حسن الكردي</option><option value="علاء الكور">علاء الكور</option><option value="محمد الصادق">محمد الصادق</option><option value="احمد ابو ضوة">احمد ابو ضوة</option><option value="عصام التميمي">عصام التميمي</option><option value="محمد عريبي">محمد عريبي</option><option value="فؤاد مسعود">فؤاد مسعود</option><option value="رضوان اسماعيل">رضوان اسماعيل</option><option value="معاد الشوشان">معاد الشوشان</option><option value="سند">سند</option><option value="علي سليمان">علي سليمان</option><option value="محمود العزري">محمود العزري</option><option value="هيتم الصادق">هيتم الصادق</option><option value="محمد العزابي">محمد العزابي</option><option value="مندر الخويلدي">مندر الخويلدي</option><option value="رضا ابو كتير">رضا ابو كتير</option></select>
-        <select id="f-sales-month" onchange="renderSalesPage()"><option value="">كل الأشهر</option><option value="1">يناير</option><option value="2">فبراير</option><option value="3">مارس</option><option value="4">أبريل</option></select>
+        <select id="f-sales-rep" onchange="renderSalesPage()"><option value="">كل المندوبين</option></select>
+        <select id="f-sales-month" onchange="renderSalesPage()"><option value="">كل الأشهر</option></select>
         <select id="f-sales-type" onchange="renderSalesPage()">
           <option value="">مبيعات + مرتجعات</option>
           <option value="مبيع">مبيعات فقط</option>
@@ -1749,7 +1725,7 @@ tbody tr:last-child{border-bottom:none}
         </select>
         <input type="text" id="f-sales-cust" placeholder="🔍 اسم العميل..." oninput="renderSalesPage()">
         <input type="text" id="f-sales-item" placeholder="🔍 اسم الصنف..." oninput="renderSalesPage()">
-        <select id="f-sales-month-q" onchange="renderSalesPage()"><option value="">كل الأشهر</option><option value="1">يناير</option><option value="2">فبراير</option><option value="3">مارس</option><option value="4">أبريل</option></select>
+        <select id="f-sales-month-q" onchange="renderSalesPage()"><option value="">كل الأشهر</option></select>
         <input type="date" id="f-sales-from" onchange="renderSalesPage()" title="من تاريخ">
         <input type="date" id="f-sales-to" onchange="renderSalesPage()" title="إلى تاريخ">
         <button class="btn" onclick="resetSalesFilters()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
@@ -1788,25 +1764,25 @@ tbody tr:last-child{border-bottom:none}
       <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
         <span class="card-title">🗂 تفصيل فواتير المندوب</span>
         <button class="btn-print-a4" onclick="printRepsTable()" title="طباعة A4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
           طباعة A4
         </button>
       </div>
       <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--r-md)">
         <span class="filter-label">فلتر:</span>
-        <select id="f-rep-select" onchange="renderRepPage()"><option value="">كل المندوبين</option><option value="هيتم الصغير">هيتم الصغير</option><option value="محمد العباني">محمد العباني</option><option value="علي غزيل">علي غزيل</option><option value="عمر النمروش">عمر النمروش</option><option value="زياد الحنش">زياد الحنش</option><option value="فراس المشبك">فراس المشبك</option><option value="جلال رحال">جلال رحال</option><option value="عبد المجيد الطير">عبد المجيد الطير</option><option value="حسن الكردي">حسن الكردي</option><option value="علاء الكور">علاء الكور</option><option value="محمد الصادق">محمد الصادق</option><option value="احمد ابو ضوة">احمد ابو ضوة</option><option value="عصام التميمي">عصام التميمي</option><option value="محمد عريبي">محمد عريبي</option><option value="فؤاد مسعود">فؤاد مسعود</option><option value="رضوان اسماعيل">رضوان اسماعيل</option><option value="معاد الشوشان">معاد الشوشان</option><option value="سند">سند</option><option value="علي سليمان">علي سليمان</option><option value="محمود العزري">محمود العزري</option><option value="هيتم الصادق">هيتم الصادق</option><option value="محمد العزابي">محمد العزابي</option><option value="مندر الخويلدي">مندر الخويلدي</option><option value="رضا ابو كتير">رضا ابو كتير</option></select>
-        <select id="f-rep-cat" onchange="renderRepPage()"><option value="">كل التصنيفات</option><option value="أخرى">أخرى</option><option value="اسواق">اسواق</option><option value="تجزئة">تجزئة</option><option value="جملة">جملة</option><option value="مقاهي ومطاعم">مقاهي ومطاعم</option></select>
-        <select id="f-rep-month" onchange="renderRepPage()"><option value="">كل الأشهر</option><option value="1">يناير</option><option value="2">فبراير</option><option value="3">مارس</option><option value="4">أبريل</option></select>
+        <select id="f-rep-select" onchange="renderRepPage()"><option value="">كل المندوبين</option></select>
+        <select id="f-rep-cat" onchange="renderRepPage()"><option value="">كل التصنيفات</option></select>
+        <select id="f-rep-month" onchange="renderRepPage()"><option value="">كل الأشهر</option></select>
         <input type="date" id="f-rep-from" onchange="renderRepPage()" title="من تاريخ">
         <input type="date" id="f-rep-to" onchange="renderRepPage()" title="إلى تاريخ">
-        <select id="f-rep-view" onchange="const t=document.getElementById(&#39;reps-table-wrap&#39;);if(t){t.className=this.value===&#39;all&#39;?&#39;table-wrap&#39;:&#39;table-wrap vmode-&#39;+this.value}" title="عرض حسب">
+        <select id="f-rep-view" onchange="const t=document.getElementById('reps-table-wrap');if(t){t.className=this.value==='all'?'table-wrap':'table-wrap vmode-'+this.value}" title="عرض حسب">
           <option value="all">عرض: أساسي</option>
           <option value="coll">عرض: التحصيلات</option>
           <option value="ret">عرض: المرتجعات</option>
           <option value="debt">عرض: المديونية</option>
           <option value="cat">عرض: بيانات التصنيف</option>
         </select>
-        <select id="f-rep-sort" onchange="const v=this.value;if(v){const[k,d]=v.split(&#39;|&#39;);window._repSort={key:k,dir:d};}else{window._repSort=null;}renderRepPage()" title="ترتيب حسب">
+        <select id="f-rep-sort" onchange="const v=this.value;if(v){const[k,d]=v.split('|');window._repSort={key:k,dir:d};}else{window._repSort=null;}renderRepPage()" title="ترتيب حسب">
           <option value="">ترتيب: افتراضي</option>
           <option value="netSales|desc">ترتيب: المبيعات ↓</option>
           <option value="netSales|asc">ترتيب: المبيعات ↑</option>
@@ -1821,7 +1797,7 @@ tbody tr:last-child{border-bottom:none}
           <option value="gap|desc">ترتيب: الفجوة ↓</option>
           <option value="name|asc">ترتيب: الاسم أ-ي</option>
         </select>
-        <button class="btn" onclick="[&#39;f-rep-select&#39;,&#39;f-rep-cat&#39;,&#39;f-rep-month&#39;,&#39;f-rep-from&#39;,&#39;f-rep-to&#39;,&#39;f-rep-sort&#39;,&#39;f-rep-view&#39;].forEach(id=&gt;{const el=document.getElementById(id);if(el)el.value=&#39;&#39;});window._repSort=null;const rt=document.getElementById(&#39;reps-table-wrap&#39;);if(rt)rt.className=&#39;table-wrap&#39;;renderRepPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
+        <button class="btn" onclick="['f-rep-select','f-rep-cat','f-rep-month','f-rep-from','f-rep-to','f-rep-sort','f-rep-view'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});window._repSort=null;const rt=document.getElementById('reps-table-wrap');if(rt)rt.className='table-wrap';renderRepPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap" id="reps-table-wrap"></div>
       <div class="table-pagination">
@@ -1853,15 +1829,15 @@ tbody tr:last-child{border-bottom:none}
       <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
         <span class="card-title">🗂 جدول الزبائن</span>
         <button class="btn-print-a4" onclick="printCustomersTable()" title="طباعة A4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
           طباعة A4
         </button>
       </div>
       <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--r-md)">
         <span class="filter-label">فلتر:</span>
         <input type="text" id="f-cust-search" placeholder="🔍 اسم الزبون..." oninput="renderCustomersPage()">
-        <select id="f-cust-rep" onchange="renderCustomersPage()"><option value="">كل المندوبين</option><option value="هيتم الصغير">هيتم الصغير</option><option value="محمد العباني">محمد العباني</option><option value="علي غزيل">علي غزيل</option><option value="عمر النمروش">عمر النمروش</option><option value="زياد الحنش">زياد الحنش</option><option value="فراس المشبك">فراس المشبك</option><option value="جلال رحال">جلال رحال</option><option value="عبد المجيد الطير">عبد المجيد الطير</option><option value="حسن الكردي">حسن الكردي</option><option value="علاء الكور">علاء الكور</option><option value="محمد الصادق">محمد الصادق</option><option value="احمد ابو ضوة">احمد ابو ضوة</option><option value="عصام التميمي">عصام التميمي</option><option value="محمد عريبي">محمد عريبي</option><option value="فؤاد مسعود">فؤاد مسعود</option><option value="رضوان اسماعيل">رضوان اسماعيل</option><option value="معاد الشوشان">معاد الشوشان</option><option value="سند">سند</option><option value="علي سليمان">علي سليمان</option><option value="محمود العزري">محمود العزري</option><option value="هيتم الصادق">هيتم الصادق</option><option value="محمد العزابي">محمد العزابي</option><option value="مندر الخويلدي">مندر الخويلدي</option><option value="رضا ابو كتير">رضا ابو كتير</option></select>
-        <select id="f-cust-repcatf" onchange="renderCustomersPage()"><option value="">كل الفئات</option><option value="أخرى">أخرى</option><option value="اسواق">اسواق</option><option value="تجزئة">تجزئة</option><option value="جملة">جملة</option><option value="مقاهي ومطاعم">مقاهي ومطاعم</option></select>
+        <select id="f-cust-rep" onchange="renderCustomersPage()"><option value="">كل المندوبين</option></select>
+        <select id="f-cust-repcatf" onchange="renderCustomersPage()"><option value="">كل الفئات</option></select>
         <select id="f-cust-cat" onchange="renderCustomersPage()">
           <option value="">كل التصنيفات</option>
           <option value="ممتاز">ممتاز</option><option value="جيد">جيد</option>
@@ -1877,14 +1853,14 @@ tbody tr:last-child{border-bottom:none}
         </select>
         <input type="date" id="f-cust-from" onchange="renderCustomersPage()" title="من تاريخ">
         <input type="date" id="f-cust-to" onchange="renderCustomersPage()" title="إلى تاريخ">
-        <select id="f-cust-view" onchange="const t=document.getElementById(&#39;cust-table-wrap&#39;);if(t){t.className=this.value===&#39;all&#39;?&#39;table-wrap&#39;:&#39;table-wrap vmode-&#39;+this.value}" title="عرض حسب">
+        <select id="f-cust-view" onchange="const t=document.getElementById('cust-table-wrap');if(t){t.className=this.value==='all'?'table-wrap':'table-wrap vmode-'+this.value}" title="عرض حسب">
           <option value="all">عرض: أساسي</option>
           <option value="coll">عرض: التحصيلات</option>
           <option value="ret">عرض: المرتجعات</option>
           <option value="debt">عرض: المديونية</option>
           <option value="cat">عرض: بيانات التصنيف</option>
         </select>
-        <button class="btn" onclick="[&#39;f-cust-search&#39;,&#39;f-cust-rep&#39;,&#39;f-cust-repcatf&#39;,&#39;f-cust-cat&#39;,&#39;f-cust-aging&#39;,&#39;f-cust-from&#39;,&#39;f-cust-to&#39;,&#39;f-cust-view&#39;].forEach(id=&gt;{const el=document.getElementById(id);if(el)el.value=&#39;&#39;});const ct=document.getElementById(&#39;cust-table-wrap&#39;);if(ct)ct.className=&#39;table-wrap&#39;;renderCustomersPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
+        <button class="btn" onclick="['f-cust-search','f-cust-rep','f-cust-repcatf','f-cust-cat','f-cust-aging','f-cust-from','f-cust-to','f-cust-view'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});const ct=document.getElementById('cust-table-wrap');if(ct)ct.className='table-wrap';renderCustomersPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap" id="cust-table-wrap"></div>
       <div class="table-pagination">
@@ -1918,26 +1894,26 @@ tbody tr:last-child{border-bottom:none}
       <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
         <span class="card-title">🗂 جدول الأصناف</span>
         <button class="btn-print-a4" onclick="printProductsTable()" title="طباعة A4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
           طباعة A4
         </button>
       </div>
       <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--r-md)">
         <span class="filter-label">فلتر:</span>
         <input type="text" id="f-prod-search" placeholder="🔍 اسم الصنف..." oninput="renderProductsPage()">
-        <select id="f-prod-rep" onchange="renderProductsPage()"><option value="">كل المندوبين</option><option value="هيتم الصغير">هيتم الصغير</option><option value="محمد العباني">محمد العباني</option><option value="علي غزيل">علي غزيل</option><option value="عمر النمروش">عمر النمروش</option><option value="زياد الحنش">زياد الحنش</option><option value="فراس المشبك">فراس المشبك</option><option value="جلال رحال">جلال رحال</option><option value="عبد المجيد الطير">عبد المجيد الطير</option><option value="حسن الكردي">حسن الكردي</option><option value="علاء الكور">علاء الكور</option><option value="محمد الصادق">محمد الصادق</option><option value="احمد ابو ضوة">احمد ابو ضوة</option><option value="عصام التميمي">عصام التميمي</option><option value="محمد عريبي">محمد عريبي</option><option value="فؤاد مسعود">فؤاد مسعود</option><option value="رضوان اسماعيل">رضوان اسماعيل</option><option value="معاد الشوشان">معاد الشوشان</option><option value="سند">سند</option><option value="علي سليمان">علي سليمان</option><option value="محمود العزري">محمود العزري</option><option value="هيتم الصادق">هيتم الصادق</option><option value="محمد العزابي">محمد العزابي</option><option value="مندر الخويلدي">مندر الخويلدي</option><option value="رضا ابو كتير">رضا ابو كتير</option></select>
-        <select id="f-prod-cat" onchange="renderProductsPage()"><option value="">كل الفئات</option><option value="أخرى">أخرى</option><option value="اسواق">اسواق</option><option value="تجزئة">تجزئة</option><option value="جملة">جملة</option><option value="مقاهي ومطاعم">مقاهي ومطاعم</option></select>
+        <select id="f-prod-rep" onchange="renderProductsPage()"><option value="">كل المندوبين</option></select>
+        <select id="f-prod-cat" onchange="renderProductsPage()"><option value="">كل الفئات</option></select>
         <input type="text" id="f-prod-cust" placeholder="🔍 اسم العميل..." oninput="renderProductsPage()">
-        <select id="f-prod-month" onchange="renderProductsPage()"><option value="">كل الأشهر</option><option value="1">يناير</option><option value="2">فبراير</option><option value="3">مارس</option><option value="4">أبريل</option></select>
+        <select id="f-prod-month" onchange="renderProductsPage()"><option value="">كل الأشهر</option></select>
         <input type="date" id="f-prod-from" onchange="renderProductsPage()" title="من تاريخ">
         <input type="date" id="f-prod-to" onchange="renderProductsPage()" title="إلى تاريخ">
-        <select id="f-prod-view" onchange="const t=document.getElementById(&#39;prod-table-wrap&#39;);if(t)t.className=this.value===&#39;all&#39;?&#39;table-wrap&#39;:&#39;table-wrap pvmode-&#39;+this.value" title="عرض حسب">
+        <select id="f-prod-view" onchange="const t=document.getElementById('prod-table-wrap');if(t)t.className=this.value==='all'?'table-wrap':'table-wrap pvmode-'+this.value" title="عرض حسب">
           <option value="all">عرض: أساسي</option>
           <option value="val">عرض: القيم المالية</option>
           <option value="qty">عرض: الكميات</option>
           <option value="ret">عرض: المرتجعات</option>
         </select>
-        <button class="btn" onclick="[&#39;f-prod-search&#39;,&#39;f-prod-rep&#39;,&#39;f-prod-cat&#39;,&#39;f-prod-cust&#39;,&#39;f-prod-month&#39;,&#39;f-prod-from&#39;,&#39;f-prod-to&#39;,&#39;f-prod-view&#39;].forEach(id=&gt;{const el=document.getElementById(id);if(el)el.value=&#39;&#39;});const pt=document.getElementById(&#39;prod-table-wrap&#39;);if(pt)pt.className=&#39;table-wrap&#39;;renderProductsPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
+        <button class="btn" onclick="['f-prod-search','f-prod-rep','f-prod-cat','f-prod-cust','f-prod-month','f-prod-from','f-prod-to','f-prod-view'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});const pt=document.getElementById('prod-table-wrap');if(pt)pt.className='table-wrap';renderProductsPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap" id="prod-table-wrap"></div>
       <div class="table-pagination">
@@ -1970,12 +1946,12 @@ tbody tr:last-child{border-bottom:none}
       <div class="filter-bar" style="border-radius:var(--r-md);margin:0">
         <span class="filter-label">فلتر:</span>
         <input type="text" id="f-debt-search" placeholder="🔍 اسم الحساب..." oninput="renderDebtPage()">
-        <select id="f-debt-rep" onchange="renderDebtPage()"><option value="">كل المندوبين</option><option value="هيتم الصغير">هيتم الصغير</option><option value="محمد العباني">محمد العباني</option><option value="علي غزيل">علي غزيل</option><option value="عمر النمروش">عمر النمروش</option><option value="زياد الحنش">زياد الحنش</option><option value="فراس المشبك">فراس المشبك</option><option value="جلال رحال">جلال رحال</option><option value="عبد المجيد الطير">عبد المجيد الطير</option><option value="حسن الكردي">حسن الكردي</option><option value="علاء الكور">علاء الكور</option><option value="محمد الصادق">محمد الصادق</option><option value="احمد ابو ضوة">احمد ابو ضوة</option><option value="عصام التميمي">عصام التميمي</option><option value="محمد عريبي">محمد عريبي</option><option value="فؤاد مسعود">فؤاد مسعود</option><option value="رضوان اسماعيل">رضوان اسماعيل</option><option value="معاد الشوشان">معاد الشوشان</option><option value="سند">سند</option><option value="علي سليمان">علي سليمان</option><option value="محمود العزري">محمود العزري</option><option value="هيتم الصادق">هيتم الصادق</option><option value="محمد العزابي">محمد العزابي</option><option value="مندر الخويلدي">مندر الخويلدي</option><option value="رضا ابو كتير">رضا ابو كتير</option></select>
-        <select id="f-debt-cat" onchange="renderDebtPage()"><option value="">كل الفئات</option><option value="أخرى">أخرى</option><option value="اسواق">اسواق</option><option value="تجزئة">تجزئة</option><option value="جملة">جملة</option><option value="مقاهي ومطاعم">مقاهي ومطاعم</option></select>
+        <select id="f-debt-rep" onchange="renderDebtPage()"><option value="">كل المندوبين</option></select>
+        <select id="f-debt-cat" onchange="renderDebtPage()"><option value="">كل الفئات</option></select>
         <select id="f-debt-type" onchange="renderDebtPage()">
           <option value="">الكل</option><option value="debit">مدين فقط</option>
         </select>
-        <button class="btn" onclick="[&#39;f-debt-search&#39;,&#39;f-debt-rep&#39;,&#39;f-debt-cat&#39;,&#39;f-debt-type&#39;].forEach(id=&gt;{const el=document.getElementById(id);if(el)el.value=&#39;&#39;});renderDebtPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
+        <button class="btn" onclick="['f-debt-search','f-debt-rep','f-debt-cat','f-debt-type'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});renderDebtPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
     </div>
 
@@ -1983,7 +1959,7 @@ tbody tr:last-child{border-bottom:none}
       <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
         <span class="card-title">👥 ملخص المديونية حسب المندوب</span>
         <button class="btn-print-a4" onclick="printDebtRepTable()" title="طباعة A4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
           طباعة A4
         </button>
       </div>
@@ -1993,7 +1969,7 @@ tbody tr:last-child{border-bottom:none}
       <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
         <span class="card-title">🗂 جدول المديونية التفصيلي</span>
         <button class="btn-print-a4" onclick="printDebtTable()" title="طباعة A4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
           طباعة A4
         </button>
       </div>
@@ -2020,96 +1996,21 @@ tbody tr:last-child{border-bottom:none}
   </div>
 
   <!-- ═══ PAGE: AGING ═══ -->
-  <div class="page active" id="page-aging">
-    <div class="kpi-grid" id="kpi-aging"><div class="kpi-card" style="--kpi-color:var(--gold)">
-    <div class="kpi-top">
-      <div class="kpi-icon">⏳</div>
-      <span class="kpi-top-menu" title="خيارات">⋯</span>
-    </div>
-    <div class="kpi-label">إجمالي الذمم</div>
-    <div class="kpi-value">6.806.579,69</div>
-    <div class="kpi-sub">إجمالي</div>
-    
-  </div><div class="kpi-card" style="--kpi-color:var(--red)">
-    <div class="kpi-top">
-      <div class="kpi-icon">🔴</div>
-      <span class="kpi-top-menu" title="خيارات">⋯</span>
-    </div>
-    <div class="kpi-label">ذمم &gt; 60 يوم</div>
-    <div class="kpi-value">19</div>
-    <div class="kpi-sub">تحتاج متابعة</div>
-    
-  </div><div class="kpi-card" style="--kpi-color:var(--accent3)">
-    <div class="kpi-top">
-      <div class="kpi-icon">⚠</div>
-      <span class="kpi-top-menu" title="خيارات">⋯</span>
-    </div>
-    <div class="kpi-label">ذمم 31-60 يوم</div>
-    <div class="kpi-value">3.101.787,84</div>
-    <div class="kpi-sub">مراقبة</div>
-    
-  </div><div class="kpi-card" style="--kpi-color:var(--accent2)">
-    <div class="kpi-top">
-      <div class="kpi-icon">✅</div>
-      <span class="kpi-top-menu" title="خيارات">⋯</span>
-    </div>
-    <div class="kpi-label">ذمم حديثة ≤30 يوم</div>
-    <div class="kpi-value">3.704.772,85</div>
-    <div class="kpi-sub">آمنة</div>
-    
-  </div><div class="kpi-card" style="--kpi-color:var(--purple)">
-    <div class="kpi-top">
-      <div class="kpi-icon">👥</div>
-      <span class="kpi-top-menu" title="خيارات">⋯</span>
-    </div>
-    <div class="kpi-label">عملاء بذمم</div>
-    <div class="kpi-value">1.581</div>
-    <div class="kpi-sub">عميل</div>
-    
-  </div></div>
-    <div class="aging-buckets" style="margin-bottom:var(--gap)" id="aging-buckets">
-    <div class="aging-bucket" style="border-top:3px solid var(--accent2)">
-      <div class="ab-days">≤ 10 أيام</div>
-      <div class="ab-val" style="color:var(--accent2)">2.31م</div>
-      <div class="ab-pct">33.9%</div>
-    </div>
-    <div class="aging-bucket" style="border-top:3px solid var(--accent2)">
-      <div class="ab-days">11-15 يوم</div>
-      <div class="ab-val" style="color:var(--accent2)">118.1ك</div>
-      <div class="ab-pct">1.7%</div>
-    </div>
-    <div class="aging-bucket" style="border-top:3px solid var(--accent)">
-      <div class="ab-days">16-30 يوم</div>
-      <div class="ab-val" style="color:var(--accent)">1.28م</div>
-      <div class="ab-pct">18.8%</div>
-    </div>
-    <div class="aging-bucket" style="border-top:3px solid var(--accent3)">
-      <div class="ab-days">31-60 يوم</div>
-      <div class="ab-val" style="color:var(--accent3)">3.10م</div>
-      <div class="ab-pct">45.6%</div>
-    </div>
-    <div class="aging-bucket" style="border-top:3px solid var(--red)">
-      <div class="ab-days">61-90 يوم</div>
-      <div class="ab-val" style="color:var(--red)">19</div>
-      <div class="ab-pct">0.0%</div>
-    </div>
-    <div class="aging-bucket" style="border-top:3px solid var(--red)">
-      <div class="ab-days">120+ يوم</div>
-      <div class="ab-val" style="color:var(--red)">—</div>
-      <div class="ab-pct">0.0%</div>
-    </div></div>
+  <div class="page" id="page-aging">
+    <div class="kpi-grid" id="kpi-aging"></div>
+    <div class="aging-buckets" style="margin-bottom:var(--gap)" id="aging-buckets"></div>
 
     <div class="card" style="margin-bottom:var(--gap)">
       <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
         <span class="card-title">🗂 جدول أعمار الذمم</span>
         <button class="btn-print-a4" onclick="printAgingTable()" title="طباعة A4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
           طباعة A4
         </button>
       </div>
       <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--r-md)">
         <span class="filter-label">فلتر:</span>
-        <select id="f-aging-rep" onchange="renderAgingPage()"><option value="">كل المندوبين</option><option value="هيتم الصغير">هيتم الصغير</option><option value="محمد العباني">محمد العباني</option><option value="علي غزيل">علي غزيل</option><option value="عمر النمروش">عمر النمروش</option><option value="زياد الحنش">زياد الحنش</option><option value="فراس المشبك">فراس المشبك</option><option value="جلال رحال">جلال رحال</option><option value="عبد المجيد الطير">عبد المجيد الطير</option><option value="حسن الكردي">حسن الكردي</option><option value="علاء الكور">علاء الكور</option><option value="محمد الصادق">محمد الصادق</option><option value="احمد ابو ضوة">احمد ابو ضوة</option><option value="عصام التميمي">عصام التميمي</option><option value="محمد عريبي">محمد عريبي</option><option value="فؤاد مسعود">فؤاد مسعود</option><option value="رضوان اسماعيل">رضوان اسماعيل</option><option value="معاد الشوشان">معاد الشوشان</option><option value="سند">سند</option><option value="علي سليمان">علي سليمان</option><option value="محمود العزري">محمود العزري</option><option value="هيتم الصادق">هيتم الصادق</option><option value="محمد العزابي">محمد العزابي</option><option value="مندر الخويلدي">مندر الخويلدي</option><option value="رضا ابو كتير">رضا ابو كتير</option></select>
+        <select id="f-aging-rep" onchange="renderAgingPage()"><option value="">كل المندوبين</option></select>
         <select id="f-aging-bucket" onchange="renderAgingPage()">
           <option value="">كل الفئات</option>
           <option value="10">≤ 10 أيام</option>
@@ -2122,315 +2023,10 @@ tbody tr:last-child{border-bottom:none}
         <input type="text" id="f-aging-search" placeholder="🔍 اسم العميل..." oninput="renderAgingPage()">
         <button class="btn" onclick="document.getElementById(&#39;f-aging-rep&#39;).value=&#39;&#39;;document.getElementById(&#39;f-aging-bucket&#39;).value=&#39;&#39;;document.getElementById(&#39;f-aging-search&#39;).value=&#39;&#39;;renderAgingPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
-      <div class="table-wrap" id="aging-table-wrap"><table>
-      <thead><tr>
-        <th>#</th><th>اسم الحساب</th><th>المندوب</th><th style="color:var(--gold)">إجمالي الذمم</th><th style="color:var(--accent2)">≤10 أيام</th><th style="color:var(--accent2)">11-15 يوم</th><th style="color:var(--accent)">16-30 يوم</th><th style="color:var(--accent3)">31-60 يوم</th><th style="color:var(--red)">61-90 يوم</th><th style="color:var(--red)">120+ يوم</th>
-      </tr></thead>
-      <tbody><tr>
-          <td class="td-num">1</td>
-          <td class="td-name" title="نقدي">نقدي</td>
-          <td>—</td>
-          <td class="td-num td-gold" style="font-weight:700">3.090</td>
-          <td class="td-num" style="color:var(--accent2);font-weight:600">3.000</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent);font-weight:600">90</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">2</td>
-          <td class="td-name" title="يوسف الورفلي /محل 154+ 155">يوسف الورفلي /محل 154+ 155</td>
-          <td>محمد العباني</td>
-          <td class="td-num td-gold" style="font-weight:700">25.876</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent);font-weight:600">25.876</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">3</td>
-          <td class="td-name" title="يسري الصعيدي دبي 33">يسري الصعيدي دبي 33</td>
-          <td>محمد العباني</td>
-          <td class="td-num td-gold" style="font-weight:700">75.758</td>
-          <td class="td-num" style="color:var(--accent2);font-weight:600">36.150</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">39.608</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">4</td>
-          <td class="td-name" title="يحي الجبالي / الدريبي / 0912181872">يحي الجبالي / الدريبي / 0912181872</td>
-          <td>مندر الخويلدي</td>
-          <td class="td-num td-gold" style="font-weight:700">5.201</td>
-          <td class="td-num" style="color:var(--accent2);font-weight:600">3.640</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">1.561</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">5</td>
-          <td class="td-name" title="وليد النحلة / دبي / 835">وليد النحلة / دبي / 835</td>
-          <td>زياد الحنش</td>
-          <td class="td-num td-gold" style="font-weight:700">9.250</td>
-          <td class="td-num" style="color:var(--accent2);font-weight:600">9.250</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">6</td>
-          <td class="td-name" title="وليد المصري / الزاوية">وليد المصري / الزاوية</td>
-          <td>عمر النمروش</td>
-          <td class="td-num td-gold" style="font-weight:700">21.405</td>
-          <td class="td-muted">—</td><td class="td-num" style="color:var(--accent2);font-weight:600">5.700</td><td class="td-num" style="color:var(--accent);font-weight:600">11.750</td><td class="td-num" style="color:var(--accent3);font-weight:600">3.955</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">7</td>
-          <td class="td-name" title="وسيم ابوزمازم / محل 401">وسيم ابوزمازم / محل 401</td>
-          <td>محمد العباني</td>
-          <td class="td-num td-gold" style="font-weight:700">4.040</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">4.040</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">8</td>
-          <td class="td-name" title="وسام العربي / المميز / محل 600/ 0913151107 دب">وسام العربي / المميز / محل 600/ 0913151107 دب</td>
-          <td>زياد الحنش</td>
-          <td class="td-num td-gold" style="font-weight:700">748</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">748</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">9</td>
-          <td class="td-name" title="هلال الخير / قصر بن غشير">هلال الخير / قصر بن غشير</td>
-          <td>عصام التميمي</td>
-          <td class="td-num td-gold" style="font-weight:700">934</td>
-          <td class="td-num" style="color:var(--accent2);font-weight:600">934</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">10</td>
-          <td class="td-name" title="هلا ماركت / جنزور الشرقية">هلا ماركت / جنزور الشرقية</td>
-          <td>فراس المشبك</td>
-          <td class="td-num td-gold" style="font-weight:700">1.820</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent);font-weight:600">1.820</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">11</td>
-          <td class="td-name" title="هبال / ايمن / ابوسليم">هبال / ايمن / ابوسليم</td>
-          <td>سند</td>
-          <td class="td-num td-gold" style="font-weight:700">900</td>
-          <td class="td-num" style="color:var(--accent2);font-weight:600">900</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">12</td>
-          <td class="td-name" title="هب الريح فوزي - الحاتة 0921773058">هب الريح فوزي - الحاتة 0921773058</td>
-          <td>محمد عريبي</td>
-          <td class="td-num td-gold" style="font-weight:700">405</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent);font-weight:600">19</td><td class="td-num" style="color:var(--accent3);font-weight:600">386</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">13</td>
-          <td class="td-name" title="هاني الغويل / السامبا / محل 186 - 0917997513">هاني الغويل / السامبا / محل 186 - 0917997513</td>
-          <td>هيتم الصغير</td>
-          <td class="td-num td-gold" style="font-weight:700">10.807</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">10.807</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">14</td>
-          <td class="td-name" title="نوران للتسوق / عبد السلام / خط 6 المشروع">نوران للتسوق / عبد السلام / خط 6 المشروع</td>
-          <td>سيف يونس</td>
-          <td class="td-num td-gold" style="font-weight:700">98</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">98</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">15</td>
-          <td class="td-name" title="نور مول عبد المجيد السبعة">نور مول عبد المجيد السبعة</td>
-          <td>سيف يونس</td>
-          <td class="td-num td-gold" style="font-weight:700">702</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">702</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">16</td>
-          <td class="td-name" title="نور سنتر للتسوق / شارع القناعة">نور سنتر للتسوق / شارع القناعة</td>
-          <td>علاء الكور</td>
-          <td class="td-num td-gold" style="font-weight:700">2.662,5</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent);font-weight:600">2.100</td><td class="td-num" style="color:var(--accent3);font-weight:600">562,5</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">17</td>
-          <td class="td-name" title="نور الدين بشوفة 226">نور الدين بشوفة 226</td>
-          <td>زياد الحنش</td>
-          <td class="td-num td-gold" style="font-weight:700">4.870</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">4.870</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">18</td>
-          <td class="td-name" title="نواصي / الخيرات / تاجوراء">نواصي / الخيرات / تاجوراء</td>
-          <td>عبد المجيد الطير</td>
-          <td class="td-num td-gold" style="font-weight:700">311,5</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">311,5</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">19</td>
-          <td class="td-name" title="نجيب للتسوق / الزاوية الرحان">نجيب للتسوق / الزاوية الرحان</td>
-          <td>علاء الكور</td>
-          <td class="td-num td-gold" style="font-weight:700">5,95</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">5,95</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">20</td>
-          <td class="td-name" title="ناصر للغدائية --ناجي / السواني">ناصر للغدائية --ناجي / السواني</td>
-          <td>حسن الكردي</td>
-          <td class="td-num td-gold" style="font-weight:700">7</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent);font-weight:600">7</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">21</td>
-          <td class="td-name" title="ناصر عبدالرحمن / محل 14">ناصر عبدالرحمن / محل 14</td>
-          <td>محمد العباني</td>
-          <td class="td-num td-gold" style="font-weight:700">155</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">155</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">22</td>
-          <td class="td-name" title="نادر الزويك /0911222762">نادر الزويك /0911222762</td>
-          <td>عمر النمروش</td>
-          <td class="td-num td-gold" style="font-weight:700">111</td>
-          <td class="td-num" style="color:var(--accent2);font-weight:600">111</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">23</td>
-          <td class="td-name" title="نادر - مختار / ولي العهد">نادر - مختار / ولي العهد</td>
-          <td>احمد نوري</td>
-          <td class="td-num td-gold" style="font-weight:700">367</td>
-          <td class="td-num" style="color:var(--accent2);font-weight:600">272</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent);font-weight:600">95</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">24</td>
-          <td class="td-name" title="ناجح البرهومي / السامبا / محل /384">ناجح البرهومي / السامبا / محل /384</td>
-          <td>هيتم الصغير</td>
-          <td class="td-num td-gold" style="font-weight:700">11.533</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent);font-weight:600">10.255</td><td class="td-num" style="color:var(--accent3);font-weight:600">1.278</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">25</td>
-          <td class="td-name" title="ميني مول 0911738960 قرجي">ميني مول 0911738960 قرجي</td>
-          <td>احمد نوري</td>
-          <td class="td-num td-gold" style="font-weight:700">225</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent);font-weight:600">225</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">26</td>
-          <td class="td-name" title="ميني ماركت القادسية">ميني ماركت القادسية</td>
-          <td>محمد العزابي</td>
-          <td class="td-num td-gold" style="font-weight:700">82</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">82</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">27</td>
-          <td class="td-name" title="ميني ماركت / اربع شوارع الرتيمي">ميني ماركت / اربع شوارع الرتيمي</td>
-          <td>فراس المشبك</td>
-          <td class="td-num td-gold" style="font-weight:700">110</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">110</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">28</td>
-          <td class="td-name" title="ميني ماركت - 0925255317 - الماية">ميني ماركت - 0925255317 - الماية</td>
-          <td>محمد عريبي</td>
-          <td class="td-num td-gold" style="font-weight:700">2</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">2</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">29</td>
-          <td class="td-name" title="ميلاد الترهوني / السامبا / محل 356/ 0926881001">ميلاد الترهوني / السامبا / محل 356/ 0926881001</td>
-          <td>هيتم الصغير</td>
-          <td class="td-num td-gold" style="font-weight:700">5.175</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">5.175</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">30</td>
-          <td class="td-name" title="ميقو كافي - طريق الخدمات عمر المختار - 0927341638">ميقو كافي - طريق الخدمات عمر المختار - 0927341638</td>
-          <td>فؤاد مسعود</td>
-          <td class="td-num td-gold" style="font-weight:700">511</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">511</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">31</td>
-          <td class="td-name" title="ميار ماركت 0919333325 قرقارش">ميار ماركت 0919333325 قرقارش</td>
-          <td>احمد ابو ضوة</td>
-          <td class="td-num td-gold" style="font-weight:700">942,5</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">942,5</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">32</td>
-          <td class="td-name" title="مونت كارلو / 0918655696 - فشلوم">مونت كارلو / 0918655696 - فشلوم</td>
-          <td>محمد العزابي</td>
-          <td class="td-num td-gold" style="font-weight:700">10</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">10</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">33</td>
-          <td class="td-name" title="مؤمن / الوادي">مؤمن / الوادي</td>
-          <td>احمد نوري</td>
-          <td class="td-num td-gold" style="font-weight:700">1.843</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">1.843</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">34</td>
-          <td class="td-name" title="مواطن نجمي 0916997574 السراج">مواطن نجمي 0916997574 السراج</td>
-          <td>احمد ابو ضوة</td>
-          <td class="td-num td-gold" style="font-weight:700">758</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">758</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">35</td>
-          <td class="td-name" title="مواد الغدائية جنب سوق الواحات / الزاوية قرية ناصر">مواد الغدائية جنب سوق الواحات / الزاوية قرية ناصر</td>
-          <td>محمد الصادق</td>
-          <td class="td-num td-gold" style="font-weight:700">1</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">1</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">36</td>
-          <td class="td-name" title="مهند \ قصر بن غشير">مهند \ قصر بن غشير</td>
-          <td>عصام التميمي</td>
-          <td class="td-num td-gold" style="font-weight:700">40</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent);font-weight:600">40</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">37</td>
-          <td class="td-name" title="مهاب المهدي / محل 704">مهاب المهدي / محل 704</td>
-          <td>محمد العباني</td>
-          <td class="td-num td-gold" style="font-weight:700">6.180</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">6.180</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">38</td>
-          <td class="td-name" title="منير العريفي /">منير العريفي /</td>
-          <td>عمر النمروش</td>
-          <td class="td-num td-gold" style="font-weight:700">6.912</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">6.912</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">39</td>
-          <td class="td-name" title="منير الشاوش / السامبا 256">منير الشاوش / السامبا 256</td>
-          <td>زياد الحنش</td>
-          <td class="td-num td-gold" style="font-weight:700">26.937</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent);font-weight:600">20.400</td><td class="td-num" style="color:var(--accent3);font-weight:600">6.537</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">40</td>
-          <td class="td-name" title="منارة ماركت - هيثم قرجي">منارة ماركت - هيثم قرجي</td>
-          <td>احمد ابو ضوة</td>
-          <td class="td-num td-gold" style="font-weight:700">4.093</td>
-          <td class="td-num" style="color:var(--accent2);font-weight:600">4.093</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">41</td>
-          <td class="td-name" title="مكانك - - الخلة">مكانك - - الخلة</td>
-          <td>سيف يونس</td>
-          <td class="td-num td-gold" style="font-weight:700">58</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">58</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">42</td>
-          <td class="td-name" title="مقهي حسن كريم">مقهي حسن كريم</td>
-          <td>فؤاد مسعود</td>
-          <td class="td-num td-gold" style="font-weight:700">385</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">385</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">43</td>
-          <td class="td-name" title="مقهي العربي 0914621485 صبراتة">مقهي العربي 0914621485 صبراتة</td>
-          <td>فؤاد مسعود</td>
-          <td class="td-num td-gold" style="font-weight:700">568</td>
-          <td class="td-num" style="color:var(--accent2);font-weight:600">568</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">44</td>
-          <td class="td-name" title="مقهي الركن الشرقي 0926372568 الزاوية">مقهي الركن الشرقي 0926372568 الزاوية</td>
-          <td>فؤاد مسعود</td>
-          <td class="td-num td-gold" style="font-weight:700">214</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">214</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">45</td>
-          <td class="td-name" title="مقهي الخرباش / 0924644892">مقهي الخرباش / 0924644892</td>
-          <td>فؤاد مسعود</td>
-          <td class="td-num td-gold" style="font-weight:700">1.533,5</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent);font-weight:600">1.124</td><td class="td-num" style="color:var(--accent3);font-weight:600">409,5</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">46</td>
-          <td class="td-name" title="الخيرات للتسوق">الخيرات للتسوق</td>
-          <td>علاء الكور</td>
-          <td class="td-num td-gold" style="font-weight:700">21</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">21</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">47</td>
-          <td class="td-name" title="مقهى مراحب /الشرطة العسكرية الزهراء">مقهى مراحب /الشرطة العسكرية الزهراء</td>
-          <td>محمود العزري</td>
-          <td class="td-num td-gold" style="font-weight:700">627</td>
-          <td class="td-num" style="color:var(--accent2);font-weight:600">510</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent);font-weight:600">117</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">48</td>
-          <td class="td-name" title="مقهى ماترس / العزيزية">مقهى ماترس / العزيزية</td>
-          <td>محمود العزري</td>
-          <td class="td-num td-gold" style="font-weight:700">735</td>
-          <td class="td-num" style="color:var(--accent2);font-weight:600">735</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">49</td>
-          <td class="td-name" title="مقهى سعيد /">مقهى سعيد /</td>
-          <td>علي سليمان</td>
-          <td class="td-num td-gold" style="font-weight:700">98</td>
-          <td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-num" style="color:var(--accent3);font-weight:600">98</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr><tr>
-          <td class="td-num">50</td>
-          <td class="td-name" title="مقهى النينجا / 0942670343 -- / الترسانة">مقهى النينجا / 0942670343 -- / الترسانة</td>
-          <td>علي سليمان</td>
-          <td class="td-num td-gold" style="font-weight:700">3.094</td>
-          <td class="td-num" style="color:var(--accent2);font-weight:600">3.094</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td><td class="td-muted">—</td>
-        </tr></tbody>
-    </table></div>
+      <div class="table-wrap" id="aging-table-wrap"></div>
       <div class="table-pagination">
-        <span id="aging-pag-info">عرض 1–50 من 1582</span>
-        <div class="pag-btns" id="aging-pag-btns"><button class="pag-btn" disabled="">◀</button><button class="pag-btn active">1</button><button class="pag-btn">2</button><button class="pag-btn">3</button><span style="color:var(--muted);padding:4px">…</span><button class="pag-btn">32</button><button class="pag-btn">▶</button></div>
+        <span id="aging-pag-info"></span>
+        <div class="pag-btns" id="aging-pag-btns"></div>
       </div>
     </div>
     <!-- الرسوم البيانية في الأسفل -->
@@ -2439,11 +2035,11 @@ tbody tr:last-child{border-bottom:none}
       <div class="grid-2">
         <div class="card">
           <div class="card-header"><span class="card-title">⏳ توزيع أعمار الذمم</span></div>
-          <div class="chart-wrap"><canvas id="ch-aging-dist" width="702" height="292" style="display: block; box-sizing: border-box; height: 234px; width: 562px;"></canvas></div>
+          <div class="chart-wrap"><canvas id="ch-aging-dist"></canvas></div>
         </div>
         <div class="card">
           <div class="card-header"><span class="card-title">👥 أعمار الذمم حسب المندوب</span></div>
-          <div class="chart-wrap"><canvas id="ch-aging-rep" width="702" height="292" style="display: block; box-sizing: border-box; height: 234px; width: 562px;"></canvas></div>
+          <div class="chart-wrap"><canvas id="ch-aging-rep"></canvas></div>
         </div>
       </div>
     </div>
@@ -2470,15 +2066,15 @@ tbody tr:last-child{border-bottom:none}
       <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
         <span class="card-title">🗂 جدول سندات التحصيل</span>
         <button class="btn-print-a4" onclick="printCollectionTable()" title="طباعة A4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
           طباعة A4
         </button>
       </div>
       <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--r-md)">
         <span class="filter-label">فلتر:</span>
-        <select id="f-coll-rep" onchange="renderCollectionPage()"><option value="">كل المندوبين</option><option value="هيتم الصغير">هيتم الصغير</option><option value="محمد العباني">محمد العباني</option><option value="علي غزيل">علي غزيل</option><option value="عمر النمروش">عمر النمروش</option><option value="زياد الحنش">زياد الحنش</option><option value="فراس المشبك">فراس المشبك</option><option value="جلال رحال">جلال رحال</option><option value="عبد المجيد الطير">عبد المجيد الطير</option><option value="حسن الكردي">حسن الكردي</option><option value="علاء الكور">علاء الكور</option><option value="محمد الصادق">محمد الصادق</option><option value="احمد ابو ضوة">احمد ابو ضوة</option><option value="عصام التميمي">عصام التميمي</option><option value="محمد عريبي">محمد عريبي</option><option value="فؤاد مسعود">فؤاد مسعود</option><option value="رضوان اسماعيل">رضوان اسماعيل</option><option value="معاد الشوشان">معاد الشوشان</option><option value="سند">سند</option><option value="علي سليمان">علي سليمان</option><option value="محمود العزري">محمود العزري</option><option value="هيتم الصادق">هيتم الصادق</option><option value="محمد العزابي">محمد العزابي</option><option value="مندر الخويلدي">مندر الخويلدي</option><option value="رضا ابو كتير">رضا ابو كتير</option></select>
-        <select id="f-coll-cat" onchange="renderCollectionPage()"><option value="">كل الفئات</option><option value="أخرى">أخرى</option><option value="اسواق">اسواق</option><option value="تجزئة">تجزئة</option><option value="جملة">جملة</option><option value="مقاهي ومطاعم">مقاهي ومطاعم</option></select>
-        <select id="f-coll-month" onchange="renderCollectionPage()"><option value="">كل الأشهر</option><option value="1">يناير</option><option value="2">فبراير</option><option value="3">مارس</option><option value="4">أبريل</option></select>
+        <select id="f-coll-rep" onchange="renderCollectionPage()"><option value="">كل المندوبين</option></select>
+        <select id="f-coll-cat" onchange="renderCollectionPage()"><option value="">كل الفئات</option></select>
+        <select id="f-coll-month" onchange="renderCollectionPage()"><option value="">كل الأشهر</option></select>
         <select id="f-coll-type" onchange="renderCollectionPage()">
           <option value="">كل الأنواع</option>
           <option value="bank">حوالات بنكية</option>
@@ -2486,7 +2082,7 @@ tbody tr:last-child{border-bottom:none}
           <option value="خصم">خصومات فقط</option>
           <option value="إضافة">إضافات فقط</option>
         </select>
-        <select id="f-coll-month-q" onchange="renderCollectionPage()"><option value="">كل الأشهر</option><option value="1">يناير</option><option value="2">فبراير</option><option value="3">مارس</option><option value="4">أبريل</option></select>
+        <select id="f-coll-month-q" onchange="renderCollectionPage()"><option value="">كل الأشهر</option></select>
         <input type="date" id="f-coll-from" onchange="renderCollectionPage()" title="من تاريخ">
         <input type="date" id="f-coll-to" onchange="renderCollectionPage()" title="إلى تاريخ">
         <button class="btn" onclick="[&#39;f-coll-rep&#39;,&#39;f-coll-cat&#39;,&#39;f-coll-month&#39;,&#39;f-coll-type&#39;,&#39;f-coll-from&#39;,&#39;f-coll-to&#39;].forEach(id=&gt;{const el=document.getElementById(id);if(el)el.value=&#39;&#39;});renderCollectionPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
@@ -2527,365 +2123,13 @@ tbody tr:last-child{border-bottom:none}
             <option value="9">سبتمبر</option><option value="10">أكتوبر</option>
             <option value="11">نوفمبر</option><option value="12">ديسمبر</option>
           </select>
-          <select id="f-summary-rep" onchange="renderCollectionSummary()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-md);color:var(--text);font-family:&#39;Cairo&#39;,sans-serif;font-size:12px;padding:6px 10px"><option value="">كل المناديب</option><option value="احمد ابو ضوة">احمد ابو ضوة</option><option value="احمد نوري">احمد نوري</option><option value="جلال رحال">جلال رحال</option><option value="حسن الكردي">حسن الكردي</option><option value="رضوان اسماعيل">رضوان اسماعيل</option><option value="زياد الحنش">زياد الحنش</option><option value="سند">سند</option><option value="طلال">طلال</option><option value="عبد الرؤوف نصر">عبد الرؤوف نصر</option><option value="عبد المجيد الطير">عبد المجيد الطير</option><option value="عبدالرؤوف بريم">عبدالرؤوف بريم</option><option value="عصام التميمي">عصام التميمي</option><option value="علاء الكور">علاء الكور</option><option value="علي سليمان">علي سليمان</option><option value="علي غزيل">علي غزيل</option><option value="عمر النمروش">عمر النمروش</option><option value="فؤاد مسعود">فؤاد مسعود</option><option value="فراس المشبك">فراس المشبك</option><option value="مبروك رجب">مبروك رجب</option><option value="محمد العباني">محمد العباني</option><option value="محمد العزابي">محمد العزابي</option><option value="محمد عريبي">محمد عريبي</option><option value="محمود العزري">محمود العزري</option><option value="معاد الشوشان">معاد الشوشان</option><option value="مندر الخويلدي">مندر الخويلدي</option><option value="هيتم الصادق">هيتم الصادق</option><option value="هيتم الصغير">هيتم الصغير</option></select>
+          <select id="f-summary-rep" onchange="renderCollectionSummary()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-md);color:var(--text);font-family:&#39;Cairo&#39;,sans-serif;font-size:12px;padding:6px 10px"><option value="">كل المندوبين</option></select>
           <select id="f-summary-cat" onchange="renderCollectionSummary()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-md);color:var(--text);font-family:&#39;Cairo&#39;,sans-serif;font-size:12px;padding:6px 10px">
             <option value="">كل الفئات</option>
           </select>
           <button class="btn" onclick="[&#39;f-summary-month&#39;,&#39;f-summary-rep&#39;,&#39;f-summary-cat&#39;].forEach(id=&gt;{const el=document.getElementById(id);if(el)el.value=&#39;&#39;});renderCollectionSummary()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
         </div>
-        <div id="coll-summary-table" style="padding:0"><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:14px 14px 6px">
-    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center">
-        <div style="font-size:18px;margin-bottom:4px">💰</div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">صافي التحصيل</div>
-        <div style="font-size:16px;font-weight:700;color:var(--accent2)">527.563</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:2px">بعد الخصم والإضافة</div>
-      </div><div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center">
-          <div style="font-size:18px;margin-bottom:4px">🏦</div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">حوالات مصرفية</div>
-          <div style="font-size:16px;font-weight:700;color:var(--purple)">521.113</div>
-          <div style="font-size:10px;margin-top:6px;border-top:1px solid var(--border);padding-top:5px;line-height:1.8;text-align:right;padding-right:4px">
-            <span style="color:var(--muted)">إجمالي: 516.953</span><br>
-            <span style="color:var(--accent2)">➕ 4.160</span><br>
-            <span style="color:var(--red)">➖ 0</span>
-          </div>
-        </div><div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center">
-        <div style="font-size:18px;margin-bottom:4px">💵</div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">تحصيلات نقدية</div>
-        <div style="font-size:16px;font-weight:700;color:var(--accent3)">6.450</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:2px">1.2% من الإجمالي</div>
-      </div><div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center">
-        <div style="font-size:18px;margin-bottom:4px">➕</div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">إضافات</div>
-        <div style="font-size:16px;font-weight:700;color:var(--accent2)">4.160</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:2px">7 حركة</div>
-      </div><div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center">
-        <div style="font-size:18px;margin-bottom:4px">➖</div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">خصومات</div>
-        <div style="font-size:16px;font-weight:700;color:var(--red)">0</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:2px">0 حركة</div>
-      </div>
-  </div><div style="padding:0 14px 14px">
-    <table style="width:100%;border-collapse:collapse;font-size:12px">
-      <thead>
-        <tr style="background:var(--surface3)">
-          <th style="padding:10px 12px;text-align:right;border-bottom:2px solid var(--border2);color:var(--accent)">البيان</th>
-          <th style="padding:10px 12px;text-align:center;border-bottom:2px solid var(--border2);color:var(--text2)">عدد السندات</th>
-          <th style="padding:10px 12px;text-align:center;border-bottom:2px solid var(--border2);color:var(--text2)">إجمالي دائن</th>
-          <th style="padding:10px 12px;text-align:center;border-bottom:2px solid var(--border2);color:var(--red)">خصومات</th>
-          <th style="padding:10px 12px;text-align:center;border-bottom:2px solid var(--border2);color:var(--accent2)">صافي التحصيل</th>
-          <th style="padding:10px 12px;text-align:center;border-bottom:2px solid var(--border2);color:var(--text2)">النسبة %</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr style="background:var(--surface2);border-bottom:1px solid var(--border)">
-          <td style="padding:9px 12px;font-weight:400;color:var(--text)">✅ صفوف عادية — حوالات</td>
-          <td style="padding:9px 12px;text-align:center;font-variant-numeric:tabular-nums;color:var(--text2)">86</td>
-          <td style="padding:9px 12px;text-align:center;font-variant-numeric:tabular-nums;color:var(--text)">516.953</td>
-          <td style="padding:9px 12px;text-align:center;font-variant-numeric:tabular-nums;color:var(--muted)">—</td>
-          <td style="padding:9px 12px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent2)">516.953</td>
-          <td style="padding:9px 12px;text-align:center;color:var(--muted)">98.0%</td>
-        </tr><tr style="background:var(--surface2);border-bottom:1px solid var(--border)">
-          <td style="padding:9px 12px;font-weight:400;color:var(--text)">✅ صفوف عادية — نقدي</td>
-          <td style="padding:9px 12px;text-align:center;font-variant-numeric:tabular-nums;color:var(--text2)">12</td>
-          <td style="padding:9px 12px;text-align:center;font-variant-numeric:tabular-nums;color:var(--text)">6.450</td>
-          <td style="padding:9px 12px;text-align:center;font-variant-numeric:tabular-nums;color:var(--muted)">—</td>
-          <td style="padding:9px 12px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent2)">6.450</td>
-          <td style="padding:9px 12px;text-align:center;color:var(--muted)">1.2%</td>
-        </tr><tr style="background:var(--surface2);border-bottom:1px solid var(--border)">
-          <td style="padding:9px 12px;font-weight:400;color:var(--text)">➕ إضافات</td>
-          <td style="padding:9px 12px;text-align:center;font-variant-numeric:tabular-nums;color:var(--text2)">7</td>
-          <td style="padding:9px 12px;text-align:center;font-variant-numeric:tabular-nums;color:var(--text)">4.160</td>
-          <td style="padding:9px 12px;text-align:center;font-variant-numeric:tabular-nums;color:var(--muted)">—</td>
-          <td style="padding:9px 12px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent2)">4.160</td>
-          <td style="padding:9px 12px;text-align:center;color:var(--muted)">0.8%</td>
-        </tr><tr style="background:var(--surface2);border-bottom:1px solid var(--border)">
-          <td style="padding:9px 12px;font-weight:400;color:var(--text)">➖ خصومات (تُطرح)</td>
-          <td style="padding:9px 12px;text-align:center;font-variant-numeric:tabular-nums;color:var(--text2)">0</td>
-          <td style="padding:9px 12px;text-align:center;font-variant-numeric:tabular-nums;color:var(--text)">—</td>
-          <td style="padding:9px 12px;text-align:center;font-variant-numeric:tabular-nums;color:var(--muted)">—</td>
-          <td style="padding:9px 12px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent2)">0</td>
-          <td style="padding:9px 12px;text-align:center;color:var(--muted)">0.0%</td>
-        </tr><tr style="background:var(--surface3);border-bottom:1px solid var(--border)">
-          <td style="padding:9px 12px;font-weight:700;color:var(--accent2)">💰 الإجمالي الكلي</td>
-          <td style="padding:9px 12px;text-align:center;font-variant-numeric:tabular-nums;color:var(--text2)">105</td>
-          <td style="padding:9px 12px;text-align:center;font-variant-numeric:tabular-nums;color:var(--text)">527.563</td>
-          <td style="padding:9px 12px;text-align:center;font-variant-numeric:tabular-nums;color:var(--muted)">—</td>
-          <td style="padding:9px 12px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent2)">527.563</td>
-          <td style="padding:9px 12px;text-align:center;color:var(--muted)">100%</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <div style="padding:0 14px 14px">
-    <div style="font-weight:600;font-size:13px;color:var(--text2);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)">📅 التحصيل الشهري</div>
-    <table style="width:100%;border-collapse:collapse;font-size:12px">
-      <thead><tr style="background:var(--surface3)">
-        <th style="padding:8px 12px;text-align:right;color:var(--text2);border-bottom:1px solid var(--border)">الشهر</th>
-        <th style="padding:8px 12px;text-align:center;color:var(--text2);border-bottom:1px solid var(--border)">صفوف عادية</th>
-        <th style="padding:8px 12px;text-align:center;color:var(--red);border-bottom:1px solid var(--border)">خصومات</th>
-        <th style="padding:8px 12px;text-align:center;color:var(--accent2);border-bottom:1px solid var(--border)">إضافات</th>
-        <th style="padding:8px 12px;text-align:center;color:var(--accent);border-bottom:1px solid var(--border);font-weight:700">صافي التحصيل</th>
-      </tr></thead>
-      <tbody>
-        <tr style="border-bottom:1px solid var(--border);background:var(--surface2)">
-          <td style="padding:8px 12px;font-weight:600">أبريل</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--text)">527.563</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent2)">4.160</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent)">527.563</td>
-        </tr>
-        <tr style="background:var(--surface3);font-weight:700">
-          <td style="padding:8px 12px">الإجمالي</td>
-          <td style="padding:8px 12px;text-align:center">527.563</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--red)">0</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent2)">4.160</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent)">527.563</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <div style="padding:0 14px 14px">
-    <div style="font-weight:600;font-size:13px;color:var(--text2);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)">👥 تحصيل المناديب</div>
-    <table style="width:100%;border-collapse:collapse;font-size:12px">
-      <thead><tr style="background:var(--surface3)">
-        <th style="padding:8px 12px;text-align:center;color:var(--text2);border-bottom:1px solid var(--border)">#</th>
-        <th style="padding:8px 12px;text-align:right;color:var(--text2);border-bottom:1px solid var(--border)">المندوب</th>
-        <th style="padding:8px 12px;text-align:center;color:var(--text2);border-bottom:1px solid var(--border)">إجمالي عادي</th>
-        <th style="padding:8px 12px;text-align:center;color:var(--red);border-bottom:1px solid var(--border)">خصومات</th>
-        <th style="padding:8px 12px;text-align:center;color:var(--accent2);border-bottom:1px solid var(--border);font-weight:700">صافي التحصيل</th>
-        <th style="padding:8px 12px;text-align:center;color:var(--purple);border-bottom:1px solid var(--border)">حوالات</th>
-        <th style="padding:8px 12px;text-align:center;color:var(--accent3);border-bottom:1px solid var(--border)">نقدي</th>
-      </tr></thead>
-      <tbody>
-        <tr style="border-bottom:1px solid var(--border);background:var(--surface2)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">1</td>
-          <td style="padding:8px 12px;font-weight:600">عبدالرؤوف بريم</td>
-          <td style="padding:8px 12px;text-align:center">291.248</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">291.248</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">291.248</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">—</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">2</td>
-          <td style="padding:8px 12px;font-weight:600">زياد الحنش</td>
-          <td style="padding:8px 12px;text-align:center">60.000</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">60.000</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">60.000</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">—</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface2)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">3</td>
-          <td style="padding:8px 12px;font-weight:600">هيتم الصادق</td>
-          <td style="padding:8px 12px;text-align:center">30.274</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">30.274</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">29.330</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">944</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">4</td>
-          <td style="padding:8px 12px;font-weight:600">مندر الخويلدي</td>
-          <td style="padding:8px 12px;text-align:center">25.664</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">25.664</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">25.664</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">—</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface2)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">5</td>
-          <td style="padding:8px 12px;font-weight:600">عمر النمروش</td>
-          <td style="padding:8px 12px;text-align:center">14.000</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">14.000</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">14.000</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">—</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">6</td>
-          <td style="padding:8px 12px;font-weight:600">هيتم الصغير</td>
-          <td style="padding:8px 12px;text-align:center">13.000</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">13.000</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">13.000</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">—</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface2)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">7</td>
-          <td style="padding:8px 12px;font-weight:600">محمد العباني</td>
-          <td style="padding:8px 12px;text-align:center">10.312</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">10.312</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">10.312</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">—</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">8</td>
-          <td style="padding:8px 12px;font-weight:600">فراس المشبك</td>
-          <td style="padding:8px 12px;text-align:center">9.683</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">9.683</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">8.000</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">1.683</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface2)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">9</td>
-          <td style="padding:8px 12px;font-weight:600">علاء الكور</td>
-          <td style="padding:8px 12px;text-align:center">8.594</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">8.594</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">8.594</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">—</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">10</td>
-          <td style="padding:8px 12px;font-weight:600">محمد عريبي</td>
-          <td style="padding:8px 12px;text-align:center">8.501</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">8.501</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">6.853</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">—</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface2)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">11</td>
-          <td style="padding:8px 12px;font-weight:600">علي غزيل</td>
-          <td style="padding:8px 12px;text-align:center">6.640</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">6.640</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">6.640</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">—</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">12</td>
-          <td style="padding:8px 12px;font-weight:600">احمد ابو ضوة</td>
-          <td style="padding:8px 12px;text-align:center">6.450</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">6.450</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">6.450</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">—</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface2)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">13</td>
-          <td style="padding:8px 12px;font-weight:600">عبد المجيد الطير</td>
-          <td style="padding:8px 12px;text-align:center">5.408</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">5.408</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">5.341</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">67</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">14</td>
-          <td style="padding:8px 12px;font-weight:600">مبروك رجب</td>
-          <td style="padding:8px 12px;text-align:center">4.480</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">4.480</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">2.780</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">—</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface2)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">15</td>
-          <td style="padding:8px 12px;font-weight:600">محمود العزري</td>
-          <td style="padding:8px 12px;text-align:center">4.089</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">4.089</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">3.749</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">340</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">16</td>
-          <td style="padding:8px 12px;font-weight:600">حسن الكردي</td>
-          <td style="padding:8px 12px;text-align:center">4.068</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">4.068</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">4.068</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">—</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface2)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">17</td>
-          <td style="padding:8px 12px;font-weight:600">عصام التميمي</td>
-          <td style="padding:8px 12px;text-align:center">3.457</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">3.457</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">3.457</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">—</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">18</td>
-          <td style="padding:8px 12px;font-weight:600">طلال</td>
-          <td style="padding:8px 12px;text-align:center">3.303</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">3.303</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">2.700</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">603</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface2)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">19</td>
-          <td style="padding:8px 12px;font-weight:600">معاد الشوشان</td>
-          <td style="padding:8px 12px;text-align:center">3.260</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">3.260</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">3.260</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">—</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">20</td>
-          <td style="padding:8px 12px;font-weight:600">فؤاد مسعود</td>
-          <td style="padding:8px 12px;text-align:center">3.258</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">3.258</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">1.500</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">1.758</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface2)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">21</td>
-          <td style="padding:8px 12px;font-weight:600">جلال رحال</td>
-          <td style="padding:8px 12px;text-align:center">2.800</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">2.800</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">2.800</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">—</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">22</td>
-          <td style="padding:8px 12px;font-weight:600">علي سليمان</td>
-          <td style="padding:8px 12px;text-align:center">2.389</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">2.389</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">2.389</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">—</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface2)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">23</td>
-          <td style="padding:8px 12px;font-weight:600">عبد الرؤوف نصر</td>
-          <td style="padding:8px 12px;text-align:center">1.867</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">1.867</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">—</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">1.055</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">24</td>
-          <td style="padding:8px 12px;font-weight:600">سند</td>
-          <td style="padding:8px 12px;text-align:center">1.697</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">1.697</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">1.697</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">—</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface2)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">25</td>
-          <td style="padding:8px 12px;font-weight:600">احمد نوري</td>
-          <td style="padding:8px 12px;text-align:center">1.629</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">1.629</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">1.629</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">—</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">26</td>
-          <td style="padding:8px 12px;font-weight:600">محمد العزابي</td>
-          <td style="padding:8px 12px;text-align:center">992</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">992</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">992</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">—</td>
-        </tr><tr style="border-bottom:1px solid var(--border);background:var(--surface2)">
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">27</td>
-          <td style="padding:8px 12px;font-weight:600">رضوان اسماعيل</td>
-          <td style="padding:8px 12px;text-align:center">500</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--muted)">—</td>
-          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--accent2)">500</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">500</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">—</td>
-        </tr>
-        <tr style="background:var(--surface3);font-weight:700">
-          <td style="padding:8px 12px"></td>
-          <td style="padding:8px 12px">الإجمالي</td>
-          <td style="padding:8px 12px;text-align:center">527.563</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--red)">0</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent2)">527.563</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--purple)">516.953</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--accent3)">6.450</td>
-        </tr>
-      </tbody>
-    </table>
-  </div></div>
+        <div id="coll-summary-table" style="padding:0"></div>
       </div>
     </div>
   </div>
@@ -2907,7 +2151,7 @@ tbody tr:last-child{border-bottom:none}
       <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
         <span class="card-title">🗂 جدول جرد المخازن</span>
         <button class="btn-print-a4" onclick="printInventoryTable()" title="طباعة A4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
           طباعة A4
         </button>
       </div>
@@ -4604,7 +3848,6 @@ function renderAgingPage(){
   const custCount=repF
     ?(ageSrc.filter(c=>(c.age30||0)+(c.age60||0)+(c.ageOld||0)>0).length||Object.keys(custAgeMap).length)
     :hasAgingFile
-      // aging_table already contains only لنا rows (filtered at parse time)
       ?D.aging_table.filter(r=>{const _n=v=>_parseNum(v);return _n(r[10])+_n(r[15])+_n(r[30])+_n(r[60])+_n(r[90])+_n(r[120])>0}).length
       :Object.keys(custAgeMap).length;
   const isFiltered=!!repF;
@@ -6042,18 +5285,9 @@ function processNewData(type,rows){
       const _nA=v=>_parseNum(v);
       // الأعمدة الرقمية قد تكون كـ '30' أو 30 في الـ rows
       const agingCols=['10','15','30','60','90','120'];
-      // ── فلتر صفوف الذمم الحقيقية: رصيد "لنا" فقط (يستبعد "لهم" = أرصدة دائنة) ──
-      const _isDebtRow=r=>{
-        const bal=String(r['الرصيد']||r['رصيد']||'');
-        // إذا وُجد عمود الرصيد وكان "لهم" → استبعاد
-        if(bal&&bal.includes('لهم')) return false;
-        // إذا لم يوجد عمود رصيد → اعتمد على مجموع الفئات
-        return true;
-      };
-      const debtRows=rows.filter(_isDebtRow);
       const bk={};
       agingCols.forEach(k=>{
-        bk[k]=debtRows.reduce((s,r)=>{
+        bk[k]=rows.reduce((s,r)=>{
           // جرب المفتاح كـ string وكـ number
           const v=r[k]!==null&&r[k]!==undefined?r[k]:(r[+k]!==null&&r[+k]!==undefined?r[+k]:null);
           return s+_nA(v);
@@ -6067,7 +5301,7 @@ function processNewData(type,rows){
         '90 يوم':    bk['90'],
         '120 يوم+':  bk['120'],
       };
-      D.aging_table=debtRows.map(r=>{
+      D.aging_table=rows.map(r=>{
         const out={};
         Object.keys(r).forEach(k=>out[k]=r[k]);
         agingCols.forEach(k=>{
@@ -8965,35 +8199,35 @@ function printOverviewMonthly(){
 
   <div class="ld-icons" id="ld-icons">
     <div class="ld-icon-item">
-      <div class="ld-icon-box loaded" id="ldi-sales">📊</div>
+      <div class="ld-icon-box" id="ldi-sales">📊</div>
       <div class="ld-icon-lbl">مبيعات</div>
     </div>
     <div class="ld-icon-item">
-      <div class="ld-icon-box loaded" id="ldi-collection">💰</div>
+      <div class="ld-icon-box" id="ldi-collection">💰</div>
       <div class="ld-icon-lbl">تحصيل</div>
     </div>
     <div class="ld-icon-item">
-      <div class="ld-icon-box loaded" id="ldi-debt">💳</div>
+      <div class="ld-icon-box" id="ldi-debt">💳</div>
       <div class="ld-icon-lbl">مديونية</div>
     </div>
     <div class="ld-icon-item">
-      <div class="ld-icon-box loaded" id="ldi-aging">⏳</div>
+      <div class="ld-icon-box" id="ldi-aging">⏳</div>
       <div class="ld-icon-lbl">الذمم</div>
     </div>
     <div class="ld-icon-item">
-      <div class="ld-icon-box loaded" id="ldi-inventory">🏭</div>
+      <div class="ld-icon-box" id="ldi-inventory">🏭</div>
       <div class="ld-icon-lbl">المخازن</div>
     </div>
     <div class="ld-icon-item">
-      <div class="ld-icon-box loaded" id="ldi-reps">👥</div>
+      <div class="ld-icon-box" id="ldi-reps">👥</div>
       <div class="ld-icon-lbl">المناديب</div>
     </div>
   </div>
 
   <div class="ld-progress-wrap">
-    <div class="ld-progress-bar" id="ld-progress" style="width: 100%;"></div>
+    <div class="ld-progress-bar" id="ld-progress" style="width:0%"></div>
   </div>
-  <div class="ld-msg" id="loading-msg">✅ تم تحميل البيانات بنجاح</div>
+  <div class="ld-msg" id="loading-msg">جاري تحميل البيانات...</div>
 
   <div class="ld-footer">© 2026 شركة ركان المتوسط — جميع الحقوق محفوظة</div>
 </div>
@@ -9003,7 +8237,7 @@ function printOverviewMonthly(){
      FINANCIAL REPORT MODAL  — تقرير الأداء المالي
 ═══════════════════════════════════════════════════════════════ -->
 <div id="fin-report-modal" style="display:none;position:fixed;inset:0;z-index:10500;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px;">
-  <div style="background:var(--surface);border-radius:18px;width:100%;max-width:780px;max-height:92vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.35);border:1px solid var(--border);font-family:&#39;Cairo&#39;,sans-serif;">
+  <div style="background:var(--surface);border-radius:18px;width:100%;max-width:780px;max-height:92vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.35);border:1px solid var(--border);font-family:'Cairo',sans-serif;">
 
     <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:2;border-radius:18px 18px 0 0;">
@@ -9028,11 +8262,11 @@ function printOverviewMonthly(){
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
           <div>
             <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">من تاريخ</label>
-            <input type="date" id="frm-from" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:&#39;Cairo&#39;,sans-serif;font-size:12px;" oninput="_frmCalc()">
+            <input type="date" id="frm-from" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;" oninput="_frmCalc()">
           </div>
           <div>
             <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">إلى تاريخ</label>
-            <input type="date" id="frm-to" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:&#39;Cairo&#39;,sans-serif;font-size:12px;" oninput="_frmCalc()">
+            <input type="date" id="frm-to" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;" oninput="_frmCalc()">
           </div>
         </div>
         <!-- نتائج الفترة -->
@@ -9063,7 +8297,7 @@ function printOverviewMonthly(){
         </div>
         <div style="margin-bottom:10px;">
           <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">تاريخ اليوم</label>
-          <input type="date" id="frm-day" style="width:220px;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:&#39;Cairo&#39;,sans-serif;font-size:12px;" oninput="_frmCalcDay()">
+          <input type="date" id="frm-day" style="width:220px;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;" oninput="_frmCalcDay()">
         </div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
           <div style="background:var(--surface);border-radius:8px;padding:8px 10px;border:1px solid var(--border);">
@@ -9111,17 +8345,17 @@ function printOverviewMonthly(){
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
           <div>
             <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">الصنف</label>
-            <select id="frm-item" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:&#39;Cairo&#39;,sans-serif;font-size:12px;" onchange="_frmCalcItem()">
+            <select id="frm-item" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;" onchange="_frmCalcItem()">
               <option value="">— اختر صنف —</option>
             </select>
           </div>
           <div>
             <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">من تاريخ</label>
-            <input type="date" id="frm-item-from" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:&#39;Cairo&#39;,sans-serif;font-size:12px;" oninput="_frmCalcItem()">
+            <input type="date" id="frm-item-from" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;" oninput="_frmCalcItem()">
           </div>
           <div>
             <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">إلى تاريخ</label>
-            <input type="date" id="frm-item-to" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:&#39;Cairo&#39;,sans-serif;font-size:12px;" oninput="_frmCalcItem()">
+            <input type="date" id="frm-item-to" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;" oninput="_frmCalcItem()">
           </div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">
@@ -9140,9 +8374,9 @@ function printOverviewMonthly(){
 
     <!-- Footer: Print -->
     <div style="padding:14px 22px 18px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;background:var(--surface);border-radius:0 0 18px 18px;position:sticky;bottom:0;z-index:2;">
-      <button onclick="closeFinancialReportModal()" style="padding:9px 20px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:&#39;Cairo&#39;,sans-serif;font-size:13px;font-weight:600;cursor:pointer;">إغلاق</button>
-      <button onclick="_frmPrint()" style="padding:9px 22px;border-radius:9px;border:none;background:linear-gradient(135deg,#4361ee,#7b5ea7);color:#fff;font-family:&#39;Cairo&#39;,sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+      <button onclick="closeFinancialReportModal()" style="padding:9px 20px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">إغلاق</button>
+      <button onclick="_frmPrint()" style="padding:9px 22px;border-radius:9px;border:none;background:linear-gradient(135deg,#4361ee,#7b5ea7);color:#fff;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
         طباعة التقرير
       </button>
     </div>
@@ -9395,347 +8629,300 @@ function _frmPrint(){
 <head>
 <meta charset="UTF-8">
 <title>تقرير الأداء المالي</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+@page{size:A4 portrait;margin:0}
+html,body{
+  font-family:'Cairo',sans-serif;
+  font-size:10pt;
+  color:#111;
+  background:#fff;
+  direction:rtl;
+  -webkit-print-color-adjust:exact!important;
+  print-color-adjust:exact!important;
+}
+body{padding:16mm 18mm 20mm 18mm}
 
-/* ══ إعادة الضبط ══ */
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+/* ── رأس الصفحة ── */
+.head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding-bottom:12px;
+  margin-bottom:14px;
+  border-bottom:2px solid #111;
+}
+.head-logo{
+  width:52px;height:52px;
+  flex-shrink:0;
+  border-radius:6px;overflow:hidden;
+}
+.head-logo img{width:100%;height:100%;object-fit:contain}
+.head-title{
+  font-size:22pt;
+  font-weight:900;
+  color:#111;
+  letter-spacing:-.5px;
+  flex:1;
+  padding:0 14px;
+}
+.head-meta{
+  text-align:left;
+  font-size:8.5pt;
+  color:#555;
+  line-height:1.9;
+  border-right:2px solid #ddd;
+  padding-right:14px;
+}
+.head-meta strong{color:#111}
 
-/* ══ صفحة الطباعة ══ */
-@page {
-  size: A4 portrait;
-  /* margin:0 يُزيل رأس وتذييل المتصفح تلقائياً في Chrome/Edge */
-  margin: 0mm;
+/* ── جدول بيانات المراسلة ── */
+.letter-info{
+  width:100%;
+  border-collapse:collapse;
+  margin-bottom:14px;
+  font-size:9.5pt;
 }
-/* تعويض الهوامش عبر padding الجسم */
-body {
-  padding: 16mm 18mm 18mm 18mm;
+.letter-info td{
+  padding:4px 0;
+  line-height:1.7;
+  vertical-align:top;
 }
+.letter-info .lbl{
+  color:#555;
+  font-weight:700;
+  white-space:nowrap;
+  padding-left:20px;
+  width:80px;
+}
+.letter-info .sep{
+  color:#bbb;
+  padding-left:10px;
+  width:10px;
+}
+.letter-info .val{color:#111}
 
-/* ══ الجسم ══ */
-html, body {
-  font-family: 'Cairo', 'Arial', sans-serif;
-  font-size: 11pt;
-  line-height: 1.6;
-  color: #1a1a2e;
-  background: #fff;
-  direction: rtl;
-  -webkit-print-color-adjust: exact !important;
-  print-color-adjust: exact !important;
-}
-
-/* لا يوجد شريط تعليمات — الطباعة تلقائية */
-
-/* ══════════════════════════════════════
-   ورقة التقرير
-══════════════════════════════════════ */
-.report-page {
-  max-width: 174mm;
-  margin: 0 auto;
-}
-
-/* ── شريط علوي ملوّن ── */
-.top-bar {
-  height: 5px;
-  background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 50%, #1e3a8a 100%);
-  border-radius: 2px;
-  margin-bottom: 18px;
-}
-
-/* ── رأس التقرير ── */
-.report-header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding-bottom: 14px;
-  border-bottom: 2px solid #1e3a8a;
-  margin-bottom: 18px;
-}
-.logo-box {
-  width: 54px; height: 54px;
-  flex-shrink: 0;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid #e5e7eb;
-  background: #f8faff;
-  display: flex; align-items: center; justify-content: center;
-}
-.logo-box img { width: 100%; height: 100%; object-fit: contain; }
-.header-center { flex: 1; }
-.company-name {
-  font-size: 8pt; font-weight: 700;
-  color: #6b7280; letter-spacing: .8px;
-  text-transform: uppercase; margin-bottom: 3px;
-}
-.report-title {
-  font-size: 20pt; font-weight: 900;
-  color: #1e3a8a; line-height: 1.1;
-}
-.header-left {
-  text-align: left;
-  font-size: 9pt; color: #6b7280;
-  line-height: 2; border-right: 3px solid #dbeafe;
-  padding-right: 12px;
-}
-.header-left .prep { color: #1e3a8a; font-weight: 700; }
-
-/* ── بيانات المستند ── */
-.doc-meta {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 16px;
-  font-size: 10pt;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  overflow: hidden;
-}
-.doc-meta tr { border-bottom: 1px solid #f3f4f6; }
-.doc-meta tr:last-child { border-bottom: none; }
-.doc-meta td { padding: 6px 12px; line-height: 1.8; }
-.doc-meta .meta-lbl {
-  font-weight: 700; color: #1e3a8a;
-  white-space: nowrap; width: 80px;
-  background: #f0f4ff;
-  border-left: 1px solid #e5e7eb;
-  text-align: right;
-}
-.doc-meta .meta-val { color: #374151; }
-
-/* ── فقرة الافتتاح ── */
-.intro-text {
-  font-size: 10.5pt;
-  color: #374151;
-  line-height: 2;
-  margin-bottom: 18px;
-  padding: 12px 14px;
-  background: #f8faff;
-  border-right: 4px solid #3b82f6;
-  border-radius: 0 8px 8px 0;
+/* ── خط رفيع ── */
+.rule{
+  border:none;
+  border-top:1px solid #ccc;
+  margin:12px 0;
 }
 
-/* ══ الجدول الرئيسي ══ */
-.main-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 18px;
-  font-size: 10.5pt;
+/* ── الافتتاحية ── */
+.intro{
+  font-size:9.5pt;
+  color:#333;
+  line-height:1.9;
+  margin-bottom:14px;
 }
 
+/* ── الجدول الرئيسي ── */
+.tbl{
+  width:100%;
+  border-collapse:collapse;
+  margin-bottom:14px;
+  font-size:9.5pt;
+}
 /* رأس الجدول */
-.main-table thead tr {
-  background: #1e3a8a;
+.tbl thead th{
+  background:#111;
+  color:#fff;
+  padding:7px 12px;
+  font-size:9pt;
+  font-weight:700;
+  white-space:nowrap;
 }
-.main-table thead th {
-  color: #fff;
-  padding: 9px 12px;
-  font-size: 10pt; font-weight: 700;
-  white-space: nowrap;
-  border: 1px solid #2d4fa8;
+.tbl thead th.th-r{text-align:right}
+.tbl thead th.th-c{text-align:center}
+
+/* صفوف الأقسام */
+.tbl .sec td{
+  background:#f2f2f2;
+  color:#111;
+  font-weight:700;
+  font-size:9pt;
+  padding:5px 12px;
+  border-top:1px solid #ccc;
+  border-bottom:1px solid #ccc;
 }
-.th-bayan { text-align: right; }
-.th-num   { text-align: center; }
 
 /* صفوف البيانات */
-.main-table tbody tr { border-bottom: 1px solid #e5e7eb; }
-.main-table tbody tr:hover { background: #f0f4ff; }
-.main-table tbody td {
-  padding: 8px 12px;
-  vertical-align: middle;
-  border-left: 1px solid #e5e7eb;
-  border-right: 1px solid #e5e7eb;
+.tbl .row td{
+  padding:6px 12px;
+  border-bottom:1px solid #e8e8e8;
+  vertical-align:middle;
+  color:#111;
 }
-.main-table tbody tr:nth-child(even) td { background: #f9fafb; }
-
-/* صفوف العناوين الفرعية */
-.row-section td {
-  background: #1e3a8a !important;
-  color: #fff !important;
-  font-weight: 700 !important;
-  font-size: 10pt;
-  padding: 7px 12px !important;
-  letter-spacing: .2px;
-}
+.tbl .row:last-child td{border-bottom:2px solid #111}
 
 /* خلايا */
-.c-bayan { text-align: right; color: #1f2937; font-weight: 600; }
-.c-qty   {
-  text-align: center; font-weight: 700;
-  color: #1d4ed8; direction: ltr;
-  font-variant-numeric: tabular-nums;
+.td-r{text-align:right}
+.td-c{text-align:center;font-variant-numeric:tabular-nums}
+.td-num{
+  text-align:center;
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+  direction:rtl;
 }
-.c-val   {
-  text-align: center; font-weight: 700;
-  color: #1f2937; direction: rtl;
-  font-variant-numeric: tabular-nums;
+.td-qty{
+  text-align:center;
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+  direction:ltr;
+  color:#1a365d;
 }
-.c-pct   {
-  text-align: center; font-weight: 800;
-  color: #b45309; direction: rtl;
-  font-variant-numeric: tabular-nums;
-}
-.c-a30   { text-align: center; font-weight: 700; color: #b45309; direction: rtl; }
-.c-a60   { text-align: center; font-weight: 700; color: #dc2626; direction: rtl; }
-.c-a90   { text-align: center; font-weight: 800; color: #7f1d1d; direction: rtl; }
-.c-dash  { text-align: center; color: #9ca3af; }
+.td-pct{text-align:center;font-weight:700;direction:rtl}
+.td-dim{color:#999;text-align:center}
+.td-sub{font-size:8pt;color:#777;font-weight:400}
 
 /* ── الخاتمة ── */
-.closing-text {
-  font-size: 10.5pt; color: #374151;
-  line-height: 2.3; margin-top: 4px;
-  padding: 12px 16px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  background: #fafafa;
+.closing{
+  font-size:9.5pt;
+  color:#333;
+  line-height:2;
+  margin-bottom:14px;
 }
-.closing-text .sign {
-  margin-top: 8px;
-  font-weight: 700; color: #1e3a8a;
-  font-size: 11pt;
+.closing .sign{
+  margin-top:6px;
+  font-weight:700;
+  color:#111;
+  font-size:10pt;
 }
 
 /* ── الفوتر ── */
-.report-footer {
-  margin-top: 18px;
-  padding-top: 8px;
-  border-top: 2px solid #1e3a8a;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 8.5pt;
-  color: #6b7280;
+.footer{
+  font-size:8pt;
+  color:#888;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding-top:8px;
+  border-top:1px solid #ccc;
 }
-.footer-brand { color: #1e3a8a; font-weight: 700; }
+.footer strong{color:#111}
 
-/* ── شريط سفلي ── */
-.bottom-bar {
-  height: 4px;
-  background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 50%, #1e3a8a 100%);
-  border-radius: 2px;
-  margin-top: 10px;
-}
-
-/* ══ الطباعة ══ */
-@media print {
-  body { font-size: 10.5pt; }
-  .main-table tbody tr { page-break-inside: avoid; }
-  .row-section { page-break-after: avoid; }
+@media print{
+  .tbl .row{page-break-inside:avoid}
+  .tbl .sec{page-break-after:avoid}
+  .footer{
+    position:fixed;
+    bottom:10mm;left:18mm;right:18mm;
+    background:#fff;
+  }
+  body{padding-bottom:24mm!important}
 }
 </style>
 </head>
 <body>
+<div class="page">
 
-<!-- طباعة تلقائية بدون شريط تعليمات -->
-
-<!-- ══ ورقة التقرير ══ -->
-<div class="report-page">
-
-  <div class="top-bar"></div>
-
-  <!-- رأس التقرير -->
-  <div class="report-header">
-    <div class="logo-box">
-      ${logoSrc ? `<img src="${logoSrc}" alt="شعار ركان">` : `<span style="font-size:22px">🏢</span>`}
+  <!-- رأس الصفحة -->
+  <div class="head">
+    <div class="head-logo">
+      ${logoSrc ? `<img src="${logoSrc}" alt="شعار">` : ''}
     </div>
-    <div class="header-center">
-      <div class="company-name">شركة ركان المتوسط — لوحة التحليل الاستراتيجي</div>
-      <div class="report-title">تقرير الأداء المالي</div>
-    </div>
-    <div class="header-left">
-      <div>📅 &nbsp;${printDate}</div>
-      <div class="prep">إعداد: المحاسب أحمد العكاري</div>
+    <div class="head-title">تقرير الأداء المالي</div>
+    <div class="head-meta">
+      <div>${printDate}</div>
+      <div><strong>إعداد:</strong> المحاسب أحمد العكاري</div>
     </div>
   </div>
 
-  <!-- بيانات المستند -->
-  <table class="doc-meta">
+  <!-- بيانات المراسلة -->
+  <table class="letter-info">
     <tr>
-      <td class="meta-lbl">إلى</td>
-      <td class="meta-val">مدير المبيعات المحترم</td>
+      <td class="lbl">إلى</td>
+      <td class="sep">:</td>
+      <td class="val">مدير المبيعات المحترم</td>
     </tr>
     <tr>
-      <td class="meta-lbl">من</td>
-      <td class="meta-val">القسم المالي</td>
+      <td class="lbl">من</td>
+      <td class="sep">:</td>
+      <td class="val">القسم المالي</td>
     </tr>
     <tr>
-      <td class="meta-lbl">التاريخ</td>
-      <td class="meta-val">${printDate}</td>
+      <td class="lbl">التاريخ</td>
+      <td class="sep">:</td>
+      <td class="val">${printDate}</td>
     </tr>
     <tr>
-      <td class="meta-lbl">الموضوع</td>
-      <td class="meta-val">تقرير الأداء المالي المحدّث للفترة من ${periodLabel}</td>
+      <td class="lbl">الموضوع</td>
+      <td class="sep">:</td>
+      <td class="val">تقرير الأداء المالي المحدّث — الفترة من ${periodLabel}</td>
     </tr>
   </table>
 
+  <hr class="rule">
+
   <!-- الافتتاحية -->
-  <div class="intro-text">
+  <p class="intro">
     تحية طيبة وبعد،<br>
     يسر القسم المالي أن يقدم لكم التقرير الموجز التالي حول الأداء المالي والإيرادات المحصّلة، بالإضافة إلى أعمار الذمم المدينة حتى تاريخه.
-  </div>
+  </p>
 
   <!-- الجدول الرئيسي -->
-  <table class="main-table">
+  <table class="tbl">
     <thead>
       <tr>
-        <th class="th-bayan" style="width:55%">البيان</th>
-        <th class="th-num"   style="width:18%">الكمية</th>
-        <th class="th-num"   style="width:27%">القيمة</th>
+        <th class="th-r" style="width:54%">البيان</th>
+        <th class="th-c" style="width:18%">الكمية</th>
+        <th class="th-c" style="width:28%">القيمة</th>
       </tr>
     </thead>
     <tbody>
 
-      <!-- المبيعات والتحصيل -->
-      <tr class="row-section">
-        <td colspan="3">📦 &nbsp;المبيعات والتحصيل &nbsp;(${periodLabel})</td>
+      <tr class="sec">
+        <td colspan="3">المبيعات والتحصيل &nbsp;(${periodLabel})</td>
       </tr>
-      <tr>
-        <td class="c-bayan">صافي المبيعات &nbsp;<span style="color:#6b7280;font-size:9pt;font-weight:400">(${periodLabel})</span></td>
-        <td class="c-qty">${netQty}</td>
-        <td class="c-val">${netSales}</td>
+      <tr class="row">
+        <td class="td-r">صافي المبيعات &nbsp;<span class="td-sub">(${periodLabel})</span></td>
+        <td class="td-qty">${netQty}</td>
+        <td class="td-num">${netSales}</td>
       </tr>
-      <tr>
-        <td class="c-bayan">التحصيل &nbsp;<span style="color:#6b7280;font-size:9pt;font-weight:400">(${periodLabel})</span></td>
-        <td class="c-dash">—</td>
-        <td class="c-val">${colTotal}</td>
+      <tr class="row">
+        <td class="td-r">إجمالي التحصيل &nbsp;<span class="td-sub">(${periodLabel})</span></td>
+        <td class="td-dim">—</td>
+        <td class="td-num">${colTotal}</td>
       </tr>
-      <tr>
-        <td class="c-bayan">نسبة التحصيل للفترة</td>
-        <td class="c-dash">—</td>
-        <td class="c-pct">${colPct}</td>
-      </tr>
-
-      <!-- بيانات اليوم -->
-      <tr class="row-section">
-        <td colspan="3">📅 &nbsp;بيانات اليوم &nbsp;(${dayLabel})</td>
-      </tr>
-      <tr>
-        <td class="c-bayan">مبيعات اليوم &nbsp;<span style="color:#6b7280;font-size:9pt;font-weight:400">(${dayLabel})</span></td>
-        <td class="c-qty">${dayQty}</td>
-        <td class="c-val">${daySales}</td>
-      </tr>
-      <tr>
-        <td class="c-bayan">تحصيل اليوم &nbsp;<span style="color:#6b7280;font-size:9pt;font-weight:400">(${dayLabel})</span></td>
-        <td class="c-dash">—</td>
-        <td class="c-val">${dayCol}</td>
+      <tr class="row">
+        <td class="td-r">نسبة التحصيل للفترة</td>
+        <td class="td-dim">—</td>
+        <td class="td-pct">${colPct}</td>
       </tr>
 
-      <!-- أعمار الذمم -->
-      <tr class="row-section">
-        <td colspan="3">⏳ &nbsp;أعمار الذمم المدينة</td>
+      <tr class="sec">
+        <td colspan="3">بيانات اليوم &nbsp;(${dayLabel})</td>
       </tr>
-      <tr>
-        <td class="c-bayan">أعمار الذمم — 30 يوم</td>
-        <td class="c-dash">—</td>
-        <td class="c-a30">${ag30}</td>
+      <tr class="row">
+        <td class="td-r">مبيعات اليوم &nbsp;<span class="td-sub">(${dayLabel})</span></td>
+        <td class="td-qty">${dayQty}</td>
+        <td class="td-num">${daySales}</td>
       </tr>
-      <tr>
-        <td class="c-bayan">أعمار الذمم — 60 يوم</td>
-        <td class="c-dash">—</td>
-        <td class="c-a60">${ag60}</td>
+      <tr class="row">
+        <td class="td-r">تحصيل اليوم &nbsp;<span class="td-sub">(${dayLabel})</span></td>
+        <td class="td-dim">—</td>
+        <td class="td-num">${dayCol}</td>
       </tr>
-      <tr>
-        <td class="c-bayan">أعمار الذمم — 90 يوم</td>
-        <td class="c-dash">—</td>
-        <td class="c-a90">${ag90}</td>
+
+      <tr class="sec">
+        <td colspan="3">أعمار الذمم المدينة</td>
+      </tr>
+      <tr class="row">
+        <td class="td-r">أعمار الذمم — 30 يوم</td>
+        <td class="td-dim">—</td>
+        <td class="td-num">${ag30}</td>
+      </tr>
+      <tr class="row">
+        <td class="td-r">أعمار الذمم — 60 يوم</td>
+        <td class="td-dim">—</td>
+        <td class="td-num">${ag60}</td>
+      </tr>
+      <tr class="row">
+        <td class="td-r">أعمار الذمم — 90 يوم</td>
+        <td class="td-dim">—</td>
+        <td class="td-num">${ag90}</td>
       </tr>
 
       ${itemRowHTML}
@@ -9744,35 +8931,28 @@ html, body {
   </table>
 
   <!-- الخاتمة -->
-  <div class="closing-text">
-    نأمل أن يكون هذا التقرير مفيدًا لكم في متابعة وتقييم أداء المبيعات.<br>
-    مع خالص التقدير،
-    <div class="sign">القسم المالي</div>
+  <div class="closing">
+    نأمل أن يكون هذا التقرير مفيدًا لكم في متابعة وتقييم أداء المبيعات والتحصيل.<br>
+    مع خالص التقدير والاحترام،
+    <div class="sign">القسم المالي — شركة ركان المتوسط</div>
   </div>
 
   <!-- الفوتر -->
-  <div class="report-footer">
-    <div>© 2026 شركة ركان المتوسط — جميع الحقوق محفوظة</div>
-    <div class="footer-brand">تقرير الأداء المالي — ${printDate}</div>
+  <div class="footer">
+    <span>© 2026 شركة ركان المتوسط — جميع الحقوق محفوظة</span>
+    <strong>تقرير الأداء المالي — ${printDate}</strong>
   </div>
 
-  <div class="bottom-bar"></div>
-
-</div><!-- end report-page -->
-
+</div>
 <script>
 function _doPrint(){
   window.print();
-  window.onafterprint = function(){ window.close(); };
+  window.onafterprint=function(){window.close()};
 }
-if(document.fonts && document.fonts.ready){
-  document.fonts.ready.then(function(){
-    setTimeout(_doPrint, 300);
-  });
-} else {
-  window.addEventListener('load', function(){
-    setTimeout(_doPrint, 500);
-  });
+if(document.fonts&&document.fonts.ready){
+  document.fonts.ready.then(function(){setTimeout(_doPrint,300)});
+}else{
+  window.addEventListener('load',function(){setTimeout(_doPrint,500)});
 }
 <\/script>
 </body></html>`;
@@ -9790,5 +8970,4 @@ if(document.fonts && document.fonts.ready){
 }
 
 </script>
-
 </body></html>
