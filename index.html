@@ -453,30 +453,6 @@ tbody tr:last-child{border-bottom:none}
 .pag-btn:disabled{opacity:.3;pointer-events:none}
 
 /* ══════════════════════════════════════════════
-   TABLE STAT BAR — شريط الإحصائيات
-══════════════════════════════════════════════ */
-.table-stat-bar{
-  display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;
-  padding:10px 16px;
-  background:color-mix(in srgb,var(--surface2) 80%,transparent);
-  border:1px solid var(--border);border-top:none;
-  border-radius:0 0 var(--r-lg) var(--r-lg);
-  font-family:'Cairo',sans-serif;font-size:11px;
-  direction:rtl;
-}
-.table-stat-bar:empty{display:none}
-.tsb-item{
-  display:flex;align-items:center;gap:5px;
-  padding:3px 10px;border-radius:20px;
-  background:color-mix(in srgb,var(--surface) 70%,transparent);
-  border:1px solid var(--border);
-  white-space:nowrap;
-}
-.tsb-label{color:var(--text2);font-size:10.5px}
-.tsb-value{font-weight:800;font-size:12px}
-.tsb-divider{width:1px;height:18px;background:var(--border);flex-shrink:0}
-
-/* ══════════════════════════════════════════════
    UPLOAD MODAL — Duralux Style
 ══════════════════════════════════════════════ */
 #upload-modal{display:none;position:fixed;inset:0;z-index:999;background:rgba(30,39,73,.5);backdrop-filter:blur(8px);align-items:center;justify-content:center}
@@ -897,11 +873,6 @@ th.sortable.sort-desc::after{content:' ▼';opacity:1;color:var(--accent)}
   .page{padding:8px 8px calc(80px + env(safe-area-inset-bottom, 0px)) 8px!important}
 }
 
-@media(max-width:768px){
-  .table-stat-bar{gap:4px 8px;padding:8px 10px}
-  .tsb-item{padding:2px 7px;font-size:10px}
-  .tsb-value{font-size:11px}
-}
 @media(max-width:480px){
   .kpi-grid{grid-template-columns:1fr 1fr!important;gap:6px!important}
   .kpi-card{padding:10px 10px 8px!important}
@@ -1754,12 +1725,12 @@ tbody tr:last-child{border-bottom:none}
         </select>
         <input type="text" id="f-sales-cust" placeholder="🔍 اسم العميل..." oninput="renderSalesPage()">
         <input type="text" id="f-sales-item" placeholder="🔍 اسم الصنف..." oninput="renderSalesPage()">
+        <select id="f-sales-month-q" onchange="renderSalesPage()"><option value="">كل الأشهر</option></select>
         <input type="date" id="f-sales-from" onchange="renderSalesPage()" title="من تاريخ">
         <input type="date" id="f-sales-to" onchange="renderSalesPage()" title="إلى تاريخ">
         <button class="btn" onclick="resetSalesFilters()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap" id="sales-table-wrap"></div>
-      <div class="table-stat-bar" id="sales-stat-bar"></div>
       <div class="table-pagination">
         <span id="sales-pag-info"></span>
         <div class="pag-btns" id="sales-pag-btns"></div>
@@ -1829,7 +1800,6 @@ tbody tr:last-child{border-bottom:none}
         <button class="btn" onclick="['f-rep-select','f-rep-cat','f-rep-month','f-rep-from','f-rep-to','f-rep-sort','f-rep-view'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});window._repSort=null;const rt=document.getElementById('reps-table-wrap');if(rt)rt.className='table-wrap';renderRepPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap" id="reps-table-wrap"></div>
-      <div class="table-stat-bar" id="reps-stat-bar"></div>
       <div class="table-pagination">
         <span id="reps-pag-info"></span>
         <div class="pag-btns" id="reps-pag-btns"></div>
@@ -1893,7 +1863,6 @@ tbody tr:last-child{border-bottom:none}
         <button class="btn" onclick="['f-cust-search','f-cust-rep','f-cust-repcatf','f-cust-cat','f-cust-aging','f-cust-from','f-cust-to','f-cust-view'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});const ct=document.getElementById('cust-table-wrap');if(ct)ct.className='table-wrap';renderCustomersPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap" id="cust-table-wrap"></div>
-      <div class="table-stat-bar" id="cust-stat-bar"></div>
       <div class="table-pagination">
         <span id="cust-pag-info"></span>
         <div class="pag-btns" id="cust-pag-btns"></div>
@@ -1947,7 +1916,6 @@ tbody tr:last-child{border-bottom:none}
         <button class="btn" onclick="['f-prod-search','f-prod-rep','f-prod-cat','f-prod-cust','f-prod-month','f-prod-from','f-prod-to','f-prod-view'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});const pt=document.getElementById('prod-table-wrap');if(pt)pt.className='table-wrap';renderProductsPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap" id="prod-table-wrap"></div>
-      <div class="table-stat-bar" id="prod-stat-bar"></div>
       <div class="table-pagination">
         <span id="prod-pag-info"></span>
         <div class="pag-btns" id="prod-pag-btns"></div>
@@ -2006,7 +1974,6 @@ tbody tr:last-child{border-bottom:none}
         </button>
       </div>
       <div class="table-wrap" id="debt-table-wrap"></div>
-      <div class="table-stat-bar" id="debt-stat-bar"></div>
       <div class="table-pagination">
         <span id="debt-pag-info"></span>
         <div class="pag-btns" id="debt-pag-btns"></div>
@@ -2057,7 +2024,6 @@ tbody tr:last-child{border-bottom:none}
         <button class="btn" onclick="document.getElementById(&#39;f-aging-rep&#39;).value=&#39;&#39;;document.getElementById(&#39;f-aging-bucket&#39;).value=&#39;&#39;;document.getElementById(&#39;f-aging-search&#39;).value=&#39;&#39;;renderAgingPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap" id="aging-table-wrap"></div>
-      <div class="table-stat-bar" id="aging-stat-bar"></div>
       <div class="table-pagination">
         <span id="aging-pag-info"></span>
         <div class="pag-btns" id="aging-pag-btns"></div>
@@ -2122,7 +2088,6 @@ tbody tr:last-child{border-bottom:none}
         <button class="btn" onclick="[&#39;f-coll-rep&#39;,&#39;f-coll-cat&#39;,&#39;f-coll-month&#39;,&#39;f-coll-type&#39;,&#39;f-coll-from&#39;,&#39;f-coll-to&#39;].forEach(id=&gt;{const el=document.getElementById(id);if(el)el.value=&#39;&#39;});renderCollectionPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap" id="coll-table-wrap"></div>
-      <div class="table-stat-bar" id="coll-stat-bar"></div>
       <div class="table-pagination">
         <span id="coll-pag-info"></span>
         <div class="pag-btns" id="coll-pag-btns"></div>
@@ -2197,7 +2162,6 @@ tbody tr:last-child{border-bottom:none}
         <button class="btn" onclick="document.getElementById(&#39;f-inv-wh&#39;).value=&#39;&#39;;document.getElementById(&#39;f-inv-search&#39;).value=&#39;&#39;;renderInventoryPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap" id="inv-table-wrap"></div>
-      <div class="table-stat-bar" id="inv-stat-bar"></div>
       <div class="table-pagination">
         <span id="inv-pag-info"></span>
         <div class="pag-btns" id="inv-pag-btns"></div>
@@ -2757,30 +2721,6 @@ function navToggleSub(btn){
 }
 
 // ══════════════════════════════════════════════════════
-//  TABLE STAT BAR — شريط الإحصائيات تحت الجداول
-// ══════════════════════════════════════════════════════
-function _updateStatBar(barId, items){
-  const el=document.getElementById(barId);
-  if(!el)return;
-  if(!items||!items.length){el.innerHTML='';return;}
-  const fmtV=v=>{
-    if(typeof v==='number'){
-      if(Number.isInteger(v)||Math.abs(v)<10000)
-        return v.toLocaleString('ar-LY',{minimumFractionDigits:0,maximumFractionDigits:2});
-      return v.toLocaleString('ar-LY',{minimumFractionDigits:0,maximumFractionDigits:2});
-    }
-    return v;
-  };
-  el.innerHTML=items.map((item,i)=>{
-    if(item==='|') return `<div class="tsb-divider"></div>`;
-    return `<div class="tsb-item">
-      <span class="tsb-label">${item.label}</span>
-      <span class="tsb-value" style="color:${item.color||'var(--accent)'}">${fmtV(item.value)}</span>
-    </div>`;
-  }).join('');
-}
-
-// ══════════════════════════════════════════════════════
 //  KPI CARD BUILDER
 // ══════════════════════════════════════════════════════
 function kpiCard(icon,label,value,color,sub,badge){
@@ -2926,9 +2866,14 @@ function renderSalesPage(){
     const fInv=new Set(saleRows.map(r=>r[kInv])).size;
     const fCust=new Set(saleRows.map(r=>r[kCust])).size;
     const isFiltered=!!(repF||monthF||typeF);
+    const kQtyF=_fc('الكمية الخارجة','الكمية');
+    const fQtySale=saleRows.reduce((s,r)=>s+_n(r[kQtyF]),0);
+    const fQtyRet=retRows.reduce((s,r)=>s+_n(r[kQtyF]),0);
+    const fNetQty=fQtySale-fQtyRet;
     document.getElementById('kpi-sales').innerHTML=
       kpiCard('💵','إجمالي المبيعات',fSales,'var(--accent)',(isFiltered?'(مفلتر) ':'')+'قبل المرتجعات')+
       kpiCard('✅','صافي المبيعات',fNet,'var(--accent2)','بعد المرتجعات')+
+      kpiCard('🔢','صافي مبيعات الكميات',fNetQty.toLocaleString('ar-LY',{minimumFractionDigits:0,maximumFractionDigits:0}),'var(--accent)','وحدة (مبيع − مرتجع)')+
       kpiCard('↩','المرتجعات',fRet,'var(--red)',fRetPct+'% من المبيعات')+
       kpiCard('💰','التحصيلات',fCol,'var(--accent2)',fColPct+'% ROI')+
       kpiCard('🔴','الفجوة غير محصّل',fGap,'var(--accent3)',fGap<0?'📈 زيادة تحصيل':'')+
@@ -2939,9 +2884,14 @@ function renderSalesPage(){
     const retPct=k.total_sales>0?(k.total_returns/k.total_sales*100).toFixed(1):0;
     const colPct=k.net_sales>0?(k.total_collected/k.net_sales*100).toFixed(1):0;
     const gap=k.net_sales-k.total_collected;
+    const _repsF=D.reps_full||[];
+    const _allQty=_repsF.reduce((s,r)=>s+(r.qty||0),0);
+    const _allRetQty=_repsF.reduce((s,r)=>s+(r.retQty||0),0);
+    const _allNetQty=_allQty-_allRetQty;
     document.getElementById('kpi-sales').innerHTML=
       kpiCard('💵','إجمالي المبيعات',k.total_sales,'var(--accent)','قبل المرتجعات')+
       kpiCard('✅','صافي المبيعات',k.net_sales,'var(--accent2)','بعد المرتجعات')+
+      kpiCard('🔢','صافي مبيعات الكميات',_allNetQty.toLocaleString('ar-LY',{minimumFractionDigits:0,maximumFractionDigits:0}),'var(--accent)','وحدة (مبيع − مرتجع)')+
       kpiCard('↩','المرتجعات',k.total_returns,'var(--red)',retPct+'% من المبيعات')+
       kpiCard('💰','التحصيلات',k.total_collected,'var(--accent2)',colPct+'% ROI')+
       kpiCard('🔴','الفجوة غير محصّل',gap,'var(--accent3)',gap<0?'📈 زيادة تحصيل':'')+
@@ -3148,35 +3098,8 @@ function _renderSalesTable(){
     </tr></tfoot>
   </table>`;
   renderPag('sales',_renderSalesTable);
-  const _sAll=PAG_STATE['sales']?.data||[];
-  const _sCn=s=>String(s||'').trim();
-  const _sHdrs=_sAll[0]?Object.keys(_sAll[0]):[];
-  const _sFc=(...ns)=>{for(const n of ns){const h=_sHdrs.find(h=>_sCn(h)===n);if(h)return h}return ns[0]};
-  const _skType=_sFc('النوع','نوع');
-  const _skTotal=_sFc('الاجمالي الصافي','الإجمالي الصافي','الصافي');
-  const _skQty=_sFc('الكمية الخارجة','الكمية');
-  const _sSaleRows=_sAll.filter(r=>_sCn(r[_skType])==='مبيع');
-  const _sRetRows=_sAll.filter(r=>_sCn(r[_skType])==='مرتجع مبيع');
-  const _sSales=_sSaleRows.reduce((s,r)=>s+_parseNum(r[_skTotal]),0);
-  const _sRet=_sRetRows.reduce((s,r)=>s+_parseNum(r[_skTotal]),0);
-  const _sQty=_sSaleRows.reduce((s,r)=>s+_parseNum(r[_skQty]),0);
-  const _sRQty=_sRetRows.reduce((s,r)=>s+_parseNum(r[_skQty]),0);
-  const _sInv=new Set(_sSaleRows.map(r=>_sCn(r[_sFc('رقم الفاتورة','الفاتورة')]))).size;
-  const _sCust=new Set(_sSaleRows.map(r=>_sCn(r[_sFc('اسم الزبون','الزبون','العميل')]))).size;
-  _updateStatBar('sales-stat-bar',[
-    {label:'📋 إجمالي السطور',value:_sAll.length,color:'var(--text)'},
-    '|',
-    {label:'💵 إجمالي المبيعات',value:_sSales,color:'var(--accent)'},
-    {label:'↩ المرتجعات',value:_sRet,color:'var(--red)'},
-    {label:'✅ صافي المبيعات',value:_sSales-_sRet,color:'var(--accent2)'},
-    '|',
-    {label:'📦 الكمية المباعة',value:_sQty,color:'var(--accent)'},
-    {label:'🔄 كمية المرتجعات',value:_sRQty,color:'var(--red)'},
-    {label:'✅ صافي الكميات',value:_sQty-_sRQty,color:'var(--accent2)'},
-    '|',
-    {label:'🧾 الفواتير',value:_sInv,color:'var(--gold)'},
-    {label:'👥 الزبائن',value:_sCust,color:'var(--purple)'},
-  ]);
+}
+function resetSalesFilters(){
   ['f-sales-rep','f-sales-month','f-sales-type','f-sales-cust','f-sales-item','f-sales-from','f-sales-to'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
   renderSalesPage();
 }
@@ -3192,71 +3115,15 @@ function renderRepPage(){
   const toF   =document.getElementById('f-rep-to')?.value||'';
   const reps=D.reps_full||(()=>{_rebuildRepData();return D.reps_full||[]})();
   let filtered=reps;
-
-  // عند وجود فلتر زمني (شهر أو نطاق): نعيد حساب أرقام كل مندوب من sales_table
-  if(monthF||fromF||toF){
-    const _cn2=s=>String(s||'').trim();
-    const _n2=v=>_parseNum(v);
-    const allSR=D.sales_table||[];
-    if(allSR.length){
-      const hdrs2=Object.keys(allSR[0]||{});
-      const _fc2=(...ns)=>{for(const n of ns){const h=hdrs2.find(h=>_cn2(h)===n);if(h)return h}return ns[0]};
-      const kRep2=_fc2('المندوب','اسم المندوب');
-      const kType2=_fc2('النوع','نوع');
-      const kDate2=_fc2('التاريخ','تاريخ');
-      const kTotal2=_fc2('الاجمالي الصافي','الإجمالي الصافي','الصافي');
-      const kQty2=_fc2('الكمية الخارجة','الكمية');
-      const kInv2=_fc2('رقم الفاتورة','الفاتورة');
-      const kCust2=_fc2('اسم الزبون','الزبون','العميل');
-      const filtSR=allSR.filter(r=>{
-        const raw=_cn2(r[kDate2]);
-        const d=new Date(raw);
-        if(isNaN(d))return false;
-        if(monthF&&(d.getMonth()+1)!==+monthF)return false;
-        const ds=raw.substring(0,10);
-        if(fromF&&ds<fromF)return false;
-        if(toF&&ds>toF)return false;
-        return true;
-      });
-      const repMap2={};
-      filtSR.forEach(r=>{
-        const name=_cn2(r[kRep2]);if(!name)return;
-        if(!repMap2[name])repMap2[name]={sales:0,returns:0,qty:0,retQty:0,invoices:new Set(),customers:new Set()};
-        const v=_n2(r[kTotal2]),q=_n2(r[kQty2]),type=_cn2(r[kType2]);
-        if(type==='مبيع'){repMap2[name].sales+=v;repMap2[name].qty+=q;repMap2[name].invoices.add(_cn2(r[kInv2]));repMap2[name].customers.add(_cn2(r[kCust2]));}
-        else if(type==='مرتجع مبيع'){repMap2[name].returns+=v;repMap2[name].retQty+=q;}
-      });
-      // التحصيل المفلتر بالشهر/النطاق
-      const colTable2=D.collection_table||[];
-      const repColMap2={};
-      colTable2.filter(r=>r._colTag!=='تجاهل').forEach(r=>{
-        const raw2=String(r['التاريخ']||'');
-        const d2=new Date(raw2);if(isNaN(d2))return;
-        if(monthF&&(d2.getMonth()+1)!==+monthF)return;
-        const ds2=raw2.substring(0,10);
-        if(fromF&&ds2<fromF)return;
-        if(toF&&ds2>toF)return;
-        const name=_cn2(r['المندوب']);if(!name)return;
-        if(!repColMap2[name])repColMap2[name]=0;
-        if(r._colTag==='خصم') repColMap2[name]-=_n2(r['مدين']);
-        else repColMap2[name]+=_n2(r['دائن']);
-      });
-      filtered=Object.entries(repMap2).map(([name,d])=>{
-        const base=reps.find(r=>r.name===name)||{tSales:0,tCol:0,tQty:0,cat:'أخرى',debtNet:0,debtTotal:0,debtPaid:0,debtPct:0,debtCusts:0};
-        const ns=d.sales-d.returns;
-        const col=Math.max(0,repColMap2[name]||0);
-        const roi=ns>0?+(col/ns*100).toFixed(2):0;
-        const retPct=d.sales>0?+(d.returns/d.sales*100).toFixed(2):0;
-        return {...base,name,sales:d.sales,returns:d.returns,qty:d.qty,retQty:d.retQty,
-          netSales:ns,col,roi,gap:ns-col,retPct,
-          invoices:d.invoices.size,customers:d.customers.size,
-          colBank:0,colCash:0};
-      }).filter(r=>r.sales>0||r.returns>0);
-    }
-  }
-
   if(repF)filtered=filtered.filter(r=>r.name===repF);
   if(catF)filtered=filtered.filter(r=>(D._repCatMap&&D._repCatMap[r.name])===catF);
+  if(fromF||toF){
+    const kDate=_fc('التاريخ','تاريخ'); const kRep=_fc('المندوب','اسم المندوب');
+    const salesRows=D._salesRows||[];
+    const repsInRange=new Set();
+    salesRows.forEach(r=>{const d=String(r[kDate]||'').substring(0,10);if((!fromF||d>=fromF)&&(!toF||d<=toF))repsInRange.add(String(r[kRep]||'').trim());});
+    filtered=filtered.filter(r=>repsInRange.has(r.name));
+  }
   // ترتيب
   const _rsk=window._repSort?.key||'netSales'; const _rsd=window._repSort?.dir||'desc';
   filtered=[...filtered].sort((a,b)=>{
@@ -3439,24 +3306,10 @@ function _renderRepsTable(){
     </tr></tfoot>
   </table>`;
   renderPag('reps',_renderRepsTable);
-  const _rAll=PAG_STATE['reps']?.data||[];
-  const _rNet=_rAll.reduce((s,r)=>s+r.netSales,0);
-  const _rCol=_rAll.reduce((s,r)=>s+r.col,0);
-  const _rGap=_rNet-_rCol;
-  const _rRoi=_rNet>0?(_rCol/_rNet*100):0;
-  _updateStatBar('reps-stat-bar',[
-    {label:'👥 المناديب',value:_rAll.length,color:'var(--purple)'},
-    '|',
-    {label:'💵 إجمالي المبيعات',value:_rAll.reduce((s,r)=>s+r.sales,0),color:'var(--accent)'},
-    {label:'↩ المرتجعات',value:_rAll.reduce((s,r)=>s+r.returns,0),color:'var(--red)'},
-    {label:'✅ صافي المبيعات',value:_rNet,color:'var(--accent2)'},
-    '|',
-    {label:'💰 التحصيلات',value:_rCol,color:'var(--accent2)'},
-    {label:'🔴 الفجوة',value:_rGap,color:_rGap>0?'var(--red)':'var(--accent2)'},
-    {label:'📊 ROI',value:_rRoi.toFixed(1)+'%',color:_rRoi>=80?'var(--accent2)':_rRoi>=60?'var(--gold)':'var(--red)'},
-    '|',
-    {label:'📦 صافي الكميات',value:_rAll.reduce((s,r)=>s+(r.qty||0),0)-_rAll.reduce((s,r)=>s+(r.retQty||0),0),color:'var(--accent)'},
-  ]);
+}
+
+// ══════════════════════════════════════════════════════
+//  PAGE: CUSTOMERS
 // ══════════════════════════════════════════════════════
 function renderCustomersPage(){
   const search=(document.getElementById('f-cust-search')?.value||'').toLowerCase();
@@ -3682,23 +3535,10 @@ function _renderCustTable(){
     </tr></tfoot>
   </table>`;
   renderPag('cust',_renderCustTable);
-  const _cAll=PAG_STATE['cust']?.data||[];
-  const _cNet=_cAll.reduce((s,c)=>s+c.ns,0);
-  const _cCol=_cAll.reduce((s,c)=>s+c.c,0);
-  const _cGap=_cNet-_cCol;
-  _updateStatBar('cust-stat-bar',[
-    {label:'🏪 الزبائن',value:_cAll.length,color:'var(--purple)'},
-    '|',
-    {label:'💵 إجمالي المبيعات',value:_cAll.reduce((s,c)=>s+c.s,0),color:'var(--accent)'},
-    {label:'↩ المرتجعات',value:_cAll.reduce((s,c)=>s+c.ret,0),color:'var(--red)'},
-    {label:'✅ صافي المبيعات',value:_cNet,color:'var(--accent2)'},
-    '|',
-    {label:'💰 التحصيلات',value:_cCol,color:'var(--accent2)'},
-    {label:'🔴 الفجوة',value:_cGap,color:_cGap>0?'var(--red)':'var(--accent2)'},
-    {label:'📊 ROI',value:(_cNet>0?(_cCol/_cNet*100):0).toFixed(1)+'%',color:(_cNet>0&&_cCol/_cNet>=0.8)?'var(--accent2)':(_cNet>0&&_cCol/_cNet>=0.6)?'var(--gold)':'var(--red)'},
-    '|',
-    {label:'🧾 الفواتير',value:_cAll.reduce((s,c)=>s+c.inv,0),color:'var(--gold)'},
-  ]);
+}
+
+// ══════════════════════════════════════════════════════
+//  PAGE: PRODUCTS
 // ══════════════════════════════════════════════════════
 function renderProductsPage(){
   const search=(document.getElementById('f-prod-search')?.value||'').toLowerCase();
@@ -3759,9 +3599,11 @@ function renderProductsPage(){
   const totalRet=items.reduce((s,p)=>s+p.retVal,0);
   const retPct=items.reduce((s,p)=>s+p.sales,0)>0?totalRet/items.reduce((s,p)=>s+p.sales,0)*100:0;
 
+  const totalNetQtyProd=items.reduce((s,p)=>s+(p.nqty||0),0);
   document.getElementById('kpi-products').innerHTML=
     kpiCard('📦','عدد الأصناف',items.length,'var(--accent)',isFiltered?'(مفلتر)':'صنف مباع')+
     kpiCard('💵','إجمالي صافي المبيعات',totalNet,'var(--accent2)','')+
+    kpiCard('🔢','صافي مبيعات الكميات',totalNetQtyProd.toLocaleString('ar-LY',{minimumFractionDigits:0,maximumFractionDigits:0}),'var(--accent)','وحدة (مبيع − مرتجع)')+
     kpiCard('↩','إجمالي المرتجعات',totalRet,'var(--red)',retPct.toFixed(1)+'%')+
     kpiCard('🏆','أفضل صنف',items[0]?.ns||0,'var(--gold)',items[0]?.name.substring(0,20)||'—')+
     kpiCard('📊','مساهمة أفضل صنف',totalNet>0?((items[0]?.ns||0)/totalNet*100).toFixed(1)+'%':'—','var(--purple)','من صافي المبيعات');
@@ -3846,24 +3688,10 @@ function _renderProdTable(){
     </tr></tfoot>
   </table>`;
   renderPag('prod',_renderProdTable);
-  const _pAll=PAG_STATE['prod']?.data||[];
-  const _pSales=_pAll.reduce((s,p)=>s+p.sales,0);
-  const _pRet=_pAll.reduce((s,p)=>s+p.retVal,0);
-  const _pNet=_pAll.reduce((s,p)=>s+p.ns,0);
-  const _pQty=_pAll.reduce((s,p)=>s+p.qty,0);
-  const _pRQty=_pAll.reduce((s,p)=>s+p.retQty,0);
-  _updateStatBar('prod-stat-bar',[
-    {label:'📦 الأصناف',value:_pAll.length,color:'var(--accent)'},
-    '|',
-    {label:'💵 إجمالي المبيعات',value:_pSales,color:'var(--accent)'},
-    {label:'↩ المرتجعات',value:_pRet,color:'var(--red)'},
-    {label:'✅ صافي المبيعات',value:_pNet,color:'var(--accent2)'},
-    {label:'📉 نسبة المرتجع',value:(_pSales>0?(_pRet/_pSales*100):0).toFixed(1)+'%',color:'var(--accent3)'},
-    '|',
-    {label:'📊 الكمية المباعة',value:_pQty,color:'var(--accent)'},
-    {label:'🔄 كمية المرتجعات',value:_pRQty,color:'var(--red)'},
-    {label:'✅ صافي الكميات',value:_pQty-_pRQty,color:'var(--accent2)'},
-  ]);
+}
+
+// ══════════════════════════════════════════════════════
+//  PAGE: DEBT
 // ══════════════════════════════════════════════════════
 function renderDebtPage(){
   const search=(document.getElementById('f-debt-search')?.value||'').toLowerCase();
@@ -3980,21 +3808,10 @@ function _renderDebtTable(){
     </tr></tfoot>
   </table>`;
   renderPag('debt',_renderDebtTable);
-  const _dAll=PAG_STATE['debt']?.data||[];
-  const _dDeb=_dAll.reduce((s,r)=>s+_parseNum(r['رصيد حالي مدين']||r['مدين']||0),0);
-  const _dCred=_dAll.reduce((s,r)=>s+_parseNum(r['رصيد حالي دائن']||r['دائن']||0),0);
-  const _dNet=_dAll.reduce((s,r)=>s+(_parseNum(r['الرصيد']||0)||(_parseNum(r['رصيد حالي مدين']||r['مدين']||0)-_parseNum(r['رصيد حالي دائن']||r['دائن']||0))),0);
-  const _dDebtors=_dAll.filter(r=>(_parseNum(r['الرصيد']||0)||(_parseNum(r['رصيد حالي مدين']||r['مدين']||0)-_parseNum(r['رصيد حالي دائن']||r['دائن']||0)))>0).length;
-  _updateStatBar('debt-stat-bar',[
-    {label:'📋 الحسابات',value:_dAll.length,color:'var(--text)'},
-    {label:'🔴 المدينون',value:_dDebtors,color:'var(--red)'},
-    '|',
-    {label:'📈 إجمالي مدين',value:_dDeb,color:'var(--red)'},
-    {label:'📉 إجمالي دائن',value:_dCred,color:'var(--accent2)'},
-    {label:'⚖️ صافي المديونية',value:_dNet,color:_dNet>0?'var(--red)':'var(--accent2)'},
-    '|',
-    {label:'📊 نسبة السداد',value:(_dDeb>0?(_dCred/_dDeb*100):0).toFixed(1)+'%',color:(_dDeb>0&&_dCred/_dDeb>=0.8)?'var(--accent2)':(_dDeb>0&&_dCred/_dDeb>=0.5)?'var(--gold)':'var(--red)'},
-  ]);
+}
+
+// ══════════════════════════════════════════════════════
+//  PAGE: AGING
 // ══════════════════════════════════════════════════════
 function renderAgingPage(){
   const repF   =document.getElementById('f-aging-rep')?.value||'';
@@ -4192,51 +4009,9 @@ function _renderAgingTable(){
     </table>`;
   }
   renderPag('aging',_renderAgingTable);
-  const _aAll=PAG_STATE['aging']?.data||[];
-  const _isRA=D.aging_table&&D.aging_table.length>0;
-  if(_aAll.length){
-    const _aHdrs=Object.keys(_aAll[0]||{});
-    const _aFc=(...ns)=>ns.find(n=>_aHdrs.includes(n));
-    const _c10=_aFc('10','10أيام','10 أيام');
-    const _c15=_aFc('15','15يوم','15 يوم');
-    const _c30=_aFc('30','30يوم','30 يوم');
-    const _c60=_aFc('60','60يوم','60 يوم');
-    const _c90=_aFc('90','90يوم','90 يوم');
-    const _c120=_aFc('120','120+','120يوم','120 يوم');
-    const _aN=v=>_parseNum(v);
-    if(_isRA){
-      const _ageCols=[_c10,_c15,_c30,_c60,_c90,_c120].filter(Boolean);
-      const _aTotal=_aAll.reduce((s,r)=>s+_ageCols.reduce((ss,c)=>ss+_aN(r[c]),0),0);
-      const _aItems=[
-        {label:'📋 الحسابات',value:_aAll.length,color:'var(--text)'},
-        '|',
-        {label:'💰 إجمالي الذمم',value:_aTotal,color:'var(--gold)'},
-        '|',
-      ];
-      if(_c10)_aItems.push({label:'≤10 أيام',value:_aAll.reduce((s,r)=>s+_aN(r[_c10]),0),color:'var(--accent2)'});
-      if(_c15)_aItems.push({label:'11-15 يوم',value:_aAll.reduce((s,r)=>s+_aN(r[_c15]),0),color:'var(--accent2)'});
-      if(_c30)_aItems.push({label:'16-30 يوم',value:_aAll.reduce((s,r)=>s+_aN(r[_c30]),0),color:'var(--accent)'});
-      if(_c60)_aItems.push({label:'31-60 يوم',value:_aAll.reduce((s,r)=>s+_aN(r[_c60]),0),color:'var(--accent3)'});
-      if(_c90)_aItems.push({label:'61-90 يوم',value:_aAll.reduce((s,r)=>s+_aN(r[_c90]),0),color:'var(--red)'});
-      if(_c120)_aItems.push({label:'120+ يوم',value:_aAll.reduce((s,r)=>s+_aN(r[_c120]),0),color:'var(--red)'});
-      _updateStatBar('aging-stat-bar',_aItems);
-    } else {
-      const _aT30=_aAll.reduce((s,r)=>s+_aN(r['30يوم']||0),0);
-      const _aT60=_aAll.reduce((s,r)=>s+_aN(r['60يوم']||0),0);
-      const _aTOld=_aAll.reduce((s,r)=>s+_aN(r['120+']||r['ذمة ≤60 يوم']||0),0);
-      _updateStatBar('aging-stat-bar',[
-        {label:'📋 الحسابات',value:_aAll.length,color:'var(--text)'},
-        '|',
-        {label:'💰 إجمالي الذمم',value:_aT30+_aT60+_aTOld,color:'var(--gold)'},
-        '|',
-        {label:'≤30 يوم',value:_aT30,color:'var(--accent2)'},
-        {label:'31-60 يوم',value:_aT60,color:'var(--accent3)'},
-        {label:'60+ يوم',value:_aTOld,color:'var(--red)'},
-      ]);
-    }
-  } else {
-    _updateStatBar('aging-stat-bar',[]);
-  }if(v===null||v===undefined)return'—';if(typeof v==='number')return fmt(v);return v}
+}
+
+function fmt2(v){if(v===null||v===undefined)return'—';if(typeof v==='number')return fmt(v);return v}
 
 // ══════════════════════════════════════════════════════
 //  PAGE: COLLECTION
@@ -4597,28 +4372,9 @@ function _renderCollTable(){
     </tr></tfoot>
   </table>`;
   renderPag('coll',_renderCollTable);
-  const _colAll=PAG_STATE['coll']?.data||[];
-  const _colEff=_colAll.filter(r=>r._colTag!=='تجاهل'&&r._colTag!=='خصم');
-  const _colDed=_colAll.filter(r=>r._colTag==='خصم');
-  const _colAdd=_colAll.filter(r=>r._colTag==='إضافة');
-  const _colGross=_colEff.reduce((s,r)=>s+_parseNum(r['دائن']),0);
-  const _colDedAmt=_colDed.reduce((s,r)=>s+_parseNum(r['مدين']),0);
-  const _colNet=Math.max(0,_colGross-_colDedAmt);
-  const _colCash=_colEff.filter(r=>(r['النوع']||'').includes('مقبوضات الصندوق')).reduce((s,r)=>s+_parseNum(r['دائن']),0);
-  const _colBank=_colGross-_colCash;
-  _updateStatBar('coll-stat-bar',[
-    {label:'📋 السطور',value:_colAll.length,color:'var(--text)'},
-    '|',
-    {label:'✅ إجمالي التحصيل',value:_colGross,color:'var(--accent2)'},
-    {label:'➖ الخصومات',value:_colDedAmt,color:'var(--red)'},
-    {label:'💰 صافي التحصيل',value:_colNet,color:'var(--accent2)'},
-    '|',
-    {label:'🏦 حوالات',value:_colBank,color:'var(--purple)'},
-    {label:'💵 نقدي',value:_colCash,color:'var(--gold)'},
-    '|',
-    {label:'➕ إضافات',value:_colAdd.length,color:'var(--accent)'},
-    {label:'➖ خصومات',value:_colDed.length,color:'var(--red)'},
-  ]);
+}
+
+// ── جدول التعديلات (خصم / إضافة) ────────────────────────────────────────────
 let _adjFilter='all';
 function setAdjFilter(f){_adjFilter=f;pagState('coll-adj',_getAdjRows(),true);_renderAdjTable();}
 function _getAdjRows(){
@@ -4859,31 +4615,10 @@ function _renderInvTable(){
     </tr></tfoot>
   </table>`;
   renderPag('inv',_renderInvTable);
-  const _invAll=PAG_STATE['inv']?.data||[];
-  const _invN=v=>_parseNum(v);
-  const _invTotalQty=_invAll.reduce((s,r)=>s+_invN(r['الكمية']),0);
-  const _invKeys=_invAll[0]?Object.keys(_invAll[0]):[];
-  const _invC=s=>String(s||'').trim();
-  const _iExp30 =_invKeys.find(k=>_invC(k)==='صلاحية 1')||null;
-  const _iExp60 =_invKeys.find(k=>_invC(k)==='صلاحية 2')||null;
-  const _iExp90 =_invKeys.find(k=>_invC(k)==='صلاحية 3')||null;
-  const _iExp120=_invKeys.find(k=>_invC(k)==='صلاحية 4')||null;
-  const _iTExp30 =_iExp30 ?_invAll.reduce((s,r)=>s+_invN(r[_iExp30 ]),0):0;
-  const _iTExp60 =_iExp60 ?_invAll.reduce((s,r)=>s+_invN(r[_iExp60 ]),0):0;
-  const _iTExp90 =_iExp90 ?_invAll.reduce((s,r)=>s+_invN(r[_iExp90 ]),0):0;
-  const _iTExp120=_iExp120?_invAll.reduce((s,r)=>s+_invN(r[_iExp120]),0):0;
-  const _invItems=[
-    {label:'📦 الأصناف',value:_invAll.length,color:'var(--accent)'},
-    {label:'🔢 إجمالي الكميات',value:_invTotalQty,color:'var(--accent2)'},
-  ];
-  if(_iTExp30>0||_iTExp60>0||_iTExp90>0||_iTExp120>0){
-    _invItems.push('|');
-    if(_iTExp30>0) _invItems.push({label:'🟢 ≤30 يوم',value:_iTExp30,color:'var(--accent2)'});
-    if(_iTExp60>0) _invItems.push({label:'🟡 31-60 يوم',value:_iTExp60,color:'var(--accent3)'});
-    if(_iTExp90>0) _invItems.push({label:'🔴 61-90 يوم',value:_iTExp90,color:'var(--red)'});
-    if(_iTExp120>0)_invItems.push({label:'⚫ 120+ يوم',value:_iTExp120,color:'var(--purple)'});
-  }
-  _updateStatBar('inv-stat-bar',_invItems);
+}
+
+// ══════════════════════════════════════════════════════
+//  EXCEL PARSER — شامل وموثوق
 // ══════════════════════════════════════════════════════
 function parseExcel(buffer){
   const wb=XLSX.read(buffer,{type:'array',cellDates:true});
@@ -4908,6 +4643,9 @@ function renderOverviewPage(){
   const totalNet     = totalSales - totalReturns;
   const totalCol     = D.kpis.total_collected || reps.reduce((s,r)=>s+r.col, 0);
   const totalDebtNet = D.kpis.total_debt || reps.reduce((s,r)=>s+(r.debtNet>0?r.debtNet:0), 0);
+  const totalQtyGross  = reps.reduce((s,r)=>s+(r.qty    ||0), 0);
+  const totalRetQty    = reps.reduce((s,r)=>s+(r.retQty ||0), 0);
+  const totalNetQty    = totalQtyGross - totalRetQty;
 
   // ── حساب الحوالات والكاش مباشرة من collection_table (نفس معادلة صفحة التحصيل) ──
   const _ovN=v=>_parseNum(v);
@@ -4941,6 +4679,7 @@ function renderOverviewPage(){
     {icon:'📦',label:'إجمالي المبيعات',val:totalSales,sub:'قبل المرتجعات',color:'var(--accent)',bar:null},
     {icon:'↩️',label:'إجمالي المرتجعات',val:totalReturns,sub:retPct.toFixed(2)+'% من المبيعات',color:'var(--red)',bar:null},
     {icon:'💰',label:'صافي المبيعات',val:totalNet,sub:'بعد المرتجعات',color:'var(--accent2)',bar:null},
+    {icon:'🔢',label:'صافي مبيعات الكميات',val:totalNetQty.toLocaleString('ar-LY',{minimumFractionDigits:0,maximumFractionDigits:0}),sub:'وحدة (مبيع − مرتجع)',color:'var(--accent)',bar:null},
     {icon:'✅',label:'إجمالي التحصيلات',val:totalCol,
       sub:`<span style="color:#7c6fff">🏦 ${Math.round(totalBank).toLocaleString('ar-LY')} (${bankPct.toFixed(1)}%)</span> &nbsp; <span style="color:var(--gold)">💵 ${Math.round(totalCash).toLocaleString('ar-LY')} (${cashPct.toFixed(1)}%)</span>`,
       color:'var(--accent2)',bar:null},
