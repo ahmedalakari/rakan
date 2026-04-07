@@ -6578,6 +6578,7 @@ function processNewData(type,rows){
     }
     case 'reps':{
       // ── قراءة ملف تصنيف المندوبين + الأهداف ──────────────────────────────
+      console.log('[REPS] معالجة ملف المناديب — عدد الصفوف:', rows.length, '— مثال:', JSON.stringify(rows[0]||{}).substring(0,200));
       const _c4=s=>String(s||'').replace(/^\uFEFF/,'').trim();
       const _n4=v=>_parseNum(v);
       const hdrs4=Object.keys(rows[0]||{});
@@ -6607,6 +6608,7 @@ function processNewData(type,rows){
         targets[name]={tSales,tQty,tCol,cat,sup};
       });
       D._repTargets=targets;
+      console.log('[REPS] _repSuperMap بعد البناء:', JSON.stringify(D._repSuperMap).substring(0,300));
       // بناء خريطة عكسية: مشرف → قائمة مناديبه
       D._superRepsMap={};
       Object.entries(D._repSuperMap).forEach(([rep,sup])=>{
