@@ -6340,15 +6340,24 @@ function processNewData(type,rows){
       const _ct6=s=>String(s===null||s===undefined?'':s).replace(/[\r\n]+/g,' ').trim();
       const _nt6=v=>{if(v===null||v===undefined||v==='')return 0;const n=parseFloat(String(v).replace(/,/g,''));return isNaN(n)?0:n;};
 
-      const rawRows = D._targetsBuffer ? parseExcelRaw(D._targetsBuffer) : null;
+      // استخدم rows المُمررة مباشرة (من المزامنة أو الرفع المحلي) بدلاً من إعادة القراءة
+      // هذا يضمن نفس البيانات في كلا المسارين
+      const rawRows = rows && rows.length ? rows : (D._targetsBuffer ? parseExcelRaw(D._targetsBuffer) : null);
       if(!rawRows||!rawRows.length){toast('⚠ لم يتم تحميل ملف الأهداف','error');break;}
 
-      // هيكل المجموعات — prodCol هو عمود اسم الصنف، totalCol هو الكمية الإجمالية
-      // ملاحظة: كل المجموعات تشترك في نفس الكمية الإجمالية للصنف
-      // نستخدم totalCol من أي مجموعة لها قيمة > 0
-      // ── بناء _GROUPS6 ديناميكياً لمقاومة انزياح الأعمدة (Google Sheets يُزيل الأعمدة الفارغة) ──
-      const ratioRow = rawRows[2] || [];
-      const hdrRow6  = rawRows[3] || [];
+      // ── بناء ديناميكي: ابحث عن صف النسب وصف الرؤوس بدلاً من أرقام ثابتة ──
+      // (blankrows:false يُغيّر أرقام الصفوف عند تصدير GSheets)
+      let ratioRow=[], hdrRow6=[], dataStartIdx=0;
+      for(let _i=0;_i<Math.min(rawRows.length,10);_i++){
+        const _r=rawRows[_i]||[];
+        const _nonNull=_r.filter(v=>v!==null&&v!==undefined);
+        const _numCount=_nonNull.filter(v=>typeof v==='number'&&v>0&&v<1).length;
+        const _txtCount=_nonNull.filter(v=>typeof v==='string'&&v.length>1).length;
+        const _hasHdr=_r.some(v=>String(v||'').includes('أجمالي الكمية'));
+        if(_numCount>=4&&_txtCount===0&&!ratioRow.length){ratioRow=_r;}
+        else if(_hasHdr&&!hdrRow6.length){hdrRow6=_r;dataStartIdx=_i+1;}
+      }
+      if(!hdrRow6.length){toast('⚠ لم يُعثر على رؤوس الملف','error');break;}
 
       // ابحث عن مواضع "الصنف" و"أجمالي الكمية" في صف الرأس
       const _prodColIdxs=[], _totalColIdxs=[];
@@ -6389,7 +6398,7 @@ function processNewData(type,rows){
       const repTotals6={};
 
       rawRows.forEach((r,idx)=>{
-        if(idx<4||!r)return;
+        if(idx<dataStartIdx||!r)return;
 
         // نبحث عن اسم الصنف من أول مجموعة تحتوي قيمة نصية
         let prodName='';
