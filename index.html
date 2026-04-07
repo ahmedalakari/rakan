@@ -6386,7 +6386,7 @@ function processNewData(type,rows){
         for(let c=prevTotal+1;c<totalCol;c++){
           const name=_ct6(hdrRow6[c]||'');
           const ratio=_nt6(ratioRow[c]);
-          if(name&&name!=='أجمالي الكمية'&&name!=='الصنف'&&!name.includes('اجمالي')&&ratio>0)
+          if(name&&name!=='أجمالي الكمية'&&name!=='الصنف'&&!name.includes('اجمالي'))
             repCols.push(c);
         }
         if(repCols.length>0)_GROUPS6.push({repCols,totalCol,prodCol});
