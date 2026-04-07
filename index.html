@@ -7159,18 +7159,50 @@ async function _autoSyncQuiet(){
       const ic = document.getElementById(iconMap[key]);
       if(ic) ic.style.borderColor='var(--red)';
       console.warn('فشل جلب', key, err.message);
+      if(key === 'reps'){
+        const _dbgEl = document.getElementById('_reps_url_dbg') || (() => {
+          const d = document.createElement('div');
+          d.id = '_reps_url_dbg';
+          d.style = 'position:fixed;bottom:80px;left:10px;z-index:9999;padding:8px 14px;border-radius:10px;font-size:11px;font-family:Cairo,sans-serif;direction:rtl;max-width:90vw;word-break:break-all;box-shadow:0 4px 12px rgba(0,0,0,.2)';
+          document.body.appendChild(d);
+          return d;
+        })();
+        _dbgEl.style.background = '#f05252';
+        _dbgEl.style.color = '#fff';
+        _dbgEl.textContent = '❌ فشل جلب ملف المناديب: ' + err.message;
+        clearTimeout(_dbgEl._t);
+        _dbgEl._t = setTimeout(() => _dbgEl.remove(), 12000);
+      }
       return null;
     }
   };
 
   /* جلب reps أولاً ومعالجته قبل إطلاق الباقي */
-  console.log('[SYNC] جلب reps من URL:', urls.reps ? urls.reps.substring(0,60)+'...' : '❌ لا URL!');
+  // DEBUG مرئي: إظهار URL وحالة الجلب
+  const _repsUrl = urls.reps || '';
+  const _showDbg = (msg, color) => {
+    const el = document.getElementById('_reps_url_dbg') || (() => {
+      const d = document.createElement('div');
+      d.id = '_reps_url_dbg';
+      d.style = 'position:fixed;bottom:80px;left:10px;z-index:9999;padding:8px 14px;border-radius:10px;font-size:11px;font-family:Cairo,sans-serif;direction:rtl;max-width:90vw;word-break:break-all;box-shadow:0 4px 12px rgba(0,0,0,.2)';
+      document.body.appendChild(d);
+      return d;
+    })();
+    el.style.background = color;
+    el.style.color = '#fff';
+    el.textContent = msg;
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.remove(), 12000);
+  };
+  if(!_repsUrl){
+    _showDbg('❌ URL ملف المناديب فارغ! اذهب لإعدادات وأضف الرابط', '#f05252');
+  } else {
+    _showDbg('⏳ جلب ملف المناديب...', '#f07820');
+  }
   const repsResult = await _fetchOne('reps');
-  console.log('[SYNC] repsResult:', repsResult ? 'نجح - صفوف: '+repsResult.rows.length : '❌ فشل');
   if(repsResult){
-    // معالجة خاصة: البحث عن صف العناوين الحقيقي في ملف المناديب
+    _showDbg('✅ تم جلب ملف المناديب: ' + repsResult.rows.length + ' صف', '#059669');
     const _repsRows = _parseRepsRows(repsResult.rows);
-    console.log('[SYNC] _repsRows بعد _parseRepsRows:', _repsRows.length, 'صف | أول صف:', JSON.stringify(_repsRows[0]||{}).substring(0,150));
     freshData['reps'] = _repsRows;
     processNewData('reps', _repsRows);
     completed++;
