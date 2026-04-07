@@ -6578,9 +6578,13 @@ function processNewData(type,rows){
     }
     case 'reps':{
       // ── قراءة ملف تصنيف المندوبين + الأهداف ──────────────────────────────
-      console.log('[REPS] معالجة ملف المناديب — عدد الصفوف:', rows.length, '— مثال:', JSON.stringify(rows[0]||{}).substring(0,200));
       const _c4=s=>String(s||'').replace(/^\uFEFF/,'').trim();
       const _n4=v=>_parseNum(v);
+
+      // ── البحث عن صف العناوين الحقيقي باستخدام _parseRepsRows ──
+      // يحل مشكلة الصفوف الفارغة في بداية الملف
+      rows = _parseRepsRows(rows);
+
       const hdrs4=Object.keys(rows[0]||{});
       const _fc4=(...ns)=>{for(const n of ns){const h=hdrs4.find(h=>_c4(h)===n||_c4(h).includes(n)||n.includes(_c4(h)));if(h&&_c4(h))return h}return null};
       const kName=_fc4('المندوب','اسم المندوب','الاسم','name','rep','مندوب');
@@ -6608,7 +6612,6 @@ function processNewData(type,rows){
         targets[name]={tSales,tQty,tCol,cat,sup};
       });
       D._repTargets=targets;
-      console.log('[REPS] _repSuperMap بعد البناء:', JSON.stringify(D._repSuperMap).substring(0,300));
       // بناء خريطة عكسية: مشرف → قائمة مناديبه
       D._superRepsMap={};
       Object.entries(D._repSuperMap).forEach(([rep,sup])=>{
@@ -7044,8 +7047,52 @@ function _updateRefreshStatus(){
   if(el)el.textContent=mins>0?`🔄 تحديث تلقائي كل ${mins} دقيقة`:'⏸ التحديث التلقائي متوقف';
 }
 
+// ── دالة تجد صف العناوين الحقيقي في ملف المناديب ──
+// يحل مشكلة الصفوف الفارغة في بداية الملف (صف 1-2 فارغ، صف 3 عناوين)
+function _parseRepsRows(rows){
+  if(!rows || !rows.length) return rows;
+  const _c = s => String(s||'').replace(/﻿/g,'').trim();
+
+  // نبحث في أول 10 صفوف عن صف يحتوي 'المندوب' أو 'rep' في القيم
+  const _keywords = ['المندوب','مندوب','اسم المندوب','rep','name'];
+  let hdrRowIdx = -1;
+  let hdrVals = [];
+
+  for(let i = 0; i < Math.min(rows.length, 10); i++){
+    const vals = Object.values(rows[i]).map(v => _c(String(v||'')));
+    if(_keywords.some(kw => vals.some(v => v === kw || v.includes(kw)))){
+      hdrRowIdx = i;
+      hdrVals = vals;
+      break;
+    }
+  }
+
+  // إذا وُجد صف عناوين بعد الصف الأول → أعد البناء
+  if(hdrRowIdx > 0 && hdrVals.length){
+    return rows.slice(hdrRowIdx + 1).map(r => {
+      const vals = Object.values(r).map(v => _c(String(v||'')));
+      const obj = {};
+      hdrVals.forEach((h, i) => { if(h) obj[h] = vals[i] || ''; });
+      return obj;
+    }).filter(r => Object.values(r).some(v => v));
+  }
+
+  // إذا كان الصف الأول هو العناوين بالفعل → أعِد كما هو
+  return rows;
+}
+
 async function _autoSyncQuiet(){
-  const urls = GS_URLS_EMBEDDED;
+  // قراءة الروابط: من input fields أولاً (المحفوظة) ثم GS_URLS_EMBEDDED كـ fallback
+  const _savedUrlsStr = (() => { try { return localStorage.getItem('ndGsUrls_v2'); } catch(e){ return null; } })();
+  const _savedUrls = _savedUrlsStr ? (() => { try { return JSON.parse(_savedUrlsStr); } catch(e){ return {}; } })() : {};
+  const urls = {
+    sales:      (document.getElementById('gs-sales')?.value?.trim())      || _savedUrls.sales      || GS_URLS_EMBEDDED.sales      || '',
+    collection: (document.getElementById('gs-collection')?.value?.trim()) || _savedUrls.collection || GS_URLS_EMBEDDED.collection || '',
+    debt:       (document.getElementById('gs-debt')?.value?.trim())       || _savedUrls.debt       || GS_URLS_EMBEDDED.debt       || '',
+    inventory:  (document.getElementById('gs-inventory')?.value?.trim())  || _savedUrls.inventory  || GS_URLS_EMBEDDED.inventory  || '',
+    reps:       (document.getElementById('gs-reps')?.value?.trim())       || _savedUrls.reps       || GS_URLS_EMBEDDED.reps       || '',
+    aging:      (document.getElementById('gs-aging')?.value?.trim())      || _savedUrls.aging      || GS_URLS_EMBEDDED.aging      || '',
+  };
   const keys = ['reps','sales','collection','debt','inventory','aging']; // reps أولاً لضمان بناء _repSuperMap قبل sales
   const msgEl=document.getElementById('loading-msg');
   const progBar=document.getElementById('ld-progress');
@@ -7127,8 +7174,10 @@ async function _autoSyncQuiet(){
   /* جلب reps أولاً ومعالجته قبل إطلاق الباقي */
   const repsResult = await _fetchOne('reps');
   if(repsResult){
-    freshData['reps'] = repsResult.rows;
-    processNewData('reps', repsResult.rows);
+    // معالجة خاصة: البحث عن صف العناوين الحقيقي في ملف المناديب
+    const _repsRows = _parseRepsRows(repsResult.rows);
+    freshData['reps'] = _repsRows;
+    processNewData('reps', _repsRows);
     completed++;
     const ic = document.getElementById(iconMap['reps']);
     if(ic) ic.className='ld-icon-box loaded';
