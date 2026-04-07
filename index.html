@@ -3182,22 +3182,6 @@ function populateRepSelects(){
 
   // ── تعبئة فلاتر المشرفين ──
   const sups=[...new Set(Object.values(D._repSuperMap||{}).filter(Boolean))].sort();
-  // DEBUG مؤقت: أظهر عدد المشرفين في toast
-  if(sups.length > 0){
-    console.log('[DEBUG] populateRepSelects: وجد ' + sups.length + ' مشرف: ' + sups.join(', '));
-  } else {
-    console.warn('[DEBUG] populateRepSelects: _repSuperMap فارغ! D._repSuperMap=', JSON.stringify(D._repSuperMap||{}));
-    // أظهر للمستخدم مباشرة
-    const _dbgBar = document.getElementById('topbar');
-    if(_dbgBar && !document.getElementById('_sup_dbg')){
-      const _dbgEl = document.createElement('div');
-      _dbgEl.id = '_sup_dbg';
-      _dbgEl.style = 'position:fixed;bottom:80px;left:10px;z-index:9999;background:#f05252;color:#fff;padding:8px 14px;border-radius:10px;font-size:12px;font-family:Cairo,sans-serif;direction:rtl;max-width:90vw;word-break:break-all';
-      _dbgEl.textContent = '⚠ _repSuperMap فارغ | reps:' + (D.reps||[]).length + ' | keys:' + Object.keys(D._repSuperMap||{}).length;
-      document.body.appendChild(_dbgEl);
-      setTimeout(()=>_dbgEl.remove(), 8000);
-    }
-  }
   const supIds=['f-sales-sup','f-rep-sup','f-cust-sup','f-prod-sup','f-debt-sup','f-aging-sup','f-coll-sup','gf-sup'];
   supIds.forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
@@ -6460,26 +6444,24 @@ function processNewData(type,rows){
       }
 
       // ── بناء _repSuperMap من ملف المبيعات إذا وُجد عمود المشرف ──
-      // ملاحظة: لا نمسح _repSuperMap هنا لأن ملف المناديب (reps) قد عالجه أولاً
-      if(kSupSales){
-        if(!D._repSuperMap) D._repSuperMap={};
-        if(!D._superRepsMap) D._superRepsMap={};
+      // ملاحظة: إذا سبق تحميل ملف التصنيف (D._repsFileLoaded)، فهو المصدر الرسمي ولا نستبدله
+      if(kSupSales && !D._repsFileLoaded){
+        // مسح القديم وإعادة البناء من الصفر في كل مزامنة
+        D._repSuperMap={};
+        D._superRepsMap={};
         rows.forEach(r=>{
           const rep=_cn(r[kRep]||'');
           const sup=_cn(r[kSupSales]||'');
-          // فقط أضف إذا لم يكن المندوب مسجلاً مسبقاً من ملف المناديب (الأولوية لملف المناديب)
-          if(rep && sup && !D._repSuperMap[rep]){
-            D._repSuperMap[rep]=sup;
+          if(rep && sup){
+            D._repSuperMap[rep]=sup; // آخر قيمة تفوز (أحدث صف)
           }
         });
-        // إعادة بناء الخريطة العكسية بالكامل
+        // بناء الخريطة العكسية: مشرف → قائمة مناديبه
         D._superRepsMap={};
         Object.entries(D._repSuperMap).forEach(([rep,sup])=>{
           if(!D._superRepsMap[sup])D._superRepsMap[sup]=[];
           if(!D._superRepsMap[sup].includes(rep))D._superRepsMap[sup].push(rep);
         });
-        // تحديث القوائم فوراً إن وُجدت بيانات
-        if(Object.keys(D._repSuperMap).length > 0) populateRepSelects();
       }
 
       // ── بناء repData الكاملة ──
@@ -6596,10 +6578,6 @@ function processNewData(type,rows){
       // ── قراءة ملف تصنيف المندوبين + الأهداف ──────────────────────────────
       const _c4=s=>String(s||'').replace(/^\uFEFF/,'').trim();
       const _n4=v=>_parseNum(v);
-
-      // ── البحث عن صف العناوين الحقيقي باستخدام _parseRepsRows ──
-      rows = _parseRepsRows(rows); // يقبل array of objects
-
       const hdrs4=Object.keys(rows[0]||{});
       const _fc4=(...ns)=>{for(const n of ns){const h=hdrs4.find(h=>_c4(h)===n||_c4(h).includes(n)||n.includes(_c4(h)));if(h&&_c4(h))return h}return null};
       const kName=_fc4('المندوب','اسم المندوب','الاسم','name','rep','مندوب');
@@ -6609,7 +6587,8 @@ function processNewData(type,rows){
       const kTQty  =_fc4('هدف الكمية','هدف الكميه','target_qty');
       const kTCol  =_fc4('هدف التحصيل','target_collection','هدف التحصيلات');
       const targets={};
-      // ملف المناديب يُعيد بناء _repSuperMap من الصفر (هو المصدر الرسمي)
+      // ملف المناديب هو المصدر الرسمي — يُعيد بناء _repSuperMap من الصفر دائماً
+      D._repsFileLoaded=true;
       D._repSuperMap={};
       D._superRepsMap={};
       // تصفية الصفوف الفارغة
@@ -6627,8 +6606,6 @@ function processNewData(type,rows){
         targets[name]={tSales,tQty,tCol,cat,sup};
       });
       D._repTargets=targets;
-      // DEBUG
-      console.log('[REPS] كُتب في _repSuperMap:', Object.keys(D._repSuperMap).length, 'مندوب | مثال:', JSON.stringify(Object.entries(D._repSuperMap).slice(0,3)));
       // بناء خريطة عكسية: مشرف → قائمة مناديبه
       D._superRepsMap={};
       Object.entries(D._repSuperMap).forEach(([rep,sup])=>{
@@ -6914,6 +6891,10 @@ async function processMultipleFiles(files){
 
   if(!classified.length)return;
 
+  // ── ترتيب الملفات: reps دائماً بعد sales لضمان الكتابة الصحيحة لـ _repSuperMap ──
+  const TYPE_ORDER={sales:0,collection:1,debt:2,aging:3,inventory:4,targets:5,reps:99};
+  classified.sort((a,b)=>(TYPE_ORDER[a.type]??50)-(TYPE_ORDER[b.type]??50));
+
   let done=0;
   _setProg('5%');
 
@@ -7064,79 +7045,9 @@ function _updateRefreshStatus(){
   if(el)el.textContent=mins>0?`🔄 تحديث تلقائي كل ${mins} دقيقة`:'⏸ التحديث التلقائي متوقف';
 }
 
-// ── دالة تجد صف العناوين الحقيقي في ملف المناديب ──
-// يحل مشكلة الصفوف الفارغة في بداية الملف (صف 1-2 فارغ، صف 3 عناوين)
-function _parseRepsRows(input){
-  // تقبل نص CSV خام أو array of objects
-  // الهدف: إيجاد صف 'المندوب' وبناء rows صحيحة منه
-
-  const _kws = ['المندوب','مندوب','اسم المندوب'];
-  const _c = s => String(s==null?'':s).replace(/﻿/g,'').replace(/[​-‏‪-‮⁠ ]/g,'').trim();
-
-  // ── حالة 1: نص CSV خام ──
-  if(typeof input === 'string' && input.length > 0){
-    const lines = input.replace(/
-/g,'
-').replace(//g,'
-').split('
-');
-    let hdrIdx = -1, hdrCols = [];
-    for(let i = 0; i < Math.min(lines.length, 20); i++){
-      const cols = lines[i].split(',').map(v => _c(v.replace(/^"|"$/g,'')));
-      if(_kws.some(kw => cols.some(c => c === kw))){
-        hdrIdx = i;
-        hdrCols = cols;
-        break;
-      }
-    }
-    if(hdrIdx < 0) return [];
-    const result = [];
-    for(let i = hdrIdx+1; i < lines.length; i++){
-      if(!lines[i].trim()) continue;
-      const vals = lines[i].split(',').map(v => _c(v.replace(/^"|"$/g,'')));
-      const row = {};
-      hdrCols.forEach((h,j) => { if(h) row[h] = vals[j] || ''; });
-      if(Object.values(row).some(v=>v)) result.push(row);
-    }
-    return result;
-  }
-
-  // ── حالة 2: array of objects من csvToRows (fallback) ──
-  if(Array.isArray(input)){
-    // إذا المفاتيح كلها '' → الملف به صفوف فارغة قبل العناوين
-    // نبحث عن أول صف قيمه تحتوي اسم عمود مثل 'المندوب'
-    for(let i = 0; i < Math.min(input.length, 20); i++){
-      const vals = Object.values(input[i]||{}).map(v=>_c(String(v||'')));
-      if(_kws.some(kw => vals.some(v => v === kw))){
-        // هذا الصف هو العناوين — ابنِ منه
-        const hdrVals = vals;
-        return input.slice(i+1).map(r => {
-          const rVals = Object.values(r).map(v=>_c(String(v||'')));
-          const obj = {};
-          hdrVals.forEach((h,j)=>{ if(h) obj[h]=rVals[j]||''; });
-          return obj;
-        }).filter(r=>Object.values(r).some(v=>v));
-      }
-    }
-    return input; // لا تعديل — الأعمدة صحيحة
-  }
-
-  return [];
-}
-
 async function _autoSyncQuiet(){
-  // قراءة الروابط: من input fields أولاً (المحفوظة) ثم GS_URLS_EMBEDDED كـ fallback
-  const _savedUrlsStr = (() => { try { return localStorage.getItem('ndGsUrls_v2'); } catch(e){ return null; } })();
-  const _savedUrls = _savedUrlsStr ? (() => { try { return JSON.parse(_savedUrlsStr); } catch(e){ return {}; } })() : {};
-  const urls = {
-    sales:      (document.getElementById('gs-sales')?.value?.trim())      || _savedUrls.sales      || GS_URLS_EMBEDDED.sales      || '',
-    collection: (document.getElementById('gs-collection')?.value?.trim()) || _savedUrls.collection || GS_URLS_EMBEDDED.collection || '',
-    debt:       (document.getElementById('gs-debt')?.value?.trim())       || _savedUrls.debt       || GS_URLS_EMBEDDED.debt       || '',
-    inventory:  (document.getElementById('gs-inventory')?.value?.trim())  || _savedUrls.inventory  || GS_URLS_EMBEDDED.inventory  || '',
-    reps:       (document.getElementById('gs-reps')?.value?.trim())       || _savedUrls.reps       || GS_URLS_EMBEDDED.reps       || '',
-    aging:      (document.getElementById('gs-aging')?.value?.trim())      || _savedUrls.aging      || GS_URLS_EMBEDDED.aging      || '',
-  };
-  const keys = ['reps','sales','collection','debt','inventory','aging']; // reps أولاً لضمان بناء _repSuperMap قبل sales
+  const urls = GS_URLS_EMBEDDED;
+  const keys = ['sales','collection','debt','inventory','reps','aging'];
   const msgEl=document.getElementById('loading-msg');
   const progBar=document.getElementById('ld-progress');
   const iconMap={sales:'ldi-sales',collection:'ldi-collection',debt:'ldi-debt',inventory:'ldi-inventory',reps:'ldi-reps',aging:'ldi-aging'};
@@ -7186,127 +7097,57 @@ async function _autoSyncQuiet(){
   });
   if(progBar&&!cacheShown){progBar.className='ld-progress-bar indeterminate';}
 
-  const TIMEOUT_MS=30000;
+  const TIMEOUT_MS=30000; /* 30 ثانية كحد أقصى لكل ملف — ملف المبيعات قد يكون كبيراً */
   let completed=0;
   const freshData={};
 
-  /* ── 3. جلب reps أولاً بشكل تسلسلي لضمان بناء _repSuperMap قبل sales ── */
-  const _fetchOne = async (key) => {
-    const url = urls[key];
-    if(!url) return null;
-    const fetchUrl = url.includes('?') ? url+'&t='+Date.now() : url+'?t='+Date.now();
-    try {
-      const resp = await Promise.race([
-        fetch(fetchUrl,{method:'GET',cache:'no-store'}),
-        new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),TIMEOUT_MS))
-      ]);
-      if(!resp.ok) throw new Error('HTTP '+resp.status);
-      const text = await resp.text();
-      if(!text||text.trim().length<10) throw new Error('فارغ');
-      if(text.trim().startsWith('<!DOCTYPE')||text.trim().startsWith('<html'))
-        throw new Error('HTML بدلاً من CSV');
-      return { key, rows: csvToRows(text), rawText: text };
-    } catch(err) {
-      const ic = document.getElementById(iconMap[key]);
-      if(ic) ic.style.borderColor='var(--red)';
-      console.warn('فشل جلب', key, err.message);
-      if(key === 'reps'){
-        const _dbgEl = document.getElementById('_reps_url_dbg') || (() => {
-          const d = document.createElement('div');
-          d.id = '_reps_url_dbg';
-          d.style = 'position:fixed;bottom:80px;left:10px;z-index:9999;padding:8px 14px;border-radius:10px;font-size:11px;font-family:Cairo,sans-serif;direction:rtl;max-width:90vw;word-break:break-all;box-shadow:0 4px 12px rgba(0,0,0,.2)';
-          document.body.appendChild(d);
-          return d;
-        })();
-        _dbgEl.style.background = '#f05252';
-        _dbgEl.style.color = '#fff';
-        _dbgEl.textContent = '❌ فشل جلب ملف المناديب: ' + err.message;
-        clearTimeout(_dbgEl._t);
-        _dbgEl._t = setTimeout(() => _dbgEl.remove(), 12000);
-      }
-      return null;
-    }
-  };
-
-  /* جلب reps أولاً ومعالجته قبل إطلاق الباقي */
-  // DEBUG مرئي: إظهار URL وحالة الجلب
-  const _repsUrl = urls.reps || '';
-  const _showDbg = (msg, color) => {
-    const el = document.getElementById('_reps_url_dbg') || (() => {
-      const d = document.createElement('div');
-      d.id = '_reps_url_dbg';
-      d.style = 'position:fixed;bottom:80px;left:10px;z-index:9999;padding:8px 14px;border-radius:10px;font-size:11px;font-family:Cairo,sans-serif;direction:rtl;max-width:90vw;word-break:break-all;box-shadow:0 4px 12px rgba(0,0,0,.2)';
-      document.body.appendChild(d);
-      return d;
-    })();
-    el.style.background = color;
-    el.style.color = '#fff';
-    el.textContent = msg;
-    clearTimeout(el._t);
-    el._t = setTimeout(() => el.remove(), 12000);
-  };
-  if(!_repsUrl){
-    _showDbg('❌ URL ملف المناديب فارغ! اذهب لإعدادات وأضف الرابط', '#f05252');
-  } else {
-    _showDbg('⏳ جلب ملف المناديب...', '#f07820');
-  }
-  const repsResult = await _fetchOne('reps');
-  if(repsResult){
-    _showDbg('✅ تم جلب ملف المناديب: ' + repsResult.rows.length + ' صف', '#059669');
-    // نُمرر rawText أولاً للحصول على parsing صحيح
-    const _repsRows = _parseRepsRows(repsResult.rawText || repsResult.rows);
-    console.log('[REPS-PARSE] نتيجة:', _repsRows.length, 'صف | أول صف:', JSON.stringify(_repsRows[0]||{}).substring(0,120));
-    const _finalRows = _repsRows.length ? _repsRows : repsResult.rows;
-    freshData['reps'] = _finalRows;
-    processNewData('reps', _finalRows);
-    completed++;
-    const ic = document.getElementById(iconMap['reps']);
-    if(ic) ic.className='ld-icon-box loaded';
-  }
-
-  /* الآن أطلق باقي الملفات بالتوازي */
-  const otherKeys = keys.filter(k => k !== 'reps');
-  const promises = otherKeys.map(async key => {
-    const url = urls[key];
-    if(!url) return null;
-    const fetchUrl = url.includes('?') ? url+'&t='+Date.now() : url+'?t='+Date.now();
-    try {
-      const fetchPromise = fetch(fetchUrl,{method:'GET',cache:'no-store'});
-      const timeoutPromise = new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),TIMEOUT_MS));
-      const resp = await Promise.race([fetchPromise, timeoutPromise]);
-      if(!resp.ok) throw new Error('HTTP '+resp.status);
-      const text = await resp.text();
-      if(!text||text.trim().length<10) throw new Error('فارغ');
+  /* ── 3. كل ملف يُعالج فور وصوله (لا انتظار للكل) ── */
+  const promises=keys.map(async key=>{
+    const url=urls[key];
+    if(!url)return null;
+    const fetchUrl=url.includes('?')?url+'&t='+Date.now():url+'?t='+Date.now();
+    try{
+      /* fetch مع timeout — نستخدم Promise.race بدلاً من AbortSignal لتجنب مشكلة الاستنساخ */
+      const fetchPromise=fetch(fetchUrl,{method:'GET',cache:'no-store'});
+      const timeoutPromise=new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),TIMEOUT_MS));
+      const resp=await Promise.race([fetchPromise,timeoutPromise]);
+      if(!resp.ok)throw new Error(`HTTP ${resp.status}`);
+      const text=await resp.text();
+      if(!text||text.trim().length<10)throw new Error('فارغ');
       if(text.trim().startsWith('<!DOCTYPE')||text.trim().startsWith('<html'))
         throw new Error('HTML بدلاً من CSV');
 
-      const rows = csvToRows(text);
-      freshData[key] = rows;
-      processNewData(key, rows);
+      /* ── عالج وعرض فوراً بدون انتظار الملفات الأخرى ── */
+      const rows=csvToRows(text);
+      freshData[key]=rows;
+      processNewData(key,rows);
       completed++;
 
-      const ic = document.getElementById(iconMap[key]);
-      if(ic) ic.className='ld-icon-box loaded';
+      /* تحديث UI فوري */
+      const ic=document.getElementById(iconMap[key]);
+      if(ic)ic.className='ld-icon-box loaded';
       if(progBar){
         progBar.className='ld-progress-bar';
         progBar.style.width=(completed/keys.length*100)+'%';
       }
-      if(msgEl) msgEl.textContent=`تم تحميل ${completed} من ${keys.length}...`;
+      if(msgEl)msgEl.textContent=`تم تحميل ${completed} من ${keys.length}...`;
 
+      /* تحديث عند أول ملف ناجح — صامت فقط */
       if(completed===1&&!cacheShown){
         _invalidatePageCache();
         populateMonthSelects();
         populateRepSelects();
       } else if(completed>1){
+        /* تحديث صامت للصفحة الحالية — مع تحديث قوائم المشرفين */
         populateRepSelects();
         const p=window.currentPage||'overview';
         if(PAGE_RENDERS[p])PAGE_RENDERS[p]();
       }
       return {key,rows};
-    } catch(err) {
-      const ic = document.getElementById(iconMap[key]);
-      if(ic) ic.style.borderColor='var(--red)';
-      console.warn('فشل جلب', key, err.message);
+    }catch(err){
+      const ic=document.getElementById(iconMap[key]);
+      if(ic)ic.style.borderColor='var(--red)';
+      console.warn('فشل جلب',key,err.message);
       return null;
     }
   });
@@ -7314,9 +7155,6 @@ async function _autoSyncQuiet(){
   /* انتظر انتهاء الكل بما فيها ملف الأهداف */
   const allPromises=targetsFetchPromise?[...promises,targetsFetchPromise]:promises;
   await Promise.allSettled(allPromises);
-
-  /* بعد اكتمال الكل — تأكيد تعبئة قوائم المشرفين بكل البيانات المتاحة */
-  try { populateRepSelects(); } catch(e){}
 
   const synced=completed;
 
@@ -7365,10 +7203,8 @@ async function _autoSyncQuiet(){
     _hideLoadingOverlay();
   } else {
     /* فشل كل شيء لكن يوجد cache — أظهر اللوحة بالبيانات القديمة */
-    // معالجة reps أولاً من الكاش لضمان _repSuperMap
-    if(cachedDataBackup['reps']) processNewData('reps', cachedDataBackup['reps']);
     Object.entries(cachedDataBackup).forEach(([key,rows])=>{
-      if(key !== 'reps') processNewData(key,rows);
+      processNewData(key,rows);
     });
     _invalidatePageCache();
     populateMonthSelects();
@@ -7453,9 +7289,6 @@ async function syncGoogleSheets(){
     }
   });
   if(targetsOk)synced++;
-
-  /* تأكيد تعبئة قوائم المشرفين بعد اكتمال المزامنة */
-  try { populateRepSelects(); } catch(e){}
 
   if(prog)prog.style.width='100%';
   statusEl.textContent=`✅ تمت المزامنة: ${synced} ملف${errors?` — ❌ ${errors} خطأ`:''}`;
