@@ -5528,10 +5528,10 @@ function parseExcel(buffer){
 
 // ── قراءة خام كـ array of arrays (لملفات ذات هيكل خاص كأهداف الأصناف) ──
 function parseExcelRaw(buffer){
-  const wb=XLSX.read(buffer,{type:'array',cellDates:false,raw:false});
+  const wb=XLSX.read(buffer,{type:'array',cellDates:false,raw:true});
   const sheet=wb.Sheets[wb.SheetNames[0]];
   if(!sheet['!ref'])return[];
-  return XLSX.utils.sheet_to_json(sheet,{header:1,defval:null,raw:false});
+  return XLSX.utils.sheet_to_json(sheet,{header:1,defval:null,raw:true});
 }
 
 
@@ -6340,10 +6340,16 @@ function processNewData(type,rows){
       const rawRows = rows&&rows.length ? rows : [];
       if(!rawRows||!rawRows.length){toast('⚠ لم يتم تحميل ملف الأهداف','error');break;}
 
-      // rawRows[2]=النسب، rawRows[3]=الرؤوس، rawRows[4+]=البيانات
-      const ratioRow = rawRows[2]||[];
-      const hdrRow6  = rawRows[3]||[];
-      const dataStartIdx = 4;
+      // ابحث ديناميكياً عن صف النسب وصف الرؤوس
+      let ratioRow=[], hdrRow6=[], dataStartIdx=4;
+      for(let _i=0;_i<Math.min(rawRows.length,15);_i++){
+        const _r=rawRows[_i]||[];
+        const _hasRatios=_r.filter(v=>typeof v==='number'&&v>0&&v<1).length>=4;
+        const _hasHdr=_r.some(v=>String(v||'').includes('أجمالي الكمية'));
+        if(_hasRatios&&!ratioRow.length)ratioRow=_r;
+        if(_hasHdr&&!hdrRow6.length){hdrRow6=_r;dataStartIdx=_i+1;}
+        if(ratioRow.length&&hdrRow6.length)break;
+      }
 
       // ابحث عن مواضع "الصنف" و"أجمالي الكمية" في صف الرأس
       const _prodColIdxs=[], _totalColIdxs=[];
