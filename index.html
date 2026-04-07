@@ -6849,7 +6849,11 @@ async function _autoSyncQuiet(){
     const dot=document.getElementById('status-dot');
     if(dot)dot.style.background='var(--accent2)';
 
-    /* إخفاء شاشة التحميل إن لم تُخفَ بعد */
+    /* إظهار اللوحة وإخفاء شاشة التحميل */
+    const _mainEl=document.getElementById('main');
+    const _sideEl=document.getElementById('sidebar');
+    if(_mainEl&&_mainEl.style.display==='none')_mainEl.style.display='';
+    if(_sideEl&&_sideEl.style.display==='none')_sideEl.style.display='';
     _hideLoadingOverlay();
   } else if(!cachedDataBackup){
     /* فشل كل شيء + لا cache */
@@ -6868,6 +6872,10 @@ async function _autoSyncQuiet(){
     const p=window.currentPage||'overview';
     if(PAGE_RENDERS[p])PAGE_RENDERS[p]();
     if(msgEl)msgEl.textContent='⚠️ تعذّر التحديث — تم عرض آخر بيانات محفوظة';
+    const _mainEl2=document.getElementById('main');
+    const _sideEl2=document.getElementById('sidebar');
+    if(_mainEl2&&_mainEl2.style.display==='none')_mainEl2.style.display='';
+    if(_sideEl2&&_sideEl2.style.display==='none')_sideEl2.style.display='';
     _hideLoadingOverlay();
   }
 
