@@ -14,22 +14,41 @@
    DURALUX THEME — Light mode (default)
 ══════════════════════════════════════════════ */
 :root{
-  --bg:#f2f4f9;--surface:#ffffff;--surface2:#f8f9fc;--surface3:#eef0f6;
-  --border:#e4e6ef;--border2:#d1d5e0;
-  --accent:#4361ee;--accent2:#2ec4b6;--accent3:#ff9f43;--gold:#f6c90e;
-  --red:#ee4d4d;--purple:#7c3aed;--pink:#e91e8c;
-  --text:#1e2749;--text2:#5b6580;--muted:#9ba5bf;
-  --r-sm:5px;--r-md:8px;--r-lg:12px;--r-xl:16px;
+  /* ═══ نمط الصور: خلفية بيضاء ناعمة، بطاقات ناصعة، ظلال خفيفة ═══ */
+  --bg:#f0f2f8;
+  --surface:#ffffff;
+  --surface2:#f7f8fc;
+  --surface3:#eef0f8;
+  --border:#e8eaf5;
+  --border2:#d8daf0;
+
+  /* ألوان ركان: أزرق للاكسنت الأساسي، برتقالي للثانوي */
+  --accent:#2c5de5;
+  --accent2:#f07820;
+  --accent3:#ff9f43;
+  --gold:#f6c90e;
+  --red:#f05252;
+  --purple:#7c3aed;
+  --pink:#e91e8c;
+
+  --text:#1a2240;
+  --text2:#5a6482;
+  --muted:#9ba5c0;
+
+  /* زوايا دائرية كبيرة كما في الصور */
+  --r-sm:8px;--r-md:14px;--r-lg:20px;--r-xl:24px;
   --gap:20px;--nav-w:240px;
-  --shadow:0 2px 8px rgba(67,97,238,.06),0 1px 3px rgba(0,0,0,.05);
-  --shadow-lg:0 8px 32px rgba(67,97,238,.12),0 2px 8px rgba(0,0,0,.06);
-  --shadow-card:0 0 0 1px rgba(0,0,0,.04),0 2px 12px rgba(0,0,0,.06);
+
+  /* ظلال ناعمة جداً كما في الصور */
+  --shadow:0 2px 12px rgba(44,93,229,.05),0 1px 3px rgba(0,0,0,.03);
+  --shadow-lg:0 8px 40px rgba(44,93,229,.10),0 2px 10px rgba(0,0,0,.05);
+  --shadow-card:0 2px 20px rgba(44,93,229,.06),0 0 0 1px rgba(232,234,245,.8);
 }
 /* Dark mode */
 body.dark{
   --bg:#0f1535;--surface:#1a2150;--surface2:#1e2a5e;--surface3:#223070;
   --border:#2a3870;--border2:#344590;
-  --accent:#4d6ef7;--accent2:#2ec4b6;--accent3:#ff9f43;--gold:#f6c90e;
+  --accent:#5b7cf5;--accent2:#f07820;--accent3:#ff9f43;--gold:#f6c90e;
   --red:#f87171;--purple:#a78bfa;--pink:#f472b6;
   --text:#dde3f8;--text2:#8fa8c8;--muted:#4a5a80;
   --shadow:0 2px 8px rgba(0,0,0,.3),0 1px 3px rgba(0,0,0,.2);
@@ -40,10 +59,15 @@ body.dark{
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{
-  background:var(--bg);color:var(--text);
+  background: linear-gradient(145deg, #edf0fc 0%, #f5f7fe 35%, #fdf6ef 65%, #f8f3fd 100%);
+  background-attachment: fixed;
+  color:var(--text);
   font-family:'Cairo',sans-serif;font-size:13px;line-height:1.6;
   min-height:100vh;direction:rtl;
   transition:background .25s,color .25s;
+}
+body.dark{
+  background: linear-gradient(145deg, #0b0f28 0%, #0f1535 50%, #1a0e04 100%) fixed;
 }
 
 /* ══════════════════════════════════════════════
@@ -54,11 +78,11 @@ body{
   background:var(--surface);border-left:1px solid var(--border);
   display:flex;flex-direction:column;z-index:200;overflow:hidden;
   transition:width .3s cubic-bezier(.4,0,.2,1);
-  box-shadow:2px 0 20px rgba(67,97,238,.06);
+  box-shadow:2px 0 20px rgba(44,93,229,.06);
 }
 #sidebar.collapsed{width:64px}
 .sidebar-header{
-  padding:0 16px;border-bottom:1px solid var(--border);
+  padding:0 16px;border-bottom:1px solid rgba(232,234,245,0.9);
   display:flex;align-items:center;gap:12px;height:70px;flex-shrink:0;
 }
 .sidebar-logo{
@@ -281,11 +305,11 @@ body.nav-collapsed #main{
   font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;
 }
 .btn:hover{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 5%,transparent)}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 4px 12px rgba(67,97,238,.25)}
-.btn.primary:hover{opacity:.92;box-shadow:0 6px 18px rgba(67,97,238,.35)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 4px 12px rgba(44,93,229,.25)}
+.btn.primary:hover{opacity:.92;box-shadow:0 6px 18px rgba(44,93,229,.35)}
 .btn.danger{border-color:color-mix(in srgb,var(--red) 35%,transparent);color:var(--red)}
-.btn.success{background:var(--accent2);border-color:var(--accent2);color:#fff;box-shadow:0 4px 12px rgba(46,196,182,.25)}
-.btn.success:hover{opacity:.9;box-shadow:0 6px 18px rgba(46,196,182,.35)}
+.btn.success{background:var(--accent2);border-color:var(--accent2);color:#fff;box-shadow:0 4px 12px rgba(240,120,32,.25)}
+.btn.success:hover{opacity:.9;box-shadow:0 6px 18px rgba(240,120,32,.35)}
 .last-update{font-size:11px;color:var(--muted);white-space:nowrap}
 
 /* ── زر الطباعة A4 ── */
@@ -297,12 +321,12 @@ body.nav-collapsed #main{
   color:var(--accent);font-family:'Cairo',sans-serif;
   font-size:12px;font-weight:700;cursor:pointer;
   transition:all .18s;white-space:nowrap;
-  box-shadow:0 1px 4px rgba(67,97,238,.1);
+  box-shadow:0 1px 4px rgba(44,93,229,.1);
 }
 .btn-print-a4:hover{
   background:var(--accent);color:#fff;
   border-color:var(--accent);
-  box-shadow:0 4px 14px rgba(67,97,238,.3);
+  box-shadow:0 4px 14px rgba(44,93,229,.3);
   transform:translateY(-1px);
 }
 .btn-print-a4 svg{width:15px;height:15px;flex-shrink:0}
@@ -497,7 +521,7 @@ tbody tr:last-child{border-bottom:none}
 ══════════════════════════════════════════════ */
 #upload-modal{display:none;position:fixed;inset:0;z-index:999;background:rgba(30,39,73,.5);backdrop-filter:blur(8px);align-items:center;justify-content:center}
 #upload-modal.open{display:flex}
-.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;width:min(620px,95vw);max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(67,97,238,.18),0 4px 16px rgba(0,0,0,.1)}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;width:min(620px,95vw);max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(44,93,229,.18),0 4px 16px rgba(0,0,0,.1)}
 .modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
 .modal-title{font-size:15px;font-weight:700;letter-spacing:-.2px}
 .modal-close{background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;line-height:1;transition:color .2s;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px}
@@ -570,7 +594,7 @@ tbody tr:last-child{border-bottom:none}
 /* ══════════════════════════════════════════════
    GLOBAL FILTER BAR — Duralux Style
 ══════════════════════════════════════════════ */
-#global-filter-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;position:sticky;top:64px;z-index:99;transition:all .3s;box-shadow:0 2px 8px rgba(67,97,238,.04)}
+#global-filter-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;position:sticky;top:64px;z-index:99;transition:all .3s;box-shadow:0 2px 8px rgba(44,93,229,.04)}
 #global-filter-bar.hidden{display:none}
 .gf-label{font-size:11px;color:var(--accent);font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:5px}
 .gf-select,.gf-input{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-md);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;padding:5px 11px;outline:none;transition:border-color .2s,box-shadow .2s;height:32px}
@@ -656,7 +680,7 @@ body.dark .filter-bar input[type="date"]{color-scheme:dark}
   position:fixed;bottom:0;left:0;right:0;z-index:300;
   background:var(--surface);
   border-top:1px solid var(--border);
-  box-shadow:0 -8px 32px rgba(67,97,238,.12);
+  box-shadow:0 -8px 32px rgba(44,93,229,.12);
   padding:0;
   height:68px;
 }
@@ -748,7 +772,7 @@ body.dark .filter-bar input[type="date"]{color-scheme:dark}
   width:48px;height:48px;border-radius:50%;
   background:var(--accent2);border:none;
   color:#fff;font-size:20px;
-  box-shadow:0 4px 18px rgba(46,196,182,.45);
+  box-shadow:0 4px 18px rgba(240,120,32,.45);
   cursor:pointer;transition:all .2s;
   align-items:center;justify-content:center;
 }
@@ -1044,7 +1068,7 @@ body.dark tbody td{color:var(--text)}
 /* Mobile FAB upgrade */
 #mob-upload-fab{
   background:var(--accent2);
-  box-shadow:0 4px 18px rgba(46,196,182,.45);
+  box-shadow:0 4px 18px rgba(240,120,32,.45);
 }
 
 /* Card filter bar buttons */
@@ -1309,6 +1333,199 @@ tbody tr:last-child{border-bottom:none}
     outline: 2px solid black !important;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5) !important;
 }
+
+/* ════════════════════════════════════════════
+   نمط الصور: Soft Minimal Dashboard
+   خلفية بيضاء ناعمة، ظلال رقيقة، زوايا كبيرة
+════════════════════════════════════════════ */
+
+/* خلفية الصفحة — متدرجة ناعمة كما في الصور */
+body:not(.dark) {
+  background: linear-gradient(145deg,
+    #f0f3fd 0%,
+    #f5f7fd 30%,
+    #fdf5ef 70%,
+    #f8f3fd 100%) fixed !important;
+}
+
+/* ═══ SIDEBAR ═══ */
+#sidebar {
+  background: #ffffff !important;
+  border-left: 1px solid rgba(232,234,245,0.8) !important;
+  box-shadow: -4px 0 30px rgba(44,93,229,.04) !important;
+}
+
+/* ═══ TOPBAR ═══ */
+#topbar {
+  background: rgba(255,255,255,0.95) !important;
+  border-bottom: 1px solid rgba(232,234,245,0.9) !important;
+  box-shadow: 0 1px 20px rgba(44,93,229,.04) !important;
+  backdrop-filter: blur(8px);
+}
+
+/* ═══ KPI CARDS — نمط الصور ═══ */
+.kpi-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(232,234,245,0.9) !important;
+  border-radius: 22px !important;
+  box-shadow: 0 2px 20px rgba(44,93,229,.06), 0 0 0 1px rgba(232,234,245,0.6) !important;
+  transition: transform .2s ease, box-shadow .2s ease !important;
+  overflow: hidden;
+}
+.kpi-card:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 8px 32px rgba(44,93,229,.10), 0 0 0 1px rgba(44,93,229,.08) !important;
+}
+
+/* شريط اللون العلوي للبطاقة */
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--kpi-color, var(--accent));
+  border-radius: 22px 22px 0 0;
+  opacity: 0.7;
+}
+
+/* أيقونة KPI */
+.kpi-icon {
+  border-radius: 14px !important;
+  background: color-mix(in srgb, var(--kpi-color,var(--accent)) 10%, #ffffff) !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* قيمة KPI الرقمية */
+.kpi-value {
+  font-weight: 800 !important;
+  color: var(--kpi-color, var(--text)) !important;
+  letter-spacing: -0.5px !important;
+}
+
+/* ═══ CARDS — نمط الصور ═══ */
+.card {
+  background: #ffffff !important;
+  border: 1px solid rgba(232,234,245,0.9) !important;
+  border-radius: 22px !important;
+  box-shadow: 0 2px 20px rgba(44,93,229,.05) !important;
+}
+
+/* ═══ FILTER BAR ═══ */
+.filter-bar {
+  background: #ffffff !important;
+  border: 1px solid rgba(232,234,245,0.9) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 2px 12px rgba(44,93,229,.04) !important;
+}
+
+/* ═══ TABLE WRAP ═══ */
+.table-wrap {
+  background: #ffffff !important;
+  border: 1px solid rgba(232,234,245,0.9) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 2px 20px rgba(44,93,229,.05) !important;
+}
+thead tr {
+  background: #f7f8fc !important;
+}
+
+/* ═══ NAV ITEMS ═══ */
+.nav-item.active {
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--accent) 12%, transparent),
+    color-mix(in srgb, var(--accent) 5%, transparent)) !important;
+  color: var(--accent) !important;
+}
+.nav-item.active::after {
+  background: var(--accent) !important;
+}
+.nav-item:hover {
+  background: rgba(44,93,229,.05) !important;
+}
+
+/* ═══ BUTTONS ═══ */
+.btn.primary {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: #fff !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 14px rgba(44,93,229,.25) !important;
+}
+.btn.success {
+  background: var(--accent2) !important;
+  border-color: var(--accent2) !important;
+  color: #fff !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 14px rgba(240,120,32,.22) !important;
+}
+.btn {
+  border-radius: 12px !important;
+}
+
+/* ═══ AGING BUCKETS ═══ */
+.aging-bucket {
+  background: #ffffff !important;
+  border: 1px solid rgba(232,234,245,0.9) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 2px 16px rgba(44,93,229,.05) !important;
+}
+
+/* ═══ MOBILE BOTTOM NAV ═══ */
+#mobile-bottom-nav {
+  background: rgba(255,255,255,.95) !important;
+  backdrop-filter: blur(12px) !important;
+  border-top: 1px solid rgba(232,234,245,.9) !important;
+  box-shadow: 0 -4px 20px rgba(44,93,229,.06) !important;
+}
+
+/* ═══ SECTION TITLE ═══ */
+.section-title span { color: var(--accent) !important; }
+
+/* ═══ BADGES ═══ */
+.nav-badge {
+  background: var(--accent) !important;
+  border-radius: 999px !important;
+}
+
+/* ═══ TOPBAR BUTTONS ═══ */
+.tb-icon-btn, #theme-toggle {
+  border-radius: 12px !important;
+  border: 1px solid rgba(232,234,245,.9) !important;
+  background: #ffffff !important;
+}
+
+/* ═══ GLOBAL FILTER ═══ */
+#global-filter-bar {
+  background: rgba(255,255,255,.92) !important;
+  backdrop-filter: blur(8px) !important;
+  border-bottom: 1px solid rgba(232,234,245,.9) !important;
+}
+
+/* ═══ SCROLLBAR ═══ */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(44,93,229,.15); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ═══ SDZ CARDS ═══ */
+.sdz-card {
+  background: #ffffff !important;
+  border-radius: 18px !important;
+}
+
+/* ═══ الوضع الداكن: محافظة على التصميم ═══ */
+body.dark .kpi-card,
+body.dark .card,
+body.dark .filter-bar,
+body.dark .table-wrap,
+body.dark .aging-bucket {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+}
+body.dark #sidebar { background: var(--surface) !important; }
+body.dark #topbar { background: rgba(26,33,80,.95) !important; }
+
 </style></head>
 <body>
 
@@ -1593,50 +1810,50 @@ tbody tr:last-child{border-bottom:none}
     <!-- ── صف البطاقات الرئيسية ── -->
     <div class="kpi-grid" id="kpi-overview">
     <div class="kpi-card" style="--kpi-color:var(--accent)">
-      <div class="kpi-top"><div class="kpi-icon">📦</div><span class="kpi-top-menu">⋯</span></div>
+      <div class="kpi-top"><div class="kpi-icon">📦</div></div>
       <div class="kpi-label">إجمالي المبيعات</div>
       <div class="kpi-value">0</div>
       <div class="kpi-sub">قبل المرتجعات</div>
     </div>
     <div class="kpi-card" style="--kpi-color:var(--red)">
-      <div class="kpi-top"><div class="kpi-icon">↩️</div><span class="kpi-top-menu">⋯</span></div>
+      <div class="kpi-top"><div class="kpi-icon">↩️</div></div>
       <div class="kpi-label">إجمالي المرتجعات</div>
       <div class="kpi-value">0</div>
       <div class="kpi-sub">0.00% من المبيعات</div>
     </div>
     <div class="kpi-card" style="--kpi-color:var(--accent2)">
-      <div class="kpi-top"><div class="kpi-icon">💰</div><span class="kpi-top-menu">⋯</span></div>
+      <div class="kpi-top"><div class="kpi-icon">💰</div></div>
       <div class="kpi-label">صافي المبيعات</div>
       <div class="kpi-value">0</div>
       <div class="kpi-sub">بعد المرتجعات</div>
     </div>
     <div class="kpi-card" style="--kpi-color:var(--accent2)">
-      <div class="kpi-top"><div class="kpi-icon">✅</div><span class="kpi-top-menu">⋯</span></div>
+      <div class="kpi-top"><div class="kpi-icon">✅</div></div>
       <div class="kpi-label">إجمالي التحصيلات</div>
       <div class="kpi-value">0</div>
       <div class="kpi-sub"><span style="color:#7c6fff">🏦 0 (0.0%)</span> &nbsp; <span style="color:var(--gold)">💵 0 (0.0%)</span></div>
     </div>
     <div class="kpi-card" style="--kpi-color:var(--red)">
-      <div class="kpi-top"><div class="kpi-icon">📊</div><span class="kpi-top-menu">⋯</span></div>
+      <div class="kpi-top"><div class="kpi-icon">📊</div></div>
       <div class="kpi-label">نسبة التحصيل ROI</div>
       <div class="kpi-value">0.00%</div>
       <div class="kpi-sub">من صافي المبيعات</div>
       <div class="ov-kpi-bar"><div class="ov-kpi-bar-fill" style="width:0.0%;background:var(--red)"></div></div>
     </div>
     <div class="kpi-card" style="--kpi-color:var(--accent3)">
-      <div class="kpi-top"><div class="kpi-icon">⚠️</div><span class="kpi-top-menu">⋯</span></div>
+      <div class="kpi-top"><div class="kpi-icon">⚠️</div></div>
       <div class="kpi-label">صافي المديونيات</div>
       <div class="kpi-value">0</div>
       <div class="kpi-sub">دينار</div>
     </div>
     <div class="kpi-card" style="--kpi-color:var(--accent2)">
-      <div class="kpi-top"><div class="kpi-icon">🔴</div><span class="kpi-top-menu">⋯</span></div>
+      <div class="kpi-top"><div class="kpi-icon">🔴</div></div>
       <div class="kpi-label">الفجوة غير المحصّلة</div>
       <div class="kpi-value">0</div>
       <div class="kpi-sub">📈 تحصيل فائض</div>
     </div>
     <div class="kpi-card" style="--kpi-color:var(--purple)">
-      <div class="kpi-top"><div class="kpi-icon">👤</div><span class="kpi-top-menu">⋯</span></div>
+      <div class="kpi-top"><div class="kpi-icon">👤</div></div>
       <div class="kpi-label">المناديب النشطون</div>
       <div class="kpi-value">0</div>
       <div class="kpi-sub">0 إجمالي</div>
@@ -2850,12 +3067,33 @@ function kpiCard(icon,label,value,color,sub,badge){
   return`<div class="kpi-card" style="--kpi-color:${color}">
     <div class="kpi-top">
       <div class="kpi-icon">${icon}</div>
-      <span class="kpi-top-menu" title="خيارات">⋯</span>
     </div>
     <div class="kpi-label">${label}</div>
     <div class="kpi-value">${dispVal}</div>
     ${sub?`<div class="kpi-sub">${sub}</div>`:''}
     ${badge?`<span class="kpi-badge" style="margin-top:6px;display:inline-block">${badge}</span>`:''}
+  </div>`;
+}
+
+// دالة بطاقة KPI مع عرض الكمية كسطر إضافي داخل البطاقة
+function kpiCardWithQty(icon,label,value,color,sub,qty,qtyLabel){
+  let dispVal=value;
+  if(typeof value==='number'&&!isNaN(value)){
+    dispVal=value.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2});
+  }
+  const qtyStr=typeof qty==='number'?qty.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0}):qty;
+  return`<div class="kpi-card" style="--kpi-color:${color}">
+    <div class="kpi-top">
+      <div class="kpi-icon">${icon}</div>
+    </div>
+    <div class="kpi-label">${label}</div>
+    <div class="kpi-value">${dispVal}</div>
+    ${sub?`<div class="kpi-sub">${sub}</div>`:''}
+    <div class="kpi-sub" style="margin-top:4px;padding-top:4px;border-top:1px solid rgba(0,0,0,.06);display:flex;align-items:center;gap:5px">
+      <span style="font-size:11px;opacity:.6">${qtyLabel||'الكمية'}:</span>
+      <span style="font-weight:700;color:${color}">${qtyStr}</span>
+      <span style="font-size:10px;opacity:.55">وحدة</span>
+    </div>
   </div>`;
 }
 
@@ -3036,11 +3274,10 @@ function renderSalesPage(){
     const fQtyRet=retRows.reduce((s,r)=>s+_n(r[kQtyF]),0);
     const fNetQty=fQtySale-fQtyRet;
     document.getElementById('kpi-sales').innerHTML=
-      kpiCard('💵','إجمالي المبيعات',fSales,'var(--accent)',(isFiltered?'(مفلتر) ':'')+'قبل المرتجعات &nbsp;·&nbsp; <span style="color:var(--accent);font-weight:700">'+fQtySale.toLocaleString('en-US',{maximumFractionDigits:0})+' وحدة</span>')+
-      kpiCard('✅','صافي المبيعات',fNet,'var(--accent2)','بعد المرتجعات &nbsp;·&nbsp; <span style="color:var(--accent2);font-weight:700">'+fNetQty.toLocaleString('en-US',{maximumFractionDigits:0})+' وحدة</span>')+
-      kpiCard('🔢','صافي مبيعات الكميات',fNetQty.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0}),'var(--accent)','وحدة (مبيع − مرتجع)')+
-      kpiCard('↩','المرتجعات',fRet,'var(--red)','<span style="color:var(--red)">'+fRetPct+'% من المبيعات</span> &nbsp;·&nbsp; <span style="font-weight:700">'+fQtyRet.toLocaleString('en-US',{maximumFractionDigits:0})+' وحدة</span>')+
-      kpiCard('💰','التحصيلات',fCol,'var(--accent2)',fColPct+'% ROI')+
+      kpiCard('💵','إجمالي المبيعات',fSales,'var(--accent)',(isFiltered?'(مفلتر) ':'')+'قبل المرتجعات')+
+      kpiCardWithQty('↩','المرتجعات',fRet,'var(--red)',fRetPct+'% من المبيعات',fQtyRet,'الكمية')+
+      kpiCard('✅','صافي المبيعات',fNet,'var(--accent2)','بعد المرتجعات')+
+      kpiCard('💰','التحصيلات',fCol,'var(--accent2)',fColPct+'% من الصافي')+
       kpiCard('🔴','الفجوة غير محصّل',fGap,'var(--accent3)',fGap<0?'📈 زيادة تحصيل':'')+
       kpiCard('🧾','الفواتير',fInv,'var(--gold)','')+
       kpiCard('👥','الزبائن',fCust,'var(--purple)','زبون نشط');
@@ -3050,15 +3287,14 @@ function renderSalesPage(){
     const colPct=k.net_sales>0?(k.total_collected/k.net_sales*100).toFixed(1):0;
     const gap=k.net_sales-k.total_collected;
     const _repsF2=D.reps_full||[];
-    const _allQtyGross=_repsF2.reduce((s,r)=>s+(r.qty||0),0);
-    const _allRetQty=_repsF2.reduce((s,r)=>s+(r.retQty||0),0);
-    const _allNetQty=_allQtyGross-_allRetQty;
+    const _allNetQty=_repsF2.reduce((s,r)=>s+(r.qty||0),0)-_repsF2.reduce((s,r)=>s+(r.retQty||0),0);
+    const _allQtySale=_repsF2.reduce((s,r)=>s+(r.qty||0),0);
+    const _allQtyRet=_repsF2.reduce((s,r)=>s+(r.retQty||0),0);
     document.getElementById('kpi-sales').innerHTML=
-      kpiCard('💵','إجمالي المبيعات',k.total_sales,'var(--accent)','قبل المرتجعات &nbsp;·&nbsp; <span style="color:var(--accent);font-weight:700">'+_allQtyGross.toLocaleString('en-US',{maximumFractionDigits:0})+' وحدة</span>')+
-      kpiCard('✅','صافي المبيعات',k.net_sales,'var(--accent2)','بعد المرتجعات &nbsp;·&nbsp; <span style="color:var(--accent2);font-weight:700">'+_allNetQty.toLocaleString('en-US',{maximumFractionDigits:0})+' وحدة</span>')+
-      kpiCard('🔢','صافي مبيعات الكميات',_allNetQty.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0}),'var(--accent)','وحدة (مبيع − مرتجع)')+
-      kpiCard('↩','المرتجعات',k.total_returns,'var(--red)','<span style="color:var(--red)">'+retPct+'% من المبيعات</span> &nbsp;·&nbsp; <span style="font-weight:700">'+_allRetQty.toLocaleString('en-US',{maximumFractionDigits:0})+' وحدة</span>')+
-      kpiCard('💰','التحصيلات',k.total_collected,'var(--accent2)',colPct+'% ROI')+
+      kpiCard('💵','إجمالي المبيعات',k.total_sales,'var(--accent)','قبل المرتجعات')+
+      kpiCardWithQty('↩','المرتجعات',k.total_returns,'var(--red)',retPct+'% من المبيعات',_allQtyRet,'الكمية')+
+      kpiCard('✅','صافي المبيعات',k.net_sales,'var(--accent2)','بعد المرتجعات')+
+      kpiCard('💰','التحصيلات',k.total_collected,'var(--accent2)',colPct+'% من الصافي')+
       kpiCard('🔴','الفجوة غير محصّل',gap,'var(--accent3)',gap<0?'📈 زيادة تحصيل':'')+
       kpiCard('🧾','الفواتير',k.total_invoices,'var(--gold)','')+
       kpiCard('👥','الزبائن',k.total_customers,'var(--purple)','زبون نشط')+
@@ -3066,7 +3302,7 @@ function renderSalesPage(){
   }
 
   // ── الرسوم البيانية الشهرية (تتفاعل مع الفلتر) ─────────────────────────────
-  _renderMonthlyTable(repF,monthF,typeF);
+  _renderMonthlyTable(repF,monthF,typeF,supF_s);
 
   // قوائم الترتيب — من الصفوف المفلترة إن وُجد فلتر
   if(repF){
@@ -3079,7 +3315,7 @@ function renderSalesPage(){
   buildSalesTable();
 }
 
-function _renderMonthlyTable(repF,monthF,typeF){
+function _renderMonthlyTable(repF,monthF,typeF,supF_s){
   const ms=_buildMonthlyStats(repF,monthF,typeF,supF_s);
   // رسم خطي
   const months=ms.labels;
@@ -3186,6 +3422,7 @@ function _buildMonthlyStats(repF,monthF,typeF,supF_s){D.monthly_stats=null;
 }
 
 function buildSalesTable(){
+  const supF  =document.getElementById('f-sales-sup')?.value||'';
   const repF  =document.getElementById('f-sales-rep')?.value||'';
   const monthF=document.getElementById('f-sales-month')?.value||document.getElementById('f-sales-month-q')?.value||'';
   const typeF =document.getElementById('f-sales-type')?.value||'';
@@ -3203,6 +3440,7 @@ function buildSalesTable(){
     const kDate=_fc('التاريخ','تاريخ');
     const kCust=_fc('اسم الزبون','الزبون','العميل');
     const kMat =_fc('المادة','الصنف','المنتج');
+    if(supF)  rows=rows.filter(r=>(D._repSuperMap&&D._repSuperMap[_cn(r[kRep])])===supF);
     if(repF)  rows=rows.filter(r=>_cn(r[kRep])===repF);
     if(typeF) rows=rows.filter(r=>_cn(r[kType])===typeF);
     if(custF) rows=rows.filter(r=>(_cn(r[kCust])||'').toLowerCase().includes(custF));
@@ -3865,11 +4103,11 @@ function renderRepGoalsPage(){
   else destroyChart('ch-rg-ach');
   // رسم الهدف vs الفعلي
   const topT=repAchArr.filter(r=>r.target>0).sort((a,b)=>b.target-a.target).slice(0,10);
-  if(topT.length) mkChart('ch-rg-target-vs-actual',{type:'bar',data:{labels:topT.map(r=>r.name.substring(0,15)),datasets:[{label:'الهدف',data:topT.map(r=>r.target),backgroundColor:'rgba(246,201,14,.7)'},{label:'الفعلي',data:topT.map(r=>r.actual),backgroundColor:'rgba(67,97,238,.7)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'var(--text)'}},datalabels:{display:false}},scales:{x:{ticks:{color:'var(--text2)',font:{size:10}}},y:{ticks:{color:'var(--text2)'}}}}});
+  if(topT.length) mkChart('ch-rg-target-vs-actual',{type:'bar',data:{labels:topT.map(r=>r.name.substring(0,15)),datasets:[{label:'الهدف',data:topT.map(r=>r.target),backgroundColor:'rgba(246,201,14,.7)'},{label:'الفعلي',data:topT.map(r=>r.actual),backgroundColor:'rgba(44,93,229,.7)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'var(--text)'}},datalabels:{display:false}},scales:{x:{ticks:{color:'var(--text2)',font:{size:10}}},y:{ticks:{color:'var(--text2)'}}}}});
   else destroyChart('ch-rg-target-vs-actual');
   // توزيع نسب الإنجاز
   const d100=repAchArr.filter(r=>r.ach>=100).length,d80=repAchArr.filter(r=>r.ach>=80&&r.ach<100).length,d50=repAchArr.filter(r=>r.ach>=50&&r.ach<80).length,d0=repAchArr.filter(r=>r.ach<50&&r.target>0).length;
-  if(d100+d80+d50+d0>0) mkChart('ch-rg-dist',{type:'doughnut',data:{labels:['≥100%','80-99%','50-79%','<50%'],datasets:[{data:[d100,d80,d50,d0],backgroundColor:['rgba(46,196,182,.8)','rgba(246,201,14,.8)','rgba(255,159,67,.8)','rgba(238,77,77,.8)']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'var(--text)',font:{size:11}}},datalabels:{display:false}}}});
+  if(d100+d80+d50+d0>0) mkChart('ch-rg-dist',{type:'doughnut',data:{labels:['≥100%','80-99%','50-79%','<50%'],datasets:[{data:[d100,d80,d50,d0],backgroundColor:['rgba(240,120,32,.8)','rgba(246,201,14,.8)','rgba(255,159,67,.8)','rgba(238,77,77,.8)']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'var(--text)',font:{size:11}}},datalabels:{display:false}}}});
   else destroyChart('ch-rg-dist');
   // أعلى 10 أصناف (مفلترة)
   const prodTotals={};
@@ -8997,10 +9235,10 @@ tfoot{display:table-footer-group}
 tfoot td,tfoot th{background:#dde3ff;font-weight:800;color:#1e2749;padding:5px 3px;border-top:2.5px solid #4361ee;border-bottom:2.5px solid #4361ee;font-size:${fs}px;white-space:nowrap}
 [style*="color:var"]{color:#1e2749!important}
 [style*="background:var"]{background:transparent!important}
-.td-red{color:#ee4d4d!important}.td-green{color:#2ec4b6!important}
+.td-red{color:#ee4d4d!important}.td-green{color:#f07820!important}
 .tag,.badge{display:inline-block;padding:1px 4px;border-radius:3px;font-size:${Math.max(fs-1,7)}px;font-weight:700;background:#eef0ff;color:#4361ee}
 .tag-red,.badge-red{background:#fff0f0;color:#ee4d4d}
-.tag-green,.badge-green{background:#f0fff9;color:#2ec4b6}
+.tag-green,.badge-green{background:#f0fff9;color:#f07820}
 .tag-orange,.badge-orange{background:#fff8f0;color:#ff9f43}
 .print-footer{margin-top:6mm;padding-top:4px;border-top:1px solid #e4e6ef;display:flex;align-items:center;justify-content:space-between;font-size:8px;color:#9ba5bf}
 .print-footer .pf-right{color:#4361ee;font-weight:700}
@@ -9586,7 +9824,7 @@ function printRepProdTargets(){
           </div>
           <div style="background:var(--surface);border-radius:8px;padding:8px 10px;border:1px solid var(--border);">
             <div style="font-size:10px;color:var(--muted);">التحصيل</div>
-            <div id="frm-collection" style="font-size:14px;font-weight:800;color:#2ec4b6;">—</div>
+            <div id="frm-collection" style="font-size:14px;font-weight:800;color:#f07820;">—</div>
           </div>
         </div>
         <div style="margin-top:8px;background:var(--surface);border-radius:8px;padding:8px 10px;border:1px solid var(--border);display:flex;align-items:center;gap:8px;">
@@ -9615,7 +9853,7 @@ function printRepProdTargets(){
           </div>
           <div style="background:var(--surface);border-radius:8px;padding:8px 10px;border:1px solid var(--border);">
             <div style="font-size:10px;color:var(--muted);">تحصيل اليوم</div>
-            <div id="frm-day-col" style="font-size:14px;font-weight:800;color:#2ec4b6;">—</div>
+            <div id="frm-day-col" style="font-size:14px;font-weight:800;color:#f07820;">—</div>
           </div>
         </div>
       </div>
