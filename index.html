@@ -2692,7 +2692,7 @@ const GS_URLS_EMBEDDED = {
   collection: 'https://docs.google.com/spreadsheets/d/1yrQLca-MiCyxrXNSJ_GqFiw5d1QN1i3Y/export?format=csv&gid=556704038',
   debt:       'https://docs.google.com/spreadsheets/d/1PexDCIHXFSyxdwvzhN4CgMD-ZvqUDAO-/export?format=csv&gid=742356649',
   inventory:  'https://docs.google.com/spreadsheets/d/1AC7ifj_KGAit8SQqjLYBNznekHQjr70q/export?format=csv&gid=1372061526',
-  reps:       'https://docs.google.com/spreadsheets/d/1zHJ8xYqsnWwTHtR8BsDp8D-rh2FkbqMo/export?format=csv&gid=883595607',
+  reps:       'https://docs.google.com/spreadsheets/d/e/2PACX-1vTYCN2dCoLrmBquVBQ4YvHpXcDYI1ggmPyDC2FrYQBb-I0PGly3syVVPDm4eHllwA/pub?gid=883595607&single=true&output=csv',
   aging:      'https://docs.google.com/spreadsheets/d/1g17IduM2pisXsHsTQBuXf8ZQ1qQKrFew/export?format=csv&gid=1432141854',
   targets:    'https://docs.google.com/spreadsheets/d/1pHZDl3B4vozI30BLDUbKBG_mzfJ5MgaN8GABDAGI5kU/export?format=xlsx&gid=1501110512',
 };
@@ -6444,19 +6444,18 @@ function processNewData(type,rows){
       }
 
       // ── بناء _repSuperMap من ملف المبيعات إذا وُجد عمود المشرف ──
-      // ملاحظة: إذا سبق تحميل ملف التصنيف (D._repsFileLoaded)، فهو المصدر الرسمي ولا نستبدله
-      if(kSupSales && !D._repsFileLoaded){
-        // مسح القديم وإعادة البناء من الصفر في كل مزامنة
-        D._repSuperMap={};
-        D._superRepsMap={};
+      if(kSupSales){
+        // لا نمسح _repSuperMap — ملف تصنيف المندوبين هو المصدر الرسمي إن وُجد
+        if(!D._repSuperMap)D._repSuperMap={};
+        if(!D._superRepsMap)D._superRepsMap={};
         rows.forEach(r=>{
           const rep=_cn(r[kRep]||'');
           const sup=_cn(r[kSupSales]||'');
-          if(rep && sup){
-            D._repSuperMap[rep]=sup; // آخر قيمة تفوز (أحدث صف)
+          if(rep && sup && !D._repSuperMap[rep]){
+            D._repSuperMap[rep]=sup; // أضف فقط إذا لم يُحدَّد من ملف التصنيف
           }
         });
-        // بناء الخريطة العكسية: مشرف → قائمة مناديبه
+        // إعادة بناء الخريطة العكسية بالكامل
         D._superRepsMap={};
         Object.entries(D._repSuperMap).forEach(([rep,sup])=>{
           if(!D._superRepsMap[sup])D._superRepsMap[sup]=[];
@@ -6579,7 +6578,7 @@ function processNewData(type,rows){
       const _c4=s=>String(s||'').replace(/^\uFEFF/,'').trim();
       const _n4=v=>_parseNum(v);
       const hdrs4=Object.keys(rows[0]||{});
-      const _fc4=(...ns)=>{for(const n of ns){const h=hdrs4.find(h=>_c4(h)===n||_c4(h).includes(n)||n.includes(_c4(h)));if(h&&_c4(h))return h}return null};
+      const _fc4=(...ns)=>{for(const n of ns){const h=hdrs4.find(h=>_c4(h)===n||_c4(h).includes(n));if(h&&_c4(h))return h}return null};
       const kName=_fc4('المندوب','اسم المندوب','الاسم','name','rep','مندوب');
       const kCat =_fc4('الفئة','التصنيف','تصنيف','الفئه','cat','category','classification');
       const kSup =_fc4('المشرف','مشرف','supervisor','المشرفين');
@@ -6587,8 +6586,7 @@ function processNewData(type,rows){
       const kTQty  =_fc4('هدف الكمية','هدف الكميه','target_qty');
       const kTCol  =_fc4('هدف التحصيل','target_collection','هدف التحصيلات');
       const targets={};
-      // ملف المناديب هو المصدر الرسمي — يُعيد بناء _repSuperMap من الصفر دائماً
-      D._repsFileLoaded=true;
+      // ملف المناديب يُعيد بناء _repSuperMap من الصفر (هو المصدر الرسمي)
       D._repSuperMap={};
       D._superRepsMap={};
       // تصفية الصفوف الفارغة
@@ -6890,10 +6888,6 @@ async function processMultipleFiles(files){
   }
 
   if(!classified.length)return;
-
-  // ── ترتيب الملفات: reps دائماً بعد sales لضمان الكتابة الصحيحة لـ _repSuperMap ──
-  const TYPE_ORDER={sales:0,collection:1,debt:2,aging:3,inventory:4,targets:5,reps:99};
-  classified.sort((a,b)=>(TYPE_ORDER[a.type]??50)-(TYPE_ORDER[b.type]??50));
 
   let done=0;
   _setProg('5%');
@@ -7278,17 +7272,28 @@ async function syncGoogleSheets(){
 
   if(prog)prog.style.width='80%';
   let synced=0, errors=0;
+  // ── معالجة reps أولاً حتى تكون _repSuperMap جاهزة قبل المبيعات ──
+  const repsIdx=keys.indexOf('reps');
+  if(repsIdx>=0){
+    const rr=csvResults[repsIdx];
+    if(rr.status==='fulfilled'&&rr.value){
+      processNewData(rr.value.key, rr.value.rows);synced++;
+      toast(`✅ ${typeLabels['reps']}`,'success');
+    } else if(rr.status==='rejected'){
+      errors++;toast(`❌ ${typeLabels['reps']}: ${rr.reason?.message||'خطأ'}`,'error');
+    }
+  }
   csvResults.forEach((r,i)=>{
+    if(keys[i]==='reps')return;
     if(r.status==='fulfilled'&&r.value){
-      processNewData(r.value.key, r.value.rows);
-      synced++;
+      processNewData(r.value.key, r.value.rows);synced++;
       toast(`✅ ${typeLabels[keys[i]]}`,'success');
     } else if(r.status==='rejected'){
-      errors++;
-      toast(`❌ ${typeLabels[keys[i]]}: ${r.reason?.message||'خطأ'}`,'error');
+      errors++;toast(`❌ ${typeLabels[keys[i]]}: ${r.reason?.message||'خطأ'}`,'error');
     }
   });
   if(targetsOk)synced++;
+  populateRepSelects();
 
   if(prog)prog.style.width='100%';
   statusEl.textContent=`✅ تمت المزامنة: ${synced} ملف${errors?` — ❌ ${errors} خطأ`:''}`;
@@ -7764,8 +7769,16 @@ function csvToRows(text){
   const lines=clean.split('\n').filter(l=>l.trim());
   if(!lines.length)return[];
   const delim=_detectDelimiter(clean);
-  const headers=parseCsvLine(lines[0],delim).map(h=>h.trim().replace(/^\uFEFF/,'').replace(/[\u200B-\u200F\u202A-\u202E\u2060]/g,''));
-  return lines.slice(1).map(line=>{
+  // ── كشف ذكي لسطر الهيدر (يتجاوز الصفوف الفارغة في البداية) ──
+  let headerIdx=0;
+  for(let i=0;i<Math.min(10,lines.length);i++){
+    const cols=parseCsvLine(lines[i],delim).map(v=>v.trim());
+    const nonEmpty=cols.filter(v=>v!=='').length;
+    const textCount=cols.filter(v=>v!==''&&isNaN(parseFloat(v.replace(/,/g,'')))).length;
+    if(nonEmpty>=2&&textCount>=2){headerIdx=i;break;}
+  }
+  const headers=parseCsvLine(lines[headerIdx],delim).map(h=>h.trim().replace(/^\uFEFF/,'').replace(/[\u200B-\u200F\u202A-\u202E\u2060]/g,''));
+  return lines.slice(headerIdx+1).map(line=>{
     const vals=parseCsvLine(line,delim);
     const row={};
     headers.forEach((h,i)=>{
