@@ -3182,6 +3182,22 @@ function populateRepSelects(){
 
   // ── تعبئة فلاتر المشرفين ──
   const sups=[...new Set(Object.values(D._repSuperMap||{}).filter(Boolean))].sort();
+  // DEBUG مؤقت: أظهر عدد المشرفين في toast
+  if(sups.length > 0){
+    console.log('[DEBUG] populateRepSelects: وجد ' + sups.length + ' مشرف: ' + sups.join(', '));
+  } else {
+    console.warn('[DEBUG] populateRepSelects: _repSuperMap فارغ! D._repSuperMap=', JSON.stringify(D._repSuperMap||{}));
+    // أظهر للمستخدم مباشرة
+    const _dbgBar = document.getElementById('topbar');
+    if(_dbgBar && !document.getElementById('_sup_dbg')){
+      const _dbgEl = document.createElement('div');
+      _dbgEl.id = '_sup_dbg';
+      _dbgEl.style = 'position:fixed;bottom:80px;left:10px;z-index:9999;background:#f05252;color:#fff;padding:8px 14px;border-radius:10px;font-size:12px;font-family:Cairo,sans-serif;direction:rtl;max-width:90vw;word-break:break-all';
+      _dbgEl.textContent = '⚠ _repSuperMap فارغ | reps:' + (D.reps||[]).length + ' | keys:' + Object.keys(D._repSuperMap||{}).length;
+      document.body.appendChild(_dbgEl);
+      setTimeout(()=>_dbgEl.remove(), 8000);
+    }
+  }
   const supIds=['f-sales-sup','f-rep-sup','f-cust-sup','f-prod-sup','f-debt-sup','f-aging-sup','f-coll-sup','gf-sup'];
   supIds.forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
@@ -6612,6 +6628,8 @@ function processNewData(type,rows){
         targets[name]={tSales,tQty,tCol,cat,sup};
       });
       D._repTargets=targets;
+      // DEBUG
+      console.log('[REPS] كُتب في _repSuperMap:', Object.keys(D._repSuperMap).length, 'مندوب | مثال:', JSON.stringify(Object.entries(D._repSuperMap).slice(0,3)));
       // بناء خريطة عكسية: مشرف → قائمة مناديبه
       D._superRepsMap={};
       Object.entries(D._repSuperMap).forEach(([rep,sup])=>{
@@ -7050,35 +7068,9 @@ function _updateRefreshStatus(){
 // ── دالة تجد صف العناوين الحقيقي في ملف المناديب ──
 // يحل مشكلة الصفوف الفارغة في بداية الملف (صف 1-2 فارغ، صف 3 عناوين)
 function _parseRepsRows(rows){
-  if(!rows || !rows.length) return rows;
-  const _c = s => String(s||'').replace(/﻿/g,'').trim();
-
-  // نبحث في أول 10 صفوف عن صف يحتوي 'المندوب' أو 'rep' في القيم
-  const _keywords = ['المندوب','مندوب','اسم المندوب','rep','name'];
-  let hdrRowIdx = -1;
-  let hdrVals = [];
-
-  for(let i = 0; i < Math.min(rows.length, 10); i++){
-    const vals = Object.values(rows[i]).map(v => _c(String(v||'')));
-    if(_keywords.some(kw => vals.some(v => v === kw || v.includes(kw)))){
-      hdrRowIdx = i;
-      hdrVals = vals;
-      break;
-    }
-  }
-
-  // إذا وُجد صف عناوين بعد الصف الأول → أعد البناء
-  if(hdrRowIdx > 0 && hdrVals.length){
-    return rows.slice(hdrRowIdx + 1).map(r => {
-      const vals = Object.values(r).map(v => _c(String(v||'')));
-      const obj = {};
-      hdrVals.forEach((h, i) => { if(h) obj[h] = vals[i] || ''; });
-      return obj;
-    }).filter(r => Object.values(r).some(v => v));
-  }
-
-  // إذا كان الصف الأول هو العناوين بالفعل → أعِد كما هو
-  return rows;
+  // هذه الدالة لا تحتاج تعديلاً — csvToRows تُنتج مفاتيح صحيحة تلقائياً
+  // حتى عند وجود صفوف فارغة في البداية (,,,,,) لأن '' لا تطغى على 'المندوب'
+  return rows || [];
 }
 
 async function _autoSyncQuiet(){
@@ -7172,10 +7164,13 @@ async function _autoSyncQuiet(){
   };
 
   /* جلب reps أولاً ومعالجته قبل إطلاق الباقي */
+  console.log('[SYNC] جلب reps من URL:', urls.reps ? urls.reps.substring(0,60)+'...' : '❌ لا URL!');
   const repsResult = await _fetchOne('reps');
+  console.log('[SYNC] repsResult:', repsResult ? 'نجح - صفوف: '+repsResult.rows.length : '❌ فشل');
   if(repsResult){
     // معالجة خاصة: البحث عن صف العناوين الحقيقي في ملف المناديب
     const _repsRows = _parseRepsRows(repsResult.rows);
+    console.log('[SYNC] _repsRows بعد _parseRepsRows:', _repsRows.length, 'صف | أول صف:', JSON.stringify(_repsRows[0]||{}).substring(0,150));
     freshData['reps'] = _repsRows;
     processNewData('reps', _repsRows);
     completed++;
