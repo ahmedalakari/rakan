@@ -6598,8 +6598,7 @@ function processNewData(type,rows){
       const _n4=v=>_parseNum(v);
 
       // ── البحث عن صف العناوين الحقيقي باستخدام _parseRepsRows ──
-      // يحل مشكلة الصفوف الفارغة في بداية الملف
-      rows = _parseRepsRows(rows);
+      rows = _parseRepsRows(rows); // يقبل array of objects
 
       const hdrs4=Object.keys(rows[0]||{});
       const _fc4=(...ns)=>{for(const n of ns){const h=hdrs4.find(h=>_c4(h)===n||_c4(h).includes(n)||n.includes(_c4(h)));if(h&&_c4(h))return h}return null};
@@ -7067,10 +7066,62 @@ function _updateRefreshStatus(){
 
 // ── دالة تجد صف العناوين الحقيقي في ملف المناديب ──
 // يحل مشكلة الصفوف الفارغة في بداية الملف (صف 1-2 فارغ، صف 3 عناوين)
-function _parseRepsRows(rows){
-  // هذه الدالة لا تحتاج تعديلاً — csvToRows تُنتج مفاتيح صحيحة تلقائياً
-  // حتى عند وجود صفوف فارغة في البداية (,,,,,) لأن '' لا تطغى على 'المندوب'
-  return rows || [];
+function _parseRepsRows(input){
+  // تقبل نص CSV خام أو array of objects
+  // الهدف: إيجاد صف 'المندوب' وبناء rows صحيحة منه
+
+  const _kws = ['المندوب','مندوب','اسم المندوب'];
+  const _c = s => String(s==null?'':s).replace(/﻿/g,'').replace(/[​-‏‪-‮⁠ ]/g,'').trim();
+
+  // ── حالة 1: نص CSV خام ──
+  if(typeof input === 'string' && input.length > 0){
+    const lines = input.replace(/
+/g,'
+').replace(//g,'
+').split('
+');
+    let hdrIdx = -1, hdrCols = [];
+    for(let i = 0; i < Math.min(lines.length, 20); i++){
+      const cols = lines[i].split(',').map(v => _c(v.replace(/^"|"$/g,'')));
+      if(_kws.some(kw => cols.some(c => c === kw))){
+        hdrIdx = i;
+        hdrCols = cols;
+        break;
+      }
+    }
+    if(hdrIdx < 0) return [];
+    const result = [];
+    for(let i = hdrIdx+1; i < lines.length; i++){
+      if(!lines[i].trim()) continue;
+      const vals = lines[i].split(',').map(v => _c(v.replace(/^"|"$/g,'')));
+      const row = {};
+      hdrCols.forEach((h,j) => { if(h) row[h] = vals[j] || ''; });
+      if(Object.values(row).some(v=>v)) result.push(row);
+    }
+    return result;
+  }
+
+  // ── حالة 2: array of objects من csvToRows (fallback) ──
+  if(Array.isArray(input)){
+    // إذا المفاتيح كلها '' → الملف به صفوف فارغة قبل العناوين
+    // نبحث عن أول صف قيمه تحتوي اسم عمود مثل 'المندوب'
+    for(let i = 0; i < Math.min(input.length, 20); i++){
+      const vals = Object.values(input[i]||{}).map(v=>_c(String(v||'')));
+      if(_kws.some(kw => vals.some(v => v === kw))){
+        // هذا الصف هو العناوين — ابنِ منه
+        const hdrVals = vals;
+        return input.slice(i+1).map(r => {
+          const rVals = Object.values(r).map(v=>_c(String(v||'')));
+          const obj = {};
+          hdrVals.forEach((h,j)=>{ if(h) obj[h]=rVals[j]||''; });
+          return obj;
+        }).filter(r=>Object.values(r).some(v=>v));
+      }
+    }
+    return input; // لا تعديل — الأعمدة صحيحة
+  }
+
+  return [];
 }
 
 async function _autoSyncQuiet(){
@@ -7202,10 +7253,12 @@ async function _autoSyncQuiet(){
   const repsResult = await _fetchOne('reps');
   if(repsResult){
     _showDbg('✅ تم جلب ملف المناديب: ' + repsResult.rows.length + ' صف', '#059669');
-    const _repsRows = _parseRepsRows(repsResult.rawText || '');
-    console.log('[REPS-PARSE] بعد _parseRepsRows:', _repsRows.length, 'صف | أول صف:', JSON.stringify(_repsRows[0]||{}).substring(0,120));
-    freshData['reps'] = _repsRows;
-    processNewData('reps', _repsRows.length ? _repsRows : repsResult.rows);
+    // نُمرر rawText أولاً للحصول على parsing صحيح
+    const _repsRows = _parseRepsRows(repsResult.rawText || repsResult.rows);
+    console.log('[REPS-PARSE] نتيجة:', _repsRows.length, 'صف | أول صف:', JSON.stringify(_repsRows[0]||{}).substring(0,120));
+    const _finalRows = _repsRows.length ? _repsRows : repsResult.rows;
+    freshData['reps'] = _finalRows;
+    processNewData('reps', _finalRows);
     completed++;
     const ic = document.getElementById(iconMap['reps']);
     if(ic) ic.className='ld-icon-box loaded';
