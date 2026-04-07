@@ -5528,11 +5528,32 @@ function parseExcel(buffer){
 
 // ── قراءة خام كـ array of arrays (لملفات ذات هيكل خاص كأهداف الأصناف) ──
 function parseExcelRaw(buffer){
-  const wb=XLSX.read(buffer,{type:'array',cellDates:false,raw:true});
+  // نقرأ الملف مرتين:
+  // 1) raw:true للحصول على القيم الرقمية الثابتة (totalCol, ratios, prodNames)
+  // 2) نتجاهل أي خلية تحتوي صيغة (تبدأ بـ =) ونضعها null
+  const wb=XLSX.read(buffer,{type:'array',cellDates:false,raw:true,cellFormula:true,sheetStubs:true});
   const sheet=wb.Sheets[wb.SheetNames[0]];
   if(!sheet['!ref'])return[];
-  // header:1 = كل صف يصبح array بدلاً من object
-  return XLSX.utils.sheet_to_json(sheet,{header:1,defval:null,raw:true});
+  // نقرأ كل خلية مباشرة: إذا كانت صيغة (t:'n' مع f) نأخذ v إذا وُجدت، وإلا null
+  const range=XLSX.utils.decode_range(sheet['!ref']);
+  const result=[];
+  for(let R=range.s.r;R<=range.e.r;R++){
+    const row=[];
+    for(let C=range.s.c;C<=range.e.c;C++){
+      const cellAddr=XLSX.utils.encode_cell({r:R,c:C});
+      const cell=sheet[cellAddr];
+      if(!cell){row.push(null);continue;}
+      // إذا كانت الخلية صيغة: خذ القيمة المحسوبة v إن وُجدت
+      if(cell.f!==undefined){
+        // v = القيمة المخزنة (قد تكون محسوبة أو null عند تصدير Google Sheets)
+        row.push(cell.v!==undefined?cell.v:null);
+      } else {
+        row.push(cell.v!==undefined?cell.v:null);
+      }
+    }
+    result.push(row);
+  }
+  return result;
 }
 
 
@@ -6343,16 +6364,33 @@ function processNewData(type,rows){
       // هيكل المجموعات — prodCol هو عمود اسم الصنف، totalCol هو الكمية الإجمالية
       // ملاحظة: كل المجموعات تشترك في نفس الكمية الإجمالية للصنف
       // نستخدم totalCol من أي مجموعة لها قيمة > 0
-      const _GROUPS6=[
-        {name:'الجملة',     repCols:[3,4,5,6,7,8],                   totalCol:9,  prodCol:10},
-        {name:'الاسواق',    repCols:[14,15],                           totalCol:16, prodCol:17},
-        {name:'شرق طرابلس', repCols:[21,22,23,24,25,26,27],           totalCol:28, prodCol:29},
-        {name:'المقاهي',    repCols:[33,34,35,36],                     totalCol:37, prodCol:38},
-        {name:'غرب طرابلس', repCols:[41,42,43,44,45,46,47,48,49,50], totalCol:51, prodCol:52},
-      ];
-
+      // ── بناء _GROUPS6 ديناميكياً لمقاومة انزياح الأعمدة (Google Sheets يُزيل الأعمدة الفارغة) ──
       const ratioRow = rawRows[2] || [];
       const hdrRow6  = rawRows[3] || [];
+
+      // ابحث عن مواضع "الصنف" و"أجمالي الكمية" في صف الرأس
+      const _prodColIdxs=[], _totalColIdxs=[];
+      hdrRow6.forEach((v,i)=>{
+        const s=_ct6(v);
+        if(s==='الصنف')_prodColIdxs.push(i);
+        if(s==='أجمالي الكمية')_totalColIdxs.push(i);
+      });
+
+      // بناء المجموعات: بين كل "أجمالي الكمية" والتالية تقع أعمدة المناديب
+      const _GROUPS6=[];
+      _totalColIdxs.forEach((totalCol,gi)=>{
+        const prodCol=_prodColIdxs[gi]??totalCol+1;
+        // أعمدة المناديب: بين totalCol السابقة (أو بداية الجزء) وهذه totalCol
+        const prevTotal=gi===0?-1:_totalColIdxs[gi-1];
+        const repCols=[];
+        for(let c=prevTotal+1;c<totalCol;c++){
+          const name=_ct6(hdrRow6[c]||'');
+          const ratio=_nt6(ratioRow[c]);
+          if(name&&name!=='أجمالي الكمية'&&name!=='الصنف'&&!name.includes('اجمالي')&&ratio>0)
+            repCols.push(c);
+        }
+        if(repCols.length>0)_GROUPS6.push({repCols,totalCol,prodCol});
+      });
 
       // خريطة: عمود → {اسم، نسبة}
       const colRepMap6={};
