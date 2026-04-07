@@ -6444,23 +6444,26 @@ function processNewData(type,rows){
       }
 
       // ── بناء _repSuperMap من ملف المبيعات إذا وُجد عمود المشرف ──
+      // ملاحظة: لا نمسح _repSuperMap هنا لأن ملف المناديب (reps) قد عالجه أولاً
       if(kSupSales){
-        // مسح القديم وإعادة البناء من الصفر في كل مزامنة
-        D._repSuperMap={};
-        D._superRepsMap={};
+        if(!D._repSuperMap) D._repSuperMap={};
+        if(!D._superRepsMap) D._superRepsMap={};
         rows.forEach(r=>{
           const rep=_cn(r[kRep]||'');
           const sup=_cn(r[kSupSales]||'');
-          if(rep && sup){
-            D._repSuperMap[rep]=sup; // آخر قيمة تفوز (أحدث صف)
+          // فقط أضف إذا لم يكن المندوب مسجلاً مسبقاً من ملف المناديب (الأولوية لملف المناديب)
+          if(rep && sup && !D._repSuperMap[rep]){
+            D._repSuperMap[rep]=sup;
           }
         });
-        // بناء الخريطة العكسية: مشرف → قائمة مناديبه
+        // إعادة بناء الخريطة العكسية بالكامل
         D._superRepsMap={};
         Object.entries(D._repSuperMap).forEach(([rep,sup])=>{
           if(!D._superRepsMap[sup])D._superRepsMap[sup]=[];
           if(!D._superRepsMap[sup].includes(rep))D._superRepsMap[sup].push(rep);
         });
+        // تحديث القوائم فوراً إن وُجدت بيانات
+        if(Object.keys(D._repSuperMap).length > 0) populateRepSelects();
       }
 
       // ── بناء repData الكاملة ──
@@ -7041,7 +7044,7 @@ function _updateRefreshStatus(){
 
 async function _autoSyncQuiet(){
   const urls = GS_URLS_EMBEDDED;
-  const keys = ['sales','collection','debt','inventory','reps','aging'];
+  const keys = ['reps','sales','collection','debt','inventory','aging']; // reps أولاً لضمان بناء _repSuperMap قبل sales
   const msgEl=document.getElementById('loading-msg');
   const progBar=document.getElementById('ld-progress');
   const iconMap={sales:'ldi-sales',collection:'ldi-collection',debt:'ldi-debt',inventory:'ldi-inventory',reps:'ldi-reps',aging:'ldi-aging'};
@@ -7149,6 +7152,9 @@ async function _autoSyncQuiet(){
   /* انتظر انتهاء الكل بما فيها ملف الأهداف */
   const allPromises=targetsFetchPromise?[...promises,targetsFetchPromise]:promises;
   await Promise.allSettled(allPromises);
+
+  /* بعد اكتمال الكل — تأكيد تعبئة قوائم المشرفين بكل البيانات المتاحة */
+  try { populateRepSelects(); } catch(e){}
 
   const synced=completed;
 
@@ -7283,6 +7289,9 @@ async function syncGoogleSheets(){
     }
   });
   if(targetsOk)synced++;
+
+  /* تأكيد تعبئة قوائم المشرفين بعد اكتمال المزامنة */
+  try { populateRepSelects(); } catch(e){}
 
   if(prog)prog.style.width='100%';
   statusEl.textContent=`✅ تمت المزامنة: ${synced} ملف${errors?` — ❌ ${errors} خطأ`:''}`;
