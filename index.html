@@ -7154,7 +7154,7 @@ async function _autoSyncQuiet(){
       if(!text||text.trim().length<10) throw new Error('فارغ');
       if(text.trim().startsWith('<!DOCTYPE')||text.trim().startsWith('<html'))
         throw new Error('HTML بدلاً من CSV');
-      return { key, rows: csvToRows(text) };
+      return { key, rows: csvToRows(text), rawText: text };
     } catch(err) {
       const ic = document.getElementById(iconMap[key]);
       if(ic) ic.style.borderColor='var(--red)';
@@ -7202,9 +7202,10 @@ async function _autoSyncQuiet(){
   const repsResult = await _fetchOne('reps');
   if(repsResult){
     _showDbg('✅ تم جلب ملف المناديب: ' + repsResult.rows.length + ' صف', '#059669');
-    const _repsRows = _parseRepsRows(repsResult.rows);
+    const _repsRows = _parseRepsRows(repsResult.rawText || '');
+    console.log('[REPS-PARSE] بعد _parseRepsRows:', _repsRows.length, 'صف | أول صف:', JSON.stringify(_repsRows[0]||{}).substring(0,120));
     freshData['reps'] = _repsRows;
-    processNewData('reps', _repsRows);
+    processNewData('reps', _repsRows.length ? _repsRows : repsResult.rows);
     completed++;
     const ic = document.getElementById(iconMap['reps']);
     if(ic) ic.className='ld-icon-box loaded';
