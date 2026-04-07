@@ -6337,7 +6337,7 @@ function processNewData(type,rows){
       const _nt6=v=>{if(v===null||v===undefined||v==='')return 0;const n=parseFloat(String(v).replace(/,/g,''));return isNaN(n)?0:n;};
 
       // استخدم rows المُمررة إن وُجدت، وإلا اقرأ من D._targetsBuffer
-      const rawRows = (rows&&rows.length) ? rows : (D._targetsBuffer ? parseExcelRaw(D._targetsBuffer) : null);
+      const rawRows = rows&&rows.length ? rows : [];
       if(!rawRows||!rawRows.length){toast('⚠ لم يتم تحميل ملف الأهداف','error');break;}
 
       // rawRows[2]=النسب، rawRows[3]=الرؤوس، rawRows[4+]=البيانات
@@ -6725,7 +6725,7 @@ async function _autoSyncQuiet(){
         if(!_arrBuf||_arrBuf.byteLength<100)throw new Error('ملف فارغ');
         const buf=new Uint8Array(_arrBuf);
         D._targetsBuffer=buf;
-        const rawRows=parseExcelRaw(buf);
+        const rawRows=parseExcel(buf);
         processNewData('targets',rawRows);
         toast('✅ أهداف الأصناف','success');
       }catch(e){toast('⚠ أهداف الأصناف: '+e.message,'warning');}
@@ -6909,7 +6909,7 @@ async function syncGoogleSheets(){
       if(!_arrBuf2||_arrBuf2.byteLength<100)throw new Error('ملف فارغ');
       const buf=new Uint8Array(_arrBuf2);
       D._targetsBuffer=buf;
-      const rawRows=parseExcelRaw(buf);
+      const rawRows=parseExcel(buf);
       processNewData('targets',rawRows);
       toast('✅ أهداف الأصناف','success');
       targetsOk=true;
