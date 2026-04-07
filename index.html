@@ -6571,7 +6571,7 @@ async function processMultipleFiles(files){
         try{
           const buf=new Uint8Array(ev.target.result);
           if(type==='targets')D._targetsBuffer=buf;
-          const rows=parseExcel(buf);
+          const rows=type==='targets'?parseExcelRaw(buf):parseExcel(buf);
           processNewData(type,rows);
           done++;
           _setProg((done/classified.length*90+5)+'%');
@@ -6612,7 +6612,7 @@ function processFile(file,type){
       if(prog)prog.style.width='70%';
       const buf2=new Uint8Array(e.target.result);
       if(type==='targets')D._targetsBuffer=buf2;
-      const rows=parseExcel(buf2);
+      const rows=type==='targets'?parseExcelRaw(buf2):parseExcel(buf2);
       processNewData(type,rows);
       if(prog)prog.style.width='100%';
       setSCardState(type,'loaded',`✅ ${rows.length.toLocaleString('ar')} صف`);
@@ -6725,7 +6725,7 @@ async function _autoSyncQuiet(){
         if(!_arrBuf||_arrBuf.byteLength<100)throw new Error('ملف فارغ');
         const buf=new Uint8Array(_arrBuf);
         D._targetsBuffer=buf;
-        const rawRows=parseExcel(buf);
+        const rawRows=parseExcelRaw(buf);
         processNewData('targets',rawRows);
         toast('✅ أهداف الأصناف','success');
       }catch(e){toast('⚠ أهداف الأصناف: '+e.message,'warning');}
@@ -6909,7 +6909,7 @@ async function syncGoogleSheets(){
       if(!_arrBuf2||_arrBuf2.byteLength<100)throw new Error('ملف فارغ');
       const buf=new Uint8Array(_arrBuf2);
       D._targetsBuffer=buf;
-      const rawRows=parseExcel(buf);
+      const rawRows=parseExcelRaw(buf);
       processNewData('targets',rawRows);
       toast('✅ أهداف الأصناف','success');
       targetsOk=true;
