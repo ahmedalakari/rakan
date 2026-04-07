@@ -5528,32 +5528,14 @@ function parseExcel(buffer){
 
 // ── قراءة خام كـ array of arrays (لملفات ذات هيكل خاص كأهداف الأصناف) ──
 function parseExcelRaw(buffer){
-  // نقرأ الملف مرتين:
-  // 1) raw:true للحصول على القيم الرقمية الثابتة (totalCol, ratios, prodNames)
-  // 2) نتجاهل أي خلية تحتوي صيغة (تبدأ بـ =) ونضعها null
-  const wb=XLSX.read(buffer,{type:'array',cellDates:false,raw:true,cellFormula:true,sheetStubs:true});
+  // raw:false → يقرأ القيم المحسوبة المخزنة (يعمل مع الملف المحلي وGSheets)
+  const wb=XLSX.read(buffer,{type:'array',cellDates:false,raw:false});
   const sheet=wb.Sheets[wb.SheetNames[0]];
   if(!sheet['!ref'])return[];
-  // نقرأ كل خلية مباشرة: إذا كانت صيغة (t:'n' مع f) نأخذ v إذا وُجدت، وإلا null
-  const range=XLSX.utils.decode_range(sheet['!ref']);
-  const result=[];
-  for(let R=range.s.r;R<=range.e.r;R++){
-    const row=[];
-    for(let C=range.s.c;C<=range.e.c;C++){
-      const cellAddr=XLSX.utils.encode_cell({r:R,c:C});
-      const cell=sheet[cellAddr];
-      if(!cell){row.push(null);continue;}
-      // إذا كانت الخلية صيغة: خذ القيمة المحسوبة v إن وُجدت
-      if(cell.f!==undefined){
-        // v = القيمة المخزنة (قد تكون محسوبة أو null عند تصدير Google Sheets)
-        row.push(cell.v!==undefined?cell.v:null);
-      } else {
-        row.push(cell.v!==undefined?cell.v:null);
-      }
-    }
-    result.push(row);
-  }
-  return result;
+  // header:1 = كل صف يصبح array
+  // defval:null = الخلايا الفارغة تصبح null
+  // blankrows:false = تجاهل الصفوف الفارغة (يمنع 1000 صف من GSheets)
+  return XLSX.utils.sheet_to_json(sheet,{header:1,defval:null,raw:false,blankrows:false});
 }
 
 
