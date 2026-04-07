@@ -6427,7 +6427,7 @@ function processNewData(type,rows){
       if(D._repMap)_rebuildRepData();
       const repCount6=Object.keys(rpt6).length;
       const prodCount6=new Set(Object.values(rpt6).flatMap(r=>Object.keys(r))).size;
-      toast(`✅ أهداف الأصناف — ${repCount6} مندوب، ${prodCount6} صنف`,'success');
+      
       break;
     }
   }
@@ -6733,8 +6733,8 @@ async function _autoSyncQuiet(){
         D._targetsBuffer=buf;
         const rawRows=parseExcelRaw(buf);
         processNewData('targets',rawRows);
-        toast('✅ أهداف الأصناف','success');
-      }catch(e){toast('⚠ أهداف الأصناف: '+e.message,'warning');}
+        
+      }catch(e){console.warn('أهداف الأصناف:',e.message);}
     })();
   }
   const CACHE_KEY='rakan_data_cache_v2';
@@ -6849,12 +6849,19 @@ async function _autoSyncQuiet(){
     const dot=document.getElementById('status-dot');
     if(dot)dot.style.background='var(--accent2)';
 
-    /* إظهار اللوحة وإخفاء شاشة التحميل */
-    const _mainEl=document.getElementById('main');
-    const _sideEl=document.getElementById('sidebar');
-    if(_mainEl&&_mainEl.style.display==='none')_mainEl.style.display='';
-    if(_sideEl&&_sideEl.style.display==='none')_sideEl.style.display='';
-    _hideLoadingOverlay();
+    /* إظهار زر الدخول بعد اكتمال التحميل */
+    _showLoadingSuccess(()=>{
+      const _mainEl=document.getElementById('main');
+      const _sideEl=document.getElementById('sidebar');
+      if(_mainEl)_mainEl.style.display='';
+      if(_sideEl)_sideEl.style.display='';
+      _invalidatePageCache();
+      populateMonthSelects();
+      populateRepSelects();
+      const _p=window.currentPage||'overview';
+      if(PAGE_RENDERS[_p])PAGE_RENDERS[_p]();
+      _startAutoRefresh();
+    });
   } else if(!cachedDataBackup){
     /* فشل كل شيء + لا cache */
     _hideLoadingOverlay();
@@ -6925,10 +6932,10 @@ async function syncGoogleSheets(){
       D._targetsBuffer=buf;
       const rawRows=parseExcelRaw(buf);
       processNewData('targets',rawRows);
-      toast('✅ أهداف الأصناف','success');
+      
       targetsOk=true;
     }catch(e){
-      toast('⚠ أهداف الأصناف: '+e.message,'warning');
+      console.warn('أهداف الأصناف:',e.message);
     }
   }
 
@@ -6993,14 +7000,8 @@ async function autoLoadOnStartup(){
     if(synced===0){
       _hideLoadingOverlay();
       _showLoadingError();
-    } else {
-      _hideLoadingOverlay();
-      _showLoadingSuccess(()=>{
-        if(mainEl) mainEl.style.display = '';
-        if(sideEl) sideEl.style.display = '';
-        _startAutoRefresh();
-      });
     }
+    // _showLoadingSuccess و إظهار اللوحة تتم داخل _autoSyncQuiet
   } catch(e){
     if(_timedOut) return;
     clearTimeout(_timeoutId);
