@@ -7094,57 +7094,87 @@ async function _autoSyncQuiet(){
   });
   if(progBar&&!cacheShown){progBar.className='ld-progress-bar indeterminate';}
 
-  const TIMEOUT_MS=30000; /* 30 ثانية كحد أقصى لكل ملف — ملف المبيعات قد يكون كبيراً */
+  const TIMEOUT_MS=30000;
   let completed=0;
   const freshData={};
 
-  /* ── 3. كل ملف يُعالج فور وصوله (لا انتظار للكل) ── */
-  const promises=keys.map(async key=>{
-    const url=urls[key];
-    if(!url)return null;
-    const fetchUrl=url.includes('?')?url+'&t='+Date.now():url+'?t='+Date.now();
-    try{
-      /* fetch مع timeout — نستخدم Promise.race بدلاً من AbortSignal لتجنب مشكلة الاستنساخ */
-      const fetchPromise=fetch(fetchUrl,{method:'GET',cache:'no-store'});
-      const timeoutPromise=new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),TIMEOUT_MS));
-      const resp=await Promise.race([fetchPromise,timeoutPromise]);
-      if(!resp.ok)throw new Error(`HTTP ${resp.status}`);
-      const text=await resp.text();
-      if(!text||text.trim().length<10)throw new Error('فارغ');
+  /* ── 3. جلب reps أولاً بشكل تسلسلي لضمان بناء _repSuperMap قبل sales ── */
+  const _fetchOne = async (key) => {
+    const url = urls[key];
+    if(!url) return null;
+    const fetchUrl = url.includes('?') ? url+'&t='+Date.now() : url+'?t='+Date.now();
+    try {
+      const resp = await Promise.race([
+        fetch(fetchUrl,{method:'GET',cache:'no-store'}),
+        new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),TIMEOUT_MS))
+      ]);
+      if(!resp.ok) throw new Error('HTTP '+resp.status);
+      const text = await resp.text();
+      if(!text||text.trim().length<10) throw new Error('فارغ');
+      if(text.trim().startsWith('<!DOCTYPE')||text.trim().startsWith('<html'))
+        throw new Error('HTML بدلاً من CSV');
+      return { key, rows: csvToRows(text) };
+    } catch(err) {
+      const ic = document.getElementById(iconMap[key]);
+      if(ic) ic.style.borderColor='var(--red)';
+      console.warn('فشل جلب', key, err.message);
+      return null;
+    }
+  };
+
+  /* جلب reps أولاً ومعالجته قبل إطلاق الباقي */
+  const repsResult = await _fetchOne('reps');
+  if(repsResult){
+    freshData['reps'] = repsResult.rows;
+    processNewData('reps', repsResult.rows);
+    completed++;
+    const ic = document.getElementById(iconMap['reps']);
+    if(ic) ic.className='ld-icon-box loaded';
+  }
+
+  /* الآن أطلق باقي الملفات بالتوازي */
+  const otherKeys = keys.filter(k => k !== 'reps');
+  const promises = otherKeys.map(async key => {
+    const url = urls[key];
+    if(!url) return null;
+    const fetchUrl = url.includes('?') ? url+'&t='+Date.now() : url+'?t='+Date.now();
+    try {
+      const fetchPromise = fetch(fetchUrl,{method:'GET',cache:'no-store'});
+      const timeoutPromise = new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),TIMEOUT_MS));
+      const resp = await Promise.race([fetchPromise, timeoutPromise]);
+      if(!resp.ok) throw new Error('HTTP '+resp.status);
+      const text = await resp.text();
+      if(!text||text.trim().length<10) throw new Error('فارغ');
       if(text.trim().startsWith('<!DOCTYPE')||text.trim().startsWith('<html'))
         throw new Error('HTML بدلاً من CSV');
 
-      /* ── عالج وعرض فوراً بدون انتظار الملفات الأخرى ── */
-      const rows=csvToRows(text);
-      freshData[key]=rows;
-      processNewData(key,rows);
+      const rows = csvToRows(text);
+      freshData[key] = rows;
+      processNewData(key, rows);
       completed++;
 
-      /* تحديث UI فوري */
-      const ic=document.getElementById(iconMap[key]);
-      if(ic)ic.className='ld-icon-box loaded';
+      const ic = document.getElementById(iconMap[key]);
+      if(ic) ic.className='ld-icon-box loaded';
       if(progBar){
         progBar.className='ld-progress-bar';
         progBar.style.width=(completed/keys.length*100)+'%';
       }
-      if(msgEl)msgEl.textContent=`تم تحميل ${completed} من ${keys.length}...`;
+      if(msgEl) msgEl.textContent=`تم تحميل ${completed} من ${keys.length}...`;
 
-      /* تحديث عند أول ملف ناجح — صامت فقط */
       if(completed===1&&!cacheShown){
         _invalidatePageCache();
         populateMonthSelects();
         populateRepSelects();
       } else if(completed>1){
-        /* تحديث صامت للصفحة الحالية — مع تحديث قوائم المشرفين */
         populateRepSelects();
         const p=window.currentPage||'overview';
         if(PAGE_RENDERS[p])PAGE_RENDERS[p]();
       }
       return {key,rows};
-    }catch(err){
-      const ic=document.getElementById(iconMap[key]);
-      if(ic)ic.style.borderColor='var(--red)';
-      console.warn('فشل جلب',key,err.message);
+    } catch(err) {
+      const ic = document.getElementById(iconMap[key]);
+      if(ic) ic.style.borderColor='var(--red)';
+      console.warn('فشل جلب', key, err.message);
       return null;
     }
   });
@@ -7203,8 +7233,10 @@ async function _autoSyncQuiet(){
     _hideLoadingOverlay();
   } else {
     /* فشل كل شيء لكن يوجد cache — أظهر اللوحة بالبيانات القديمة */
+    // معالجة reps أولاً من الكاش لضمان _repSuperMap
+    if(cachedDataBackup['reps']) processNewData('reps', cachedDataBackup['reps']);
     Object.entries(cachedDataBackup).forEach(([key,rows])=>{
-      processNewData(key,rows);
+      if(key !== 'reps') processNewData(key,rows);
     });
     _invalidatePageCache();
     populateMonthSelects();
