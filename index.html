@@ -5528,14 +5528,10 @@ function parseExcel(buffer){
 
 // ── قراءة خام كـ array of arrays (لملفات ذات هيكل خاص كأهداف الأصناف) ──
 function parseExcelRaw(buffer){
-  // raw:false → يقرأ القيم المحسوبة المخزنة (يعمل مع الملف المحلي وGSheets)
   const wb=XLSX.read(buffer,{type:'array',cellDates:false,raw:false});
   const sheet=wb.Sheets[wb.SheetNames[0]];
   if(!sheet['!ref'])return[];
-  // header:1 = كل صف يصبح array
-  // defval:null = الخلايا الفارغة تصبح null
-  // blankrows:false = تجاهل الصفوف الفارغة (يمنع 1000 صف من GSheets)
-  return XLSX.utils.sheet_to_json(sheet,{header:1,defval:null,raw:false,blankrows:false});
+  return XLSX.utils.sheet_to_json(sheet,{header:1,defval:null,raw:false});
 }
 
 
@@ -6340,24 +6336,14 @@ function processNewData(type,rows){
       const _ct6=s=>String(s===null||s===undefined?'':s).replace(/[\r\n]+/g,' ').trim();
       const _nt6=v=>{if(v===null||v===undefined||v==='')return 0;const n=parseFloat(String(v).replace(/,/g,''));return isNaN(n)?0:n;};
 
-      // استخدم rows المُمررة مباشرة (من المزامنة أو الرفع المحلي) بدلاً من إعادة القراءة
-      // هذا يضمن نفس البيانات في كلا المسارين
-      const rawRows = rows && rows.length ? rows : (D._targetsBuffer ? parseExcelRaw(D._targetsBuffer) : null);
+      // استخدم rows المُمررة إن وُجدت، وإلا اقرأ من D._targetsBuffer
+      const rawRows = (rows&&rows.length) ? rows : (D._targetsBuffer ? parseExcelRaw(D._targetsBuffer) : null);
       if(!rawRows||!rawRows.length){toast('⚠ لم يتم تحميل ملف الأهداف','error');break;}
 
-      // ── بناء ديناميكي: ابحث عن صف النسب وصف الرؤوس بدلاً من أرقام ثابتة ──
-      // (blankrows:false يُغيّر أرقام الصفوف عند تصدير GSheets)
-      let ratioRow=[], hdrRow6=[], dataStartIdx=0;
-      for(let _i=0;_i<Math.min(rawRows.length,10);_i++){
-        const _r=rawRows[_i]||[];
-        const _nonNull=_r.filter(v=>v!==null&&v!==undefined);
-        const _numCount=_nonNull.filter(v=>typeof v==='number'&&v>0&&v<1).length;
-        const _txtCount=_nonNull.filter(v=>typeof v==='string'&&v.length>1).length;
-        const _hasHdr=_r.some(v=>String(v||'').includes('أجمالي الكمية'));
-        if(_numCount>=4&&_txtCount===0&&!ratioRow.length){ratioRow=_r;}
-        else if(_hasHdr&&!hdrRow6.length){hdrRow6=_r;dataStartIdx=_i+1;}
-      }
-      if(!hdrRow6.length){toast('⚠ لم يُعثر على رؤوس الملف','error');break;}
+      // rawRows[2]=النسب، rawRows[3]=الرؤوس، rawRows[4+]=البيانات
+      const ratioRow = rawRows[2]||[];
+      const hdrRow6  = rawRows[3]||[];
+      const dataStartIdx = 4;
 
       // ابحث عن مواضع "الصنف" و"أجمالي الكمية" في صف الرأس
       const _prodColIdxs=[], _totalColIdxs=[];
