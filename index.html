@@ -596,6 +596,13 @@ tbody tr:last-child{border-bottom:none}
 ══════════════════════════════════════════════ */
 #global-filter-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;position:sticky;top:64px;z-index:99;transition:all .3s;box-shadow:0 2px 8px rgba(44,93,229,.04)}
 #global-filter-bar.hidden{display:none}
+/* تجميد الفلاتر عند تفعيل الفلتر الشامل */
+.gf-locked{pointer-events:none!important;opacity:.45!important;cursor:not-allowed!important}
+select.gf-locked,input.gf-locked{background:repeating-linear-gradient(45deg,transparent,transparent 4px,color-mix(in srgb,var(--accent2) 8%,transparent) 4px,color-mix(in srgb,var(--accent2) 8%,transparent) 8px)!important;border-color:var(--accent2)!important;}
+.gf-lock-notice{display:none;align-items:center;gap:5px;font-size:10.5px;color:var(--accent2);font-weight:700;
+  background:color-mix(in srgb,var(--accent2) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent2) 30%,transparent);
+  border-radius:6px;padding:3px 8px;white-space:nowrap}
+.gf-lock-notice.visible{display:flex}
 .gf-label{font-size:11px;color:var(--accent);font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:5px}
 .gf-select,.gf-input{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-md);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;padding:5px 11px;outline:none;transition:border-color .2s,box-shadow .2s;height:32px}
 .gf-select:focus,.gf-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 10%,transparent)}
@@ -659,6 +666,26 @@ tbody tr:last-child{border-bottom:none}
 /* ── input date theme ── */
 body:not(.dark) .filter-bar input[type="date"]{color-scheme:light}
 body.dark .filter-bar input[type="date"]{color-scheme:dark}
+
+/* ── date-input wrapper مع أيقونة التقويم ── */
+.date-wrap{
+  position:relative;display:inline-flex;align-items:center;
+}
+.date-wrap::before{
+  content:'📅';
+  position:absolute;
+  right:8px;
+  top:50%;transform:translateY(-50%);
+  font-size:13px;
+  pointer-events:none;
+  z-index:1;
+  line-height:1;
+}
+.date-wrap input[type="date"]{
+  padding-right:30px!important;
+}
+body:not(.dark) .date-wrap input[type="date"]{color-scheme:light}
+body.dark .date-wrap input[type="date"]{color-scheme:dark}
 
 .ov-row2-grid{display:grid;grid-template-columns:repeat(2,1fr) 1.4fr;gap:var(--gap);margin-bottom:var(--gap)}
 @media(max-width:1024px){.ov-row2-grid{grid-template-columns:1fr 1fr}}
@@ -1790,17 +1817,17 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
     <span class="gf-label" style="color:var(--text2);font-size:11px">المندوب:</span>
     <select class="gf-select" id="gf-rep" onchange="onGfRepChange()"><option value="">كل المندوبين</option></select>
 
-    <span class="gf-label" style="color:var(--text2);font-size:11px">فئة المندوب:</span>
-    <select class="gf-select" id="gf-cat" onchange="onGfCatChange()"><option value="">كل الفئات</option></select>
+    <span class="gf-label" style="color:var(--text2);font-size:11px">القناة البيعية:</span>
+    <select class="gf-select" id="gf-cat" onchange="onGfCatChange()"><option value="">كل القنوات البيعية</option></select>
 
     <span class="gf-label" style="color:var(--text2);font-size:11px">الشهر:</span>
     <select class="gf-select" id="gf-month" onchange="applyGlobalFilter()"><option value="">كل الأشهر</option></select>
 
     <span class="gf-label" style="color:var(--text2);font-size:11px">التاريخ:</span>
     <div class="gf-date-wrap">
-      <input class="gf-input" type="date" id="gf-date-from" onchange="applyGlobalFilter()" placeholder="من">
+      <div class="date-wrap"><input class="gf-input" type="date" id="gf-date-from" onchange="applyGlobalFilter()" placeholder="من"></div>
       <span class="gf-sep">←</span>
-      <input class="gf-input" type="date" id="gf-date-to" onchange="applyGlobalFilter()" placeholder="إلى">
+      <div class="date-wrap"><input class="gf-input" type="date" id="gf-date-to" onchange="applyGlobalFilter()" placeholder="إلى"></div>
     </div>
 
     <button class="btn" style="height:32px;padding:0 12px;font-size:11px" onclick="resetGlobalFilter()">↺ إلغاء الفلتر</button>
@@ -1954,7 +1981,7 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
         </div>
         <div class="card">
           <div class="card-header">
-            <span class="card-title">🏭 مبيعات حسب فئة المندوب</span>
+            <span class="card-title">🏭 مبيعات حسب القناة البيعية</span>
           </div>
           <div class="chart-wrap tall"><canvas id="ov-catChart"></canvas></div>
         </div>
@@ -2006,6 +2033,7 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
         <span class="filter-label">فلتر:</span>
         <select id="f-sales-sup" onchange="_onSupChange('f-sales-rep','f-sales-sup',renderSalesPage)"><option value="">كل المشرفين</option></select>
         <select id="f-sales-rep" onchange="renderSalesPage()"><option value="">كل المندوبين</option></select>
+        <select id="f-sales-cat" onchange="renderSalesPage()"><option value="">كل القنوات البيعية</option></select>
         <select id="f-sales-month" onchange="renderSalesPage()"><option value="">كل الأشهر</option></select>
         <select id="f-sales-type" onchange="renderSalesPage()">
           <option value="">مبيعات + مرتجعات</option>
@@ -2014,8 +2042,8 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
         </select>
         <input type="text" id="f-sales-cust" placeholder="🔍 اسم العميل..." oninput="renderSalesPage()">
         <input type="text" id="f-sales-item" placeholder="🔍 اسم الصنف..." oninput="renderSalesPage()">
-        <input type="date" id="f-sales-from" onchange="renderSalesPage()" title="من تاريخ">
-        <input type="date" id="f-sales-to" onchange="renderSalesPage()" title="إلى تاريخ">
+        <div class="date-wrap"><input type="date" id="f-sales-from" onchange="renderSalesPage()" title="من تاريخ"></div>
+        <div class="date-wrap"><input type="date" id="f-sales-to" onchange="renderSalesPage()" title="إلى تاريخ"></div>
         <button class="btn" onclick="resetSalesFilters()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap" id="sales-table-wrap"></div>
@@ -2061,16 +2089,16 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
         <span class="filter-label">فلتر:</span>
         <select id="f-rep-select" onchange="renderRepPage()"><option value="">كل المندوبين</option></select>
         <select id="f-rep-sup" onchange="_onSupChange('f-rep-select','f-rep-sup',renderRepPage)"><option value="">كل المشرفين</option></select>
-        <select id="f-rep-cat" onchange="renderRepPage()"><option value="">كل التصنيفات</option></select>
+        <select id="f-rep-cat" onchange="renderRepPage()"><option value="">كل القنوات البيعية</option></select>
         <select id="f-rep-month" onchange="renderRepPage()"><option value="">كل الأشهر</option></select>
-        <input type="date" id="f-rep-from" onchange="renderRepPage()" title="من تاريخ">
-        <input type="date" id="f-rep-to" onchange="renderRepPage()" title="إلى تاريخ">
+        <div class="date-wrap"><input type="date" id="f-rep-from" onchange="renderRepPage()" title="من تاريخ"></div>
+        <div class="date-wrap"><input type="date" id="f-rep-to" onchange="renderRepPage()" title="إلى تاريخ"></div>
         <select id="f-rep-view" onchange="const t=document.getElementById('reps-table-wrap');if(t){t.className=this.value==='all'?'table-wrap':'table-wrap vmode-'+this.value}" title="عرض حسب">
           <option value="all">عرض: أساسي</option>
           <option value="coll">عرض: التحصيلات</option>
           <option value="ret">عرض: المرتجعات</option>
           <option value="debt">عرض: المديونية</option>
-          <option value="cat">عرض: بيانات التصنيف</option>
+          <option value="cat">عرض: بيانات القناة البيعية</option>
         </select>
         <select id="f-rep-sort" onchange="const v=this.value;if(v){const[k,d]=v.split('|');window._repSort={key:k,dir:d};}else{window._repSort=null;}renderRepPage()" title="ترتيب حسب">
           <option value="">ترتيب: افتراضي</option>
@@ -2127,11 +2155,11 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
       <div class="filter-bar" style="margin:10px 16px 0;border-radius:var(--r-md);flex-wrap:wrap;gap:6px">
         <span class="filter-label">فلتر:</span>
         <select id="f-rpt-sup" onchange="_rptOnSupChange()"><option value="">كل المشرفين</option></select>
-        <select id="f-rpt-cat" onchange="_rptOnCatChange()"><option value="">كل الفئات</option></select>
+        <select id="f-rpt-cat" onchange="_rptOnCatChange()"><option value="">كل القنوات البيعية</option></select>
         <select id="f-rpt-rep" onchange="_rptOnAnyChange()"><option value="">كل المناديب</option></select>
         <select id="f-rpt-month" onchange="_rptOnAnyChange()"><option value="">كل الأشهر</option></select>
-        <input type="date" id="f-rpt-from" onchange="_rptOnAnyChange()" title="من تاريخ">
-        <input type="date" id="f-rpt-to" onchange="_rptOnAnyChange()" title="إلى تاريخ">
+        <div class="date-wrap"><input type="date" id="f-rpt-from" onchange="_rptOnAnyChange()" title="من تاريخ"></div>
+        <div class="date-wrap"><input type="date" id="f-rpt-to" onchange="_rptOnAnyChange()" title="إلى تاريخ"></div>
         <input type="text" id="f-rpt-search" placeholder="🔍 بحث في الأصناف..." oninput="renderRepProdTargets()" style="min-width:120px;flex:1">
         <select id="f-rpt-sort" onchange="renderRepProdTargets()">
           <option value="name">ترتيب: الصنف أ-ي</option>
@@ -2174,9 +2202,9 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
         <input type="text" id="f-cust-search" placeholder="🔍 اسم الزبون..." oninput="renderCustomersPage()">
         <select id="f-cust-rep" onchange="renderCustomersPage()"><option value="">كل المندوبين</option></select>
         <select id="f-cust-sup" onchange="_onSupChange('f-cust-rep','f-cust-sup',renderCustomersPage)"><option value="">كل المشرفين</option></select>
-        <select id="f-cust-repcatf" onchange="renderCustomersPage()"><option value="">كل الفئات</option></select>
+        <select id="f-cust-repcatf" onchange="renderCustomersPage()"><option value="">كل القنوات البيعية</option></select>
         <select id="f-cust-cat" onchange="renderCustomersPage()">
-          <option value="">كل التصنيفات</option>
+          <option value="">كل القنوات البيعية</option>
           <option value="ممتاز">ممتاز</option><option value="جيد">جيد</option>
           <option value="متوسط">متوسط</option><option value="مخاطرة">مخاطرة</option>
           <option value="مخاطرة عالية">مخاطرة عالية</option>
@@ -2188,14 +2216,14 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
           <option value="old">ذمة &gt; 60 يوم</option>
           <option value="any">لديه ذمم</option>
         </select>
-        <input type="date" id="f-cust-from" onchange="renderCustomersPage()" title="من تاريخ">
-        <input type="date" id="f-cust-to" onchange="renderCustomersPage()" title="إلى تاريخ">
+        <div class="date-wrap"><input type="date" id="f-cust-from" onchange="renderCustomersPage()" title="من تاريخ"></div>
+        <div class="date-wrap"><input type="date" id="f-cust-to" onchange="renderCustomersPage()" title="إلى تاريخ"></div>
         <select id="f-cust-view" onchange="const t=document.getElementById('cust-table-wrap');if(t){t.className=this.value==='all'?'table-wrap':'table-wrap vmode-'+this.value}" title="عرض حسب">
           <option value="all">عرض: أساسي</option>
           <option value="coll">عرض: التحصيلات</option>
           <option value="ret">عرض: المرتجعات</option>
           <option value="debt">عرض: المديونية</option>
-          <option value="cat">عرض: بيانات التصنيف</option>
+          <option value="cat">عرض: بيانات القناة البيعية</option>
         </select>
         <button class="btn" onclick="['f-cust-sup','f-cust-search','f-cust-rep','f-cust-repcatf','f-cust-cat','f-cust-aging','f-cust-from','f-cust-to','f-cust-view'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});const ct=document.getElementById('cust-table-wrap');if(ct)ct.className='table-wrap';renderCustomersPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
@@ -2241,11 +2269,11 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
         <input type="text" id="f-prod-search" placeholder="🔍 اسم الصنف..." oninput="renderProductsPage()">
         <select id="f-prod-rep" onchange="renderProductsPage()"><option value="">كل المندوبين</option></select>
         <select id="f-prod-sup" onchange="_onSupChange('f-prod-rep','f-prod-sup',renderProductsPage)"><option value="">كل المشرفين</option></select>
-        <select id="f-prod-cat" onchange="renderProductsPage()"><option value="">كل الفئات</option></select>
+        <select id="f-prod-cat" onchange="renderProductsPage()"><option value="">كل القنوات البيعية</option></select>
         <input type="text" id="f-prod-cust" placeholder="🔍 اسم العميل..." oninput="renderProductsPage()">
         <select id="f-prod-month" onchange="renderProductsPage()"><option value="">كل الأشهر</option></select>
-        <input type="date" id="f-prod-from" onchange="renderProductsPage()" title="من تاريخ">
-        <input type="date" id="f-prod-to" onchange="renderProductsPage()" title="إلى تاريخ">
+        <div class="date-wrap"><input type="date" id="f-prod-from" onchange="renderProductsPage()" title="من تاريخ"></div>
+        <div class="date-wrap"><input type="date" id="f-prod-to" onchange="renderProductsPage()" title="إلى تاريخ"></div>
         <select id="f-prod-view" onchange="const t=document.getElementById('prod-table-wrap');if(t)t.className=this.value==='all'?'table-wrap':'table-wrap pvmode-'+this.value" title="عرض حسب">
           <option value="all">عرض: أساسي</option>
           <option value="val">عرض: القيم المالية</option>
@@ -2288,7 +2316,7 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
         <input type="text" id="f-debt-search" placeholder="🔍 اسم الحساب..." oninput="renderDebtPage()">
         <select id="f-debt-rep" onchange="renderDebtPage()"><option value="">كل المندوبين</option></select>
         <select id="f-debt-sup" onchange="_onSupChange('f-debt-rep','f-debt-sup',renderDebtPage)"><option value="">كل المشرفين</option></select>
-        <select id="f-debt-cat" onchange="renderDebtPage()"><option value="">كل الفئات</option></select>
+        <select id="f-debt-cat" onchange="renderDebtPage()"><option value="">كل القنوات البيعية</option></select>
         <select id="f-debt-type" onchange="renderDebtPage()">
           <option value="">الكل</option><option value="debit">مدين فقط</option>
         </select>
@@ -2356,7 +2384,7 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
         <select id="f-aging-sup" onchange="_onSupChange('f-aging-rep','f-aging-sup',renderAgingPage)"><option value="">كل المشرفين</option></select>
         <select id="f-aging-rep" onchange="renderAgingPage()"><option value="">كل المندوبين</option></select>
         <select id="f-aging-bucket" onchange="renderAgingPage()">
-          <option value="">كل الفئات</option>
+          <option value="">كل القنوات البيعية</option>
           <option value="10">≤ 10 أيام</option>
           <option value="15">11-15 يوم</option>
           <option value="30">16-30 يوم</option>
@@ -2419,7 +2447,7 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
         <span class="filter-label">فلتر:</span>
         <select id="f-coll-rep" onchange="renderCollectionPage()"><option value="">كل المندوبين</option></select>
         <select id="f-coll-sup" onchange="_onSupChange('f-coll-rep','f-coll-sup',renderCollectionPage)"><option value="">كل المشرفين</option></select>
-        <select id="f-coll-cat" onchange="renderCollectionPage()"><option value="">كل الفئات</option></select>
+        <select id="f-coll-cat" onchange="renderCollectionPage()"><option value="">كل القنوات البيعية</option></select>
         <select id="f-coll-month" onchange="renderCollectionPage()"><option value="">كل الأشهر</option></select>
         <select id="f-coll-type" onchange="renderCollectionPage()">
           <option value="">كل الأنواع</option>
@@ -2429,8 +2457,8 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
           <option value="إضافة">إضافات فقط</option>
         </select>
         <select id="f-coll-month-q" onchange="renderCollectionPage()"><option value="">كل الأشهر</option></select>
-        <input type="date" id="f-coll-from" onchange="renderCollectionPage()" title="من تاريخ">
-        <input type="date" id="f-coll-to" onchange="renderCollectionPage()" title="إلى تاريخ">
+        <div class="date-wrap"><input type="date" id="f-coll-from" onchange="renderCollectionPage()" title="من تاريخ"></div>
+        <div class="date-wrap"><input type="date" id="f-coll-to" onchange="renderCollectionPage()" title="إلى تاريخ"></div>
         <button class="btn" onclick="[&#39;f-coll-sup&#39;,&#39;f-coll-rep&#39;,&#39;f-coll-cat&#39;,&#39;f-coll-month&#39;,&#39;f-coll-type&#39;,&#39;f-coll-from&#39;,&#39;f-coll-to&#39;].forEach(id=&gt;{const el=document.getElementById(id);if(el)el.value=&#39;&#39;});renderCollectionPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap" id="coll-table-wrap"></div>
@@ -2472,7 +2500,7 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
           </select>
           <select id="f-summary-rep" onchange="renderCollectionSummary()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-md);color:var(--text);font-family:&#39;Cairo&#39;,sans-serif;font-size:12px;padding:6px 10px"><option value="">كل المندوبين</option></select>
           <select id="f-summary-cat" onchange="renderCollectionSummary()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-md);color:var(--text);font-family:&#39;Cairo&#39;,sans-serif;font-size:12px;padding:6px 10px">
-            <option value="">كل الفئات</option>
+            <option value="">كل القنوات البيعية</option>
           </select>
           <button class="btn" onclick="[&#39;f-summary-month&#39;,&#39;f-summary-rep&#39;,&#39;f-summary-cat&#39;].forEach(id=&gt;{const el=document.getElementById(id);if(el)el.value=&#39;&#39;});renderCollectionSummary()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
         </div>
@@ -3181,7 +3209,9 @@ function populateRepSelects(){
   const reps=[..._rBase,..._rCat];
 
   // ── تعبئة فلاتر المشرفين ──
-  const sups=[...new Set(Object.values(D._repSuperMap||{}).filter(Boolean))].sort();
+  // تنقية الأسماء غير الصالحة (إجمالي الأسواق، اجمالي...) من قائمة المشرفين
+  const _invalidSup=s=>!s||s.includes('إجمالي')||s.includes('اجمالي')||s.includes('الإجمالي');
+  const sups=[...new Set(Object.values(D._repSuperMap||{}).filter(s=>s&&!_invalidSup(s)))].sort();
   const supIds=['f-sales-sup','f-rep-sup','f-cust-sup','f-prod-sup','f-debt-sup','f-aging-sup','f-coll-sup','gf-sup'];
   supIds.forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
@@ -3207,10 +3237,10 @@ function populateRepSelects(){
 
   // ── تعبئة فلاتر الفئات ──
   const cats=[...new Set(reps.map(r=>(D._repCatMap&&D._repCatMap[r])||'').filter(Boolean))].sort();
-  ['f-coll-cat','f-rep-cat','f-prod-cat','f-debt-cat','f-cust-repcatf'].forEach(id=>{
+  ['f-coll-cat','f-rep-cat','f-prod-cat','f-debt-cat','f-cust-repcatf','f-sales-cat'].forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
     const cur=el.value;
-    el.innerHTML='<option value="">كل الفئات</option>'+cats.map(c=>`<option value="${c}"${c===cur?' selected':''}>${c}</option>`).join('');
+    el.innerHTML='<option value="">كل القنوات البيعية</option>'+cats.map(c=>`<option value="${c}"${c===cur?' selected':''}>${c}</option>`).join('');
   });
   const whs=Object.keys(D.inventory_by_warehouse||{});
   const whEl=document.getElementById('f-inv-wh');
@@ -3245,6 +3275,7 @@ function _repMatchesSup(repName, supVal){
 function renderSalesPage(){
   const repF=document.getElementById('f-sales-rep')?.value||'';
   const supF_s=document.getElementById('f-sales-sup')?.value||'';
+  const catF_s=document.getElementById('f-sales-cat')?.value||'';
   const monthF=document.getElementById('f-sales-month')?.value||'';
   const typeF=document.getElementById('f-sales-type')?.value||'';
   const _cn=s=>String(s||'').trim();
@@ -3260,6 +3291,7 @@ function renderSalesPage(){
     const kType=_fc('النوع','نوع');
     const kDate=_fc('التاريخ','تاريخ');
     if(supF_s)filtRows=filtRows.filter(r=>(D._repSuperMap&&D._repSuperMap[_cn(r[kRep])])===supF_s);
+    if(catF_s)filtRows=filtRows.filter(r=>(D._repCatMap&&D._repCatMap[_cn(r[kRep])])===catF_s);
     if(repF)filtRows=filtRows.filter(r=>_cn(r[kRep])===repF);
     if(typeF)filtRows=filtRows.filter(r=>_cn(r[kType])===typeF);
     if(monthF)filtRows=filtRows.filter(r=>{const d=new Date(_cn(r[kDate]));return!isNaN(d)&&(d.getMonth()+1)===+monthF});
@@ -3323,7 +3355,7 @@ function renderSalesPage(){
   }
 
   // ── الرسوم البيانية الشهرية (تتفاعل مع الفلتر) ─────────────────────────────
-  _renderMonthlyTable(repF,monthF,typeF,supF_s);
+  _renderMonthlyTable(repF,monthF,typeF,supF_s,catF_s);
 
   // قوائم الترتيب — من الصفوف المفلترة إن وُجد فلتر
   if(repF){
@@ -3336,8 +3368,8 @@ function renderSalesPage(){
   buildSalesTable();
 }
 
-function _renderMonthlyTable(repF,monthF,typeF,supF_s){
-  const ms=_buildMonthlyStats(repF,monthF,typeF,supF_s);
+function _renderMonthlyTable(repF,monthF,typeF,supF_s,catF_s=''){
+  const ms=_buildMonthlyStats(repF,monthF,typeF,supF_s,catF_s);
   // رسم خطي
   const months=ms.labels;
   lineChart('ch-sales-monthly',months,[
@@ -3381,17 +3413,18 @@ function _renderMonthlyTable(repF,monthF,typeF,supF_s){
   '<td class="td-num '+tagCls(100-totalRetPct)+'" style="font-weight:900">'+totalRetPct.toFixed(1)+'%</td></tr>';
 }
 
-function _buildMonthlyStats(repF,monthF,typeF,supF_s){D.monthly_stats=null;
+function _buildMonthlyStats(repF,monthF,typeF,supF_s,catF_s=''){D.monthly_stats=null;
   const _cn=s=>String(s||'').trim();
   const _n=v=>_parseNum(v);
   let rows=D.sales_table||[];
-  if(rows.length&&(repF||monthF||typeF||supF_s)){
+  if(rows.length&&(repF||monthF||typeF||supF_s||catF_s)){
     const hdrs=Object.keys(rows[0]||{});
     const _fc=(...ns)=>{for(const n of ns){const h=hdrs.find(h=>_cn(h)===n);if(h)return h}return ns[0]};
     const kRep=_fc('المندوب','اسم المندوب');
     const kType=_fc('النوع','نوع');
     const kDate=_fc('التاريخ','تاريخ');
     if(supF_s)rows=rows.filter(r=>(D._repSuperMap&&D._repSuperMap[_cn(r[kRep])])===supF_s);
+    if(catF_s)rows=rows.filter(r=>(D._repCatMap&&D._repCatMap[_cn(r[kRep])])===catF_s);
     if(repF)rows=rows.filter(r=>_cn(r[kRep])===repF);
     if(typeF)rows=rows.filter(r=>_cn(r[kType])===typeF);
     if(monthF)rows=rows.filter(r=>{const d=new Date(_cn(r[kDate]));return!isNaN(d)&&(d.getMonth()+1)===+monthF});
@@ -3412,11 +3445,13 @@ function _buildMonthlyStats(repF,monthF,typeF,supF_s){D.monthly_stats=null;
   }
   let colRows=(D.collection_table||[]).filter(r=>r._colTag!=='تجاهل'&&r._colTag!=='خصم');
   if(supF_s)colRows=colRows.filter(r=>(D._repSuperMap&&D._repSuperMap[_cn(r['المندوب']||'')])===supF_s);
+  if(catF_s)colRows=colRows.filter(r=>(D._repCatMap&&D._repCatMap[_cn(r['المندوب']||'')])===catF_s);
   if(repF)colRows=colRows.filter(r=>_cn(r['المندوب']||'')===repF);
   if(monthF)colRows=colRows.filter(r=>{const d=new Date(r['التاريخ']);return!isNaN(d)&&(d.getMonth()+1)===+monthF});
   // طرح الخصومات المفلترة
   let dedRows=(D.collection_table||[]).filter(r=>r._colTag==='خصم');
   if(supF_s)dedRows=dedRows.filter(r=>(D._repSuperMap&&D._repSuperMap[_cn(r['المندوب']||'')])===supF_s);
+  if(catF_s)dedRows=dedRows.filter(r=>(D._repCatMap&&D._repCatMap[_cn(r['المندوب']||'')])===catF_s);
   if(repF)dedRows=dedRows.filter(r=>_cn(r['المندوب']||'')===repF);
   if(monthF)dedRows=dedRows.filter(r=>{const d=new Date(r['التاريخ']);return!isNaN(d)&&(d.getMonth()+1)===+monthF});
   const colMap={},dedMap={};
@@ -3558,7 +3593,7 @@ function _renderSalesTable(){
   ]);}
 }
 function resetSalesFilters(){
-  ['f-sales-sup','f-sales-rep','f-sales-month','f-sales-type','f-sales-cust','f-sales-item','f-sales-from','f-sales-to'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
+  ['f-sales-sup','f-sales-rep','f-sales-cat','f-sales-month','f-sales-type','f-sales-cust','f-sales-item','f-sales-from','f-sales-to'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
   renderSalesPage();
 }
 
@@ -3761,35 +3796,34 @@ function _initRepProdTargetsCard(selectedRep){
   const hasTargets=D.rep_product_targets&&Object.keys(D.rep_product_targets).length>0;
   if(!hasTargets)return;
 
-  // ملء قائمة المشرفين
   const supSel=document.getElementById('f-rpt-sup');
+  const catSel=document.getElementById('f-rpt-cat');
+  const repSel=document.getElementById('f-rpt-rep');
+
+  // ── ملء قائمة المشرفين دائماً من D._supTotals (ملف الأهداف) ──
   if(supSel){
-    const sups=[...new Set(Object.values(D._repSuperMap||{}).filter(Boolean))].sort();
+    const _invSup=s=>!s||s.includes('إجمالي')||s.includes('اجمالي')||s.includes('الإجمالي');
+    const sups=D._supTotals&&Object.keys(D._supTotals).length>0
+      ?Object.keys(D._supTotals).filter(s=>!_invSup(s)).sort()
+      :[...new Set(Object.values(D._repSuperMap||{}).filter(s=>s&&!_invSup(s)))].sort();
     const curSup=supSel.value||'';
     supSel.innerHTML='<option value="">كل المشرفين</option>'+sups.map(s=>`<option value="${s}"${s===curSup?' selected':''}>${s}</option>`).join('');
   }
-
-  // ملء قائمة الفئات
-  const catSel=document.getElementById('f-rpt-cat');
-  if(catSel){
-    const cats=[...new Set(Object.keys(D.rep_product_targets).map(r=>(D._repCatMap&&D._repCatMap[r])||'').filter(Boolean))].sort();
-    const curCat=catSel.value||'';
-    catSel.innerHTML='<option value="">كل الفئات</option>'+cats.map(c=>`<option value="${c}"${c===curCat?' selected':''}>${c}</option>`).join('');
-  }
-
-  // ملء قائمة المناديب (مفلترة حسب المشرف والفئة)
-  const supF0=supSel?.value||'';
-  const catF=catSel?.value||'';
-  const repSel=document.getElementById('f-rpt-rep');
-  if(repSel){
-    const allReps=Object.keys(D.rep_product_targets).sort();
-    let reps=allReps;
-    if(supF0)reps=reps.filter(r=>(D._repSuperMap&&D._repSuperMap[r])===supF0);
-    if(catF)reps=reps.filter(r=>(D._repCatMap&&D._repCatMap[r])===catF);
-    const curVal=repSel.value||selectedRep||'';
-    const validVal=reps.includes(curVal)?curVal:'';
-    repSel.innerHTML='<option value="">كل المناديب</option>'+reps.map(r=>`<option value="${r}"${r===validVal?' selected':''}>${r}</option>`).join('');
-    if(!repSel.value&&selectedRep&&reps.includes(selectedRep))repSel.value=selectedRep;
+  const alreadyInit=supSel&&supSel.options.length>1;
+  if(!alreadyInit){
+    if(false){// placeholder
+    // ملء أولي: كل القنوات البيعية
+    }
+    if(catSel){
+      const cats=[...new Set(Object.keys(D.rep_product_targets).map(r=>(D._repCatMap&&D._repCatMap[r])||'').filter(Boolean))].sort();
+      catSel.innerHTML='<option value="">كل القنوات البيعية</option>'+cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+    }
+    // ملء أولي: كل المناديب
+    if(repSel){
+      const allReps=Object.keys(D.rep_product_targets).sort();
+      repSel.innerHTML='<option value="">كل المناديب</option>'+allReps.map(r=>`<option value="${r}">${r}</option>`).join('');
+      if(selectedRep)repSel.value=selectedRep;
+    }
   }
 
   // ملء قائمة الأشهر من sales_table
@@ -3810,33 +3844,59 @@ function _initRepProdTargetsCard(selectedRep){
 }
 
 // عند تغيير الفئة: نُعيد ملء قائمة المناديب ثم نرسم
-function _rptOnCatChange(){
-  const supF=document.getElementById('f-rpt-sup')?.value||'';
-  const catF=document.getElementById('f-rpt-cat')?.value||'';
+// ── دالة مشتركة: تحديث القوائم المترابطة (المشرف / الفئة / المندوب) ──
+function _rptSyncFilters(changed){
+  const allReps=Object.keys(D.rep_product_targets||{}).sort();
+  const supSel=document.getElementById('f-rpt-sup');
+  const catSel=document.getElementById('f-rpt-cat');
   const repSel=document.getElementById('f-rpt-rep');
-  if(repSel){
-    let reps=Object.keys(D.rep_product_targets||{}).sort();
-    if(supF)reps=reps.filter(r=>(D._repSuperMap&&D._repSuperMap[r])===supF);
-    if(catF)reps=reps.filter(r=>(D._repCatMap&&D._repCatMap[r])===catF);
-    repSel.innerHTML='<option value="">كل المناديب</option>'+reps.map(r=>`<option value="${r}">${r}</option>`).join('');
+
+  // قراءة القيم قبل أي تعديل
+  let supF=supSel?.value||'';
+  let catF=catSel?.value||'';
+  let repF=repSel?.value||'';
+
+  // عند اختيار مندوب → استنتج فئته ومشرفه
+  if(changed==='rep' && repF){
+    if(D._repCatMap&&D._repCatMap[repF])  catF=D._repCatMap[repF];
+    if(D._repSuperMap&&D._repSuperMap[repF]) supF=D._repSuperMap[repF];
   }
-  renderRepProdTargets();
-  renderRepGoalsPage();
-}
-function _rptOnSupChange(){
-  const supF=document.getElementById('f-rpt-sup')?.value||'';
-  const catF=document.getElementById('f-rpt-cat')?.value||'';
-  const repSel=document.getElementById('f-rpt-rep');
-  if(repSel){
-    let reps=Object.keys(D.rep_product_targets||{}).sort();
-    if(supF)reps=reps.filter(r=>(D._repSuperMap&&D._repSuperMap[r])===supF);
-    if(catF)reps=reps.filter(r=>(D._repCatMap&&D._repCatMap[r])===catF);
-    const cur=repSel.value||'';
-    repSel.innerHTML='<option value="">كل المناديب</option>'+reps.map(r=>`<option value="${r}"${r===cur&&reps.includes(cur)?' selected':''}>${r}</option>`).join('');
-    if(cur&&!reps.includes(cur))repSel.value='';
+
+  // دالة مساعدة: المشرف الخاص بمندوب
+  const getSup=r=>(D._repSuperMap&&D._repSuperMap[r])||'';
+  const getCat=r=>(D._repCatMap&&D._repCatMap[r])||'';
+
+  // ── قائمة المشرفين: تُصفَّى حسب الفئة فقط (بغض النظر عن المندوب) ──
+  const _invSup=s=>!s||s.includes('إجمالي')||s.includes('اجمالي')||s.includes('الإجمالي');
+  if(supSel){
+    let base=catF ? allReps.filter(r=>getCat(r)===catF) : allReps;
+    const sups=[...new Set(base.map(r=>getSup(r)).filter(s=>s&&!_invSup(s)))].sort();
+    supSel.innerHTML='<option value="">كل المشرفين</option>'+sups.map(s=>`<option value="${s}"${s===supF?' selected':''}>${s}</option>`).join('');
+    if(supF&&!sups.includes(supF)) supF='';
+    supSel.value=supF;
   }
-  renderRepProdTargets();
+
+  // ── قائمة الفئات: تُصفَّى حسب المشرف فقط ──
+  if(catSel){
+    let base=supF ? allReps.filter(r=>getSup(r)===supF) : allReps;
+    const cats=[...new Set(base.map(r=>getCat(r)).filter(Boolean))].sort();
+    catSel.innerHTML='<option value="">كل القنوات البيعية</option>'+cats.map(c=>`<option value="${c}"${c===catF?' selected':''}>${c}</option>`).join('');
+    if(catF&&!cats.includes(catF)) catF='';
+    catSel.value=catF;
+  }
+
+  // ── قائمة المناديب: تُصفَّى حسب المشرف والفئة معاً ──
+  if(repSel){
+    let reps=[...allReps];
+    if(supF) reps=reps.filter(r=>getSup(r)===supF);
+    if(catF) reps=reps.filter(r=>getCat(r)===catF);
+    repSel.innerHTML='<option value="">كل المناديب</option>'+reps.map(r=>`<option value="${r}"${r===repF?' selected':''}>${r}</option>`).join('');
+    if(repF&&!reps.includes(repF)) repF='';
+    repSel.value=repF;
+  }
 }
+function _rptOnCatChange(){ _rptSyncFilters('cat'); renderRepProdTargets(); renderRepGoalsPage(); }
+function _rptOnSupChange(){ _rptSyncFilters('sup'); renderRepProdTargets(); renderRepGoalsPage(); }
 
 // إعادة تعيين كل فلاتر البطاقة
 function _rptReset(){
@@ -3848,6 +3908,7 @@ function _rptReset(){
 
 // ── رسم جدول مقارنة الأصناف لمندوب محدد ──
 function _rptOnAnyChange(){
+  _rptSyncFilters('rep');
   renderRepProdTargets();
   renderRepGoalsPage();
 }
@@ -3942,8 +4003,19 @@ function renderRepProdTargets(){
   }
 
   // إحصائيات ملخصة
-  const totalTarget=Math.round(products.reduce((s,p)=>s+p.target,0));
+  let totalTarget=Math.round(products.reduce((s,p)=>s+p.target,0));
   const totalActual=products.reduce((s,p)=>s+p.actual,0);
+  // تصحيح إجمالي الهدف باستخدام عمود الإجمالي الأدق
+  {
+    const _sf=document.getElementById('f-rpt-sup')?.value||'';
+    const _rf=document.getElementById('f-rpt-rep')?.value||'';
+    const _cf=document.getElementById('f-rpt-cat')?.value||'';
+    if(_sf && D._supTotals && D._supTotals[_sf]!=null){
+      totalTarget=Math.round(D._supTotals[_sf]);
+    } else if(!_sf&&!_rf&&!_cf && D._supTotals){
+      totalTarget=D._allSupTotal||Math.round(Object.values(D._supTotals).reduce((s,v)=>s+v,0));
+    }
+  }
   const overallAch=totalTarget>0?(totalActual/totalTarget*100):0;
   const achColor=v=>v>=100?'var(--accent2)':v>=80?'var(--gold)':'var(--red)';
   const achBg=v=>v>=100?'rgba(0,255,136,.08)':v>=80?'rgba(255,193,7,.08)':'rgba(248,113,113,.08)';
@@ -3953,11 +4025,16 @@ function renderRepProdTargets(){
   const supF_s=document.getElementById('f-rpt-sup')?.value||'';
   const catF_s=document.getElementById('f-rpt-cat')?.value||'';
   const supLabel_s=supF_s||(repName&&D._repSuperMap&&D._repSuperMap[repName])||'كل المشرفين';
+  const catLabel_s=catF_s||'كل القنوات البيعية';
   const remaining=totalTarget-totalActual;
   const summaryHtml=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:14px;padding:4px 0">
     <div style="background:var(--surface2);border-radius:var(--r-md);padding:8px 10px;text-align:center;border-top:3px solid var(--purple)">
       <div style="font-size:10px;color:var(--muted);margin-bottom:3px">المشرف</div>
       <div style="font-size:12px;font-weight:700;color:var(--purple)">${supLabel_s}</div>
+    </div>
+    <div style="background:var(--surface2);border-radius:var(--r-md);padding:10px 12px;text-align:center;border-top:3px solid var(--pink)">
+      <div style="font-size:10px;color:var(--muted);margin-bottom:3px">القناة البيعية</div>
+      <div style="font-size:12px;font-weight:700;color:var(--pink)">${catLabel_s}</div>
     </div>
     <div style="background:var(--surface2);border-radius:var(--r-md);padding:10px 12px;text-align:center;border-top:3px solid var(--accent)">
       <div style="font-size:10px;color:var(--muted);margin-bottom:3px">المندوب</div>
@@ -4006,6 +4083,117 @@ function renderRepProdTargets(){
     </tr>`;
   }).join('');
 
+  // ── بناء الجدول الأفقي: المناديب كأعمدة، الأصناف كصفوف ──
+  // بناء بيانات كل مندوب لكل صنف ديناميكياً
+  const crossProds=products.map(p=>p.prod); // الأصناف المرتبة والمفلترة
+  const crossReps=filteredReps; // المناديب الديناميكيون
+
+  // جدول مفصل لكل مندوب: {target, actual} لكل صنف
+  const crossData={}; // crossData[rep][prod] = {tgt, act}
+  crossReps.forEach(rn=>{
+    crossData[rn]={};
+    const targets=D.rep_product_targets[rn]||{};
+    crossProds.forEach(prod=>{
+      const tgt=Math.round(targets[prod]||0);
+      let act=(actualByRep[rn]&&actualByRep[rn][prod])||0;
+      if(!act){const norm=_normProd(prod);act=(actualByRepNorm[rn]&&actualByRepNorm[rn][norm])||0;}
+      crossData[rn][prod]={tgt,act};
+    });
+  });
+
+  // إجماليات كل مندوب (عمود)
+  const repColTotals={}; // repColTotals[rep] = {tgt, act}
+  crossReps.forEach(rn=>{
+    let t=0,a=0;
+    crossProds.forEach(prod=>{const d=crossData[rn][prod];t+=d.tgt;a+=d.act;});
+    repColTotals[rn]={tgt:t,act:a};
+  });
+
+  // إجماليات كل صنف (صف)
+  const prodRowTotals={}; // prodRowTotals[prod] = {tgt, act}
+  crossProds.forEach(prod=>{
+    let t=0,a=0;
+    crossReps.forEach(rn=>{const d=crossData[rn][prod];t+=d.tgt;a+=d.act;});
+    prodRowTotals[prod]={tgt:t,act:a};
+  });
+
+  // الإجمالي الكلي
+  const grandTgt=crossReps.reduce((s,rn)=>s+repColTotals[rn].tgt,0);
+  const grandAct=crossReps.reduce((s,rn)=>s+repColTotals[rn].act,0);
+
+  const thS='padding:7px 10px;text-align:center;font-size:11px;font-weight:700;white-space:nowrap;border:1px solid var(--border2)';
+  const tdS=(align='center')=>`padding:6px 8px;text-align:${align};font-size:11px;border:1px solid var(--border);white-space:nowrap`;
+  const achC=v=>v>=100?'var(--accent2)':v>=80?'var(--gold)':'var(--red)';
+  const fmtA=v=>v>0?fmt(v):'<span style="color:var(--muted)">—</span>';
+
+  // رأس الجدول: صف المناديب
+  const repHeaderCells=crossReps.map(rn=>`<th style="${thS};color:var(--accent);background:var(--surface2)" colspan="2">${rn}</th>`).join('');
+  // صف الإجماليات في الرأس
+  const repTotalHeader=crossReps.map(rn=>{
+    const {tgt,act}=repColTotals[rn];
+    const ach=tgt>0?(act/tgt*100):0;
+    return `<th style="${thS};color:var(--gold);background:var(--surface3)">${fmt(tgt)}</th>`+
+           `<th style="${thS};color:${achC(ach)};background:var(--surface3)">${act>0?fmt(act)+' ('+ach.toFixed(0)+'%)':'—'}</th>`;
+  }).join('');
+
+  // صفوف الأصناف
+  const crossRows=crossProds.map(prod=>{
+    const {tgt:ptgt,act:pact}=prodRowTotals[prod];
+    const pach=ptgt>0?(pact/ptgt*100):0;
+    const repCells=crossReps.map(rn=>{
+      const {tgt,act}=crossData[rn][prod];
+      const ach=tgt>0?(act/tgt*100):0;
+      return `<td style="${tdS()};color:var(--gold)">${tgt>0?fmt(tgt):'—'}</td>`+
+             `<td style="${tdS()};color:${tgt>0?achC(ach):'var(--muted)'}">${tgt>0?(act>0?fmt(act):'0'):'—'}</td>`;
+    }).join('');
+    return `<tr>
+      <td style="${tdS('right')};font-weight:600;color:var(--text);background:var(--surface2);min-width:160px">${prod}</td>
+      <td style="${tdS()};color:var(--gold);font-weight:700">${fmt(ptgt)}</td>
+      <td style="${tdS()};color:${achC(pach)};font-weight:700">${fmtA(pact)}<br><span style="font-size:10px">${ptgt>0?pach.toFixed(0)+'%':''}</span></td>
+      ${repCells}
+    </tr>`;
+  }).join('');
+
+  // صف الإجمالي الكلي
+  const grandAch=grandTgt>0?(grandAct/grandTgt*100):0;
+  const grandRepCells=crossReps.map(rn=>{
+    const {tgt,act}=repColTotals[rn];
+    const ach=tgt>0?(act/tgt*100):0;
+    return `<td style="${tdS()};color:var(--gold);font-weight:700;background:var(--surface3)">${fmt(tgt)}</td>`+
+           `<td style="${tdS()};color:${achC(ach)};font-weight:700;background:var(--surface3)">${act>0?fmt(act):'0'}<br><span style="font-size:10px">${ach.toFixed(0)}%</span></td>`;
+  }).join('');
+
+  const crossTableHtml=`
+  <div style="margin-top:18px;border-top:2px solid var(--border2);padding-top:12px">
+    <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px;padding:0 4px">📊 جدول المقارنة — المناديب × الأصناف</div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+      <table style="border-collapse:collapse;font-family:'Cairo',sans-serif;direction:rtl;font-size:11px">
+        <thead>
+          <tr style="background:var(--surface2)">
+            <th style="${thS};color:var(--text2);background:var(--surface2)">الصنف</th>
+            <th style="${thS};color:var(--gold);background:var(--surface2)" colspan="2">إجمالي الكمية</th>
+            ${repHeaderCells}
+          </tr>
+          <tr style="background:var(--surface3)">
+            <th style="${thS};color:var(--text2);background:var(--surface3)">—</th>
+            <th style="${thS};color:var(--gold);background:var(--surface3)">🎯 الهدف</th>
+            <th style="${thS};color:var(--accent);background:var(--surface3)">📦 الفعلي</th>
+            ${repTotalHeader}
+          </tr>
+        </thead>
+        <tbody>${crossRows}</tbody>
+        <tfoot>
+          <tr style="background:var(--surface3);font-weight:700;border-top:2px solid var(--border2)">
+            <td style="${tdS('right')};font-weight:700;color:var(--text);background:var(--surface3)">إجمالي الجملة</td>
+            <td style="${tdS()};color:var(--gold);font-weight:700;background:var(--surface3)">${fmt(grandTgt)}</td>
+            <td style="${tdS()};color:${achC(grandAch)};font-weight:700;background:var(--surface3)">${fmt(grandAct)}<br><span style="font-size:10px">${grandAch.toFixed(0)}%</span></td>
+            ${grandRepCells}
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>`;
+
   wrap.innerHTML=summaryHtml+`<div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
     <table style="width:100%;min-width:520px;border-collapse:collapse;font-family:'Cairo',sans-serif;direction:rtl">
       <thead>
@@ -4028,7 +4216,7 @@ function renderRepProdTargets(){
         </tr>
       </tfoot>
     </table>
-  </div>`;
+  </div>`+crossTableHtml;
 }
 
 
@@ -4058,7 +4246,15 @@ function renderRepGoalsPage(){
 
   // تحديد المناديب المفلترين
   let filtRepsG=Object.keys(D.rep_product_targets).sort();
-  if(supF_g)filtRepsG=filtRepsG.filter(r=>(D._repSuperMap&&D._repSuperMap[r])===supF_g);
+  if(supF_g){
+    // استخدم _supRepMap (من ملف الأهداف) أولاً، ثم _repSuperMap
+    if(D._supRepMap&&D._supRepMap[supF_g]){
+      const supReps=D._supRepMap[supF_g];
+      filtRepsG=filtRepsG.filter(r=>supReps.includes(r));
+    } else {
+      filtRepsG=filtRepsG.filter(r=>(D._repSuperMap&&D._repSuperMap[r])===supF_g);
+    }
+  }
   if(catF_g)filtRepsG=filtRepsG.filter(r=>(D._repCatMap&&D._repCatMap[r])===catF_g);
   if(repF_g)filtRepsG=filtRepsG.filter(r=>r===repF_g);
 
@@ -4090,6 +4286,10 @@ function renderRepGoalsPage(){
 
   let totalTarget=0,totalActual=0,above100=0,below80=0;
   const repAchArr=[];
+
+  // إذا كان الفلتر مشرف واحد محدد → استخدم إجماليه من D._supTotals (الأدق)
+  const _supName = supF_g && D._supTotals && D._supTotals[supF_g]!=null ? supF_g : null;
+
   filtRepsG.forEach(rn=>{
     const targets=D.rep_product_targets[rn]||{};
     let rTgt=0,rAct=0;
@@ -4103,6 +4303,14 @@ function renderRepGoalsPage(){
     if(ach>=100)above100++;else if(ach<80)below80++;
     repAchArr.push({name:rn,target:rTgt,actual:rAct,ach});
   });
+
+  // تصحيح إجمالي الهدف باستخدام عمود إجمالي المشرف (الأدق من الملف)
+  if(_supName){
+    totalTarget=Math.round(D._supTotals[_supName]);
+  } else if(!supF_g && !repF_g && !catF_g && D._supTotals){
+    // الإجمالي الكلي = من _allSupTotal (قبل تقريب كل مشرف منفصلاً)
+    totalTarget=D._allSupTotal||Math.round(Object.values(D._supTotals).reduce((s,v)=>s+v,0));
+  }
   const overallAch=totalTarget>0?(totalActual/totalTarget*100):0;
   const isFiltered=!!(supF_g||repF_g||catF_g||monthF_g||fromF_g||toF_g);
   // حساب بيانات المشرف
@@ -4429,7 +4637,7 @@ function _renderCustTable(){
       <th class="col-debt" style="color:var(--accent2)" onclick="window._custSort={key:'age30',dir:'desc'};renderCustomersPage()" style="cursor:pointer">ذمة ≤30 يوم</th>
       <th class="col-debt" style="color:var(--accent3)" onclick="window._custSort={key:'age60',dir:'desc'};renderCustomersPage()" style="cursor:pointer">ذمة ≤60 يوم</th>
       <th class="col-debt" style="color:var(--red)" onclick="window._custSort={key:'ageOld',dir:'desc'};renderCustomersPage()" style="cursor:pointer">ذمة > 60 يوم</th>
-      <th class="col-cat" onclick="window._custSort={key:'cat',dir:'asc'};renderCustomersPage()" style="cursor:pointer">التصنيف</th>
+      <th class="col-cat" onclick="window._custSort={key:'cat',dir:'asc'};renderCustomersPage()" style="cursor:pointer">القناة البيعية</th>
     </tr></thead>
     <tbody>${rows.map((c,i)=>`<tr>
       <td class="td-num">${(PAG_STATE['cust'].page-1)*PAGE_SIZE+i+1}</td>
@@ -4544,7 +4752,7 @@ function renderProductsPage(){
   if(repSel&&repSel.options.length<=1){const cur=repSel.value;repSel.innerHTML='<option value="">كل المندوبين</option>'+reps.map(r=>`<option value="${r}"${r===cur?' selected':''}>${r}</option>`).join('');}
   const cats=[...new Set(reps.map(r=>(D._repCatMap&&D._repCatMap[r])||'').filter(Boolean))].sort();
   const catSel=document.getElementById('f-prod-cat');
-  if(catSel&&catSel.options.length<=1){const cur=catSel.value;catSel.innerHTML='<option value="">كل الفئات</option>'+cats.map(c=>`<option value="${c}"${c===cur?' selected':''}>${c}</option>`).join('');}
+  if(catSel&&catSel.options.length<=1){const cur=catSel.value;catSel.innerHTML='<option value="">كل القنوات البيعية</option>'+cats.map(c=>`<option value="${c}"${c===cur?' selected':''}>${c}</option>`).join('');}
 
   const srcAll=D.item_full||items;
   const totalSalesAll=srcAll.reduce((s,p)=>s+p.sales,0);
@@ -4740,7 +4948,10 @@ function renderDebtPage(){
     // بناء خريطة أعمار الذمم حسب المندوب
     const repAgeMap={};
     if(hasAging){
-      _agT.forEach(r=>{
+      let _agTFiltered=_agT;
+      if(supF_d)_agTFiltered=_agTFiltered.filter(r=>(D._repSuperMap&&D._repSuperMap[String(r['المندوب']||'').trim()])===supF_d);
+      if(repF)  _agTFiltered=_agTFiltered.filter(r=>(r['المندوب']||'').trim()===repF.trim());
+      _agTFiltered.forEach(r=>{
         const rep=String(r['المندوب']||'').trim();if(!rep)return;
         if(!repAgeMap[rep])repAgeMap[rep]={};
         _agCols.forEach(col=>{repAgeMap[rep][col]=(repAgeMap[rep][col]||0)+_parseNum(r[col]);});
@@ -4898,9 +5109,30 @@ function renderAgingPage(){
 
   // ── تحديد قيم الفئات ─────────────────────────────────────────────────────
   let bNew, b60, bOld, b90=0, b10=0, b15=0;
-  if(repF){
-    // عند الفلتر: البيانات المحسوبة من المبيعات حسب المندوب
-    bNew=Math.round(sumNew); b60=Math.round(sum60); bOld=Math.round(sumOld);
+  const isFilteredAg=!!(repF||supF_a);
+  if(isFilteredAg){
+    // عند الفلتر: احسب من الصفوف المفلترة مباشرة
+    if(hasAgingFile){
+      let filtAg=D.aging_table||[];
+      if(supF_a)filtAg=filtAg.filter(r=>(D._repSuperMap&&D._repSuperMap[String(r['المندوب']||'').trim()])===supF_a);
+      if(repF)  filtAg=filtAg.filter(r=>(r['المندوب']||'').trim()===repF.trim());
+      const _aHdrs=filtAg[0]?Object.keys(filtAg[0]):[];
+      const _aFnd=(...ns)=>ns.find(n=>_aHdrs.includes(n));
+      const _c10=_aFnd('10','10أيام','10 أيام');
+      const _c15=_aFnd('15','15يوم','15 يوم');
+      const _c30=_aFnd('30','30يوم','30 يوم');
+      const _c60=_aFnd('60','60يوم','60 يوم');
+      const _c90=_aFnd('90','90يوم','90 يوم');
+      const _c120=_aFnd('120','120+','120يوم','120 يوم');
+      b10 =_c10 ?filtAg.reduce((s,r)=>s+_parseNum(r[_c10 ]),0):0;
+      b15 =_c15 ?filtAg.reduce((s,r)=>s+_parseNum(r[_c15 ]),0):0;
+      bNew=_c30 ?filtAg.reduce((s,r)=>s+_parseNum(r[_c30 ]),0):0;
+      b60 =_c60 ?filtAg.reduce((s,r)=>s+_parseNum(r[_c60 ]),0):0;
+      b90 =_c90 ?filtAg.reduce((s,r)=>s+_parseNum(r[_c90 ]),0):0;
+      bOld=_c120?filtAg.reduce((s,r)=>s+_parseNum(r[_c120]),0):0;
+    } else {
+      bNew=Math.round(sumNew); b60=Math.round(sum60); bOld=Math.round(sumOld);
+    }
   } else if(hasBuckets){
     // الأولوية: aging_buckets (من الملف أو الافتراضي)
     b10  =D.aging_buckets['أقل من 10']||0;
@@ -4916,19 +5148,20 @@ function renderAgingPage(){
   }
 
   const totalAging=b10+b15+bNew+b60+b90+bOld;
-  const custCount=repF
-    ?(ageSrc.filter(c=>(c.age30||0)+(c.age60||0)+(c.ageOld||0)>0).length||Object.keys(custAgeMap).length)
+  const custCount=isFilteredAg
+    ?(hasAgingFile
+      ?(()=>{let fAg=D.aging_table||[];if(supF_a)fAg=fAg.filter(r=>(D._repSuperMap&&D._repSuperMap[String(r['المندوب']||'').trim()])===supF_a);if(repF)fAg=fAg.filter(r=>(r['المندوب']||'').trim()===repF.trim());return fAg.filter(r=>{const _n=v=>_parseNum(v);const hdrs=Object.keys(r);const s=hdrs.reduce((t,k)=>t+_n(r[k]),0);return s>0;}).length;})()
+      :(ageSrc.filter(c=>(c.age30||0)+(c.age60||0)+(c.ageOld||0)>0).length||Object.keys(custAgeMap).length))
     :hasAgingFile
       ?D.aging_table.filter(r=>{const _n=v=>_parseNum(v);return _n(r[10])+_n(r[15])+_n(r[30])+_n(r[60])+_n(r[90])+_n(r[120])>0}).length
       :Object.keys(custAgeMap).length;
-  const isFiltered=!!repF;
 
   document.getElementById('kpi-aging').innerHTML=
-    kpiCard('⏳','إجمالي الذمم',totalAging,'var(--gold)',isFiltered?'(مفلتر)':'إجمالي')+
+    kpiCard('⏳','إجمالي الذمم',totalAging,'var(--gold)',isFilteredAg?'(مفلتر)':'إجمالي')+
     kpiCard('🔴','ذمم > 60 يوم',b90+bOld,'var(--red)','تحتاج متابعة')+
     kpiCard('⚠','ذمم 31-60 يوم',b60,'var(--accent3)','مراقبة')+
     kpiCard('✅','ذمم حديثة ≤30 يوم',b10+b15+bNew,'var(--accent2)','آمنة')+
-    kpiCard('👥','عملاء بذمم',custCount,'var(--purple)',isFiltered?'(مفلتر)':'عميل');
+    kpiCard('👥','عملاء بذمم',custCount,'var(--purple)',isFilteredAg?'(مفلتر)':'عميل');
 
   // ── بطاقات الفئات بالترتيب: 10 - 15 - 30 - 60 - 90 - 120+ ─────────────
   const bucketsEl=document.getElementById('aging-buckets');
@@ -4978,6 +5211,7 @@ function renderAgingPage(){
   let rows=[];
   if(hasAgingFile){
     rows=D.aging_table||[];
+    if(supF_a)rows=rows.filter(r=>(D._repSuperMap&&D._repSuperMap[String(r['المندوب']||'').trim()])===supF_a);
     if(repF)   rows=rows.filter(r=>(r['المندوب']||'').trim()===repF.trim());
     if(searchF)rows=rows.filter(r=>(r['اسم الحساب']||'').toLowerCase().includes(searchF));
     if(bucketF)rows=rows.filter(r=>_nAT(r[bucketF]||r[bucketF+'يوم'])>0);
@@ -5442,7 +5676,7 @@ function _renderCollTable(){
     <thead><tr>
       <th>#</th><th>التاريخ</th><th>النوع / السند</th><th>اسم الحساب</th>
       <th>مدين</th><th>دائن</th><th>الرصيد التراكمي</th>
-      <th>التصنيف</th><th>المندوب</th><th>البيان</th>
+      <th>القناة البيعية</th><th>المندوب</th><th>البيان</th>
     </tr></thead>
     <tbody>${rows.map((r,i)=>{
       const cred=_n(r['دائن']);const deb=_n(r['مدين']);
@@ -5533,7 +5767,7 @@ function _renderAdjTable(){
   };
   wrap.innerHTML=`<table>
     <thead><tr>
-      <th>#</th><th>التصنيف</th><th>التاريخ</th><th>رقم السند</th>
+      <th>#</th><th>القناة البيعية</th><th>التاريخ</th><th>رقم السند</th>
       <th>اسم الحساب</th><th>مدين</th><th>دائن</th>
       <th>المندوب</th><th>البيان</th>
     </tr></thead>
@@ -6039,7 +6273,7 @@ function renderOverviewPage(){
       animation:{duration:800,easing:'easeOutQuart'}}
   });
 
-  // ── رسم مبيعات حسب فئة المندوب ──
+  // ── رسم مبيعات حسب القناة البيعية ──
   destroyChart('ov-catChart');
   const catStyle2={'جملة':'#34D399','تجزئة':'#4F8EF7','أسواق':'#F87171','مقاهي ومطاعم':'#FCD34D','مستقل':'#FB923C','إدارية':'#8AA5C0'};
   const catGroups={};
@@ -6448,10 +6682,11 @@ function processNewData(type,rows){
         // لا نمسح _repSuperMap — ملف تصنيف المندوبين هو المصدر الرسمي إن وُجد
         if(!D._repSuperMap)D._repSuperMap={};
         if(!D._superRepsMap)D._superRepsMap={};
+        const _invSupCheck=s=>!s||s.includes('إجمالي')||s.includes('اجمالي')||s.includes('الإجمالي');
         rows.forEach(r=>{
           const rep=_cn(r[kRep]||'');
           const sup=_cn(r[kSupSales]||'');
-          if(rep && sup && !D._repSuperMap[rep]){
+          if(rep && sup && !_invSupCheck(sup) && !D._repSuperMap[rep]){
             D._repSuperMap[rep]=sup; // أضف فقط إذا لم يُحدَّد من ملف التصنيف
           }
         });
@@ -6580,7 +6815,7 @@ function processNewData(type,rows){
       const hdrs4=Object.keys(rows[0]||{});
       const _fc4=(...ns)=>{for(const n of ns){const h=hdrs4.find(h=>_c4(h)===n||_c4(h).includes(n));if(h&&_c4(h))return h}return null};
       const kName=_fc4('المندوب','اسم المندوب','الاسم','name','rep','مندوب');
-      const kCat =_fc4('الفئة','التصنيف','تصنيف','الفئه','cat','category','classification');
+      const kCat =_fc4('القناة البيعية','القناة البيعية','تصنيف','الفئه','cat','category','classification');
       const kSup =_fc4('المشرف','مشرف','supervisor','المشرفين');
       const kTSales=_fc4('هدف المبيعات','هدف البيع','target_sales','الهدف');
       const kTQty  =_fc4('هدف الكمية','هدف الكميه','target_qty');
@@ -6600,7 +6835,10 @@ function processNewData(type,rows){
         const tQty  =kTQty  ?_n4(r[kTQty  ]):0;
         const tCol  =kTCol  ?_n4(r[kTCol  ]):0;
         if(cat) REP_CATEGORIES[name]=cat;
-        if(sup) D._repSuperMap[name]=sup;
+        // تنقية اسم المشرف من أي قيم غير صالحة
+        const _cleanSup=s=>s&&!s.includes('إجمالي')&&!s.includes('اجمالي')&&!s.includes('الإجمالي');
+        const _supNorm=sup?_normSup(sup):sup;
+        if(_supNorm && _cleanSup(_supNorm)) D._repSuperMap[name]=_supNorm;
         targets[name]={tSales,tQty,tCol,cat,sup};
       });
       D._repTargets=targets;
@@ -6630,28 +6868,22 @@ function processNewData(type,rows){
     }
     case 'targets':{
       // ── قراءة ملف أهداف الأصناف ──
-      // البنية: هدف_مندوب = الكمية_الإجمالية_للصنف × نسبة_المندوب
-      // الكميات في أعمدة totalCol هي نفسها لكل المجموعات (كمية مشتركة للصنف)
-      // النسب في صف 2 (index 2)، الأسماء في صف 3 (index 3)
       const _ct6=s=>String(s===null||s===undefined?'':s).replace(/[\r\n]+/g,' ').trim();
-      const _nt6=v=>{if(v===null||v===undefined||v==='')return 0;const n=parseFloat(String(v).replace(/,/g,''));return isNaN(n)?0:n;};
+      const _nt6=v=>{if(v===null||v===undefined||v==='')return 0;const s=String(v);if(s.startsWith('='))return 0;const n=parseFloat(s.replace(/,/g,''));return isNaN(n)?0:n;};
 
-      // استخدم rows المُمررة إن وُجدت، وإلا اقرأ من D._targetsBuffer
-      const rawRows = rows&&rows.length ? rows : [];
-      if(!rawRows||!rawRows.length){toast('⚠ لم يتم تحميل ملف الأهداف','error');break;}
+      const rawRows=rows&&rows.length?rows:[];
+      if(!rawRows.length){toast('⚠ لم يتم تحميل ملف الأهداف','error');break;}
 
-      // ابحث ديناميكياً عن صف النسب وصف الرؤوس
-      let ratioRow=[], hdrRow6=[], dataStartIdx=4;
+      // صف الرأس
+      let hdrRow6=[], dataStartIdx=4;
       for(let _i=0;_i<Math.min(rawRows.length,15);_i++){
         const _r=rawRows[_i]||[];
-        const _hasRatios=_r.filter(v=>typeof v==='number'&&v>0&&v<1).length>=4;
-        const _hasHdr=_r.some(v=>String(v||'').includes('أجمالي الكمية'));
-        if(_hasRatios&&!ratioRow.length)ratioRow=_r;
-        if(_hasHdr&&!hdrRow6.length){hdrRow6=_r;dataStartIdx=_i+1;}
-        if(ratioRow.length&&hdrRow6.length)break;
+        if(_r.some(v=>String(v||'').includes('أجمالي الكمية'))){
+          hdrRow6=_r; dataStartIdx=_i+1; break;
+        }
       }
 
-      // ابحث عن مواضع "الصنف" و"أجمالي الكمية" في صف الرأس
+      // أعمدة الصنف وأجمالي الكمية
       const _prodColIdxs=[], _totalColIdxs=[];
       hdrRow6.forEach((v,i)=>{
         const s=_ct6(v);
@@ -6659,70 +6891,161 @@ function processNewData(type,rows){
         if(s==='أجمالي الكمية')_totalColIdxs.push(i);
       });
 
-      // بناء المجموعات: بين كل "أجمالي الكمية" والتالية تقع أعمدة المناديب
+      // بناء المجموعات ديناميكياً
       const _GROUPS6=[];
       _totalColIdxs.forEach((totalCol,gi)=>{
         const prodCol=_prodColIdxs[gi]??totalCol+1;
-        // أعمدة المناديب: بين totalCol السابقة (أو بداية الجزء) وهذه totalCol
         const prevTotal=gi===0?-1:_totalColIdxs[gi-1];
+        let supCol=-1;
         const repCols=[];
         for(let c=prevTotal+1;c<totalCol;c++){
           const name=_ct6(hdrRow6[c]||'');
-          const ratio=_nt6(ratioRow[c]);
-          if(name&&name!=='أجمالي الكمية'&&name!=='الصنف'&&!name.includes('اجمالي'))
-            repCols.push(c);
+          if(!name)continue;
+          if(name.includes('اجمالي')||name.includes('إجمالي')){if(supCol===-1)supCol=c;continue;}
+          if(name!=='أجمالي الكمية'&&name!=='الصنف')repCols.push(c);
         }
-        if(repCols.length>0)_GROUPS6.push({repCols,totalCol,prodCol});
+        if(!repCols.length)return;
+        // استخراج اسم المشرف: نستخدم القيمة الخام قبل _ct6 للحفاظ على \n
+        const _rawSupRaw=String(hdrRow6[supCol]===null||hdrRow6[supCol]===undefined?'':hdrRow6[supCol]);
+        const _supLines=_rawSupRaw.split(/[\r\n]+/).map(l=>l.trim()).filter(Boolean);
+        let supName;
+        if(_supLines.length>=2){
+          // سطرين: "اجمالي المنطقة\nاسم المشرف" → خذ السطر الأخير
+          supName=_supLines[_supLines.length-1];
+        } else {
+          // سطر واحد: احذف كلمة "اجمالي" والكلمات الوصفية
+          const _skip=new Set(['اجمالي','إجمالي','الجملة','الاسواق','الأسواق','شرق','غرب','طرابلس','المقاهي','مقاهي','شمال','جنوب','وسط','منطقة','مناطق']);
+          const _rawText=_rawSupRaw.replace(/[\r\n]+/g,' ').trim();
+          const _parts=_rawText.split(/\s+/);
+          const _filtered=_parts.filter(p=>p&&!_skip.has(p));
+          // خريطة تحويل الكلمات المركّبة لأسماء مشرفين صحيحة
+          const _compoundMap={
+            'أسواق':'أسواق','اسواق':'أسواق',
+            'جملة':'جملة','الجملة':'جملة',
+            'تجزئة':'تجزئة','مقاهي':'مقاهي ومطاعم','مطاعم':'مقاهي ومطاعم'
+          };
+          let _name=_filtered.join(' ');
+          // إذا بقيت كلمة واحدة فقط، تحقق من خريطة التحويل
+          if(_filtered.length===1&&_compoundMap[_filtered[0]]){
+            _name=_compoundMap[_filtered[0]];
+          } else if(_filtered.length===0){
+            // حاول استخراج الكلمة الأخيرة الوصفية (الاسواق → أسواق)
+            const _lastPart=_parts[_parts.length-1]||'';
+            _name=_compoundMap[_lastPart]||_rawText;
+          }
+          supName=_name||_rawText;
+        }
+        // تنقية نهائية: إذا ابتدأ الاسم بـ "إجمالي" أو "اجمالي"، احذفها
+        supName=supName.replace(/^(إجمالي|اجمالي)\s+/,'').trim();
+        // تحويل الأسماء المعروفة
+        const _knownSups={'الاسواق':'أسواق','الأسواق':'أسواق','اسواق':'أسواق'};
+        if(_knownSups[supName])supName=_knownSups[supName];
+        _GROUPS6.push({repCols,totalCol,prodCol,supCol,supName});
       });
 
-      // خريطة: عمود → {اسم، نسبة}
+      // خريطة عمود → اسم المندوب
       const colRepMap6={};
-      _GROUPS6.forEach(g=>{
-        g.repCols.forEach(c=>{
-          const name =_ct6(hdrRow6[c]||'');
-          const ratio=_nt6(ratioRow[c]);
-          if(name&&name!=='أجمالي الكمية'&&name!=='الصنف'&&!name.includes('اجمالي'))
-            colRepMap6[c]={name,ratio};
-        });
-      });
+      _GROUPS6.forEach(g=>g.repCols.forEach(c=>{
+        const name=_ct6(hdrRow6[c]||'');
+        if(name&&!name.includes('اجمالي')&&!name.includes('إجمالي')&&name!=='أجمالي الكمية'&&name!=='الصنف')
+          colRepMap6[c]=name;
+      }));
 
-      const rpt6={};
-      const repTotals6={};
+      const rpt6={}, repTotals6={}, supRepTotals6={}, supTotals6={};
 
       rawRows.forEach((r,idx)=>{
         if(idx<dataStartIdx||!r)return;
-
-        // نبحث عن اسم الصنف من أول مجموعة تحتوي قيمة نصية
+        // تخطي صفوف الإجمالي
         let prodName='';
         for(const g of _GROUPS6){
           const v=_ct6(r[g.prodCol]||'');
-          if(v&&!v.startsWith('الإجمالي')&&v!=='الصنف'){prodName=v;break;}
+          if(!v)continue;
+          if(v.startsWith('الإجمالي')||v.startsWith('الاجمالي')||v==='الصنف'){prodName='';break;}
+          if(!prodName)prodName=v;
         }
         if(!prodName)return;
 
-        // نحسب هدف كل مندوب = الكمية_الإجمالية × نسبة_المندوب
         _GROUPS6.forEach(g=>{
-          // الكمية الإجمالية لهذه المجموعة (قد تكون 0 إن لم تُوزَّع على هذه المجموعة)
-          const rawQty=r[g.totalCol];
-          const totalQty=_nt6(rawQty);
-          if(totalQty<=0)return;
+          const gProd=_ct6(r[g.prodCol]||'');
+          if(!gProd||gProd.startsWith('الإجمالي')||gProd.startsWith('الاجمالي'))return;
 
+          // ── قيم المناديب مباشرة من الخلايا (تقريب لـ 2 عشرية للحد من تراكم الكسور) ──
           g.repCols.forEach(c=>{
-            const info=colRepMap6[c];if(!info||!info.ratio)return;
-            const val=Math.round(totalQty*info.ratio*100)/100;
-            if(val<=0)return;
-            if(!rpt6[info.name])rpt6[info.name]={};
-            rpt6[info.name][prodName]=(rpt6[info.name][prodName]||0)+val;
-            repTotals6[info.name]=(repTotals6[info.name]||0)+val;
+            const name=colRepMap6[c];if(!name)return;
+            const raw=_nt6(r[c]);if(raw<=0)return;
+            const val=Math.round(raw*100)/100; // تقريب لـ 2 عشرية يقلل تراكم الخطأ
+            if(!rpt6[name])rpt6[name]={};
+            rpt6[name][prodName]=(rpt6[name][prodName]||0)+val;
+            repTotals6[name]=(repTotals6[name]||0)+val;
+            // إجمالي المشرف = مجموع مناديبه
+            if(g.supName){
+              supRepTotals6[g.supName]=(supRepTotals6[g.supName]||0)+val;
+              if(!supTotals6[g.supName])supTotals6[g.supName]={};
+              supTotals6[g.supName][prodName]=(supTotals6[g.supName][prodName]||0)+val;
+            }
           });
+
         });
       });
 
       D.rep_product_targets=rpt6;
+      D._supProductTargets=supTotals6;
+
+      // ── حساب _supTotals من عمود إجمالي المشرف مباشرة (أدق من جمع المناديب) ──
+      // نقرأ صف الإجمالي النهائي من الملف لكل مشرف
+      const supTotalsFromCol={};
+      rawRows.forEach((r,idx)=>{
+        if(idx<dataStartIdx||!r)return;
+        // نبحث في عمود الصنف لأي مجموعة عن 'الإجمالي' (صف الإجمالي النهائي)
+        let isFinalTotal=false;
+        for(const g of _GROUPS6){
+          const pv=_ct6(r[g.prodCol]||'');
+          if(pv==='الإجمالي'){isFinalTotal=true;break;}
+        }
+        if(!isFinalTotal)return;
+        // استخرج قيمة كل مشرف من عمود الإجمالي الخاص به
+        _GROUPS6.forEach(g=>{
+          if(g.supCol<0||!g.supName)return;
+          const sv=_nt6(r[g.supCol]);
+          if(sv>0){
+            supTotalsFromCol[g.supName]=(supTotalsFromCol[g.supName]||0)+sv;
+          }
+        });
+      });
+
+      // استخدم قيم عمود الإجمالي إذا وُجدت (أدق)، وإلا استخدم مجموع المناديب مقرَّباً
+      const _hasDirect=Object.keys(supTotalsFromCol).length>0;
+      if(_hasDirect){
+        // نحفظ الإجمالي الكلي قبل التقريب لضمان دقة العرض الكلي
+        D._allSupTotal=Math.round(Object.values(supTotalsFromCol).reduce((s,v)=>s+v,0));
+        Object.keys(supTotalsFromCol).forEach(s=>{
+          supRepTotals6[s]=Math.round(supTotalsFromCol[s]);
+        });
+      } else {
+        // إجمالي من مجموع المناديب قبل التقريب المنفصل
+        D._allSupTotal=Math.round(Object.values(supRepTotals6).reduce((s,v)=>s+v,0));
+        Object.keys(supRepTotals6).forEach(s=>{supRepTotals6[s]=Math.round(supRepTotals6[s]);});
+      }
+      D._supTotals=supRepTotals6;
+      // خريطة المشرف → مناديبه (للفلترة في صفحة الأهداف)
+      D._supRepMap={};
+      _GROUPS6.forEach(g=>{
+        if(!g.supName)return;
+        if(!D._supRepMap[g.supName])D._supRepMap[g.supName]=[];
+        g.repCols.forEach(c=>{
+          const name=colRepMap6[c];
+          if(name&&!D._supRepMap[g.supName].includes(name))
+            D._supRepMap[g.supName].push(name);
+        });
+      });
       if(!D._repTargets)D._repTargets={};
       Object.entries(repTotals6).forEach(([rep,total])=>{
         if(!D._repTargets[rep])D._repTargets[rep]={tSales:0,tQty:0,tCol:0,cat:''};
         D._repTargets[rep].tQty=Math.round(total);
+      });
+      Object.entries(supRepTotals6).forEach(([sup,total])=>{
+        if(!D._repTargets[sup])D._repTargets[sup]={tSales:0,tQty:0,tCol:0,cat:''};
+        D._repTargets[sup].tQty=Math.round(total);
       });
       if(D._repMap)_rebuildRepData();
       const repCount6=Object.keys(rpt6).length;
@@ -6786,7 +7109,7 @@ function openCollSummaryModal(){
   // فئات من _repCatMap
   const cats=[...new Set(reps.map(r=>(D._repCatMap&&D._repCatMap[r])||'').filter(Boolean))].sort();
   const catSel=document.getElementById('f-summary-cat');
-  if(catSel){const cur=catSel.value;catSel.innerHTML='<option value="">كل الفئات</option>'+cats.map(c=>`<option value="${c}"${c===cur?' selected':''}>${c}</option>`).join('');}
+  if(catSel){const cur=catSel.value;catSel.innerHTML='<option value="">كل القنوات البيعية</option>'+cats.map(c=>`<option value="${c}"${c===cur?' selected':''}>${c}</option>`).join('');}
   renderCollectionSummary();
 }
 function closeCollSummaryModal(){
@@ -8094,7 +8417,7 @@ async function exportCollectionExcel(){
   const ws4=workbook.addWorksheet('✅ سندات التحصيل',{views:[{rightToLeft:true}]});
   ws4.columns=[{width:6},{width:13},{width:12},{width:22},{width:32},{width:32},{width:13},{width:13},{width:20},{width:42},{width:13}];
   addTitleRow(ws4,'✅ سندات التحصيل',11,1,C.darkBg);
-  addHeaderRow(ws4,['#','التاريخ','رقم السند','النوع','اسم الحساب','الحساب المقابل','مدين','دائن','المندوب','البيان','التصنيف'],2);
+  addHeaderRow(ws4,['#','التاريخ','رقم السند','النوع','اسم الحساب','الحساب المقابل','مدين','دائن','المندوب','البيان','القناة البيعية'],2);
 
   const allVisible=[...normalRows,...addRows,...deductRows].sort((a,b)=>{
     const da=new Date(a['التاريخ']||0),db=new Date(b['التاريخ']||0);
@@ -8177,6 +8500,7 @@ function _getActiveFiltersText(page){
   if(page==='sales'){
     _add('المشرف',_v('f-sales-sup'));
     _add('المندوب',_v('f-sales-rep'));
+    _add('القناة البيعية',_v('f-sales-cat'));
     _add('الشهر',_v('f-sales-month'));
     const t=_v('f-sales-type');if(t)_add('النوع',t==='مبيع'?'مبيع فقط':'مرتجع فقط');
     const c=_v('f-sales-cust');if(c)_add('الزبون',c);
@@ -8185,7 +8509,7 @@ function _getActiveFiltersText(page){
   } else if(page==='reps'){
     _add('المشرف',_v('f-rep-sup'));
     _add('المندوب',_v('f-rep-select'));
-    _add('الفئة',_v('f-rep-cat'));
+    _add('القناة البيعية',_v('f-rep-cat'));
     _add('الشهر',_v('f-rep-month'));
     const fr=_v('f-rep-from'),to=_v('f-rep-to');
     if(fr||to)_add('الفترة',(fr||'...')+' → '+(to||'...'));
@@ -8193,7 +8517,7 @@ function _getActiveFiltersText(page){
     _add('المشرف',_v('f-cust-sup'));
     const s=_v('f-cust-search');if(s)_add('بحث',s);
     _add('المندوب',_v('f-cust-rep'));
-    _add('فئة المندوب',_v('f-cust-repcatf'));
+    _add('القناة البيعية',_v('f-cust-repcatf'));
     _add('تصنيف الزبون',_v('f-cust-cat'));
     const ag=_v('f-cust-aging');
     if(ag)_add('عمر الذمة',ag==='30'?'≤30 يوم':ag==='60'?'≤60 يوم':ag==='old'?'>60 يوم':'لديه ذمم');
@@ -8203,7 +8527,7 @@ function _getActiveFiltersText(page){
     _add('المشرف',_v('f-prod-sup'));
     const s=_v('f-prod-search');if(s)_add('بحث',s);
     _add('المندوب',_v('f-prod-rep'));
-    _add('الفئة',_v('f-prod-cat'));
+    _add('القناة البيعية',_v('f-prod-cat'));
     const c=_v('f-prod-cust');if(c)_add('الزبون',c);
     _add('الشهر',_v('f-prod-month'));
     const fr=_v('f-prod-from'),to=_v('f-prod-to');
@@ -8212,7 +8536,7 @@ function _getActiveFiltersText(page){
     _add('المشرف',_v('f-debt-sup'));
     const s=_v('f-debt-search');if(s)_add('بحث',s);
     _add('المندوب',_v('f-debt-rep'));
-    _add('الفئة',_v('f-debt-cat'));
+    _add('القناة البيعية',_v('f-debt-cat'));
     const t=_v('f-debt-type');if(t)_add('النوع','مدين فقط');
   } else if(page==='aging'){
     _add('المشرف',_v('f-aging-sup'));
@@ -8222,7 +8546,7 @@ function _getActiveFiltersText(page){
   } else if(page==='collection'){
     _add('المشرف',_v('f-coll-sup'));
     _add('المندوب',_v('f-coll-rep'));
-    _add('الفئة',_v('f-coll-cat'));
+    _add('القناة البيعية',_v('f-coll-cat'));
     _add('الشهر',_v('f-coll-month')||_v('f-coll-month-q'));
     const t=_v('f-coll-type');if(t)_add('النوع',t);
     const fr=_v('f-coll-from'),to=_v('f-coll-to');
@@ -8244,7 +8568,7 @@ async function exportCurrentTable(){
   const schemaMap={
     sales:     [{k:'التاريخ',w:13},{k:'رقم الفاتورة',w:14},{k:'النوع',w:10},{k:'اسم الزبون',w:28},{k:'المندوب',w:22},{k:'المادة',w:32},{k:'الكمية الخارجة',w:12,n:true},{k:'السعر الافرادي',w:14,n:true},{k:'الحسم',w:12,n:true},{k:'الاجمالي الصافي',w:16,n:true}],
     reps:      [{k:'name',l:'المندوب',w:24},{k:'netSales',l:'صافي المبيعات',w:16,n:true},{k:'col',l:'التحصيل',w:16,n:true},{k:'roi',l:'ROI %',w:10,n:true},{k:'returns',l:'المرتجعات',w:14,n:true},{k:'retPct',l:'نسبة المرتجع %',w:14,n:true},{k:'gap',l:'الفجوة',w:14,n:true},{k:'debtNet',l:'صافي الديون',w:14,n:true},{k:'invoices',l:'الفواتير',w:10,n:true},{k:'customers',l:'الزبائن',w:10,n:true}],
-    customers: [{k:'n',l:'اسم الزبون',w:28},{k:'rep',l:'المندوب',w:22},{k:'ns',l:'صافي المبيعات',w:16,n:true},{k:'c',l:'التحصيل',w:14,n:true},{k:'cp',l:'% التحصيل',w:12,n:true},{k:'g',l:'الفجوة',w:14,n:true},{k:'ret',l:'المرتجعات',w:14,n:true},{k:'rp',l:'% المرتجعات',w:12,n:true},{k:'inv',l:'الفواتير',w:10,n:true},{k:'cat',l:'التصنيف',w:12}],
+    customers: [{k:'n',l:'اسم الزبون',w:28},{k:'rep',l:'المندوب',w:22},{k:'ns',l:'صافي المبيعات',w:16,n:true},{k:'c',l:'التحصيل',w:14,n:true},{k:'cp',l:'% التحصيل',w:12,n:true},{k:'g',l:'الفجوة',w:14,n:true},{k:'ret',l:'المرتجعات',w:14,n:true},{k:'rp',l:'% المرتجعات',w:12,n:true},{k:'inv',l:'الفواتير',w:10,n:true},{k:'cat',l:'القناة البيعية',w:12}],
     products:  [{k:'name',l:'اسم الصنف',w:32},{k:'ns',l:'صافي المبيعات',w:16,n:true},{k:'sales',l:'إجمالي المبيعات',w:16,n:true},{k:'retVal',l:'قيمة المرتجعات',w:16,n:true},{k:'qty',l:'الكمية',w:12,n:true},{k:'retQty',l:'كمية المرتجعات',w:14,n:true},{k:'nqty',l:'صافي الكمية',w:12,n:true},{k:'retPct',l:'نسبة المرتجع %',w:13,n:true},{k:'avgP',l:'متوسط السعر',w:13,n:true}],
     debt:      [{k:'اسم الحساب',w:28},{k:'المندوب',w:22},{k:'رمز الحساب',w:14},{k:'رصيد حالي مدين',w:16,n:true},{k:'رصيد حالي دائن',w:16,n:true},{k:'الرصيد',w:14,n:true}],
     aging:     null,
@@ -8374,10 +8698,20 @@ function toast(msg,type='info'){
 //  GLOBAL FILTER — فلتر شامل يؤثر على اللوحة كاملة
 // ══════════════════════════════════════════════════════
 
+// ── تطبيع أسماء المشرفين (توحيد الكتابة) ──
+function _normSup(s){
+  if(!s)return s;
+  // توحيد كتابة الأسواق
+  if(s==='اسواق'||s==='الاسواق'||s==='الأسواق')return 'أسواق';
+  // إزالة "إجمالي" من البداية
+  s=s.replace(/^(إجمالي|اجمالي)\s+/,'').trim();
+  return s;
+}
+
 // خريطة فئات المندوبين — يمكن توسيعها أو تحميلها من الملف
 const REP_CATEGORIES = {
-  'عبدالرؤوف بريم':'اسواق',
-  'علي غزيل':'اسواق',
+  'عبدالرؤوف بريم':'أسواق',
+  'علي غزيل':'أسواق',
   'الادارية':'إدارية',
   'احمد ابو ضوة':'تجزئة',
   'احمد عبدالحميد':'تجزئة',
@@ -8533,6 +8867,12 @@ function resetGlobalFilter(){
   const gfCat=document.getElementById('gf-cat'); if(gfCat) gfCat.value='';
   const gfRep=document.getElementById('gf-rep'); if(gfRep) gfRep.value='';
   populateRepSelectsAndCats();
+  // إزالة التجميد عن جميع فلاتر الصفحات
+  document.querySelectorAll('.gf-locked').forEach(el=>{
+    el.classList.remove('gf-locked');
+    el.disabled=false;
+  });
+  document.querySelectorAll('.gf-lock-notice').forEach(n=>n.remove());
   _applyGFtoD();
   _updateGFBadge();
   if(PAGE_RENDERS[currentPage]) PAGE_RENDERS[currentPage]();
@@ -8547,6 +8887,7 @@ function resetGlobalFilter(){
 // الأزواج: [repSelectId, catSelectId, renderFunction]
 // [repId, catId, renderFn, supId]
 const _REP_CAT_PAIRS = [
+  ['f-sales-rep',  'f-sales-cat',   ()=>renderSalesPage(),           'f-sales-sup'],
   ['f-rep-select',  'f-rep-cat',     ()=>renderRepPage(),             'f-rep-sup'],
   ['f-cust-rep',    'f-cust-repcatf',()=>renderCustomersPage(),       'f-cust-sup'],
   ['f-prod-rep',    'f-prod-cat',    ()=>renderProductsPage(),        'f-prod-sup'],
@@ -8619,9 +8960,13 @@ function onGfSupChange(){
   const repSel=document.getElementById('gf-rep');
   const curRep=repSel?.value||'';
   if(repSel){
-    const allReps=D.reps||[];
+    const _rBase=D.reps||Object.keys(D.sales_by_rep||{});
+    const _rCat=Object.keys(REP_CATEGORIES).filter(r=>r&&!_rBase.includes(r));
+    const allReps=[..._rBase,..._rCat];
     const filtReps=supVal?allReps.filter(r=>(D._repSuperMap&&D._repSuperMap[r])===supVal):allReps;
     repSel.innerHTML='<option value="">كل المندوبين</option>'+filtReps.map(r=>`<option value="${r}"${r===curRep?' selected':''}>${r}</option>`).join('');
+    // إعادة تعيين المندوب إن لم يعد في القائمة
+    if(curRep && !filtReps.includes(curRep)) repSel.value='';
   }
   applyGlobalFilter();
 }
@@ -8639,7 +8984,76 @@ function applyGlobalFilter(){
   GF.dateTo   = document.getElementById('gf-date-to')?.value || '';
   _applyGFtoD();
   _updateGFBadge();
+  _syncPageFiltersFromGF();
   if(PAGE_RENDERS[currentPage]) PAGE_RENDERS[currentPage]();
+}
+
+// ── مزامنة فلاتر الصفحات مع الفلتر الشامل وتجميدها ──
+function _syncPageFiltersFromGF(){
+  const active = !!(GF.sup||GF.rep||GF.cat||GF.month||GF.dateFrom||GF.dateTo);
+
+  // قائمة كل الفلاتر في الصفحات [id, نوع القيمة: 'sup'|'rep'|'cat'|'month'|'from'|'to']
+  const PAGE_FILTERS = [
+    // مبيعات
+    {id:'f-sales-sup',   gfKey:'sup'},  {id:'f-sales-rep',   gfKey:'rep'},
+    {id:'f-sales-cat',   gfKey:'cat'},
+    {id:'f-sales-month', gfKey:'month'},{id:'f-sales-from',  gfKey:'from'}, {id:'f-sales-to',   gfKey:'to'},
+    // تقرير المناديب
+    {id:'f-rep-sup',     gfKey:'sup'},  {id:'f-rep-select',  gfKey:'rep'},  {id:'f-rep-cat',    gfKey:'cat'},
+    {id:'f-rep-month',   gfKey:'month'},{id:'f-rep-from',    gfKey:'from'}, {id:'f-rep-to',     gfKey:'to'},
+    // أهداف المناديب
+    {id:'f-rpt-sup',     gfKey:'sup'},  {id:'f-rpt-rep',     gfKey:'rep'},  {id:'f-rpt-cat',    gfKey:'cat'},
+    {id:'f-rpt-month',   gfKey:'month'},{id:'f-rpt-from',    gfKey:'from'}, {id:'f-rpt-to',     gfKey:'to'},
+    // الزبائن
+    {id:'f-cust-sup',    gfKey:'sup'},  {id:'f-cust-rep',    gfKey:'rep'},  {id:'f-cust-repcatf',gfKey:'cat'},
+    {id:'f-cust-from',   gfKey:'from'}, {id:'f-cust-to',     gfKey:'to'},
+    // الأصناف
+    {id:'f-prod-sup',    gfKey:'sup'},  {id:'f-prod-rep',    gfKey:'rep'},  {id:'f-prod-cat',   gfKey:'cat'},
+    {id:'f-prod-month',  gfKey:'month'},{id:'f-prod-from',   gfKey:'from'}, {id:'f-prod-to',    gfKey:'to'},
+    // المديونية
+    {id:'f-debt-sup',    gfKey:'sup'},  {id:'f-debt-rep',    gfKey:'rep'},  {id:'f-debt-cat',   gfKey:'cat'},
+    // أعمار الذمم
+    {id:'f-aging-sup',   gfKey:'sup'},  {id:'f-aging-rep',   gfKey:'rep'},
+    // التحصيل
+    {id:'f-coll-sup',    gfKey:'sup'},  {id:'f-coll-rep',    gfKey:'rep'},  {id:'f-coll-cat',   gfKey:'cat'},
+    {id:'f-coll-month',  gfKey:'month'},{id:'f-coll-from',   gfKey:'from'}, {id:'f-coll-to',    gfKey:'to'},
+    // ملخص التحصيل
+    {id:'f-summary-rep', gfKey:'rep'},  {id:'f-summary-cat', gfKey:'cat'},  {id:'f-summary-month',gfKey:'month'},
+    // فلاتر إضافية
+    {id:'f-coll-month-q',gfKey:'month'},{id:'f-sales-month-q',gfKey:'month'},
+  ];
+
+  const gfValues = {sup:GF.sup, rep:GF.rep, cat:GF.cat, month:GF.month, from:GF.dateFrom, to:GF.dateTo};
+
+  PAGE_FILTERS.forEach(({id, gfKey})=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(active && gfValues[gfKey]){
+      el.value = gfValues[gfKey];
+      el.classList.add('gf-locked');
+      el.disabled = true;
+    } else if(active && !gfValues[gfKey]){
+      el.classList.add('gf-locked');
+      el.disabled = true;
+    } else {
+      el.classList.remove('gf-locked');
+      el.disabled = false;
+    }
+  });
+
+  // إدارة إشعار التجميد في كل filter-bar
+  document.querySelectorAll('.filter-bar').forEach(bar=>{
+    // أزل الإشعار القديم إن وجد
+    const old = bar.querySelector('.gf-lock-notice');
+    if(old) old.remove();
+    if(active){
+      // أنشئ إشعاراً جديداً
+      const notice = document.createElement('span');
+      notice.className = 'gf-lock-notice visible';
+      notice.innerHTML = '🔒 <span>الفلتر الشامل مفعّل — <button onclick="resetGlobalFilter()" style="background:none;border:none;color:var(--accent2);font-family:Cairo,sans-serif;font-size:10.5px;font-weight:700;cursor:pointer;padding:0;text-decoration:underline">إلغاؤه</button></span>';
+      bar.insertBefore(notice, bar.firstChild);
+    }
+  });
 }
 
 function _updateGFBadge(){
@@ -8653,7 +9067,7 @@ function _updateGFBadge(){
     const parts=[];
     if(GF.sup) parts.push('المشرف: '+GF.sup);
     if(GF.rep) parts.push('المندوب: '+GF.rep);
-    if(GF.cat) parts.push('الفئة: '+GF.cat);
+    if(GF.cat) parts.push('القناة البيعية: '+GF.cat);
     if(GF.month) parts.push('الشهر: '+MONTH_NAMES[+GF.month]);
     if(GF.dateFrom) parts.push('من: '+GF.dateFrom);
     if(GF.dateTo) parts.push('إلى: '+GF.dateTo);
@@ -9153,7 +9567,7 @@ function populateRepSelectsAndCats(){
   if(fRepCat){
     const cur=fRepCat.value;
     const cats=[...new Set(allReps.map(r=>repCatMap[r]||'').filter(Boolean))].sort();
-    fRepCat.innerHTML='<option value="">كل التصنيفات</option>'+cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+    fRepCat.innerHTML='<option value="">كل القنوات البيعية</option>'+cats.map(c=>`<option value="${c}">${c}</option>`).join('');
     if(cur)fRepCat.value=cur;
   }
 
@@ -9162,7 +9576,7 @@ function populateRepSelectsAndCats(){
   const activeCat = gfCat ? gfCat.value : '';
   if(gfCat){
     const cats = [...new Set(allReps.map(r=>repCatMap[r]||'أخرى').filter(Boolean))].sort();
-    gfCat.innerHTML = '<option value="">كل الفئات</option>' + cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+    gfCat.innerHTML = '<option value="">كل القنوات البيعية</option>' + cats.map(c=>`<option value="${c}">${c}</option>`).join('');
     if(activeCat && [...gfCat.options].some(o=>o.value===activeCat)) gfCat.value = activeCat;
   }
 
@@ -9508,7 +9922,7 @@ function printRepsTable(){
     landscape:true,
     filterDefs:[
       {label:'المندوب',id:'f-rep-select'},
-      {label:'التصنيف',id:'f-rep-cat'},
+      {label:'القناة البيعية',id:'f-rep-cat'},
       {label:'الشهر',id:'f-rep-month'},
       {label:'من تاريخ',id:'f-rep-from'},
       {label:'إلى تاريخ',id:'f-rep-to'},
@@ -9526,8 +9940,8 @@ function printCustomersTable(){
     filterDefs:[
       {label:'الزبون',id:'f-cust-search'},
       {label:'المندوب',id:'f-cust-rep'},
-      {label:'الفئة',id:'f-cust-repcatf'},
-      {label:'التصنيف',id:'f-cust-cat'},
+      {label:'القناة البيعية',id:'f-cust-repcatf'},
+      {label:'القناة البيعية',id:'f-cust-cat'},
       {label:'أعمار الذمم',id:'f-cust-aging'},
       {label:'من تاريخ',id:'f-cust-from'},
       {label:'إلى تاريخ',id:'f-cust-to'},
@@ -9543,7 +9957,7 @@ function printProductsTable(){
     filterDefs:[
       {label:'الصنف',id:'f-prod-search'},
       {label:'المندوب',id:'f-prod-rep'},
-      {label:'الفئة',id:'f-prod-cat'},
+      {label:'القناة البيعية',id:'f-prod-cat'},
       {label:'العميل',id:'f-prod-cust'},
       {label:'الشهر',id:'f-prod-month'},
       {label:'من تاريخ',id:'f-prod-from'},
@@ -9560,7 +9974,7 @@ function printDebtRepTable(){
     filterDefs:[
       {label:'الحساب',id:'f-debt-search'},
       {label:'المندوب',id:'f-debt-rep'},
-      {label:'الفئة',id:'f-debt-cat'},
+      {label:'القناة البيعية',id:'f-debt-cat'},
       {label:'النوع',id:'f-debt-type'},
     ]
   });
@@ -9574,7 +9988,7 @@ function printDebtTable(){
     filterDefs:[
       {label:'الحساب',id:'f-debt-search'},
       {label:'المندوب',id:'f-debt-rep'},
-      {label:'الفئة',id:'f-debt-cat'},
+      {label:'القناة البيعية',id:'f-debt-cat'},
       {label:'النوع',id:'f-debt-type'},
     ]
   });
@@ -9600,7 +10014,7 @@ function printCollectionTable(){
     landscape:true,
     filterDefs:[
       {label:'المندوب',id:'f-coll-rep'},
-      {label:'الفئة',id:'f-coll-cat'},
+      {label:'القناة البيعية',id:'f-coll-cat'},
       {label:'الشهر',id:'f-coll-month'},
       {label:'النوع',id:'f-coll-type'},
       {label:'من تاريخ',id:'f-coll-from'},
@@ -9637,7 +10051,7 @@ function printRepProdTargets(){
     landscape:false,
     filterDefs:[
       {label:'المشرف',id:'f-rpt-sup'},
-      {label:'الفئة',id:'f-rpt-cat'},
+      {label:'القناة البيعية',id:'f-rpt-cat'},
       {label:'المندوب',id:'f-rpt-rep'},
       {label:'الشهر',id:'f-rpt-month'},
       {label:'من تاريخ',id:'f-rpt-from'},
@@ -9905,11 +10319,11 @@ function printRepProdTargets(){
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
           <div>
             <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">من تاريخ</label>
-            <input type="date" id="frm-from" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;" oninput="_frmCalc()">
+            <div class="date-wrap"><input type="date" id="frm-from" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;" oninput="_frmCalc()"></div>
           </div>
           <div>
             <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">إلى تاريخ</label>
-            <input type="date" id="frm-to" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;" oninput="_frmCalc()">
+            <div class="date-wrap"><input type="date" id="frm-to" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;" oninput="_frmCalc()"></div>
           </div>
         </div>
         <!-- نتائج الفترة -->
@@ -9940,7 +10354,7 @@ function printRepProdTargets(){
         </div>
         <div style="margin-bottom:10px;">
           <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">تاريخ اليوم</label>
-          <input type="date" id="frm-day" style="width:220px;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;" oninput="_frmCalcDay()">
+          <div class="date-wrap"><input type="date" id="frm-day" style="width:220px;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;" oninput="_frmCalcDay()"></div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
           <div style="background:var(--surface);border-radius:8px;padding:8px 10px;border:1px solid var(--border);">
@@ -9964,18 +10378,36 @@ function printRepProdTargets(){
           <span>⏳</span> أعمار الذمم
           <span style="font-size:10px;color:var(--muted);font-weight:400;">(محدّثة تلقائياً من اللوحة)</span>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px;">
           <div style="background:var(--surface);border-radius:8px;padding:8px 10px;border:1px solid var(--border);">
-            <div style="font-size:10px;color:var(--muted);">30 يوم</div>
+            <div style="font-size:10px;color:var(--muted);">≤ 10 أيام</div>
+            <div id="frm-ag10" style="font-size:14px;font-weight:800;color:var(--accent2);">—</div>
+          </div>
+          <div style="background:var(--surface);border-radius:8px;padding:8px 10px;border:1px solid var(--border);">
+            <div style="font-size:10px;color:var(--muted);">11-15 يوم</div>
+            <div id="frm-ag15" style="font-size:14px;font-weight:800;color:var(--accent2);">—</div>
+          </div>
+          <div style="background:var(--surface);border-radius:8px;padding:8px 10px;border:1px solid var(--border);">
+            <div style="font-size:10px;color:var(--muted);">16-30 يوم</div>
             <div id="frm-ag30" style="font-size:14px;font-weight:800;color:#f4a261;">—</div>
           </div>
           <div style="background:var(--surface);border-radius:8px;padding:8px 10px;border:1px solid var(--border);">
-            <div style="font-size:10px;color:var(--muted);">60 يوم</div>
+            <div style="font-size:10px;color:var(--muted);">31-60 يوم</div>
             <div id="frm-ag60" style="font-size:14px;font-weight:800;color:#ee4d4d;">—</div>
           </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
           <div style="background:var(--surface);border-radius:8px;padding:8px 10px;border:1px solid var(--border);">
-            <div style="font-size:10px;color:var(--muted);">90 يوم</div>
+            <div style="font-size:10px;color:var(--muted);">61-90 يوم</div>
             <div id="frm-ag90" style="font-size:14px;font-weight:800;color:#c0392b;">—</div>
+          </div>
+          <div style="background:var(--surface);border-radius:8px;padding:8px 10px;border:1px solid var(--border);">
+            <div style="font-size:10px;color:var(--muted);">120+ يوم</div>
+            <div id="frm-ag120" style="font-size:14px;font-weight:800;color:#8e0000;">—</div>
+          </div>
+          <div style="background:color-mix(in srgb,var(--gold) 8%,transparent);border-radius:8px;padding:8px 10px;border:1px solid color-mix(in srgb,var(--gold) 30%,transparent);">
+            <div style="font-size:10px;color:var(--muted);font-weight:700;">الإجمالي الكلي</div>
+            <div id="frm-ag-total" style="font-size:14px;font-weight:800;color:var(--gold);">—</div>
           </div>
         </div>
       </div>
@@ -9994,11 +10426,11 @@ function printRepProdTargets(){
           </div>
           <div>
             <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">من تاريخ</label>
-            <input type="date" id="frm-item-from" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;" oninput="_frmCalcItem()">
+            <div class="date-wrap"><input type="date" id="frm-item-from" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;" oninput="_frmCalcItem()"></div>
           </div>
           <div>
             <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">إلى تاريخ</label>
-            <input type="date" id="frm-item-to" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;" oninput="_frmCalcItem()">
+            <div class="date-wrap"><input type="date" id="frm-item-to" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;" oninput="_frmCalcItem()"></div>
           </div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">
@@ -10161,9 +10593,20 @@ function _frmCalcDay(){
 /* ── تحميل أعمار الذمم من اللوحة ── */
 function _frmLoadAging(){
   const b = D.aging_buckets || {};
-  _frmSet('frm-ag30', _frmFmt(b['30 يوم']||0));
-  _frmSet('frm-ag60', _frmFmt(b['60 يوم']||0));
-  _frmSet('frm-ag90', _frmFmt(b['90 يوم']||0));
+  const ag10  = b['أقل من 10']||b['10 أيام']||b['10']||0;
+  const ag15  = b['أقل من 15']||b['15 يوم']||b['15']||0;
+  const ag30  = b['30 يوم']||b['30']||0;
+  const ag60  = b['60 يوم']||b['60']||0;
+  const ag90  = b['90 يوم']||b['90']||0;
+  const ag120 = b['120 يوم+']||b['120+']||b['120']||0;
+  const total = ag10+ag15+ag30+ag60+ag90+ag120;
+  _frmSet('frm-ag10',  _frmFmt(ag10));
+  _frmSet('frm-ag15',  _frmFmt(ag15));
+  _frmSet('frm-ag30',  _frmFmt(ag30));
+  _frmSet('frm-ag60',  _frmFmt(ag60));
+  _frmSet('frm-ag90',  _frmFmt(ag90));
+  _frmSet('frm-ag120', _frmFmt(ag120));
+  _frmSet('frm-ag-total', _frmFmt(total));
 }
 
 /* ── ملء قائمة الأصناف ── */
@@ -10241,6 +10684,10 @@ function _frmPrint(){
   const ag30      = document.getElementById('frm-ag30').textContent;
   const ag60      = document.getElementById('frm-ag60').textContent;
   const ag90      = document.getElementById('frm-ag90').textContent;
+  const ag10      = document.getElementById('frm-ag10')?.textContent||'—';
+  const ag15      = document.getElementById('frm-ag15')?.textContent||'—';
+  const ag120     = document.getElementById('frm-ag120')?.textContent||'—';
+  const agTotal   = document.getElementById('frm-ag-total')?.textContent||'—';
   const itemSales = document.getElementById('frm-item-sales').textContent;
   const itemQty   = document.getElementById('frm-item-qty').textContent;
 
@@ -10253,6 +10700,7 @@ function _frmPrint(){
 
   const now = new Date();
   const printDate = _fmtDate(now.toISOString().slice(0,10));
+  const timeStr = now.toLocaleTimeString('ar-LY',{hour:'2-digit',minute:'2-digit'});
   const periodLabel = (from && to) ? `${_fmtDate(from)} حتى ${_fmtDate(to)}` : '—';
   const dayLabel    = day ? _fmtDate(day) : '—';
 
@@ -10276,257 +10724,533 @@ function _frmPrint(){
 <title>تقرير الأداء المالي</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
-:root{
-  --blue:#003f8c;
-  --blue2:#0050b3;
-  --blue-lt:#eaf1fb;
-  --blue-mid:#b8d0f0;
-  --orange:#e04400;
-  --orange-lt:#fef3ee;
-  --ink:#111827;
-  --ink2:#374151;
-  --muted:#9ca3af;
-  --border:#e5eaf5;
-  --strip:#f7f9fd;
-}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 @page{size:A4 portrait;margin:0}
 html,body{
-  font-family:'Cairo',sans-serif;font-size:8.5pt;
-  color:var(--ink);background:#fff;direction:rtl;
-  -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;
-}
-body{padding:8mm 12mm 8mm 12mm}
-
-/* ━━ رأس الصفحة ━━ */
-.head{
+  font-family:'Cairo',sans-serif;
+  font-size:9pt;
+  color:#1a1a2e;
   background:#fff;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 0;
-  border-bottom:2px solid var(--blue);
-  margin-bottom:0;
+  direction:rtl;
+  -webkit-print-color-adjust:exact!important;
+  print-color-adjust:exact!important;
 }
-.head-right{display:flex;align-items:center;gap:10px}
-.head-logo{width:38px;height:38px;border-radius:5px;overflow:hidden;flex-shrink:0}
-.head-logo img{width:100%;height:100%;object-fit:contain}
-.head-company{font-size:7pt;color:var(--blue);font-weight:700;letter-spacing:.4px}
-.head-title{font-size:14pt;font-weight:900;color:#111;line-height:1.15;letter-spacing:-.2px}
-.head-accent{width:100%;height:2px;background:linear-gradient(to left,var(--blue) 70%,var(--orange) 100%);margin-bottom:8px}
-.head-meta{text-align:left;font-size:7pt;color:#888;line-height:1.9}
-.head-meta strong{color:var(--blue);font-weight:700}
+body{padding:12mm 14mm 10mm 14mm}
 
-/* ━━ جدول المراسلة ━━ */
-.letter-info{width:100%;border-collapse:collapse;margin-bottom:6px;font-size:8pt}
-.letter-info td{padding:2px 0;line-height:1.6;vertical-align:top}
-.letter-info .lbl{color:var(--muted);font-weight:700;white-space:nowrap;padding-left:14px;width:72px}
-.letter-info .sep{color:var(--blue-mid);padding-left:6px;width:10px}
-.letter-info .val{color:var(--ink)}
-
-/* ━━ فاصل ━━ */
-.rule{border:none;border-top:1px solid var(--border);margin:6px 0}
-
-/* ━━ الافتتاحية ━━ */
-.intro{
-  font-size:8pt;color:var(--ink2);line-height:1.75;
+/* ── رأس الصفحة الرسمي ── */
+.header{
+  display:flex;
+  align-items:stretch;
+  justify-content:space-between;
   margin-bottom:8px;
-  padding:6px 10px 6px 8px;
-  border-right:3px solid var(--orange);
-  background:var(--orange-lt);
+  border-bottom:none;
+  border-radius:6px 6px 0 0;
+  overflow:hidden;
+}
+.header-accent{
+  width:6px;
+  background:#002f7a;
+  flex-shrink:0;
+}
+.header-body{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 14px;
+  background:#fff;
+}
+.hdr-logo-wrap{
+  display:flex;align-items:center;gap:12px;
+}
+.hdr-logo{
+  width:38px;height:38px;
+  border-radius:4px;overflow:hidden;flex-shrink:0;
+  border:1px solid #d0dce8;
+  background:#f5f7fb;
+  display:flex;align-items:center;justify-content:center;
+}
+.hdr-logo img{width:100%;height:100%;object-fit:contain}
+.hdr-logo-placeholder{
+  width:46px;height:46px;
+  border-radius:4px;
+  background:#002f7a;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18pt;font-weight:900;color:#fff;
+  letter-spacing:-.5px;flex-shrink:0;
+}
+.hdr-text{}
+.company-name{
+  font-size:7.5pt;font-weight:700;
+  color:#5a6a85;letter-spacing:.4px;
+  text-transform:uppercase;
+  margin-bottom:1px;
+}
+.report-title{
+  font-size:16pt;font-weight:900;
+  color:#002f7a;line-height:1;
+  letter-spacing:-.3px;
+}
+.hdr-divider{
+  width:1px;
+  background:#d0dce8;
+  margin:6px 0;
+}
+.hdr-right{
+  text-align:left;
+  font-size:8pt;
+  color:#5a6a85;
+  line-height:1.9;
+  padding-right:4px;
+}
+.hdr-right .date-val{
+  font-size:10.5pt;font-weight:900;
+  color:#002f7a;display:block;
+  margin-bottom:1px;
+}
+/* شريط فاصل تحت الهيدر */
+.header-rule{
+  height:3px;
+  background:linear-gradient(to left,#f05a1e 0%,#f05a1e 60px,#002f7a 60px,#002f7a 100%);
+  margin-bottom:14px;
+  border-left:1.5px solid #c8d6ec;
+  border-right:1.5px solid #c8d6ec;
 }
 
-/* ━━ الجدول الرئيسي ━━ */
-.tbl{width:100%;border-collapse:collapse;margin-bottom:8px;font-size:8.5pt}
-
-.tbl thead th{
-  background:var(--blue);color:#fff;
-  padding:6px 11px;font-size:8pt;font-weight:700;
-  white-space:nowrap;letter-spacing:.1px;
+/* ── بطاقة المراسلة الرسمية (تصميم جديد) ── */
+.memo-table{
+  width:100%;
+  border-collapse:collapse;
+  margin-bottom:14px;
+  font-size:8.5pt;
 }
-.tbl thead th.th-r{text-align:right}
-.tbl thead th.th-c{text-align:center}
-.tbl thead tr th:first-child{border-right:4px solid var(--orange)}
-
-/* صفوف العناوين */
-.tbl .sec td{
-  background:var(--blue-lt);color:var(--blue);
-  font-weight:800;font-size:8pt;
-  padding:4px 11px;
-  border-top:1.5px solid var(--blue-mid);
-  border-bottom:1px solid var(--blue-mid);
+.memo-table tr{ border:none; }
+.memo-table .m-lbl{
+  width:78px;
+  padding:0 0 6px 0;
+  color:#7a8aaa;
+  font-weight:700;
+  font-size:7pt;
+  letter-spacing:.6px;
+  text-transform:uppercase;
+  vertical-align:top;
+  white-space:nowrap;
+  padding-top:2px;
 }
-.tbl .sec td:first-child{border-right:4px solid var(--orange)}
-
-/* صفوف البيانات */
-.tbl .row td{
-  padding:5px 11px;
-  border-bottom:1px solid var(--border);
-  vertical-align:middle;color:var(--ink);
+.memo-table .m-sep{
+  width:8px;
+  text-align:center;
+  color:#c5d0e8;
+  font-weight:400;
+  padding-bottom:6px;
+  vertical-align:top;
+  padding-top:2px;
 }
-.tbl tbody .row:nth-child(even) td{background:var(--strip)}
-.tbl .row:last-child td{border-bottom:2px solid var(--blue)}
+.memo-table .m-val{
+  padding:0 10px 6px 0;
+  color:#1a1a2e;
+  font-weight:700;
+  font-size:9pt;
+  vertical-align:top;
+  line-height:1.4;
+}
+/* صف "إلى" مميز */
+.memo-table tr:first-child .m-val{
+  font-size:10pt;
+  color:#003c96;
+  font-weight:900;
+}
+/* صف "الموضوع" مميز */
+.memo-table tr:last-child .m-val{
+  color:#003c96;
+  font-weight:800;
+  border-top:1.5px solid #d0ddf5;
+  padding-top:6px;
+  margin-top:2px;
+}
+.memo-table tr:last-child .m-lbl,
+.memo-table tr:last-child .m-sep{
+  border-top:1.5px solid #d0ddf5;
+  padding-top:6px;
+}
 
-/* خلايا */
-.td-r{text-align:right}
-.td-num{text-align:center;font-weight:700;font-variant-numeric:tabular-nums;direction:rtl;color:var(--blue)}
-.td-qty{text-align:center;font-weight:600;font-variant-numeric:tabular-nums;direction:ltr;color:var(--orange)}
-.td-pct{text-align:center;font-weight:800;direction:rtl;color:var(--blue2)}
-.td-dim{color:var(--muted);text-align:center}
-.td-sub{font-size:7pt;color:var(--muted);font-weight:400}
+/* ── عنوان القسم ── */
+.sec-hdr{
+  background:#003c96;
+  color:#fff;
+  padding:5px 12px 5px 14px;
+  font-size:8.5pt;
+  font-weight:700;
+  letter-spacing:.2px;
+  margin-bottom:0;
+  border-radius:5px 5px 0 0;
+  border-right:4px solid #f05a1e;
+}
 
-/* ━━ الخاتمة ━━ */
-.closing{font-size:8pt;color:var(--ink2);line-height:1.8;margin-bottom:6px}
-.closing .sign{margin-top:3px;font-weight:700;color:var(--blue);font-size:8.5pt}
+/* ── جدول البيانات ── */
+.data-table{
+  width:100%;
+  border-collapse:collapse;
+  margin-bottom:12px;
+  font-size:8.5pt;
+}
+.data-table thead th{
+  background:#eef3fc;
+  color:#003c96;
+  font-weight:700;
+  padding:5px 12px;
+  text-align:right;
+  border:1px solid #d0ddf5;
+  font-size:8pt;
+}
+.data-table thead th:not(:first-child){
+  text-align:center;
+  width:28%;
+}
+.data-table tbody td{
+  padding:5px 12px;
+  border:1px solid #e4ecf8;
+  color:#1a1a2e;
+  vertical-align:middle;
+}
+.data-table tbody tr:nth-child(even) td{
+  background:#f8faff;
+}
+.data-table .row-label{
+  font-weight:600;color:#2d3748;
+}
+.data-table .row-sub{
+  font-size:7pt;color:#999;font-weight:400;
+}
+.data-table .val-num{
+  text-align:center;
+  font-weight:800;
+  color:#003c96;
+  font-variant-numeric:tabular-nums;
+  font-size:9pt;
+}
+.data-table .val-qty{
+  text-align:center;
+  font-weight:700;
+  color:#4a5568;
+  font-variant-numeric:tabular-nums;
+}
+.data-table .val-pct{
+  text-align:center;
+  font-weight:800;
+  color:#2d6a4f;
+}
+.data-table .val-muted{
+  text-align:center;color:#bbb;
+}
+/* أعمار الذمم — ألوان */
+.ag-safe{color:#1d6b45;font-weight:800}
+.ag-watch{color:#2563eb;font-weight:800}
+.ag-warn{color:#b45309;font-weight:800}
+.ag-danger{color:#c0392b;font-weight:800}
+.ag-critical{color:#7f1d1d;font-weight:900}
+/* صف الإجمالي */
+.total-row td{
+  background:#003c96!important;
+  color:#fff!important;
+  font-weight:800!important;
+  font-size:9.5pt!important;
+  border-color:#003c96!important;
+}
+.total-row td:first-child{
+  border-right:4px solid #f05a1e!important;
+}
+.total-row .val-num{color:#fff!important}
 
-/* ━━ الفوتر ━━ */
+/* ── صنف محدد ── */
+.item-row td{
+  background:#f5f8ff!important;
+  color:#003c96!important;
+  font-weight:700!important;
+  border-color:#d0ddf5!important;
+}
+
+/* ── فوتر ── */
 .footer{
-  display:flex;justify-content:space-between;align-items:center;
-  padding-top:5px;border-top:1px solid var(--border);
-  font-size:7pt;color:var(--muted);
+  margin-top:14px;
+  border-top:3px solid #002f7a;
+  position:relative;
 }
-.footer strong{color:var(--blue2);font-weight:700}
+.footer::before{
+  content:'';
+  display:block;
+  height:3px;
+  width:56px;
+  background:#f05a1e;
+  position:absolute;
+  top:-3px;left:0;
+}
+.footer-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding-top:7px;
+  font-size:7.5pt;
+  color:#7a8aaa;
+}
+.footer-sig{
+  font-weight:700;color:#002f7a;font-size:8pt;
+}
+.footer-copy{color:#aaa;font-size:7pt;}
+.footer-dot{color:#f05a1e;font-weight:900;margin:0 4px}
+.footer-closing{
+  margin-top:10px;
+  padding:8px 12px;
+  border:1px solid #d4e0f5;
+  border-right:3px solid #f05a1e;
+  border-radius:0 3px 3px 0;
+  background:#fafbff;
+  font-size:8pt;
+  color:#2c3e60;
+  line-height:1.8;
+}
+.footer-closing strong{display:block;color:#002f7a;font-size:8.5pt;margin-bottom:2px;}
+
+/* ── الرسالة التمهيدية ── */
+.intro-msg{
+  margin-bottom:14px;
+  padding:10px 14px;
+  border:1px solid #d4e0f5;
+  border-right:4px solid #002f7a;
+  border-radius:0 4px 4px 0;
+  background:#f9fbff;
+  font-size:8.5pt;
+  color:#2c3e60;
+  line-height:1.9;
+}
+.intro-msg .salutation{
+  font-weight:800;
+  color:#002f7a;
+  display:block;
+  margin-bottom:3px;
+  font-size:9pt;
+}
+
+/* ── بطاقة المراسلة (تصميم جديد) ── */
+/* ── بطاقة المراسلة — نمط بسيط ── */
+.memo-card-wrap{ margin-bottom:14px; }
+.memo-card{
+  width:100%;
+  border-collapse:collapse;
+  font-size:9pt;
+}
+.memo-card tr{ border-bottom:1px solid #edf2f8; }
+.memo-card tr:last-child{ border-bottom:none; }
+.memo-card .mc-lbl{
+  width:64px;
+  padding:6px 0 6px 8px;
+  color:#002f7a;
+  font-weight:800;
+  font-size:9pt;
+  text-align:right;
+  white-space:nowrap;
+  vertical-align:middle;
+}
+.memo-card .mc-sep{
+  width:14px;
+  padding:6px 2px;
+  color:#a0b0cc;
+  text-align:center;
+  vertical-align:middle;
+}
+.memo-card .mc-val{
+  padding:6px 10px 6px 0;
+  color:#1a2540;
+  font-weight:600;
+  font-size:9pt;
+  vertical-align:middle;
+  text-align:right;
+}
+.memo-card .mc-val.subj-val{
+  color:#002f7a;
+  font-weight:800;
+}
 
 @media print{
-  .tbl .row{page-break-inside:avoid}
-  .tbl .sec{page-break-after:avoid}
-  body{padding:8mm 12mm 8mm 12mm!important}
+  body{padding:12mm 14mm 10mm 14mm!important}
+  .data-table tr{page-break-inside:avoid}
 }
 </style>
 </head>
 <body>
-<div class="page">
 
-  <!-- رأس الصفحة -->
-  <div class="head">
-    <div class="head-right">
-      <div class="head-logo">
-        ${logoSrc ? `<img src="${logoSrc}" alt="شعار">` : ''}
-      </div>
-      <div>
-        <div class="head-company">شركة ركان المتوسط</div>
-        <div class="head-title">تقرير الأداء المالي</div>
+<!-- رأس الصفحة الرسمي -->
+<div class="header">
+  <div class="header-accent"></div>
+  <div class="header-body">
+    <div class="hdr-logo-wrap">
+      ${logoSrc
+        ? `<div class="hdr-logo"><img src="${logoSrc}" alt="شعار"></div>`
+        : `<div class="hdr-logo-placeholder">ر</div>`
+      }
+      <div class="hdr-text">
+        <div class="company-name">شركة ركان المتوسط</div>
+        <div class="report-title">تقرير الأداء المالي</div>
       </div>
     </div>
-    <div class="head-meta">
-      <div>${printDate}</div>
-      <div><strong>إعداد:</strong> المحاسب أحمد العكاري</div>
+    <div class="hdr-divider"></div>
+    <div class="hdr-right">
+      <span class="date-val">${printDate}</span>
+      <span>${timeStr}</span>
     </div>
   </div>
-  <div class="head-accent"></div>
-
-  <!-- بيانات المراسلة -->
-  <table class="letter-info">
-    <tr>
-      <td class="lbl">إلى</td>
-      <td class="sep">:</td>
-      <td class="val">مدير المبيعات المحترم</td>
-    </tr>
-    <tr>
-      <td class="lbl">من</td>
-      <td class="sep">:</td>
-      <td class="val">القسم المالي</td>
-    </tr>
-    <tr>
-      <td class="lbl">التاريخ</td>
-      <td class="sep">:</td>
-      <td class="val">${printDate}</td>
-    </tr>
-    <tr>
-      <td class="lbl">الموضوع</td>
-      <td class="sep">:</td>
-      <td class="val">تقرير الأداء المالي المحدّث — الفترة من ${periodLabel}</td>
-    </tr>
-  </table>
-
-  <hr class="rule">
-
-  <!-- الافتتاحية -->
-  <p class="intro">
-    تحية طيبة وبعد،<br>
-    يسر القسم المالي أن يقدم لكم التقرير الموجز التالي حول الأداء المالي والإيرادات المحصّلة، بالإضافة إلى أعمار الذمم المدينة حتى تاريخه.
-  </p>
-
-  <!-- الجدول الرئيسي -->
-  <table class="tbl">
-    <thead>
-      <tr>
-        <th class="th-r" style="width:54%">البيان</th>
-        <th class="th-c" style="width:18%">الكمية</th>
-        <th class="th-c" style="width:28%">القيمة</th>
-      </tr>
-    </thead>
-    <tbody>
-
-      <tr class="sec">
-        <td colspan="3">المبيعات والتحصيل &nbsp;(${periodLabel})</td>
-      </tr>
-      <tr class="row">
-        <td class="td-r">صافي المبيعات &nbsp;<span class="td-sub">(${periodLabel})</span></td>
-        <td class="td-qty">${netQty}</td>
-        <td class="td-num">${netSales}</td>
-      </tr>
-      <tr class="row">
-        <td class="td-r">إجمالي التحصيل &nbsp;<span class="td-sub">(${periodLabel})</span></td>
-        <td class="td-dim">—</td>
-        <td class="td-num">${colTotal}</td>
-      </tr>
-      <tr class="row">
-        <td class="td-r">نسبة التحصيل للفترة</td>
-        <td class="td-dim">—</td>
-        <td class="td-pct">${colPct}</td>
-      </tr>
-
-      <tr class="sec">
-        <td colspan="3">بيانات اليوم &nbsp;(${dayLabel})</td>
-      </tr>
-      <tr class="row">
-        <td class="td-r">مبيعات اليوم &nbsp;<span class="td-sub">(${dayLabel})</span></td>
-        <td class="td-qty">${dayQty}</td>
-        <td class="td-num">${daySales}</td>
-      </tr>
-      <tr class="row">
-        <td class="td-r">تحصيل اليوم &nbsp;<span class="td-sub">(${dayLabel})</span></td>
-        <td class="td-dim">—</td>
-        <td class="td-num">${dayCol}</td>
-      </tr>
-
-      <tr class="sec">
-        <td colspan="3">أعمار الذمم المدينة</td>
-      </tr>
-      <tr class="row">
-        <td class="td-r">أعمار الذمم — 30 يوم</td>
-        <td class="td-dim">—</td>
-        <td class="td-num">${ag30}</td>
-      </tr>
-      <tr class="row">
-        <td class="td-r">أعمار الذمم — 60 يوم</td>
-        <td class="td-dim">—</td>
-        <td class="td-num">${ag60}</td>
-      </tr>
-      <tr class="row">
-        <td class="td-r">أعمار الذمم — 90 يوم</td>
-        <td class="td-dim">—</td>
-        <td class="td-num">${ag90}</td>
-      </tr>
-
-      ${itemRowHTML}
-
-    </tbody>
-  </table>
-
-  <!-- الخاتمة -->
-  <div class="closing">
-    نأمل أن يكون هذا التقرير مفيدًا لكم في متابعة وتقييم أداء المبيعات والتحصيل.<br>
-    مع خالص التقدير والاحترام،
-    <div class="sign">القسم المالي — شركة ركان المتوسط</div>
-  </div>
-
-  <!-- الفوتر -->
-  <div class="footer">
-    <span>© 2026 شركة ركان المتوسط — جميع الحقوق محفوظة</span>
-    <strong>تقرير الأداء المالي — ${printDate}</strong>
-  </div>
-
 </div>
+<div class="header-rule"></div>
+
+<!-- بطاقة المراسلة الرسمية -->
+<div class="memo-card-wrap">
+  <table class="memo-card">
+    <tr>
+      <td class="mc-lbl">من / إلى</td>
+      <td class="mc-sep">:</td>
+      <td class="mc-val" colspan="3">القسم المالي &nbsp;—&nbsp; مدير المبيعات المحترم</td>
+    </tr>
+    <tr>
+      <td class="mc-lbl">الفترة</td>
+      <td class="mc-sep">:</td>
+      <td class="mc-val">${periodLabel}</td>
+    </tr>
+    <tr>
+      <td class="mc-lbl">الموضوع</td>
+      <td class="mc-sep">:</td>
+      <td class="mc-val subj-val">تقرير الأداء المالي${day ? ' — بيانات ' + dayLabel : ''}</td>
+    </tr>
+  </table>
+</div>
+
+<!-- الرسالة التمهيدية -->
+<div class="intro-msg">
+  <span class="salutation">تحية طيبة وبعد،</span>
+  يسر القسم المالي أن يقدم لكم التقرير التالي حول الأداء المالي والإيرادات للمحفظة، بالإضافة إلى أعمار الذمم المدينة حتى تاريخه. نأمل أن يُسهم هذا التقرير في دعم اتخاذ القرار الرشيد.
+</div>
+
+<!-- جدول البيانات الموحد -->
+<div class="sec-hdr">البيانات المالية</div>
+<table class="data-table">
+  <thead>
+    <tr>
+      <th>البيان</th>
+      <th>الكمية</th>
+      <th>القيمة (د.ل)</th>
+    </tr>
+  </thead>
+  <tbody>
+
+    <!-- المبيعات والتحصيل -->
+    <tr>
+      <td colspan="3" style="background:#eef3fc;color:#003c96;font-weight:800;font-size:8pt;padding:4px 12px 4px 14px;border:1px solid #d0ddf5;border-right:4px solid #f05a1e;">
+        أولاً — المبيعات والتحصيل &nbsp;<span style="font-weight:400;font-size:7.5pt;color:#6b7280">(${periodLabel})</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="row-label">صافي المبيعات</td>
+      <td class="val-qty">${netQty}</td>
+      <td class="val-num">${netSales}</td>
+    </tr>
+    <tr>
+      <td class="row-label">إجمالي التحصيل</td>
+      <td class="val-muted">—</td>
+      <td class="val-num">${colTotal}</td>
+    </tr>
+    <tr>
+      <td class="row-label">نسبة التحصيل</td>
+      <td class="val-muted">—</td>
+      <td class="val-pct">${colPct}</td>
+    </tr>
+
+    <!-- بيانات اليوم -->
+    <tr>
+      <td colspan="3" style="background:#eef3fc;color:#003c96;font-weight:800;font-size:8pt;padding:4px 12px 4px 14px;border:1px solid #d0ddf5;border-right:4px solid #f05a1e;">
+        ثانياً — بيانات اليوم &nbsp;<span style="font-weight:400;font-size:7.5pt;color:#6b7280">(${day ? dayLabel : '—'})</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="row-label">مبيعات اليوم</td>
+      <td class="val-qty">${dayQty}</td>
+      <td class="val-num">${daySales}</td>
+    </tr>
+    <tr>
+      <td class="row-label">تحصيل اليوم</td>
+      <td class="val-muted">—</td>
+      <td class="val-num">${dayCol}</td>
+    </tr>
+
+    <!-- أعمار الذمم -->
+    <tr>
+      <td colspan="3" style="background:#eef3fc;color:#003c96;font-weight:800;font-size:8pt;padding:4px 12px 4px 14px;border:1px solid #d0ddf5;border-right:4px solid #f05a1e;">
+        ثالثاً — أعمار الذمم المدينة
+      </td>
+    </tr>
+    <tr>
+      <td class="row-label">ذمم ≤ 10 أيام</td>
+      <td class="val-muted">—</td>
+      <td class="val-num ag-safe">${ag10}</td>
+    </tr>
+    <tr>
+      <td class="row-label">ذمم 11 – 15 يوم</td>
+      <td class="val-muted">—</td>
+      <td class="val-num ag-safe">${ag15}</td>
+    </tr>
+    <tr>
+      <td class="row-label">ذمم 16 – 30 يوم</td>
+      <td class="val-muted">—</td>
+      <td class="val-num ag-watch">${ag30}</td>
+    </tr>
+    <tr>
+      <td class="row-label">ذمم 31 – 60 يوم</td>
+      <td class="val-muted">—</td>
+      <td class="val-num ag-warn">${ag60}</td>
+    </tr>
+    <tr>
+      <td class="row-label">ذمم 61 – 90 يوم</td>
+      <td class="val-muted">—</td>
+      <td class="val-num ag-danger">${ag90}</td>
+    </tr>
+    <tr>
+      <td class="row-label">ذمم 120+ يوم</td>
+      <td class="val-muted">—</td>
+      <td class="val-num ag-critical">${ag120}</td>
+    </tr>
+    <tr class="total-row">
+      <td>إجمالي الذمم المدينة</td>
+      <td style="text-align:center">—</td>
+      <td style="text-align:center;font-variant-numeric:tabular-nums">${agTotal}</td>
+    </tr>
+
+    ${item ? `
+    <!-- صنف محدد -->
+    <tr>
+      <td colspan="3" style="background:#eef3fc;color:#003c96;font-weight:800;font-size:8pt;padding:4px 12px 4px 14px;border:1px solid #d0ddf5;border-right:4px solid #f05a1e;">
+        رابعاً — تفصيل صنف محدد &nbsp;<span style="font-weight:400;font-size:7.5pt;color:#6b7280">(${_fmtDate(itemFrom)} — ${_fmtDate(itemTo)})</span>
+      </td>
+    </tr>
+    <tr class="item-row">
+      <td class="row-label">${item}</td>
+      <td class="val-qty">${itemQty}</td>
+      <td class="val-num">${itemSales}</td>
+    </tr>` : ''}
+
+  </tbody>
+</table>
+
+<!-- الفوتر -->
+<div class="footer">
+  <div class="footer-closing">
+    <strong>وتفضلوا بقبول فائق الاحترام والتقدير،</strong>
+    المحاسب أحمد العكاري <span class="footer-dot">·</span> القسم المالي <span class="footer-dot">·</span> شركة ركان المتوسط
+  </div>
+  <div class="footer-inner">
+    <div class="footer-copy"></div>
+    <div class="footer-sig"></div>
+  </div>
+</div>
+
+</body>
 <script>
 function _doPrint(){
   window.print();
