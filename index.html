@@ -6214,15 +6214,34 @@ function renderExpensesPage(){
     if(lbl)lbl.textContent='كل الفترات';
   }
 
-  // ── صافي المبيعات من اللوحة ──
-  const netSales = D.kpis?.net_sales || 0;
+  // ── صافي المبيعات مع تطبيق نفس فلتر التاريخ ──
   const fmt  = v=>v.toLocaleString('ar-LY',{minimumFractionDigits:2,maximumFractionDigits:2});
   const fmtP = v=>v.toFixed(2)+'%';
 
+  let netSales = 0;
+  if(fromVal || toVal){
+    // احسب صافي المبيعات للفترة المحددة فقط من sales_table
+    let _sales=0, _returns=0;
+    (D.sales_table||[]).forEach(r=>{
+      const _cn=s=>String(s||'').replace(/^\uFEFF/,'').trim();
+      const dateStr=_cn(r['التاريخ']||r['تاريخ']||'').substring(0,10);
+      if(fromVal && dateStr<fromVal) return;
+      if(toVal   && dateStr>toVal)   return;
+      const type=_cn(r['النوع']||r['نوع']||'');
+      const total=_parseNum(r['الاجمالي الصافي']||r['الإجمالي الصافي']||r['الصافي']||0);
+      if(type==='مبيع')        _sales+=total;
+      if(type==='مرتجع مبيع') _returns+=total;
+    });
+    netSales = Math.max(0, _sales - _returns);
+  } else {
+    // بدون فلتر: استخدم الإجمالي الكامل من kpis
+    netSales = D.kpis?.net_sales || 0;
+  }
+
   const salesRef = document.getElementById('exp-sales-ref');
   if(salesRef) salesRef.textContent = netSales>0
-    ? `صافي المبيعات (القاعدة): ${fmt(netSales)} د.ل`
-    : '⚠️ ارفع ملف المبيعات لحساب النسب';
+    ? `صافي المبيعات${(fromVal||toVal)?' (الفترة المحددة)':''}: ${fmt(netSales)} د.ل`
+    : (D.sales_table?.length>0 ? '⚠️ لا توجد مبيعات في الفترة المحددة' : '⚠️ ارفع ملف المبيعات لحساب النسب');
 
   // ══ KPI Cards ══
   const opIncome = netSales - totalExpAll;
@@ -12669,7 +12688,25 @@ function _expPrint(){
   // ── جمع البيانات ──
   const fromVal = document.getElementById('f-exp-from')?.value || '';
   const toVal   = document.getElementById('f-exp-to')?.value   || '';
-  const netSales = D.kpis?.net_sales || 0;
+
+  // احسب صافي المبيعات حسب نفس فلتر التاريخ
+  let netSales = 0;
+  if(fromVal || toVal){
+    let _s=0, _r=0;
+    (D.sales_table||[]).forEach(r=>{
+      const _cn=s=>String(s||'').replace(/^\uFEFF/,'').trim();
+      const ds=_cn(r['التاريخ']||r['تاريخ']||'').substring(0,10);
+      if(fromVal && ds<fromVal) return;
+      if(toVal   && ds>toVal)   return;
+      const tp=_cn(r['النوع']||r['نوع']||'');
+      const tot=_parseNum(r['الاجمالي الصافي']||r['الإجمالي الصافي']||r['الصافي']||0);
+      if(tp==='مبيع')        _s+=tot;
+      if(tp==='مرتجع مبيع') _r+=tot;
+    });
+    netSales = Math.max(0, _s - _r);
+  } else {
+    netSales = D.kpis?.net_sales || 0;
+  }
 
   // إعادة حساب البيانات مع الفلتر الحالي
   let cats = [];
