@@ -1670,6 +1670,23 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
       </div>
     </div>
 
+    <!-- ── المصروفات ── -->
+    <div class="nav-group">
+      <div class="nav-section">المالية</div>
+      <div class="nav-item nav-parent open" data-tooltip="المصروفات">
+        <div class="nav-icon-wrap" onclick="showPage('expenses')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <span class="nav-label" onclick="showPage('expenses')">تحليل المصروفات</span>
+      </div>
+      <div class="nav-sub open">
+        <div class="nav-item nav-sub-item" onclick="showPage('expenses')" data-page="expenses">
+          <span class="nav-sub-dot"></span>
+          <span class="nav-label">التحليل الرأسي</span>
+        </div>
+      </div>
+    </div>
+
     <!-- ── المستودع ── -->
     <div class="nav-group">
       <div class="nav-section">المستودع</div>
@@ -2210,7 +2227,7 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
         <select id="f-cust-sup" onchange="_onSupChange('f-cust-rep','f-cust-sup',renderCustomersPage)"><option value="">كل المشرفين</option></select>
         <select id="f-cust-repcatf" onchange="renderCustomersPage()"><option value="">كل القنوات البيعية</option></select>
         <select id="f-cust-cat" onchange="renderCustomersPage()">
-          <option value="">كل القنوات البيعية</option>
+          <option value="">كل التصنيفات</option>
           <option value="ممتاز">ممتاز</option><option value="جيد">جيد</option>
           <option value="متوسط">متوسط</option><option value="مخاطرة">مخاطرة</option>
           <option value="مخاطرة عالية">مخاطرة عالية</option>
@@ -2566,6 +2583,74 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
     </div>
   </div>
 
+
+  <!-- ════════════ صفحة تحليل المصروفات ════════════ -->
+  <div class="page" id="page-expenses">
+
+    <!-- KPI bar -->
+    <div class="kpi-grid" id="kpi-expenses"></div>
+
+    <!-- شريط الفلتر -->
+    <div class="filter-bar" style="margin:0 0 var(--gap);">
+      <span class="filter-label">فلتر:</span>
+      <div class="date-wrap"><input type="date" id="f-exp-from" onchange="renderExpensesPage()" title="من تاريخ"></div>
+      <div class="date-wrap"><input type="date" id="f-exp-to" onchange="renderExpensesPage()" title="إلى تاريخ"></div>
+      <button class="btn" onclick="document.getElementById('f-exp-from').value='';document.getElementById('f-exp-to').value='';renderExpensesPage();" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
+      <span id="exp-period-label" style="font-size:11px;color:var(--accent);font-weight:600;margin-right:auto;"></span>
+      <span id="exp-sales-ref" style="font-size:11px;color:var(--muted);font-weight:500;"></span>
+      <button onclick="_expPrint()" style="display:flex;align-items:center;gap:7px;padding:8px 18px;border-radius:9px;border:none;background:linear-gradient(135deg,#4361ee,#7b5ea7);color:#fff;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        طباعة التقرير
+      </button>
+    </div>
+
+    <!-- جدول التحليل الرأسي — أولاً -->
+    <div class="card" style="margin-bottom:var(--gap);">
+      <div class="card-header">
+        <span class="card-title">🗂 التحليل الرأسي الكامل — نسب المصروفات إلى صافي المبيعات</span>
+      </div>
+      <div id="expenses-table-wrap" style="overflow-x:auto;"></div>
+    </div>
+
+    <!-- النقاط الحرجة والتوصيات -->
+    <div class="card" id="exp-flags-card" style="margin-bottom:var(--gap);">
+      <div class="card-header"><span class="card-title">⚠️ النقاط الحرجة (Red Flags) والتوصيات</span></div>
+      <div id="exp-flags-wrap"></div>
+    </div>
+
+    <!-- صف الرسوم البيانية: أعلى بنود + توزيع دائري -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);margin-bottom:var(--gap)">
+      <div class="card">
+        <div class="card-header"><span class="card-title">📉 أعلى بنود المصروفات</span></div>
+        <div class="chart-wrap tall"><canvas id="ch-exp-hbar"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">🥧 توزيع إجمالي المصروفات</span></div>
+        <div class="chart-wrap tall"><canvas id="ch-exp-donut"></canvas></div>
+      </div>
+    </div>
+
+    <!-- صف الرسوم البيانية: مقارنة + نسب -->
+    <div style="display:grid;grid-template-columns:3fr 2fr;gap:var(--gap);margin-bottom:var(--gap)">
+      <div class="card">
+        <div class="card-header"><span class="card-title">📊 المصروفات vs صافي المبيعات</span></div>
+        <div class="chart-wrap tall"><canvas id="ch-exp-compare"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">📈 نسب المصروفات من المبيعات</span></div>
+        <div class="chart-wrap tall"><canvas id="ch-exp-ratio"></canvas></div>
+      </div>
+    </div>
+
+    <!-- رسالة عند عدم وجود بيانات -->
+    <div id="exp-empty" style="display:none;padding:48px;text-align:center;color:var(--muted);">
+      <div style="font-size:48px;margin-bottom:16px;">💸</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px;">لا توجد بيانات مصروفات</div>
+      <div style="font-size:13px;">ارفع ملف <strong>المصروفات.xlsx</strong> عبر نافذة رفع البيانات</div>
+    </div>
+
+  </div>
+
 </div><!-- /main -->
 
 
@@ -2643,6 +2728,11 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
             <div class="scard-name">أهداف الأصناف</div>
             <div class="scard-status" id="ss-targets">⬜ لم يُرفع</div>
           </div>
+          <div class="sdz-card" id="scard-expenses">
+            <div class="scard-icon">💸</div>
+            <div class="scard-name">المصروفات</div>
+            <div class="scard-status" id="ss-expenses">⬜ لم يُرفع</div>
+          </div>
         </div>
 
         <!-- سجل العمليات -->
@@ -2677,6 +2767,8 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
         <input class="gs-input" id="gs-inventory" placeholder="https://docs.google.com/spreadsheets/...">
         <label style="font-size:11px;color:var(--gold);display:block;margin-bottom:4px;margin-top:8px">👥 تصنيف المندوبين والأهداف (CSV)</label>
         <input class="gs-input" id="gs-reps" placeholder="https://docs.google.com/spreadsheets/..." style="border-color:rgba(255,215,0,.4)">
+        <label style="font-size:11px;color:var(--red);display:block;margin-bottom:4px;margin-top:8px">💸 المصروفات (CSV)</label>
+        <input class="gs-input" id="gs-expenses" placeholder="https://docs.google.com/spreadsheets/d/.../export?format=csv&sheet=Sheet1" style="border-color:rgba(240,82,82,.4)">
         <label style="font-size:11px;color:var(--accent3);display:block;margin-bottom:4px;margin-top:8px">🎯 توزيع أهداف الأصناف (xlsx — رابط تنزيل مباشر)</label>
         <input class="gs-input" id="gs-targets" placeholder="https://docs.google.com/spreadsheets/d/.../export?format=xlsx" style="border-color:rgba(255,159,67,.4)">
         <div style="font-size:10px;color:var(--muted);margin-top:3px;padding-right:2px">💡 في Google Sheets: ملف ← تنزيل ← Microsoft Excel ← انسخ رابط الصفحة التي ستفتح</div>
@@ -2730,6 +2822,7 @@ const GS_URLS_EMBEDDED = {
   reps:       'https://docs.google.com/spreadsheets/d/e/2PACX-1vTYCN2dCoLrmBquVBQ4YvHpXcDYI1ggmPyDC2FrYQBb-I0PGly3syVVPDm4eHllwA/pub?gid=883595607&single=true&output=csv',
   aging:      'https://docs.google.com/spreadsheets/d/1g17IduM2pisXsHsTQBuXf8ZQ1qQKrFew/export?format=csv&gid=1432141854',
   targets:    'https://docs.google.com/spreadsheets/d/1pHZDl3B4vozI30BLDUbKBG_mzfJ5MgaN8GABDAGI5kU/export?format=xlsx&gid=1501110512',
+  expenses:   'https://docs.google.com/spreadsheets/d/1Du6P3GxkrSZkj7VdWcC6YKgx2CXTedmVst53QobuBxo/export?format=csv&sheet=Sheet1',
 };
 
 // ══════════════════════════════════════════════════════
@@ -2743,7 +2836,7 @@ const EMBEDDED = {
   inventory_by_warehouse:{},aging_buckets:{},
   _repSuperMap:{},_superRepsMap:{},
   reps:[],
-  sales_table:[],debt_table:[],aging_table:[],collection_table:[],inventory_table:[]
+  sales_table:[],debt_table:[],aging_table:[],collection_table:[],inventory_table:[],expenses_table:[]
 };
 
 // ══════════════════════════════════════════════════════
@@ -2985,8 +3078,8 @@ function lineChart(id,labels,datasets){
 // ══════════════════════════════════════════════════════
 //  NAVIGATION
 // ══════════════════════════════════════════════════════
-const PAGE_TITLES={'overview':'📈 نظرة عامة — لوحة القيادة','sales':'📊 تحليل المبيعات','reps':'👥 تقرير المندوبين','rep-goals':'🎯 أهداف المناديب','customers':'🏪 إدارة الزبائن','products':'📦 تحليل الأصناف','debt':'💳 المديونية','aging':'⏳ أعمار الذمم','collection':'💰 التحصيل','inventory':'🏭 جرد المخازن'};
-const PAGE_RENDERS={'overview':renderOverviewPage,'sales':renderSalesPage,'reps':renderRepPage,'rep-goals':renderRepGoalsPage,'customers':renderCustomersPage,'products':renderProductsPage,'debt':renderDebtPage,'aging':renderAgingPage,'collection':renderCollectionPage,'inventory':renderInventoryPage};
+const PAGE_TITLES={'overview':'📈 نظرة عامة — لوحة القيادة','sales':'📊 تحليل المبيعات','reps':'👥 تقرير المندوبين','rep-goals':'🎯 أهداف المناديب','customers':'🏪 إدارة الزبائن','products':'📦 تحليل الأصناف','debt':'💳 المديونية','aging':'⏳ أعمار الذمم','collection':'💰 التحصيل','inventory':'🏭 جرد المخازن','expenses':'💸 تحليل المصروفات'};
+const PAGE_RENDERS={'overview':renderOverviewPage,'sales':renderSalesPage,'reps':renderRepPage,'rep-goals':renderRepGoalsPage,'customers':renderCustomersPage,'products':renderProductsPage,'debt':renderDebtPage,'aging':renderAgingPage,'collection':renderCollectionPage,'inventory':renderInventoryPage,'expenses':renderExpensesPage};
 
 let currentPage='overview';
 const _renderedPages=new Set(); // تتبّع الصفحات المرسومة
@@ -4845,7 +4938,7 @@ function _renderCustTable(){
       <th class="col-debt" style="color:var(--accent2)" onclick="window._custSort={key:'age30',dir:'desc'};renderCustomersPage()" style="cursor:pointer">ذمة ≤30 يوم</th>
       <th class="col-debt" style="color:var(--accent3)" onclick="window._custSort={key:'age60',dir:'desc'};renderCustomersPage()" style="cursor:pointer">ذمة ≤60 يوم</th>
       <th class="col-debt" style="color:var(--red)" onclick="window._custSort={key:'ageOld',dir:'desc'};renderCustomersPage()" style="cursor:pointer">ذمة > 60 يوم</th>
-      <th class="col-cat" onclick="window._custSort={key:'cat',dir:'asc'};renderCustomersPage()" style="cursor:pointer">القناة البيعية</th>
+      <th class="col-cat" onclick="window._custSort={key:'cat',dir:'asc'};renderCustomersPage()" style="cursor:pointer">التصنيف</th>
     </tr></thead>
     <tbody>${rows.map((c,i)=>`<tr>
       <td class="td-num">${(PAG_STATE['cust'].page-1)*PAGE_SIZE+i+1}</td>
@@ -6006,6 +6099,388 @@ function _renderAdjTable(){
 
 
 // ══════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════
+   تحليل المصروفات — Vertical Analysis
+═══════════════════════════════════════════════════════════════════ */
+
+/* ── بناء بيانات المصروفات ── */
+function _rebuildExpensesData(){
+  const rows = D.expenses_table || [];
+  const map = {};
+  rows.forEach(r=>{
+    const _n = v => { const x=parseFloat(String(v||'').replace(/,/g,'')); return isNaN(x)?0:x; };
+    const acc = String(r['اسم الحساب']||r['الحساب']||'').trim();
+    const debit  = _n(r['مدين']);
+    const credit = _n(r['دائن']);
+    if(!acc) return;
+    if(!map[acc]) map[acc]={debit:0,credit:0};
+    map[acc].debit  += debit;
+    map[acc].credit += credit;
+  });
+  // صافي لكل حساب (مدين - دائن)
+  D._expMap = map;
+  D._expCategories = Object.entries(map)
+    .map(([name,v])=>({name, net: Math.max(0, v.debit - v.credit)}))
+    .filter(x=>x.net>0)
+    .sort((a,b)=>b.net-a.net);
+}
+
+/* ── تصنيف النقاط الحرجة ── */
+function _expRating(name, pctSales){
+  const n = name;
+  if(n.includes('تخفيض'))
+    return pctSales>3?{lbl:'⚠️ مرتفع جداً',cls:'red',flag:true}:pctSales>1.5?{lbl:'⚡ يحتاج مراقبة',cls:'orange',flag:true}:{lbl:'✅ مقبول',cls:'green',flag:false};
+  if(n.includes('أجور')||n.includes('مرتب')||n.includes('الاجور'))
+    return pctSales>5?{lbl:'⚠️ مرتفع',cls:'red',flag:true}:pctSales>3?{lbl:'⚡ مراقبة',cls:'orange',flag:true}:{lbl:'✅ طبيعي',cls:'green',flag:false};
+  if(n.includes('صيانة'))
+    return pctSales>1.5?{lbl:'⚠️ مرتفع',cls:'red',flag:true}:pctSales>0.8?{lbl:'⚡ مراقبة',cls:'orange',flag:true}:{lbl:'✅ طبيعي',cls:'green',flag:false};
+  if(n.includes('وقود')||n.includes('محروق'))
+    return pctSales>0.5?{lbl:'⚠️ مرتفع',cls:'red',flag:true}:{lbl:'✅ طبيعي',cls:'green',flag:false};
+  if(n.includes('بدل سيارة')||n.includes('بدل السيارة'))
+    return pctSales>0.8?{lbl:'⚠️ مرتفع',cls:'red',flag:true}:{lbl:'✅ طبيعي',cls:'green',flag:false};
+  if(n.includes('إضافي')||n.includes('اضافي'))
+    return pctSales>0.5?{lbl:'⚡ مراقبة',cls:'orange',flag:true}:{lbl:'✅ طبيعي',cls:'green',flag:false};
+  if(n.includes('متفرق'))
+    return pctSales>0.3?{lbl:'⚡ مراقبة',cls:'orange',flag:true}:{lbl:'✅ طبيعي',cls:'green',flag:false};
+  if(n.includes('عمولة'))
+    return pctSales>2.5?{lbl:'⚠️ مرتفع',cls:'red',flag:true}:pctSales>1.5?{lbl:'⚡ مراقبة',cls:'orange',flag:true}:{lbl:'✅ طبيعي',cls:'green',flag:false};
+  return {lbl:'✅ طبيعي',cls:'green',flag:false};
+}
+
+/* ── توصيات ذكية ── */
+function _expAdvice(name, pctSales, amount){
+  const fmt = v=>v.toLocaleString('ar-LY',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const n = name;
+  if(n.includes('تخفيض') && pctSales>1.5)
+    return `التخفيضات بلغت ${fmt(amount)} د.ل (${pctSales.toFixed(2)}% من المبيعات) وتتجاوز المعيار (1–2%). يُنصح بـ: (1) تقييد التخفيضات الفردية >1,000 د.ل بموافقة المدير التجاري. (2) فصل الخصومات التجارية عن إلغاءات الديون في الحسابات. (3) ربط كل تخفيض بهدف حجم مبيعات محدد مسبقاً.`;
+  if((n.includes('أجور')||n.includes('مرتب')||n.includes('الاجور')) && pctSales>3)
+    return `بند الأجور ${fmt(amount)} د.ل يمثل ${pctSales.toFixed(2)}% من المبيعات. يُنصح بـ: (1) مراجعة هيكل الرواتب مقارنةً بالإنتاجية. (2) ربط المكافآت بمؤشرات الأداء KPI. (3) تقليل الاعتماد على العمل الإضافي بتوزيع أفضل للجدول الزمني.`;
+  if(n.includes('صيانة') && pctSales>0.8)
+    return `الصيانة ${fmt(amount)} د.ل وتياز المعيار المقبول (<0.8%). يُنصح بـ: (1) وضع خطة صيانة وقائية شهرية. (2) إجراء عطاءات لأي مشتريات >2,000 د.ل. (3) تحديد ورش معتمدة بعقود سنوية.`;
+  if(n.includes('وقود') && pctSales>0.5)
+    return `الوقود ${fmt(amount)} د.ل يتجاوز المعيار (<0.5%). يُنصح بـ: (1) تركيب GPS لتتبع السيارات. (2) استخدام كروت وقود مخصصة لكل سيارة. (3) ربط طلب الوقود بمسافة الرحلة المنجزة فعلياً.`;
+  if(n.includes('بدل سيارة') && pctSales>0.8)
+    return `بدل السيارة ${fmt(amount)} د.ل مرتفع. يُنصح بـ: (1) تمييز السيارات المشتراة كأصول ثابتة وليس مصروفاً. (2) توحيد سياسة البدل: مبلغ ثابت × كيلومترات فعلية.`;
+  if((n.includes('إضافي')||n.includes('اضافي')) && pctSales>0.5)
+    return `العمل الإضافي ${fmt(amount)} د.ل يشير لضغط على القوى العاملة. يُنصح بـ: (1) دراسة جدوى التوظيف الدائم مقابل الإضافي. (2) تحديد ساعات الذروة واستحداث وردية إضافية.`;
+  if(n.includes('عمولة') && pctSales>1.5)
+    return `عمولات ${fmt(amount)} د.ل مرتفعة. يُنصح بـ: (1) ربط 30–40% من العمولة بالتحصيل الفعلي. (2) وضع سقف للعمولة الشهرية لكل مندوب.`;
+  return null;
+}
+
+/* ── الدالة الرئيسية للرسم ── */
+function renderExpensesPage(){
+  if(!D.expenses_table || !D.expenses_table.length){
+    document.getElementById('exp-empty').style.display='block';
+    document.getElementById('kpi-expenses').innerHTML='';
+    document.getElementById('expenses-table-wrap').innerHTML='';
+    document.getElementById('exp-flags-wrap').innerHTML='';
+    document.getElementById('exp-sales-ref').textContent='';
+    destroyChart('ch-exp-bar');
+    destroyChart('ch-exp-pie');
+    return;
+  }
+  document.getElementById('exp-empty').style.display='none';
+
+  _rebuildExpensesData(); // دائماً أعد البناء لضمان تحديث البيانات
+
+  // ── فلترة حسب التاريخ إذا وُجد ──
+  const fromVal = document.getElementById('f-exp-from')?.value || '';
+  const toVal   = document.getElementById('f-exp-to')?.value   || '';
+  let cats = D._expCategories;
+  let totalExpAll = cats.reduce((s,c)=>s+c.net,0);
+
+  if(fromVal || toVal){
+    // إعادة حساب مع الفلتر
+    const map2={};
+    (D.expenses_table||[]).forEach(r=>{
+      const _n=v=>{const x=parseFloat(String(v||'').replace(/,/g,''));return isNaN(x)?0:x;};
+      const dateStr=String(r['التاريخ']||'').substring(0,10);
+      if(fromVal && dateStr<fromVal) return;
+      if(toVal   && dateStr>toVal)   return;
+      const acc=String(r['اسم الحساب']||r['الحساب']||'').trim();
+      const debit=_n(r['مدين']), credit=_n(r['دائن']);
+      if(!acc)return;
+      if(!map2[acc])map2[acc]={debit:0,credit:0};
+      map2[acc].debit+=debit; map2[acc].credit+=credit;
+    });
+    cats=Object.entries(map2).map(([name,v])=>({name,net:Math.max(0,v.debit-v.credit)}))
+              .filter(x=>x.net>0).sort((a,b)=>b.net-a.net);
+    totalExpAll=cats.reduce((s,c)=>s+c.net,0);
+    const lbl=document.getElementById('exp-period-label');
+    if(lbl)lbl.textContent=(fromVal&&toVal)?`📅 ${fromVal} — ${toVal}`:(fromVal?`من ${fromVal}`:`حتى ${toVal}`);
+  } else {
+    const lbl=document.getElementById('exp-period-label');
+    if(lbl)lbl.textContent='كل الفترات';
+  }
+
+  // ── صافي المبيعات من اللوحة ──
+  const netSales = D.kpis?.net_sales || 0;
+  const fmt  = v=>v.toLocaleString('ar-LY',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fmtP = v=>v.toFixed(2)+'%';
+
+  const salesRef = document.getElementById('exp-sales-ref');
+  if(salesRef) salesRef.textContent = netSales>0
+    ? `صافي المبيعات (القاعدة): ${fmt(netSales)} د.ل`
+    : '⚠️ ارفع ملف المبيعات لحساب النسب';
+
+  // ══ KPI Cards ══
+  const opIncome = netSales - totalExpAll;
+  const opMargin = netSales > 0 ? opIncome/netSales*100 : 0;
+  const expRatio = netSales > 0 ? totalExpAll/netSales*100 : 0;
+  const topCat   = cats[0] || {name:'—',net:0};
+  const kpiWrap  = document.getElementById('kpi-expenses');
+  kpiWrap.innerHTML = [
+    kpiCard('💸','إجمالي المصروفات',totalExpAll,'var(--red)',''),
+    netSales>0?kpiCard('📉','نسبة المصروفات/المبيعات',fmtP(expRatio),'var(--accent2)','من صافي المبيعات'):'',
+    netSales>0?kpiCard('🏦','الدخل التشغيلي التقديري',opIncome,'var(--accent)','بعد المصروفات'):'',
+    netSales>0?kpiCard('📊','هامش الربح التشغيلي',fmtP(opMargin),'var(--purple)','تقديري'):'',
+    kpiCard('🔝','أعلى بند مصروف',topCat.net,'var(--orange)',topCat.name.substring(0,18)+'…'),
+    kpiCard('📋','عدد بنود المصروفات',cats.length,'var(--muted)','حساب فريد'),
+  ].join('');
+
+  // ══ جدول التحليل الرأسي ══
+  const clsMap={red:'var(--red)',orange:'var(--accent2)',green:'var(--accent)'};
+  let tbody='';
+  cats.forEach((c,i)=>{
+    const ps = netSales>0 ? c.net/netSales*100 : null;
+    const pt = totalExpAll>0 ? c.net/totalExpAll*100 : 0;
+    const r  = _expRating(c.name, ps||0);
+    const psSafe = ps !== null ? fmtP(ps) : '—';
+    const psColor = ps!==null ? `color:${clsMap[r.cls]};font-weight:700` : '';
+    const barWidth = Math.min(100, pt).toFixed(1);
+    tbody += `<tr style="background:${i%2===0?'var(--surface)':'var(--surface2)'}">
+      <td style="padding:8px 12px;font-weight:600;color:var(--text)">${c.name}</td>
+      <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--text)">${fmt(c.net)}</td>
+      <td style="padding:8px 12px;text-align:center;${psColor}">${psSafe}</td>
+      <td style="padding:8px 12px;text-align:center;color:var(--text2)">${fmtP(pt)}</td>
+      <td style="padding:8px 14px;">
+        <div style="background:var(--border);border-radius:4px;height:8px;width:100%;">
+          <div style="background:${clsMap[r.cls]};border-radius:4px;height:8px;width:${barWidth}%;transition:width .4s;"></div>
+        </div>
+      </td>
+      <td style="padding:6px 10px;text-align:center;">
+        <span style="background:${r.cls==='red'?'rgba(240,82,82,.12)':r.cls==='orange'?'rgba(240,120,32,.12)':'rgba(30,132,73,.12)'};color:${clsMap[r.cls]};border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700;">${r.lbl}</span>
+      </td>
+    </tr>`;
+  });
+
+  // صف الإجمالي
+  const totPs = netSales>0 ? fmtP(totalExpAll/netSales*100) : '—';
+  tbody += `<tr style="background:rgba(240,120,32,.08);border-top:2px solid var(--accent2);">
+    <td style="padding:10px 12px;font-weight:800;color:var(--accent2)">إجمالي المصروفات</td>
+    <td style="padding:10px 12px;text-align:center;font-weight:800;color:var(--accent2)">${fmt(totalExpAll)}</td>
+    <td style="padding:10px 12px;text-align:center;font-weight:800;color:var(--accent2)">${totPs}</td>
+    <td style="padding:10px 12px;text-align:center;font-weight:800;color:var(--accent2)">100.00%</td>
+    <td colspan="2"></td>
+  </tr>`;
+
+  // صف هامش الربح
+  if(netSales>0){
+    const marginColor = opMargin>=20?'var(--accent)':opMargin>=10?'var(--accent2)':'var(--red)';
+    tbody += `<tr style="background:rgba(44,93,229,.08);border-top:2px solid var(--accent);">
+      <td style="padding:10px 12px;font-weight:800;color:${marginColor}">🏦 الدخل التشغيلي التقديري</td>
+      <td style="padding:10px 12px;text-align:center;font-weight:800;color:${marginColor}">${fmt(opIncome)}</td>
+      <td style="padding:10px 12px;text-align:center;font-weight:800;color:${marginColor}">${fmtP(opMargin)}</td>
+      <td colspan="3"></td>
+    </tr>`;
+  }
+
+  // ══ الرسوم البيانية أولاً — بنفس نمط التبويبات الأخرى ══
+  // نرسمها قبل الجدول لضمان ظهورها في أعلى الصفحة مع الـ canvas المرئي
+  const c = _chartColors();
+  const top10 = cats.slice(0,10);
+
+  destroyChart('ch-exp-hbar');
+  destroyChart('ch-exp-donut');
+  destroyChart('ch-exp-compare');
+  destroyChart('ch-exp-ratio');
+
+  // 1) أعلى بنود المصروفات — hbar بالأسلوب المعتاد
+  hbarChart(
+    'ch-exp-hbar',
+    top10.map(c=>c.name.length>22?c.name.substring(0,22)+'…':c.name),
+    top10.map(c=>+c.net.toFixed(2)),
+    'المبلغ (د.ل)'
+  );
+
+  // 2) توزيع دائري — donut بالأسلوب المعتاد
+  const top8 = cats.slice(0,8);
+  const othersNet = cats.slice(8).reduce((s,x)=>s+x.net,0);
+  const donutLabels = top8.map(c=>c.name.length>18?c.name.substring(0,18)+'…':c.name);
+  const donutData   = top8.map(c=>+c.net.toFixed(2));
+  if(othersNet>0){ donutLabels.push('أخرى'); donutData.push(+othersNet.toFixed(2)); }
+  donutChart('ch-exp-donut', donutLabels, donutData);
+
+  // 3) مقارنة: المصروفات + % من المبيعات — bar مزدوج بمحورين Y — نفس نمط مبيعات vs تحصيل
+  {
+    const top8c = cats.slice(0,8);
+    const cmpLabels = top8c.map(cc=>{
+      const nm = cc.name.replace(/^م\.?\s*/,'').replace(/^م\s+/,'');
+      return nm.length>14 ? nm.substring(0,14)+'…' : nm;
+    });
+
+    destroyChart('ch-exp-compare');
+    mkChart('ch-exp-compare',{
+      type:'bar',
+      data:{
+        labels: cmpLabels,
+        datasets:[
+          {
+            label:'المصروفات',
+            data: top8c.map(cc=>+cc.net.toFixed(2)),
+            backgroundColor:'#F07820cc',
+            borderRadius:{topLeft:6,topRight:6},
+            borderWidth:0, hoverBorderWidth:2, hoverBorderColor:'#fff',
+            yAxisID:'y'
+          },
+          {
+            label:'% من المبيعات',
+            data: top8c.map(cc=> netSales>0 ? +(cc.net/netSales*100).toFixed(2) : 0),
+            backgroundColor:'#34D399cc',
+            borderRadius:{topLeft:6,topRight:6},
+            borderWidth:0, hoverBorderWidth:2, hoverBorderColor:'#fff',
+            yAxisID:'y2'
+          },
+          ...(netSales>0 ? [{
+            label:'الفجوة عن المبيعات',
+            data: top8c.map(cc=> +(Math.max(0, netSales - cc.net)).toFixed(2)),
+            backgroundColor:'#F87171bb',
+            borderRadius:{topLeft:6,topRight:6},
+            borderWidth:0, hoverBorderWidth:2, hoverBorderColor:'#fff',
+            yAxisID:'y',
+            hidden: true
+          }] : [])
+        ]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{
+          legend:{display:true,labels:{color:c.text,font:{family:'Cairo',size:11},usePointStyle:true,padding:14}},
+          datalabels:{display:false},
+          tooltip:{...(_chartDefaults().plugins.tooltip), callbacks:{
+            label: ctx => {
+              if(ctx.datasetIndex===1) return ` % من المبيعات: ${ctx.parsed.y.toFixed(2)}%`;
+              return ` ${ctx.dataset.label}: ${fmtShort(ctx.parsed.y)} `;
+            }
+          }}
+        },
+        scales:{
+          x:{
+            ticks:{color:c.muted,font:{family:'Cairo',size:9}},
+            grid:{display:false},border:{display:false}
+          },
+          y:{
+            type:'linear', position:'right',
+            ticks:{color:c.muted,font:{family:'Cairo',size:10},callback:v=>fmtShort(v)},
+            grid:{color:c.grid+'44'},border:{display:false},
+            title:{display:true,text:'المبلغ (د.ل)',color:c.muted,font:{family:'Cairo',size:9}}
+          },
+          y2:{
+            type:'linear', position:'left',
+            ticks:{color:'#059669',font:{family:'Cairo',size:10},callback:v=>v+'%'},
+            grid:{display:false},border:{display:false},
+            title:{display:true,text:'% من المبيعات',color:'#059669',font:{family:'Cairo',size:9}},
+            min:0
+          }
+        },
+        animation:{duration:800,easing:'easeOutQuart'}
+      }
+    });
+  }
+
+  // 4) نسب المصروفات من المبيعات — bar أفقي للنسب (أعلى 8)
+  if(netSales>0){
+    const ratioLabels = top8.map(c=>c.name.length>18?c.name.substring(0,18)+'…':c.name);
+    const ratioData   = top8.map(c=>+(c.net/netSales*100).toFixed(2));
+    const ratioColors = top8.map(c=>{
+      const ps = c.net/netSales*100;
+      const r  = _expRating(c.name, ps);
+      return r.cls==='red'?'#F05252cc':r.cls==='orange'?'#F07820cc':'#2C5DE5cc';
+    });
+    mkChart('ch-exp-ratio',{
+      type:'bar',
+      data:{labels:ratioLabels,datasets:[{
+        label:'% من المبيعات',data:ratioData,
+        backgroundColor:ratioColors,
+        borderRadius:6,borderSkipped:false,borderWidth:0,
+        hoverBorderWidth:2,hoverBorderColor:'#fff'
+      }]},
+      options:{
+        indexAxis:'y',responsive:true,maintainAspectRatio:false,
+        plugins:{
+          legend:{display:false},
+          datalabels:{display:true,anchor:'end',align:'end',color:c.text2,
+            font:{family:'Cairo',size:10,weight:'bold'},formatter:v=>v+'%'},
+          tooltip:{...(_chartDefaults().plugins.tooltip),
+            callbacks:{label:ctx=>` ${ctx.parsed.x.toFixed(2)}% من صافي المبيعات`}}
+        },
+        scales:{
+          x:{ticks:{color:c.muted,font:{family:'Cairo',size:10},callback:v=>v+'%'},
+             grid:{color:c.grid+'44'},border:{display:false}},
+          y:{ticks:{color:c.text,font:{family:'Cairo',size:10,weight:'500'},padding:6},
+             grid:{display:false},border:{display:false}}
+        },
+        animation:{duration:800,easing:'easeOutQuart'}
+      }
+    });
+  } else {
+    destroyChart('ch-exp-ratio');
+  }
+
+  // ══ النقاط الحرجة والتوصيات ══
+  const flags = cats.filter(c=>{
+    const ps=netSales>0?c.net/netSales*100:c.net/totalExpAll*100*50;
+    return _expRating(c.name,ps).flag;
+  });
+
+  const flagsWrap = document.getElementById('exp-flags-wrap');
+  if(!flags.length){
+    flagsWrap.innerHTML=`<div style="padding:20px;text-align:center;color:var(--accent);font-weight:600;">✅ لم يتم اكتشاف نقاط حرجة في المصروفات الحالية</div>`;
+  } else {
+    flagsWrap.innerHTML = flags.map(c=>{
+      const ps=netSales>0?c.net/netSales*100:0;
+      const r=_expRating(c.name,ps);
+      const advice=_expAdvice(c.name,ps,c.net);
+      const bg=r.cls==='red'?'rgba(240,82,82,.06)':'rgba(240,120,32,.06)';
+      const bc=r.cls==='red'?'rgba(240,82,82,.3)':'rgba(240,120,32,.3)';
+      const cc=r.cls==='red'?'var(--red)':'var(--accent2)';
+      return `<div style="border:1px solid ${bc};border-right:4px solid ${cc};border-radius:10px;padding:14px 16px;margin:10px;background:${bg};">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <span style="font-size:16px;">${r.cls==='red'?'⚠️':'⚡'}</span>
+          <span style="font-weight:800;font-size:13px;color:${cc};">${c.name}</span>
+          <span style="margin-right:auto;font-size:12px;color:${cc};font-weight:700;">${fmt(c.net)} د.ل${netSales>0?' ('+fmtP(ps)+' من المبيعات)':''}</span>
+        </div>
+        ${advice?`<div style="font-size:12px;color:var(--text2);line-height:1.7;">${advice}</div>`:''}
+      </div>`;
+    }).join('');
+  }
+
+  // ══ الجدول أخيراً بعد الرسوم — داخل requestAnimationFrame لضمان ظهور الـ canvas أولاً ══
+  requestAnimationFrame(()=>{
+    document.getElementById('expenses-table-wrap').innerHTML=`
+    <table style="width:100%;border-collapse:collapse;font-family:Cairo,sans-serif;font-size:12px;">
+      <thead>
+        <tr style="background:var(--accent);color:#fff;">
+          <th style="padding:10px 12px;text-align:right;font-weight:700;">بند المصروفات</th>
+          <th style="padding:10px 12px;text-align:center;font-weight:700;">المبلغ (د.ل)</th>
+          <th style="padding:10px 12px;text-align:center;font-weight:700;">% من المبيعات</th>
+          <th style="padding:10px 12px;text-align:center;font-weight:700;">% من الإجمالي</th>
+          <th style="padding:10px 12px;text-align:center;font-weight:700;">الحجم النسبي</th>
+          <th style="padding:10px 12px;text-align:center;font-weight:700;">التقييم</th>
+        </tr>
+      </thead>
+      <tbody>${tbody}</tbody>
+    </table>`;
+  });
+}
+
+/* ── تحديث تلقائي عند المزامنة ── */
+function _refreshExpensesIfOpen(){
+  if(currentPage==='expenses') renderExpensesPage();
+}
+
+
 function renderInventoryPage(){
   const whF=document.getElementById('f-inv-wh')?.value||'';
   const search=(document.getElementById('f-inv-search')?.value||'').toLowerCase();
@@ -7277,6 +7752,14 @@ function processNewData(type,rows){
       
       break;
     }
+    case 'expenses':{
+      D.expenses_table = rows;
+      D._expMap = null;
+      D._expCategories = null;
+      _rebuildExpensesData();
+      if(currentPage==='expenses') renderExpensesPage();
+      return;
+    }
   }
   lastUpdateTs='تم التحديث: '+(_getLastDataDate()||new Date().toLocaleString('en-US'));
   const _luEl=document.getElementById('last-update');
@@ -7359,11 +7842,12 @@ const FILE_NAME_MAP=[
   {type:'collection',patterns:['تحصيل','collect','قبض','سند']},
   {type:'inventory', patterns:['جرد','invent','مخزن','مخازن','مستودع']},
   {type:'reps',      patterns:['تصنيف المندوب','reps_cat','مندوبين']},
+  {type:'expenses',   patterns:['مصروف','مصاريف','expenses','expense','نفقات','تكاليف']},
   {type:'targets',   patterns:['توزيع_اهداف','توزيع اهداف','اهداف_ابريل','اهداف ابريل','اهداف_يناير','اهداف_فبراير','اهداف_مارس','اهداف_مايو','اهداف_يونيو','اهداف_يوليو','اهداف_اغسطس','اهداف_سبتمبر','اهداف_اكتوبر','اهداف_نوفمبر','اهداف_ديسمبر','اهداف_المندوب','targets']},
 ];
 
-const TYPE_LABELS={sales:'مبيعات',debt:'مديونية',aging:'أعمار الذمم',collection:'تحصيل',inventory:'جرد المخازن',reps:'تصنيف المندوبين والأهداف',targets:'أهداف الأصناف'};
-const TYPE_ICONS={sales:'📊',debt:'💳',aging:'⏳',collection:'💰',inventory:'🏭',reps:'👥',targets:'🎯'};
+const TYPE_LABELS={sales:'مبيعات',debt:'مديونية',aging:'أعمار الذمم',collection:'تحصيل',inventory:'جرد المخازن',reps:'تصنيف المندوبين والأهداف',targets:'أهداف الأصناف',expenses:'المصروفات'};
+const TYPE_ICONS={sales:'📊',debt:'💳',aging:'⏳',collection:'💰',inventory:'🏭',reps:'👥',targets:'🎯',expenses:'💸'};
 
 function detectFileType(filename){
   const name=(filename||'').replace(/\.xlsx?$/i,'').toLowerCase();
@@ -7542,7 +8026,8 @@ function saveGsUrls(){
     collection:document.getElementById('gs-collection')?.value||'',
     inventory: document.getElementById('gs-inventory')?.value||'',
     reps:     document.getElementById('gs-reps')?.value||'',
-    targets:  document.getElementById('gs-targets')?.value||''
+    targets:  document.getElementById('gs-targets')?.value||'',
+    expenses: document.getElementById('gs-expenses')?.value||''
   };
   const interval=document.getElementById('gs-interval')?.value||'5';
   try{
@@ -7558,7 +8043,7 @@ function loadGsUrls(){
     const saved=localStorage.getItem(GS_STORAGE_KEY);
     if(!saved)return false;
     const urls=JSON.parse(saved);
-    ['sales','debt','aging','collection','inventory','reps','targets'].forEach(k=>{
+    ['sales','debt','aging','collection','inventory','reps','targets','expenses'].forEach(k=>{
       const el=document.getElementById('gs-'+k);
       if(el&&urls[k])el.value=urls[k];
     });
@@ -7588,10 +8073,10 @@ function _updateRefreshStatus(){
 
 async function _autoSyncQuiet(){
   const urls = GS_URLS_EMBEDDED;
-  const keys = ['sales','collection','debt','inventory','reps','aging'];
+  const keys = ['sales','collection','debt','inventory','reps','aging','expenses'];
   const msgEl=document.getElementById('loading-msg');
   const progBar=document.getElementById('ld-progress');
-  const iconMap={sales:'ldi-sales',collection:'ldi-collection',debt:'ldi-debt',inventory:'ldi-inventory',reps:'ldi-reps',aging:'ldi-aging'};
+  const iconMap={sales:'ldi-sales',collection:'ldi-collection',debt:'ldi-debt',inventory:'ldi-inventory',reps:'ldi-reps',aging:'ldi-aging',expenses:'ldi-expenses'};
 
   // ── جلب ملف أهداف الأصناف (xlsx) بالتوازي ──
   const targetsUrl=(document.getElementById('gs-targets')?.value?.trim())||GS_URLS_EMBEDDED['targets']||'';
@@ -7701,20 +8186,21 @@ async function _autoSyncQuiet(){
   const synced=completed;
 
   /* ── 4. حفظ في Cache المحلي ── */
-  if(synced>0){
+  const _allSuccess = synced === keys.length; // نجحت جميع الملفات بدون استثناء
+
+  if(_allSuccess){
+    /* ✅ جميع الملفات اكتملت — احفظ وأظهر زر الدخول */
     try{
       localStorage.setItem(CACHE_KEY,JSON.stringify(freshData));
       localStorage.setItem(CACHE_TS_KEY,Date.now().toString());
     }catch(e){/* localStorage full */}
 
     if(progBar){progBar.className='ld-progress-bar';progBar.style.width='100%';}
-    if(msgEl)msgEl.textContent='✅ تم تحميل البيانات بنجاح';
+    if(msgEl)msgEl.innerHTML=`<span style="color:#0a9e6e;font-weight:700">✅ تم تحميل جميع الملفات (${synced}/${keys.length}) بنجاح</span>`;
 
-    /* إعادة عرض نهائية بكل البيانات */
     _invalidatePageCache();
     populateMonthSelects();
     populateRepSelects();
-    // إعادة تطبيق الفلتر الشامل إن كان نشطاً (حتى لا يُفقد عند المزامنة)
     if(GF&&(GF.sup||GF.rep||GF.cat||GF.month||GF.dateFrom||GF.dateTo)){
       _applyGFtoD();
       _updateGFBadge();
@@ -7728,7 +8214,6 @@ async function _autoSyncQuiet(){
     const dot=document.getElementById('status-dot');
     if(dot)dot.style.background='var(--accent2)';
 
-    /* إظهار زر الدخول بعد اكتمال التحميل */
     _showLoadingSuccess(()=>{
       const _mainEl=document.getElementById('main');
       const _sideEl=document.getElementById('sidebar');
@@ -7739,9 +8224,51 @@ async function _autoSyncQuiet(){
       populateRepSelects();
       const _p=window.currentPage||'overview';
       if(PAGE_RENDERS[_p])PAGE_RENDERS[_p]();
-    _refreshFrmIfOpen();
+      _refreshFrmIfOpen();
       _startAutoRefresh();
     });
+
+  } else if(synced>0 && !_allSuccess){
+    /* ⚠️ بعض الملفات فشلت — أظهر تحذيراً واضحاً بدون زر الدخول */
+    const _failed = keys.length - synced;
+    if(progBar){progBar.className='ld-progress-bar';progBar.style.width='100%';progBar.style.background='var(--accent2)';}
+    if(msgEl)msgEl.innerHTML=`
+      <span style="color:var(--accent2);font-weight:800;display:block;margin-bottom:6px">
+        ⚠️ تم تحميل ${synced} من ${keys.length} — فشل ${_failed} ملف
+      </span>
+      <span style="color:var(--text2);font-size:11px">
+        يرجى التحقق من روابط الملفات وإعادة المزامنة للمتابعة
+      </span>`;
+    /* أظهر أيقونات الفاشلة باللون الأحمر بوضوح */
+    keys.forEach(k=>{
+      const ic=document.getElementById(iconMap[k]);
+      if(ic && !ic.className.includes('loaded')){
+        ic.className='ld-icon-box';
+        ic.style.cssText='border-color:var(--red);background:rgba(240,82,82,.08);color:var(--red)';
+      }
+    });
+    /* زر إعادة المحاولة فقط — لا زر دخول */
+    let retryWrap=document.getElementById('ld-retry-wrap');
+    if(!retryWrap){
+      retryWrap=document.createElement('div');
+      retryWrap.id='ld-retry-wrap';
+      retryWrap.style.cssText='margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap';
+      retryWrap.innerHTML=`
+        <button onclick="autoLoadOnStartup()" style="
+          background:var(--accent);color:#fff;border:none;border-radius:10px;
+          padding:10px 28px;font-size:13px;font-weight:800;font-family:'Cairo',sans-serif;
+          cursor:pointer;display:inline-flex;align-items:center;gap:8px;">
+          🔄 إعادة المحاولة
+        </button>
+        <button onclick="_hideLoadingOverlay();document.getElementById('main').style.display='';document.getElementById('sidebar').style.display='';" style="
+          background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:10px;
+          padding:10px 22px;font-size:12px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer;">
+          دخول بالبيانات المتاحة
+        </button>`;
+      const msgNode=document.getElementById('loading-msg');
+      if(msgNode&&msgNode.parentNode) msgNode.parentNode.insertBefore(retryWrap, msgNode.nextSibling);
+    }
+
   } else if(!cachedDataBackup){
     /* فشل كل شيء + لا cache */
     _hideLoadingOverlay();
@@ -7778,8 +8305,8 @@ async function _autoSyncQuiet(){
 async function syncGoogleSheets(){
   const prog=document.getElementById('gs-progress');
   const statusEl=document.getElementById('gs-status');
-  const keys=['sales','debt','aging','collection','inventory','reps'];
-  const typeLabels={sales:'مبيعات',debt:'مديونية',aging:'أعمار الذمم',collection:'تحصيل',inventory:'جرد المخازن',reps:'تصنيف المندوبين والأهداف'};
+  const keys=['sales','debt','aging','collection','inventory','reps','expenses'];
+  const typeLabels={sales:'مبيعات',debt:'مديونية',aging:'أعمار الذمم',collection:'تحصيل',inventory:'جرد المخازن',reps:'تصنيف المندوبين والأهداف',expenses:'المصروفات'};
 
   statusEl.textContent='⏳ جاري جلب البيانات...';
   if(prog)prog.style.width='10%';
@@ -7916,7 +8443,7 @@ function _showLoadingSuccess(onEnter){
   if(msgEl) msgEl.innerHTML = '<span style="color:var(--accent2);font-weight:700">✅ تم تحميل البيانات بنجاح</span>';
 
   // تحويل أيقونات التحميل إلى ✅ إن لم تكن كذلك
-  ['ldi-sales','ldi-collection','ldi-debt','ldi-aging','ldi-inventory','ldi-reps'].forEach(id=>{
+  ['ldi-sales','ldi-collection','ldi-debt','ldi-aging','ldi-inventory','ldi-reps','ldi-expenses'].forEach(id=>{
     const ic = document.getElementById(id);
     if(ic && ic.className.includes('loading')) ic.className = 'ld-icon-box loaded';
   });
@@ -8251,6 +8778,10 @@ function _showLoadingOverlay(){
       <div class="ld-icon-box" id="ldi-reps">👥</div>
       <div class="ld-icon-lbl">المناديب</div>
     </div>
+    <div class="ld-icon-item">
+      <div class="ld-icon-box" id="ldi-expenses">💸</div>
+      <div class="ld-icon-lbl">المصروفات</div>
+    </div>
   </div>
 
   <div class="ld-progress-wrap">
@@ -8301,8 +8832,12 @@ function _parseNum(v){
   s=s
     // إزالة الكلمات المحاسبية العربية والإنجليزية
     .replace(/لنا|علينا|مدين|دائن|CR|DR|debit|credit/gi,'')
-    // إزالة فواصل الآلاف (فاصلة عادية أو فاصلة عربية ،)
-    .replace(/[,،]/g,'')
+    // تحويل الأرقام العربية/الهندية إلى لاتينية
+    .replace(/[٠-٩]/g, d => String.fromCharCode(d.charCodeAt(0) - 0x0660 + 0x30))
+    // إزالة فاصلة الآلاف العربية ٬ (U+066C) والعادية , و ،
+    .replace(/[,،٬]/g,'')
+    // تحويل النقطة العشرية العربية ٫ (U+066B) إلى نقطة عادية
+    .replace(/٫/g,'.')
     // إبقاء الأرقام والنقطة العشرية والإشارة السالبة فقط
     .replace(/[^\d.\-]/g,'')
     .trim();
@@ -9707,12 +10242,11 @@ function _reprocessCollection(rows){
     if(custNm){if(!custColMap[custNm])custColMap[custNm]={total:0,ops:0};custColMap[custNm].total+=cred;custColMap[custNm].ops+=1;}
   });
 
-  // ثانياً: طرح الخصومات من المندوب المعني
+  // ثانياً: طرح الخصومات من المندوب والزبون المعني
   deductRows.forEach(r=>{
     const rep=_c(r['المندوب'])||'غير محدد';
     const deb=_n2(r['مدين']);
-    const acc=_c(r['الحساب المقابل']||r['الحساب']||'');
-    const bayan=_c(r['البيان']||'');
+    const custNm=_c(r['اسم الحساب']||r['اسم العميل']||r['الزبون']||'');
     if(!byRep[rep])byRep[rep]={total:0,ops:0,bank:0,cash:0};
     byRep[rep].total=Math.max(0,byRep[rep].total-deb);
     // طرح الخصم من bank أو cash حسب نوعه
@@ -9720,6 +10254,10 @@ function _reprocessCollection(rows){
     const isBank=!isCash;
     if(isBank)byRep[rep].bank=Math.max(0,(byRep[rep].bank||0)-deb);
     else if(isCash)byRep[rep].cash=Math.max(0,(byRep[rep].cash||0)-deb);
+    // ── طرح الخصم من الزبون أيضاً ──
+    if(custNm && custColMap[custNm]){
+      custColMap[custNm].total=Math.max(0, custColMap[custNm].total-deb);
+    }
   });
 
   D.collection_by_rep=Object.fromEntries(Object.entries(byRep).map(([k,v])=>[k,v.total]).sort((a,b)=>b[1]-a[1]));
@@ -10186,7 +10724,7 @@ function printCustomersTable(){
       {label:'الزبون',id:'f-cust-search'},
       {label:'المندوب',id:'f-cust-rep'},
       {label:'القناة البيعية',id:'f-cust-repcatf'},
-      {label:'القناة البيعية',id:'f-cust-cat'},
+      {label:'التصنيف',id:'f-cust-cat'},
       {label:'أعمار الذمم',id:'f-cust-aging'},
       {label:'من تاريخ',id:'f-cust-from'},
       {label:'إلى تاريخ',id:'f-cust-to'},
@@ -11302,6 +11840,7 @@ function _refreshFrmIfOpen(){
     _frmLoadAging();
     _frmPopulateItems();
   }
+  _refreshExpensesIfOpen();
 }
 
 function openFinancialReportModal(){
@@ -11368,7 +11907,7 @@ function _frmCalc(){
     const qtyV  = _parseNum(r['الكمية الخارجة']||r['الكمية']||0);
     const qtyI  = _parseNum(r['الكمية الداخلة']||0);
     if(type==='مبيع')           { sales+=total; qty+=qtyV; }
-    if(type==='مرتجع مبيع')    { returns+=total; retQty+=qtyV; }
+    if(type==='مرتجع مبيع')    { returns+=total; retQty+=(qtyI>0?qtyI:qtyV); }
   });
   const netSales = sales - returns;
   const netQty   = qty - retQty;
@@ -11408,8 +11947,9 @@ function _frmCalcDay(){
     const type  = _cn(r['النوع']||r['نوع']||'');
     const total = _parseNum(r['الاجمالي الصافي']||r['الإجمالي الصافي']||r['الصافي']||0);
     const qtyV  = _parseNum(r['الكمية الخارجة']||r['الكمية']||0);
+    const qtyI  = _parseNum(r['الكمية الداخلة']||0);
     if(type==='مبيع')         { sales+=total; qty+=qtyV; }
-    if(type==='مرتجع مبيع')  { returns+=total; retQty+=qtyV; }
+    if(type==='مرتجع مبيع')  { returns+=total; retQty+=(qtyI>0?qtyI:qtyV); }
   });
 
   let collected = 0;
@@ -11490,8 +12030,9 @@ function _frmCalcItem(){
     const type  = _cn(r['النوع']||r['نوع']||'');
     const total = _parseNum(r['الاجمالي الصافي']||r['الإجمالي الصافي']||r['الصافي']||0);
     const qtyV  = _parseNum(r['الكمية الخارجة']||r['الكمية']||0);
+    const qtyI  = _parseNum(r['الكمية الداخلة']||0);
     if(type==='مبيع')         { sales+=total; qty+=qtyV; }
-    if(type==='مرتجع مبيع')  { returns+=total; retQty+=qtyV; }
+    if(type==='مرتجع مبيع')  { returns+=total; retQty+=(qtyI>0?qtyI:qtyV); }
   });
   _frmSet('frm-item-sales', _frmFmt(sales - returns));
   _frmSet('frm-item-qty',   _frmFmtQty(qty - retQty));
@@ -12115,6 +12656,341 @@ if(document.fonts&&document.fonts.ready){
     alert('يرجى السماح بالنوافذ المنبثقة لهذا الموقع ثم أعد المحاولة');
     return;
   }
+  pw.document.open();
+  pw.document.write(htmlDoc);
+  pw.document.close();
+  pw.focus();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   طباعة تقرير تحليل المصروفات
+══════════════════════════════════════════════════════════════════ */
+function _expPrint(){
+  // ── جمع البيانات ──
+  const fromVal = document.getElementById('f-exp-from')?.value || '';
+  const toVal   = document.getElementById('f-exp-to')?.value   || '';
+  const netSales = D.kpis?.net_sales || 0;
+
+  // إعادة حساب البيانات مع الفلتر الحالي
+  let cats = [];
+  if(D.expenses_table && D.expenses_table.length){
+    const map = {};
+    D.expenses_table.forEach(r=>{
+      const _n = v=>{ const x=parseFloat(String(v||'').replace(/[,،٬]/g,'').replace(/٫/g,'.').replace(/[^\d.\-]/g,'')); return isNaN(x)?0:x; };
+      const dateStr = String(r['التاريخ']||'').substring(0,10);
+      if(fromVal && dateStr < fromVal) return;
+      if(toVal   && dateStr > toVal)   return;
+      const acc = String(r['اسم الحساب']||r['الحساب']||'').trim();
+      if(!acc) return;
+      if(!map[acc]) map[acc]={debit:0,credit:0};
+      map[acc].debit  += _n(r['مدين']);
+      map[acc].credit += _n(r['دائن']);
+    });
+    cats = Object.entries(map)
+      .map(([name,v])=>({name, net: Math.max(0, v.debit-v.credit)}))
+      .filter(x=>x.net>0)
+      .sort((a,b)=>b.net-a.net);
+  }
+
+  if(!cats.length){ alert('لا توجد بيانات مصروفات للطباعة'); return; }
+
+  const totalExp = cats.reduce((s,c)=>s+c.net, 0);
+  const opIncome = netSales > 0 ? netSales - totalExp : null;
+  const opMargin = netSales > 0 ? (opIncome/netSales*100) : null;
+
+  const fmt  = v => v.toLocaleString('ar-LY',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' د.ل';
+  const fmtP = v => v.toFixed(2) + '%';
+
+  const _fmtDate = d => {
+    if(!d) return '—';
+    const [y,m,dd] = d.split('-');
+    const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+    return `${parseInt(dd,10)} ${months[parseInt(m,10)-1]} ${y}`;
+  };
+
+  const now = new Date();
+  const printDate = _fmtDate(now.toISOString().slice(0,10));
+  const timeStr   = now.toLocaleTimeString('ar-LY',{hour:'2-digit',minute:'2-digit'});
+  const periodLabel = (fromVal && toVal)
+    ? `${_fmtDate(fromVal)} حتى ${_fmtDate(toVal)}`
+    : (fromVal ? `من ${_fmtDate(fromVal)}` : toVal ? `حتى ${_fmtDate(toVal)}` : 'كامل الفترة المتاحة');
+
+  const dayForFile = (()=>{ const n=new Date(); return `${String(n.getDate()).padStart(2,'0')}-${String(n.getMonth()+1).padStart(2,'0')}-${n.getFullYear()}`; })();
+  const pdfTitle = `تقرير تحليل المصروفات ${dayForFile}`;
+
+  const logoEl  = document.querySelector('.sidebar-logo img, #sidebar-open-btn img');
+  const logoSrc = logoEl ? logoEl.src : '';
+
+  // ── تصنيف البنود ──
+  const ratingFn = (name, pct) => {
+    if(name.includes('تخفيض'))
+      return pct>3?{lbl:'مرتفع جداً',cls:'danger'}:pct>1.5?{lbl:'يحتاج مراقبة',cls:'warn'}:{lbl:'مقبول',cls:'safe'};
+    if(name.includes('أجور')||name.includes('مرتب')||name.includes('الاجور'))
+      return pct>5?{lbl:'مرتفع',cls:'danger'}:pct>3?{lbl:'مراقبة',cls:'warn'}:{lbl:'طبيعي',cls:'safe'};
+    if(name.includes('صيانة'))
+      return pct>1.5?{lbl:'مرتفع',cls:'danger'}:pct>0.8?{lbl:'مراقبة',cls:'warn'}:{lbl:'طبيعي',cls:'safe'};
+    if(name.includes('وقود')||name.includes('محروق'))
+      return pct>0.5?{lbl:'مرتفع',cls:'danger'}:{lbl:'طبيعي',cls:'safe'};
+    if(name.includes('بدل سيارة'))
+      return pct>0.8?{lbl:'مرتفع',cls:'danger'}:{lbl:'طبيعي',cls:'safe'};
+    if(name.includes('إضافي')||name.includes('اضافي'))
+      return pct>0.5?{lbl:'مراقبة',cls:'warn'}:{lbl:'طبيعي',cls:'safe'};
+    if(name.includes('عمولة'))
+      return pct>2.5?{lbl:'مرتفع',cls:'danger'}:pct>1.5?{lbl:'مراقبة',cls:'warn'}:{lbl:'طبيعي',cls:'safe'};
+    return {lbl:'طبيعي',cls:'safe'};
+  };
+
+  // ── صفوف الجدول ──
+  let tableRows = '';
+  const idx_map = ['أولاً','ثانياً','ثالثاً','رابعاً','خامساً','سادساً','سابعاً','ثامناً','تاسعاً','عاشراً'];
+  cats.forEach((c,i) => {
+    const ps  = netSales>0 ? c.net/netSales*100 : null;
+    const pt  = c.net/totalExp*100;
+    const r   = ratingFn(c.name, ps||0);
+    const clrMap = {safe:'#1d6b45',warn:'#b45309',danger:'#c0392b'};
+    const bgMap  = {safe:'#f0faf5',warn:'#fffbeb',danger:'#fef2f2'};
+    const badgeBg= {safe:'#d1fae5',warn:'#fef3c7',danger:'#fee2e2'};
+    const even   = i%2===0;
+    tableRows += `
+    <tr style="background:${even?'#fff':bgMap[r.cls]};">
+      <td style="padding:5px 10px;border:1px solid #e4ecf8;font-weight:600;color:#2d3748;font-size:8pt;">${c.name}</td>
+      <td style="padding:5px 10px;border:1px solid #e4ecf8;text-align:center;font-weight:800;color:#003c96;font-size:8.5pt;font-variant-numeric:tabular-nums;">${fmt(c.net)}</td>
+      <td style="padding:5px 10px;border:1px solid #e4ecf8;text-align:center;font-weight:700;color:${ps!==null?clrMap[r.cls]:'#aaa'};font-size:8.5pt;">${ps!==null?fmtP(ps):'—'}</td>
+      <td style="padding:5px 10px;border:1px solid #e4ecf8;text-align:center;color:#4a5568;font-size:8pt;">${fmtP(pt)}</td>
+      <td style="padding:5px 8px;border:1px solid #e4ecf8;text-align:center;">
+        <span style="background:${badgeBg[r.cls]};color:${clrMap[r.cls]};border-radius:4px;padding:2px 7px;font-size:7.5pt;font-weight:700;">${r.lbl}</span>
+      </td>
+    </tr>`;
+  });
+
+  // صف الإجمالي
+  tableRows += `
+    <tr style="background:#003c96;">
+      <td style="padding:7px 10px;border:1px solid #003c96;border-right:4px solid #f05a1e;color:#fff;font-weight:800;font-size:9pt;">إجمالي المصروفات</td>
+      <td style="padding:7px 10px;border:1px solid #003c96;text-align:center;color:#fff;font-weight:800;font-size:9pt;">${fmt(totalExp)}</td>
+      <td style="padding:7px 10px;border:1px solid #003c96;text-align:center;color:#fff;font-weight:800;">${netSales>0?fmtP(totalExp/netSales*100):'—'}</td>
+      <td style="padding:7px 10px;border:1px solid #003c96;text-align:center;color:#fff;font-weight:800;">100.00%</td>
+      <td style="border:1px solid #003c96;"></td>
+    </tr>`;
+
+  // صف الدخل التشغيلي
+  if(opIncome !== null){
+    const mc = opMargin>=20?'#1d6b45':opMargin>=10?'#b45309':'#c0392b';
+    const mb = opMargin>=20?'#f0faf5':opMargin>=10?'#fffbeb':'#fef2f2';
+    tableRows += `
+    <tr style="background:${mb};">
+      <td style="padding:7px 10px;border:1px solid #d0ddf5;border-right:4px solid ${mc};color:${mc};font-weight:800;font-size:9pt;">🏦 الدخل التشغيلي التقديري</td>
+      <td style="padding:7px 10px;border:1px solid #d0ddf5;text-align:center;color:${mc};font-weight:800;font-size:9pt;">${fmt(opIncome)}</td>
+      <td style="padding:7px 10px;border:1px solid #d0ddf5;text-align:center;color:${mc};font-weight:800;">${fmtP(opMargin)}</td>
+      <td colspan="2" style="border:1px solid #d0ddf5;"></td>
+    </tr>`;
+  }
+
+  // ── بنود التحذير للتوصيات ──
+  const flagRows = cats.filter(c=>{
+    const ps = netSales>0?c.net/netSales*100:0;
+    return ratingFn(c.name,ps).cls !== 'safe';
+  });
+  const flagsHTML = flagRows.length ? flagRows.map(c=>{
+    const ps = netSales>0?c.net/netSales*100:0;
+    const r  = ratingFn(c.name,ps);
+    const bc = r.cls==='danger'?'#c0392b':'#b45309';
+    const bb = r.cls==='danger'?'#fef2f2':'#fffbeb';
+    return `<tr style="background:${bb};">
+      <td style="padding:5px 10px;border:1px solid #e4ecf8;border-right:4px solid ${bc};font-weight:700;color:${bc};font-size:8pt;">${c.name}</td>
+      <td style="padding:5px 10px;border:1px solid #e4ecf8;text-align:center;font-weight:800;color:${bc};font-size:8pt;">${fmt(c.net)}</td>
+      <td style="padding:5px 10px;border:1px solid #e4ecf8;text-align:center;color:${bc};font-weight:800;font-size:8pt;">${netSales>0?fmtP(ps):'—'}</td>
+      <td style="padding:5px 8px;border:1px solid #e4ecf8;text-align:center;"><span style="background:${r.cls==='danger'?'#fee2e2':'#fef3c7'};color:${bc};border-radius:4px;padding:2px 7px;font-size:7.5pt;font-weight:700;">${r.lbl}</span></td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="4" style="padding:10px;text-align:center;color:#1d6b45;font-weight:600;font-size:8pt;border:1px solid #e4ecf8;">✅ لا توجد بنود تتجاوز المعيار المقبول</td></tr>`;
+
+  // ══════════════════════════════════════════════════════════
+  // مستند HTML للطباعة
+  // ══════════════════════════════════════════════════════════
+  const htmlDoc = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>${pdfTitle}</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+@page{size:A4 portrait;margin:0}
+html,body{font-family:'Cairo',sans-serif;font-size:9pt;color:#1a1a2e;background:#fff;direction:rtl;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+body{padding:12mm 14mm 10mm 14mm}
+.header{display:flex;align-items:stretch;justify-content:space-between;margin-bottom:8px;border-radius:6px 6px 0 0;overflow:hidden;}
+.header-accent{width:6px;background:#002f7a;flex-shrink:0;}
+.header-body{flex:1;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fff;}
+.hdr-logo-wrap{display:flex;align-items:center;gap:12px;}
+.hdr-logo{width:38px;height:38px;border-radius:4px;overflow:hidden;flex-shrink:0;border:1px solid #d0dce8;background:#f5f7fb;display:flex;align-items:center;justify-content:center;}
+.hdr-logo img{width:100%;height:100%;object-fit:contain}
+.hdr-logo-placeholder{width:46px;height:46px;border-radius:4px;background:#002f7a;display:flex;align-items:center;justify-content:center;font-size:18pt;font-weight:900;color:#fff;letter-spacing:-.5px;flex-shrink:0;}
+.company-name{font-size:7.5pt;font-weight:700;color:#5a6a85;letter-spacing:.4px;text-transform:uppercase;margin-bottom:1px;}
+.report-title{font-size:16pt;font-weight:900;color:#002f7a;line-height:1;letter-spacing:-.3px;}
+.hdr-divider{width:1px;background:#d0dce8;margin:6px 0;}
+.hdr-right{text-align:left;font-size:8pt;color:#5a6a85;line-height:1.9;padding-right:4px;}
+.hdr-right .date-val{font-size:10.5pt;font-weight:900;color:#002f7a;display:block;margin-bottom:1px;}
+.header-rule{height:3px;background:linear-gradient(to left,#f05a1e 0%,#f05a1e 60px,#002f7a 60px,#002f7a 100%);margin-bottom:14px;border-left:1.5px solid #c8d6ec;border-right:1.5px solid #c8d6ec;}
+.memo-card-wrap{margin-bottom:14px;}
+.memo-card{width:100%;border-collapse:collapse;font-size:9pt;}
+.memo-card tr{border-bottom:1px solid #edf2f8;}
+.memo-card tr:last-child{border-bottom:none;}
+.memo-card .mc-lbl{width:64px;padding:6px 0 6px 8px;color:#002f7a;font-weight:800;font-size:9pt;text-align:right;white-space:nowrap;vertical-align:middle;}
+.memo-card .mc-sep{width:14px;padding:6px 2px;color:#a0b0cc;text-align:center;vertical-align:middle;}
+.memo-card .mc-val{padding:6px 10px 6px 0;color:#1a2540;font-weight:600;font-size:9pt;vertical-align:middle;text-align:right;}
+.memo-card .mc-val.subj-val{color:#002f7a;font-weight:800;}
+.intro-msg{margin-bottom:14px;padding:10px 14px;border:1px solid #d4e0f5;border-right:4px solid #002f7a;border-radius:0 4px 4px 0;background:#f9fbff;font-size:8.5pt;color:#2c3e60;line-height:1.9;}
+.intro-msg .salutation{font-weight:800;color:#002f7a;display:block;margin-bottom:3px;font-size:9pt;}
+.sec-hdr{background:#003c96;color:#fff;padding:5px 12px 5px 14px;font-size:8.5pt;font-weight:700;letter-spacing:.2px;margin-bottom:0;border-radius:5px 5px 0 0;border-right:4px solid #f05a1e;}
+.kpi-row{display:flex;gap:8px;margin-bottom:14px;}
+.kpi-box{flex:1;border:1px solid #d0ddf5;border-radius:6px;padding:8px 12px;text-align:center;background:#f9fbff;}
+.kpi-box .kv{font-size:11pt;font-weight:900;color:#002f7a;display:block;margin-bottom:2px;}
+.kpi-box .kl{font-size:7.5pt;color:#7a8aaa;font-weight:600;}
+.kpi-box.warn .kv{color:#b45309;}
+.kpi-box.danger .kv{color:#c0392b;}
+.kpi-box.green .kv{color:#1d6b45;}
+.data-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:8.5pt;}
+.data-table thead th{background:#eef3fc;color:#003c96;font-weight:700;padding:5px 10px;text-align:right;border:1px solid #d0ddf5;font-size:8pt;}
+.footer{margin-top:14px;border-top:3px solid #002f7a;position:relative;}
+.footer::before{content:'';display:block;height:3px;width:56px;background:#f05a1e;position:absolute;top:-3px;left:0;}
+.footer-inner{display:flex;align-items:center;justify-content:space-between;padding-top:7px;font-size:7.5pt;color:#7a8aaa;}
+.footer-closing{margin-top:10px;padding:8px 12px;border:1px solid #d4e0f5;border-right:3px solid #f05a1e;border-radius:0 3px 3px 0;background:#fafbff;font-size:8pt;color:#2c3e60;line-height:1.8;}
+.footer-closing strong{display:block;color:#002f7a;font-size:8.5pt;margin-bottom:2px;}
+@media print{body{padding:12mm 14mm 10mm 14mm!important}.data-table tr{page-break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-accent"></div>
+  <div class="header-body">
+    <div class="hdr-logo-wrap">
+      ${logoSrc ? `<div class="hdr-logo"><img src="${logoSrc}" alt="شعار"></div>` : `<div class="hdr-logo-placeholder">ر</div>`}
+      <div class="hdr-text">
+        <div class="company-name">شركة ركان المتوسط</div>
+        <div class="report-title">تقرير تحليل المصروفات</div>
+      </div>
+    </div>
+    <div class="hdr-divider"></div>
+    <div class="hdr-right">
+      <span class="date-val">${printDate}</span>
+      <span>${timeStr}</span>
+    </div>
+  </div>
+</div>
+<div class="header-rule"></div>
+
+<div class="memo-card-wrap">
+  <table class="memo-card">
+    <tr>
+      <td class="mc-lbl">من / إلى</td>
+      <td class="mc-sep">:</td>
+      <td class="mc-val">القسم المالي &nbsp;—&nbsp; الإدارة المحترمة</td>
+    </tr>
+    <tr>
+      <td class="mc-lbl">الفترة</td>
+      <td class="mc-sep">:</td>
+      <td class="mc-val">${periodLabel}</td>
+    </tr>
+    <tr>
+      <td class="mc-lbl">الموضوع</td>
+      <td class="mc-sep">:</td>
+      <td class="mc-val subj-val">التحليل الرأسي للمصروفات التشغيلية ونسبتها إلى صافي المبيعات</td>
+    </tr>
+  </table>
+</div>
+
+<div class="intro-msg">
+  <span class="salutation">تحية طيبة وبعد،</span>
+  يتضمن هذا التقرير تحليلاً رأسياً شاملاً لبنود المصروفات التشغيلية خلال الفترة المحددة، مع احتساب نسبة كل بند إلى صافي المبيعات وتقييم مستواه مقارنةً بالمعايير المحاسبية المتعارف عليها في قطاع التوزيع.
+</div>
+
+<!-- بطاقات KPI -->
+<div class="kpi-row">
+  <div class="kpi-box ${totalExp/Math.max(netSales,1)*100>20?'danger':totalExp/Math.max(netSales,1)*100>10?'warn':'green'}">
+    <span class="kv">${fmt(totalExp)}</span>
+    <span class="kl">إجمالي المصروفات</span>
+  </div>
+  ${netSales>0?`
+  <div class="kpi-box ${totalExp/netSales*100>20?'danger':totalExp/netSales*100>10?'warn':'green'}">
+    <span class="kv">${fmtP(totalExp/netSales*100)}</span>
+    <span class="kl">نسبة المصروفات / المبيعات</span>
+  </div>
+  <div class="kpi-box ${opMargin>=20?'green':opMargin>=10?'warn':'danger'}">
+    <span class="kv">${fmtP(opMargin)}</span>
+    <span class="kl">هامش الربح التشغيلي</span>
+  </div>
+  <div class="kpi-box green">
+    <span class="kv">${fmt(netSales)}</span>
+    <span class="kl">صافي المبيعات (القاعدة)</span>
+  </div>` : `
+  <div class="kpi-box">
+    <span class="kv">${cats.length}</span>
+    <span class="kl">عدد بنود المصروفات</span>
+  </div>
+  <div class="kpi-box">
+    <span class="kv">${cats[0]?.name?.substring(0,18)||'—'}</span>
+    <span class="kl">أعلى بند مصروف</span>
+  </div>`}
+</div>
+
+<!-- جدول التحليل الرأسي الكامل -->
+<div class="sec-hdr">التحليل الرأسي — نسب المصروفات إلى صافي المبيعات</div>
+<table class="data-table">
+  <thead>
+    <tr>
+      <th style="width:35%">بند المصروفات</th>
+      <th style="width:22%;text-align:center">المبلغ (د.ل)</th>
+      <th style="width:15%;text-align:center">% من المبيعات</th>
+      <th style="width:13%;text-align:center">% من الإجمالي</th>
+      <th style="width:15%;text-align:center">التقييم</th>
+    </tr>
+  </thead>
+  <tbody>${tableRows}</tbody>
+</table>
+
+<!-- النقاط الحرجة -->
+<div class="sec-hdr" style="margin-top:4px;">⚠ النقاط الحرجة — البنود التي تتجاوز المعيار</div>
+<table class="data-table">
+  <thead>
+    <tr>
+      <th style="width:40%">البند</th>
+      <th style="width:25%;text-align:center">المبلغ (د.ل)</th>
+      <th style="width:20%;text-align:center">% من المبيعات</th>
+      <th style="width:15%;text-align:center">التقييم</th>
+    </tr>
+  </thead>
+  <tbody>${flagsHTML}</tbody>
+</table>
+
+<div class="footer">
+  <div class="footer-closing">
+    <strong>وتفضلوا بقبول فائق الاحترام والتقدير،</strong>
+    المحاسب أحمد العكاري <span style="color:#f05a1e;font-weight:900;margin:0 4px">·</span> القسم المالي <span style="color:#f05a1e;font-weight:900;margin:0 4px">·</span> شركة ركان المتوسط
+  </div>
+  <div class="footer-inner">
+    <div style="color:#aaa;font-size:7pt;">تم الإنشاء تلقائياً من نظام التحليل الاستراتيجي — الندى</div>
+    <div style="font-weight:700;color:#002f7a;font-size:8pt;">${printDate} — ${timeStr}</div>
+  </div>
+</div>
+
+</body>
+<script>
+function _doPrint(){
+  document.title='${pdfTitle}';
+  window.print();
+  window.onafterprint=function(){window.close()};
+}
+if(document.fonts&&document.fonts.ready){
+  document.fonts.ready.then(function(){setTimeout(_doPrint,300)});
+}else{
+  window.addEventListener('load',function(){setTimeout(_doPrint,500)});
+}
+<\/script>
+</body></html>`;
+
+  const pw = window.open('','_blank','width=960,height=780,scrollbars=yes,resizable=yes');
+  if(!pw){ alert('يرجى السماح بالنوافذ المنبثقة لهذا الموقع ثم أعد المحاولة'); return; }
   pw.document.open();
   pw.document.write(htmlDoc);
   pw.document.close();
