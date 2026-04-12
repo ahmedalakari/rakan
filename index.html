@@ -444,12 +444,24 @@ body.nav-collapsed #main{
    TABLE — Duralux Style
 ══════════════════════════════════════════════ */
 .table-wrap{overflow-x:auto;border-radius:var(--r-lg);border:1px solid var(--border);max-height:600px;box-shadow:var(--shadow-card)}
-table{width:100%;border-collapse:collapse;font-size:12.5px;table-layout:auto}
+table{width:100%;border-collapse:collapse;font-size:12px;table-layout:auto}
+.table-compact table{font-size:11px}
 thead tr{background:var(--surface2);position:sticky;top:0;z-index:2}
-thead th{padding:10px 14px;text-align:right;color:var(--text2);font-weight:700;font-size:11px;border-bottom:1px solid var(--border);white-space:nowrap;letter-spacing:.3px}
+thead th{padding:8px 10px;text-align:right;color:var(--text2);font-weight:700;font-size:11px;border-bottom:1px solid var(--border);white-space:nowrap;letter-spacing:.2px}
+.table-compact thead th{padding:5px 7px;font-size:10px}
 tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
 tbody tr:hover{background:color-mix(in srgb,var(--accent) 3%,transparent)}
-tbody td{padding:9px 14px;color:var(--text);white-space:nowrap}
+tbody td{padding:7px 10px;color:var(--text);white-space:nowrap}
+.table-compact tbody td{padding:4px 7px;font-size:11px}
+/* تجميد العمود الأول (اليمين في RTL) */
+.table-sticky-col thead th:first-child,
+.table-sticky-col tbody td:first-child,
+.table-sticky-col tfoot td:first-child{position:sticky;right:0;z-index:3;background:var(--surface2);box-shadow:-2px 0 6px rgba(0,0,0,.06)}
+.table-sticky-col tbody td:first-child{background:var(--surface)}
+.table-sticky-col tbody tr:hover td:first-child{background:color-mix(in srgb,var(--accent) 3%,transparent)}
+/* زر التبديل بين العادي والمضغوط */
+.table-toggle-btn{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-family:'Cairo',sans-serif;font-size:11px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.table-toggle-btn:hover{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,transparent)}
 
 
 /* ── Products view mode ── */
@@ -1118,7 +1130,8 @@ body.dark tbody td{color:var(--text)}
 
 /* Table footer */
 tfoot tr{border-top:2px solid var(--border)}
-tfoot td{padding:9px 14px;white-space:nowrap}
+tfoot td{padding:7px 10px;white-space:nowrap}
+.table-compact tfoot td{padding:4px 7px;font-size:11px}
 
 /* Sortable headers */
 th.sortable{cursor:pointer;user-select:none;transition:color .15s}
@@ -2026,24 +2039,6 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
     <div class="kpi-grid" id="kpi-sales"></div>
     <div class="card" style="margin-bottom:var(--gap)">
       <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-        <div style="display:flex;align-items:center;gap:10px">
-          <span class="card-title">📋 مقارنة الأداء الشهري</span>
-          <span style="font-size:11px;color:var(--muted)">بالدينار الليبي</span>
-        </div>
-        <button class="btn-print-a4" onclick="printMonthlyTable()" title="طباعة A4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-          طباعة A4
-        </button>
-      </div>
-      <div class="table-wrap" id="sales-monthly-static-wrap">
-        <table>
-          <thead id="monthly-thead"></thead>
-          <tbody id="monthly-tbody"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">ارفع ملف المبيعات لعرض المقارنة الشهرية</td></tr></tbody>
-        </table>
-      </div>
-    </div>
-    <div class="card" style="margin-bottom:var(--gap)">
-      <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
         <span class="card-title">🗂 جدول فواتير المبيعات</span>
         <button class="btn-print-a4" onclick="printSalesTable()" title="طباعة A4">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
@@ -2067,7 +2062,7 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
         <div class="date-wrap"><input type="date" id="f-sales-to" onchange="renderSalesPage()" title="إلى تاريخ"></div>
         <button class="btn" onclick="resetSalesFilters()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
-      <div class="table-wrap" id="sales-table-wrap"></div>
+      <div class="table-wrap table-sticky-col" id="sales-table-wrap"></div>
       <div class="table-stat-bar" id="sales-stat-bar"></div>
       <div class="table-pagination">
         <span id="sales-pag-info"></span>
@@ -2130,7 +2125,7 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
         <select id="f-rep-month" onchange="renderRepPage()"><option value="">كل الأشهر</option></select>
         <div class="date-wrap"><input type="date" id="f-rep-from" onchange="renderRepPage()" title="من تاريخ"></div>
         <div class="date-wrap"><input type="date" id="f-rep-to" onchange="renderRepPage()" title="إلى تاريخ"></div>
-        <select id="f-rep-view" onchange="const t=document.getElementById('reps-table-wrap');if(t){t.className=this.value==='all'?'table-wrap':'table-wrap vmode-'+this.value}" title="عرض حسب">
+        <select id="f-rep-view" onchange="const t=document.getElementById('reps-table-wrap');if(t){t.className=this.value==='all'?'table-wrap table-compact':'table-wrap table-compact vmode-'+this.value}" title="عرض حسب">
           <option value="all">عرض: أساسي</option>
           <option value="coll">عرض: التحصيلات</option>
           <option value="ret">عرض: المرتجعات</option>
@@ -2154,9 +2149,9 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
           <option value="gap|desc">ترتيب: الفجوة ↓</option>
           <option value="name|asc">ترتيب: الاسم أ-ي</option>
         </select>
-        <button class="btn" onclick="['f-rep-sup','f-rep-select','f-rep-cat','f-rep-month','f-rep-from','f-rep-to','f-rep-sort','f-rep-view'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});window._repSort=null;const rt=document.getElementById('reps-table-wrap');if(rt)rt.className='table-wrap';renderRepPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
+        <button class="btn" onclick="['f-rep-sup','f-rep-select','f-rep-cat','f-rep-month','f-rep-from','f-rep-to','f-rep-sort','f-rep-view'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});window._repSort=null;const rt=document.getElementById('reps-table-wrap');if(rt)rt.className='table-wrap table-compact';renderRepPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
-      <div class="table-wrap" id="reps-table-wrap"></div>
+      <div class="table-wrap table-sticky-col" id="reps-table-wrap"></div>
       <div class="table-stat-bar" id="reps-stat-bar"></div>
       <div class="table-pagination">
         <span id="reps-pag-info"></span>
@@ -2263,16 +2258,16 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
         </select>
         <div class="date-wrap"><input type="date" id="f-cust-from" onchange="renderCustomersPage()" title="من تاريخ"></div>
         <div class="date-wrap"><input type="date" id="f-cust-to" onchange="renderCustomersPage()" title="إلى تاريخ"></div>
-        <select id="f-cust-view" onchange="const t=document.getElementById('cust-table-wrap');if(t){t.className=this.value==='all'?'table-wrap':'table-wrap vmode-'+this.value}" title="عرض حسب">
+        <select id="f-cust-view" onchange="const t=document.getElementById('cust-table-wrap');if(t){t.className=this.value==='all'?'table-wrap table-compact':'table-wrap table-compact vmode-'+this.value}" title="عرض حسب">
           <option value="all">عرض: أساسي</option>
           <option value="coll">عرض: التحصيلات</option>
           <option value="ret">عرض: المرتجعات</option>
           <option value="debt">عرض: المديونية</option>
           <option value="cat">عرض: بيانات القناة البيعية</option>
         </select>
-        <button class="btn" onclick="['f-cust-sup','f-cust-search','f-cust-rep','f-cust-repcatf','f-cust-cat','f-cust-aging','f-cust-from','f-cust-to','f-cust-view'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});const ct=document.getElementById('cust-table-wrap');if(ct)ct.className='table-wrap';renderCustomersPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
+        <button class="btn" onclick="['f-cust-sup','f-cust-search','f-cust-rep','f-cust-repcatf','f-cust-cat','f-cust-aging','f-cust-from','f-cust-to','f-cust-view'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});const ct=document.getElementById('cust-table-wrap');if(ct)ct.className='table-wrap table-compact';renderCustomersPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
-      <div class="table-wrap" id="cust-table-wrap"></div>
+      <div class="table-wrap table-sticky-col" id="cust-table-wrap"></div>
       <div class="table-stat-bar" id="cust-stat-bar"></div>
       <div class="table-pagination">
         <span id="cust-pag-info"></span>
@@ -2319,15 +2314,15 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
         <select id="f-prod-month" onchange="renderProductsPage()"><option value="">كل الأشهر</option></select>
         <div class="date-wrap"><input type="date" id="f-prod-from" onchange="renderProductsPage()" title="من تاريخ"></div>
         <div class="date-wrap"><input type="date" id="f-prod-to" onchange="renderProductsPage()" title="إلى تاريخ"></div>
-        <select id="f-prod-view" onchange="const t=document.getElementById('prod-table-wrap');if(t)t.className=this.value==='all'?'table-wrap':'table-wrap pvmode-'+this.value" title="عرض حسب">
+        <select id="f-prod-view" onchange="const t=document.getElementById('prod-table-wrap');if(t)t.className=this.value==='all'?'table-wrap table-compact':'table-wrap table-compact pvmode-'+this.value" title="عرض حسب">
           <option value="all">عرض: أساسي</option>
           <option value="val">عرض: القيم المالية</option>
           <option value="qty">عرض: الكميات</option>
           <option value="ret">عرض: المرتجعات</option>
         </select>
-        <button class="btn" onclick="['f-prod-sup','f-prod-search','f-prod-rep','f-prod-cat','f-prod-cust','f-prod-month','f-prod-from','f-prod-to','f-prod-view'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});const pt=document.getElementById('prod-table-wrap');if(pt)pt.className='table-wrap';renderProductsPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
+        <button class="btn" onclick="['f-prod-sup','f-prod-search','f-prod-rep','f-prod-cat','f-prod-cust','f-prod-month','f-prod-from','f-prod-to','f-prod-view'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});const pt=document.getElementById('prod-table-wrap');if(pt)pt.className='table-wrap table-compact';renderProductsPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
-      <div class="table-wrap" id="prod-table-wrap"></div>
+      <div class="table-wrap table-sticky-col" id="prod-table-wrap"></div>
       <div class="table-stat-bar" id="prod-stat-bar"></div>
       <div class="table-pagination">
         <span id="prod-pag-info"></span>
@@ -2441,7 +2436,7 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
         <input type="text" id="f-aging-search" placeholder="🔍 اسم العميل..." oninput="renderAgingPage()">
         <button class="btn" onclick="document.getElementById('f-aging-sup').value='';document.getElementById('f-aging-rep').value='';document.getElementById('f-aging-cat').value='';document.getElementById('f-aging-bucket').value='';document.getElementById('f-aging-search').value='';renderAgingPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
-      <div class="table-wrap" id="aging-table-wrap"></div>
+      <div class="table-wrap table-sticky-col" id="aging-table-wrap"></div>
       <div class="table-stat-bar" id="aging-stat-bar"></div>
       <div class="table-pagination">
         <span id="aging-pag-info"></span>
@@ -2507,7 +2502,7 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
         <div class="date-wrap"><input type="date" id="f-coll-to" onchange="renderCollectionPage()" title="إلى تاريخ"></div>
         <button class="btn" onclick="[&#39;f-coll-sup&#39;,&#39;f-coll-rep&#39;,&#39;f-coll-cat&#39;,&#39;f-coll-month&#39;,&#39;f-coll-type&#39;,&#39;f-coll-from&#39;,&#39;f-coll-to&#39;].forEach(id=&gt;{const el=document.getElementById(id);if(el)el.value=&#39;&#39;});renderCollectionPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
-      <div class="table-wrap" id="coll-table-wrap"></div>
+      <div class="table-wrap table-sticky-col" id="coll-table-wrap"></div>
       <div class="table-stat-bar" id="coll-stat-bar"></div>
       <div class="table-pagination">
         <span id="coll-pag-info"></span>
@@ -4793,7 +4788,7 @@ function _renderRepsTable(){
     wrap.innerHTML='<div style="padding:24px;text-align:center;color:var(--muted)">ارفع ملف مبيعات لعرض التفاصيل</div>';_updateStatBar('reps-stat-bar',[]);renderPag('reps',_renderRepsTable);return;
   }
   const _rvmode=document.getElementById('f-rep-view')?.value||'all';
-  if(_rvmode!=='all')wrap.className='table-wrap vmode-'+_rvmode; else wrap.className='table-wrap';
+  if(_rvmode!=='all')wrap.className='table-wrap table-compact vmode-'+_rvmode; else wrap.className='table-wrap table-compact';
   const tagAch=v=>{const c=v>=100?'td-green':v>=80?'td-gold':'td-red';return `<span class="${c}" style="font-weight:700">${v.toFixed(1)}%</span>`};
   const tagRoi=v=>{const c=v>=80?'td-green':v>=60?'td-gold':'td-red';return `<span class="${c}" style="font-weight:700">${v.toFixed(1)}%</span>`};
   const tagRet=v=>{const c=v>=15?'td-red':v>=8?'td-gold':'td-green';return `<span class="${c}">${v.toFixed(1)}%</span>`};
@@ -5058,7 +5053,7 @@ function _renderCustTable(){
   const wrap=document.getElementById('cust-table-wrap');
   if(!rows.length){wrap.innerHTML='<div style="padding:24px;text-align:center;color:var(--muted)">لا نتائج</div>';_updateStatBar('cust-stat-bar',[]);renderPag('cust',_renderCustTable);return}
   const _vmode=document.getElementById('f-cust-view')?.value||'all';
-  if(_vmode!=='all')wrap.className='table-wrap vmode-'+_vmode; else wrap.className='table-wrap';
+  if(_vmode!=='all')wrap.className='table-wrap table-compact vmode-'+_vmode; else wrap.className='table-wrap table-compact';
   const tagCP=v=>{const c=v>=80?'td-green':v>=60?'td-gold':'td-red';return `<span class="${c}" style="font-weight:700">${v.toFixed(1)}%</span>`};
   const tagCat=v=>{const m={'مخاطرة عالية':'td-red','مخاطرة':'td-red','متوسط':'td-gold','ممتاز':'td-green','جيد':'td-accent'};return `<span class="${m[v]||''}" style="font-size:11px;font-weight:700">${v}</span>`};
   const allCust=PAG_STATE['cust']?.data||[];
@@ -5248,7 +5243,7 @@ function _renderProdTable(){
   const wrap=document.getElementById('prod-table-wrap');
   if(!rows.length){wrap.innerHTML='<div style="padding:24px;text-align:center;color:var(--muted)">لا توجد بيانات — ارفع ملف مبيعات</div>';_updateStatBar('prod-stat-bar',[]);renderPag('prod',_renderProdTable);return}
   const _pvmode=document.getElementById('f-prod-view')?.value||'all';
-  if(_pvmode!=='all')wrap.className='table-wrap pvmode-'+_pvmode; else wrap.className='table-wrap';
+  if(_pvmode!=='all')wrap.className='table-wrap table-compact pvmode-'+_pvmode; else wrap.className='table-wrap table-compact';
   const tagRet=v=>{const c=v>=15?'td-red':v>=8?'td-gold':'td-green';return `<span class="${c}">${v.toFixed(1)}%</span>`};
   const allProd=PAG_STATE['prod']?.data||[];
   const tPSales=allProd.reduce((s,p)=>s+p.sales,0)||1;
@@ -9741,6 +9736,30 @@ function populateMonthSelects(){
 
 // ── إخفاء/إظهار الرسوم البيانية ───────────────────────────────────────────
 let _chartsHidden = false;
+let _tableCompact = true;
+function toggleTableCompact(){
+  _tableCompact = !_tableCompact;
+  document.querySelectorAll('.table-wrap').forEach(w=>{
+    w.classList.toggle('table-compact', _tableCompact);
+  });
+}
+// تطبيق الضغط تلقائياً على أي table-wrap يُضاف لاحقاً
+(function(){
+  const _obs = new MutationObserver(function(mutations){
+    mutations.forEach(function(m){
+      m.addedNodes.forEach(function(n){
+        if(n.nodeType!==1) return;
+        if(n.classList && n.classList.contains('table-wrap')) n.classList.add('table-compact');
+        n.querySelectorAll && n.querySelectorAll('.table-wrap').forEach(function(w){ w.classList.add('table-compact'); });
+      });
+    });
+  });
+  document.addEventListener('DOMContentLoaded', function(){
+    _obs.observe(document.body, {childList:true, subtree:true});
+    document.querySelectorAll('.table-wrap').forEach(function(w){ w.classList.add('table-compact'); });
+  });
+})();
+
 function toggleChartsVisibility(){
   _chartsHidden = !_chartsHidden;
   const btn = document.getElementById('btn-hide-charts');
