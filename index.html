@@ -3497,13 +3497,14 @@ function renderSalesPage(){
     const fCust=new Set(saleRows.map(r=>r[kCust])).size;
     const isFiltered=!!(repF||monthF||typeF);
     const kQtyF=_fc('الكمية الخارجة','الكمية');
+    const kQtyFI=_fc('الكمية الداخلة');
     const fQtySale=saleRows.reduce((s,r)=>s+_n(r[kQtyF]),0);
-    const fQtyRet=retRows.reduce((s,r)=>s+_n(r[kQtyF]),0);
+    const fQtyRet=retRows.reduce((s,r)=>{const qi=_n(r[kQtyFI]);const qo=_n(r[kQtyF]);return s+(qi>0?qi:qo);},0);
     const fNetQty=fQtySale-fQtyRet;
     document.getElementById('kpi-sales').innerHTML=
-      kpiCard('💵','إجمالي المبيعات',fSales,'var(--accent)',(isFiltered?'(مفلتر) ':'')+'قبل المرتجعات')+
-      kpiCardWithQty('↩','المرتجعات',fRet,'var(--red)',fRetPct+'% من المبيعات',fQtyRet,'الكمية')+
       kpiCard('✅','صافي المبيعات',fNet,'var(--accent2)','بعد المرتجعات')+
+      kpiCardWithQty('↩','المرتجعات',fRet,'var(--red)',fRetPct+'% من المبيعات',fQtyRet,'الكمية')+
+      kpiCard('💵','إجمالي المبيعات',fSales,'var(--accent)',(isFiltered?'(مفلتر) ':'')+'قبل المرتجعات')+
       kpiCard('💰','التحصيلات',fCol,'var(--accent2)',fColPct+'% من الصافي')+
       kpiCard('🔴','الفجوة غير محصّل',fGap,'var(--accent3)',fGap<0?'📈 زيادة تحصيل':'')+
       kpiCard('🧾','الفواتير',fInv,'var(--gold)','')+
@@ -3518,9 +3519,9 @@ function renderSalesPage(){
     const _allQtySale=_repsF2.reduce((s,r)=>s+(r.qty||0),0);
     const _allQtyRet=_repsF2.reduce((s,r)=>s+(r.retQty||0),0);
     document.getElementById('kpi-sales').innerHTML=
-      kpiCard('💵','إجمالي المبيعات',k.total_sales,'var(--accent)','قبل المرتجعات')+
-      kpiCardWithQty('↩','المرتجعات',k.total_returns,'var(--red)',retPct+'% من المبيعات',_allQtyRet,'الكمية')+
       kpiCard('✅','صافي المبيعات',k.net_sales,'var(--accent2)','بعد المرتجعات')+
+      kpiCardWithQty('↩','المرتجعات',k.total_returns,'var(--red)',retPct+'% من المبيعات',_allQtyRet,'الكمية')+
+      kpiCard('💵','إجمالي المبيعات',k.total_sales,'var(--accent)','قبل المرتجعات')+
       kpiCard('💰','التحصيلات',k.total_collected,'var(--accent2)',colPct+'% من الصافي')+
       kpiCard('🔴','الفجوة غير محصّل',gap,'var(--accent3)',gap<0?'📈 زيادة تحصيل':'')+
       kpiCard('🧾','الفواتير',k.total_invoices,'var(--gold)','')+
@@ -6927,9 +6928,9 @@ function renderOverviewPage(){
   const roiColor = roiPct>=80?'var(--accent2)':roiPct>=60?'var(--gold)':'var(--red)';
   const _fmtN=v=>(typeof v==='number'&&!isNaN(v))?v.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2}):v;
   document.getElementById('kpi-overview').innerHTML = [
-    {icon:'📦',label:'إجمالي المبيعات',val:totalSales,sub:'قبل المرتجعات &nbsp;·&nbsp; <span style="color:var(--accent);font-weight:700">'+totalQtyGross.toLocaleString('en-US',{maximumFractionDigits:0})+' وحدة</span>',color:'var(--accent)',bar:null},
-    {icon:'↩️',label:'إجمالي المرتجعات',val:totalReturns,sub:'<span style="color:var(--red)">'+retPct.toFixed(2)+'% من المبيعات</span> &nbsp;·&nbsp; <span style="font-weight:700">'+(totalRetQty||0).toLocaleString('en-US',{maximumFractionDigits:0})+' وحدة</span>',color:'var(--red)',bar:null},
     {icon:'💰',label:'صافي المبيعات',val:totalNet,sub:'بعد المرتجعات &nbsp;·&nbsp; <span style="color:var(--accent2);font-weight:700">'+totalNetQty.toLocaleString('en-US',{maximumFractionDigits:0})+' وحدة</span>',color:'var(--accent2)',bar:null},
+    {icon:'↩️',label:'إجمالي المرتجعات',val:totalReturns,sub:'<span style="color:var(--red)">'+retPct.toFixed(2)+'% من المبيعات</span> &nbsp;·&nbsp; <span style="font-weight:700">'+(totalRetQty||0).toLocaleString('en-US',{maximumFractionDigits:0})+' وحدة</span>',color:'var(--red)',bar:null},
+    {icon:'📦',label:'إجمالي المبيعات',val:totalSales,sub:'قبل المرتجعات &nbsp;·&nbsp; <span style="color:var(--accent);font-weight:700">'+totalQtyGross.toLocaleString('en-US',{maximumFractionDigits:0})+' وحدة</span>',color:'var(--accent)',bar:null},
     {icon:'✅',label:'إجمالي التحصيلات',val:totalCol,
       sub:'<span style="color:#7c6fff">🏦 '+Math.round(totalBank).toLocaleString('en-US')+' ('+bankPct.toFixed(1)+'%)</span> &nbsp; <span style="color:var(--gold)">💵 '+Math.round(totalCash).toLocaleString('en-US')+' ('+cashPct.toFixed(1)+'%)</span>',
       color:'var(--accent2)',bar:null},
@@ -10142,6 +10143,7 @@ function _reprocessSales(rows){
   const kType=_fc('النوع','نوع');
   const kMat=_fc('المادة','الصنف','المنتج');
   const kQtyO=_fc('الكمية الخارجة','الكمية');
+  const kQtyI=_fc('الكمية الداخلة');
   const kTotal=_fc('الاجمالي الصافي','الإجمالي الصافي','الصافي');
   const kCust=_fc('اسم الزبون','الزبون','العميل');
   const kRep=_fc('المندوب','اسم المندوب');
@@ -10160,6 +10162,7 @@ function _reprocessSales(rows){
     const mat=_cn(row[kMat]);
     const total=_n(row[kTotal]);
     const qtyO=_n(row[kQtyO]);
+    const qtyI=_n(row[kQtyI]);
     const dateStr=_cn(row[kDate]).substring(0,10);
     const isSale=type==='مبيع';
     const isRet=type==='مرتجع مبيع';
@@ -10172,7 +10175,7 @@ function _reprocessSales(rows){
     if(cust)rm.customers.add(cust);
     if(mat)rm.items.add(mat);
     if(isSale){rm.sales+=total;rm.qty+=qtyO;}
-    if(isRet){rm.returns+=total;rm.retQty+=qtyO;}
+    if(isRet){rm.returns+=total;rm.retQty+=(qtyI>0?qtyI:qtyO);}
 
     if(cust){
       if(!custMap[cust])custMap[cust]={invoices:new Set(),items:new Set(),rep,sales:0,qty:0,returns:0};
