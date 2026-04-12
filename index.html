@@ -363,41 +363,35 @@ body.nav-collapsed #main{
 .kpi-grid{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:var(--gap);
+  gap:10px;
   margin-bottom:var(--gap);
 }
-/* 9 بطاقات في النظرة العامة: 5 + 4 متوازنة */
-/* 8 بطاقات في النظرة العامة: 4 + 4 متوازنة */
 
 .kpi-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);
-  padding:18px 20px 14px;position:relative;overflow:hidden;
-  transition:transform .2s,box-shadow .2s,border-color .2s;cursor:default;
-  display:flex;flex-direction:column;box-shadow:var(--shadow-card);
-  min-height:130px;
+  background:var(--surface2);border-radius:14px;
+  padding:16px 18px;
+  display:flex;align-items:center;gap:14px;
+  transition:transform .18s,box-shadow .18s;cursor:default;
 }
-.kpi-card:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--kpi-color,var(--accent)) 30%,transparent);box-shadow:var(--shadow-lg)}
-.kpi-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  background:var(--kpi-color,var(--accent));
-}
-.kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08)}
 .kpi-icon{
-  font-size:16px;width:38px;height:38px;border-radius:10px;
-  background:color-mix(in srgb,var(--kpi-color,var(--accent)) 10%,transparent);
+  font-size:18px;width:44px;height:44px;border-radius:12px;
+  background:color-mix(in srgb,var(--kpi-color,var(--accent)) 13%,transparent);
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  order:2;
 }
-.kpi-label{font-size:11px;color:var(--text2);font-weight:600;letter-spacing:.3px;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi-info{flex:1;min-width:0;order:1;text-align:right}
+.kpi-label{font-size:11px;color:var(--text2);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
 .kpi-value{
-  font-size:clamp(14px,1.4vw,22px);
-  font-weight:800;color:var(--kpi-color,var(--accent));
+  font-size:clamp(15px,1.5vw,22px);
+  font-weight:700;color:var(--kpi-color,var(--accent));
   line-height:1.15;letter-spacing:-.3px;
-  word-break:break-all;overflow-wrap:anywhere;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.kpi-sub{font-size:10.5px;color:var(--muted);margin-top:7px;border-top:1px solid var(--border);padding-top:7px;line-height:1.5}
-.kpi-badge{font-size:10px;padding:2px 8px;border-radius:999px;font-weight:700;
+.kpi-sub{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi-badge{font-size:9px;padding:1px 6px;border-radius:999px;font-weight:700;
   background:color-mix(in srgb,var(--accent2) 12%,transparent);
-  color:var(--accent2);border:1px solid color-mix(in srgb,var(--accent2) 28%,transparent)}
+  color:var(--accent2);border:1px solid color-mix(in srgb,var(--accent2) 28%,transparent);display:inline-block;margin-top:3px}
 
 /* ══════════════════════════════════════════════
    GRID LAYOUTS
@@ -822,6 +816,20 @@ body.dark .date-wrap input[type="date"]{color-scheme:dark}
   .topbar-right{margin-right:0;gap:4px;flex-wrap:nowrap;overflow:hidden}
   .topbar-right .last-update{display:none}
   #theme-toggle{display:flex!important;flex-shrink:0}
+  /* إخفاء أزرار غير ضرورية في الـ topbar على الهاتف */
+  .tb-divider{display:none!important}
+  #btn-hide-charts{display:none!important}
+  .tb-desktop-only{display:none!important}
+  /* تصغير الأزرار المتبقية */
+  #btn-today-filter,#gf-toggle-btn{
+    padding:5px 9px!important;font-size:11px!important;height:32px!important;
+  }
+  #btn-settings,#btn-export-collection{
+    padding:5px 9px!important;font-size:11px!important;height:32px!important;
+  }
+  button[onclick="openFinancialReportModal()"]{
+    padding:5px 9px!important;font-size:11px!important;height:32px!important;
+  }
   /* Global filter bar on mobile */
   #global-filter-bar{top:52px;padding:8px 10px;gap:6px;overflow-x:auto;flex-wrap:nowrap}
   #global-filter-bar .gf-select,
@@ -832,11 +840,11 @@ body.dark .date-wrap input[type="date"]{color-scheme:dark}
   /* KPI grid: 2 columns */
   .kpi-grid{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
   #kpi-overview{grid-template-columns:repeat(2,1fr)}
-  .kpi-card{padding:12px 12px 10px}
-  .kpi-value{font-size:clamp(12px,3vw,17px)}
+  .kpi-card{padding:12px 14px;gap:10px}
+  .kpi-icon{width:38px;height:38px;font-size:16px}
+  .kpi-value{font-size:clamp(13px,3vw,18px)}
   .kpi-label{font-size:10px}
-  .kpi-icon{width:28px;height:28px;font-size:14px}
-  .kpi-sub{font-size:10px}
+  .kpi-sub{font-size:9px}
   /* Overview row2: stack vertically */
   #ov-row2{grid-template-columns:1fr 1fr!important;gap:10px}
   /* Cards */
@@ -915,7 +923,7 @@ th.sortable.sort-desc::after{content:' ▼';opacity:1;color:var(--accent)}
 /* ── إخفاء الأزرار غير الضرورية في الهاتف ── */
 @media(max-width:768px){
   /* topbar: أبقِ فقط العناصر الأساسية */
-  #btn-today-filter,#btn-hide-charts,#gf-toggle-btn,
+  #btn-hide-charts,
   .tb-divider,.tb-desktop-only{display:none!important}
   #theme-toggle{width:32px!important;height:32px!important;font-size:13px!important}
   /* أزرار الرفع والتصدير: أجعلها أصغر */
@@ -1234,6 +1242,24 @@ tbody tr:last-child{border-bottom:none}
 #mobile-menu-btn{background:none!important;border:none!important;color:var(--text2)!important;border-radius:var(--r-md)!important;width:36px!important;height:36px!important;display:flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;transition:all .2s!important;flex-shrink:0!important;padding:0!important}
 #mobile-menu-btn:hover{color:var(--accent)!important;background:var(--surface2)!important}
 
+@media(max-width:768px){
+  #topbar{height:52px!important;padding:0 10px!important;gap:5px!important}
+  .tb-left{flex-shrink:1;min-width:0;overflow:hidden}
+  #topbar-title{font-size:12px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+  .topbar-right{gap:4px!important;flex-wrap:nowrap!important;flex-shrink:0}
+  /* أزرار الـ topbar في الهاتف */
+  #btn-today-filter,#gf-toggle-btn{
+    padding:0 8px!important;height:32px!important;font-size:11px!important;
+  }
+  #btn-settings{padding:0 8px!important;height:32px!important;font-size:11px!important}
+  button[onclick="openFinancialReportModal()"]{
+    padding:0 8px!important;height:32px!important;font-size:11px!important;
+  }
+  #theme-toggle,#topbar-refresh-btn{
+    width:32px!important;height:32px!important;font-size:13px!important;
+  }
+  #topbar-refresh-btn svg{width:13px!important;height:13px!important}
+}
 /* ── Topbar Mobile Responsive ── */
 @media(max-width:768px){
   #topbar{padding:0 10px;height:52px;gap:6px}
@@ -1773,6 +1799,11 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
       <span class="mn-icon-wrap"><span class="mn-icon">🏭</span></span>
       <span>المخازن</span>
     </button>
+    <button class="mob-nav-item" onclick="showPage('expenses')" id="mnav-expenses">
+      <span class="mn-dot"></span>
+      <span class="mn-icon-wrap"><span class="mn-icon">💸</span></span>
+      <span>المصروفات</span>
+    </button>
   </div>
 </nav>
 
@@ -1857,53 +1888,36 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
     <!-- ── صف البطاقات الرئيسية ── -->
     <div class="kpi-grid" id="kpi-overview">
     <div class="kpi-card" style="--kpi-color:var(--accent)">
-      <div class="kpi-top"><div class="kpi-icon">📦</div></div>
-      <div class="kpi-label">إجمالي المبيعات</div>
-      <div class="kpi-value">0</div>
-      <div class="kpi-sub">قبل المرتجعات</div>
+      <div class="kpi-icon">📦</div>
+      <div class="kpi-info"><div class="kpi-label">إجمالي المبيعات</div><div class="kpi-value">0</div><div class="kpi-sub">قبل المرتجعات</div></div>
     </div>
     <div class="kpi-card" style="--kpi-color:var(--red)">
-      <div class="kpi-top"><div class="kpi-icon">↩️</div></div>
-      <div class="kpi-label">إجمالي المرتجعات</div>
-      <div class="kpi-value">0</div>
-      <div class="kpi-sub">0.00% من المبيعات</div>
+      <div class="kpi-icon">↩️</div>
+      <div class="kpi-info"><div class="kpi-label">إجمالي المرتجعات</div><div class="kpi-value">0</div><div class="kpi-sub">0.00% من المبيعات</div></div>
     </div>
     <div class="kpi-card" style="--kpi-color:var(--accent2)">
-      <div class="kpi-top"><div class="kpi-icon">💰</div></div>
-      <div class="kpi-label">صافي المبيعات</div>
-      <div class="kpi-value">0</div>
-      <div class="kpi-sub">بعد المرتجعات</div>
+      <div class="kpi-icon">💰</div>
+      <div class="kpi-info"><div class="kpi-label">صافي المبيعات</div><div class="kpi-value">0</div><div class="kpi-sub">بعد المرتجعات</div></div>
     </div>
     <div class="kpi-card" style="--kpi-color:var(--accent2)">
-      <div class="kpi-top"><div class="kpi-icon">✅</div></div>
-      <div class="kpi-label">إجمالي التحصيلات</div>
-      <div class="kpi-value">0</div>
-      <div class="kpi-sub"><span style="color:#7c6fff">🏦 0 (0.0%)</span> &nbsp; <span style="color:var(--gold)">💵 0 (0.0%)</span></div>
+      <div class="kpi-icon">✅</div>
+      <div class="kpi-info"><div class="kpi-label">إجمالي التحصيلات</div><div class="kpi-value">0</div><div class="kpi-sub"><span style="color:#7c6fff">🏦 0 (0.0%)</span> &nbsp; <span style="color:var(--gold)">💵 0 (0.0%)</span></div></div>
     </div>
     <div class="kpi-card" style="--kpi-color:var(--red)">
-      <div class="kpi-top"><div class="kpi-icon">📊</div></div>
-      <div class="kpi-label">نسبة التحصيل ROI</div>
-      <div class="kpi-value">0.00%</div>
-      <div class="kpi-sub">من صافي المبيعات</div>
-      <div class="ov-kpi-bar"><div class="ov-kpi-bar-fill" style="width:0.0%;background:var(--red)"></div></div>
+      <div class="kpi-icon">📊</div>
+      <div class="kpi-info"><div class="kpi-label">نسبة التحصيل ROI</div><div class="kpi-value">0.00%</div><div class="kpi-sub">من صافي المبيعات</div></div>
     </div>
     <div class="kpi-card" style="--kpi-color:var(--accent3)">
-      <div class="kpi-top"><div class="kpi-icon">⚠️</div></div>
-      <div class="kpi-label">صافي المديونيات</div>
-      <div class="kpi-value">0</div>
-      <div class="kpi-sub">دينار</div>
+      <div class="kpi-icon">⚠️</div>
+      <div class="kpi-info"><div class="kpi-label">صافي المديونيات</div><div class="kpi-value">0</div><div class="kpi-sub">دينار</div></div>
     </div>
     <div class="kpi-card" style="--kpi-color:var(--accent2)">
-      <div class="kpi-top"><div class="kpi-icon">🔴</div></div>
-      <div class="kpi-label">الفجوة غير المحصّلة</div>
-      <div class="kpi-value">0</div>
-      <div class="kpi-sub">📈 تحصيل فائض</div>
+      <div class="kpi-icon">🔴</div>
+      <div class="kpi-info"><div class="kpi-label">الفجوة غير المحصّلة</div><div class="kpi-value">0</div><div class="kpi-sub">📈 تحصيل فائض</div></div>
     </div>
     <div class="kpi-card" style="--kpi-color:var(--purple)">
-      <div class="kpi-top"><div class="kpi-icon">👤</div></div>
-      <div class="kpi-label">المناديب النشطون</div>
-      <div class="kpi-value">0</div>
-      <div class="kpi-sub">0 إجمالي</div>
+      <div class="kpi-icon">👤</div>
+      <div class="kpi-info"><div class="kpi-label">المناديب النشطون</div><div class="kpi-value">0</div><div class="kpi-sub">0 إجمالي</div></div>
     </div></div>
 
     <!-- ── صف ثانٍ: مرتجعات / بنك / كاش ── -->
@@ -2028,16 +2042,6 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
         </table>
       </div>
     </div>
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-header"><span class="card-title">🏆 أفضل المندوبين — مبيعات</span></div>
-        <div id="rep-rank-list" class="rank-list"></div>
-      </div>
-      <div class="card">
-        <div class="card-header"><span class="card-title">⚠ أعلى المرتجعات</span></div>
-        <div id="ret-rank-list" class="rank-list"></div>
-      </div>
-    </div>
     <div class="card" style="margin-bottom:var(--gap)">
       <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
         <span class="card-title">🗂 جدول فواتير المبيعات</span>
@@ -2082,6 +2086,16 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
           <div class="card-header"><span class="card-title">🥧 توزيع المبيعات والمرتجعات</span></div>
           <div class="chart-wrap"><canvas id="ch-sales-donut"></canvas></div>
         </div>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top:var(--gap)">
+      <div class="card">
+        <div class="card-header"><span class="card-title">🏆 أفضل المندوبين — مبيعات</span></div>
+        <div id="rep-rank-list" class="rank-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">⚠ أعلى المرتجعات</span></div>
+        <div id="ret-rank-list" class="rank-list"></div>
       </div>
     </div>
   </div>
@@ -2627,7 +2641,7 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
     </div>
 
     <!-- صف الرسوم البيانية: أعلى بنود + توزيع دائري -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);margin-bottom:var(--gap)">
+    <div class="grid-2">
       <div class="card">
         <div class="card-header"><span class="card-title">📉 أعلى بنود المصروفات</span></div>
         <div class="chart-wrap tall"><canvas id="ch-exp-hbar"></canvas></div>
@@ -2639,7 +2653,7 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
     </div>
 
     <!-- صف الرسوم البيانية: مقارنة + نسب -->
-    <div style="display:grid;grid-template-columns:3fr 2fr;gap:var(--gap);margin-bottom:var(--gap)">
+    <div class="grid-2">
       <div class="card">
         <div class="card-header"><span class="card-title">📊 المصروفات vs صافي المبيعات</span></div>
         <div class="chart-wrap tall"><canvas id="ch-exp-compare"></canvas></div>
@@ -3288,17 +3302,16 @@ function kpiCard(icon,label,value,color,sub,badge){
     dispVal=value.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2});
   }
   return`<div class="kpi-card" style="--kpi-color:${color}">
-    <div class="kpi-top">
-      <div class="kpi-icon">${icon}</div>
+    <div class="kpi-icon">${icon}</div>
+    <div class="kpi-info">
+      <div class="kpi-label">${label}</div>
+      <div class="kpi-value">${dispVal}</div>
+      ${sub?`<div class="kpi-sub">${sub}</div>`:''}
+      ${badge?`<span class="kpi-badge">${badge}</span>`:''}
     </div>
-    <div class="kpi-label">${label}</div>
-    <div class="kpi-value">${dispVal}</div>
-    ${sub?`<div class="kpi-sub">${sub}</div>`:''}
-    ${badge?`<span class="kpi-badge" style="margin-top:6px;display:inline-block">${badge}</span>`:''}
   </div>`;
 }
 
-// دالة بطاقة KPI مع عرض الكمية كسطر إضافي داخل البطاقة
 function kpiCardWithQty(icon,label,value,color,sub,qty,qtyLabel){
   let dispVal=value;
   if(typeof value==='number'&&!isNaN(value)){
@@ -3306,16 +3319,12 @@ function kpiCardWithQty(icon,label,value,color,sub,qty,qtyLabel){
   }
   const qtyStr=typeof qty==='number'?qty.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0}):qty;
   return`<div class="kpi-card" style="--kpi-color:${color}">
-    <div class="kpi-top">
-      <div class="kpi-icon">${icon}</div>
-    </div>
-    <div class="kpi-label">${label}</div>
-    <div class="kpi-value">${dispVal}</div>
-    ${sub?`<div class="kpi-sub">${sub}</div>`:''}
-    <div class="kpi-sub" style="margin-top:4px;padding-top:4px;border-top:1px solid rgba(0,0,0,.06);display:flex;align-items:center;gap:5px">
-      <span style="font-size:11px;opacity:.6">${qtyLabel||'الكمية'}:</span>
-      <span style="font-weight:700;color:${color}">${qtyStr}</span>
-      <span style="font-size:10px;opacity:.55">وحدة</span>
+    <div class="kpi-icon">${icon}</div>
+    <div class="kpi-info">
+      <div class="kpi-label">${label}</div>
+      <div class="kpi-value">${dispVal}</div>
+      ${sub?`<div class="kpi-sub">${sub}</div>`:''}
+      <div class="kpi-sub" style="color:${color};font-weight:700">${qtyStr} ${qtyLabel||'وحدة'}</div>
     </div>
   </div>`;
 }
@@ -3983,10 +3992,12 @@ function renderRepPage(){
     kpiCard('📊','إجمالي صافي المبيعات',totalNet,'var(--accent)',repF?'(مفلتر)':'')+
     ((!isRepFiltered&&_unassigned>0)?
       `<div class="kpi-card" style="--kpi-color:var(--accent2)">
-        <div class="kpi-top"><div class="kpi-icon">💳</div></div>
-        <div class="kpi-label">إجمالي التحصيل</div>
-        <div class="kpi-value">${totalCol.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2})}</div>
-        <div class="kpi-sub">${avgRoi.toFixed(1)}% ROI</div>
+        <div class="kpi-icon">💳</div>
+        <div class="kpi-info">
+          <div class="kpi-label">إجمالي التحصيل</div>
+          <div class="kpi-value">${totalCol.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2})}</div>
+          <div class="kpi-sub">${avgRoi.toFixed(1)}% ROI</div>
+        </div>
       </div>`
     : kpiCard('💳','إجمالي التحصيل',totalCol,'var(--accent2)',avgRoi.toFixed(1)+'% ROI'+(isRepFiltered?' (مفلتر)':'')))+
     kpiCard('🔴','الفجوة الإجمالية',totalGap,'var(--accent3)','غير محصّل');
@@ -6318,8 +6329,8 @@ function renderExpensesPage(){
   _rebuildExpensesData(); // دائماً أعد البناء لضمان تحديث البيانات
 
   // ── فلترة حسب التاريخ إذا وُجد ──
-  const fromVal = document.getElementById('f-exp-from')?.value || '';
-  const toVal   = document.getElementById('f-exp-to')?.value   || '';
+  const fromVal = document.getElementById('f-exp-from')?.value || GF.dateFrom || '';
+  const toVal   = document.getElementById('f-exp-to')?.value   || GF.dateTo   || '';
   let cats = D._expCategories;
   let totalExpAll = cats.reduce((s,c)=>s+c.net,0);
 
@@ -6940,11 +6951,12 @@ function renderOverviewPage(){
     {icon:'👤',label:'المناديب النشطون',val:reps.filter(r=>r.sales>0&&!['ترك الفرع','موقوف'].includes((D._repSuperMap&&D._repSuperMap[r.name])||'')).length,sub:reps.length+' إجمالي',color:'var(--purple)',bar:null},
   ].map(c=>`
     <div class="kpi-card" style="--kpi-color:${c.color}">
-      <div class="kpi-top"><div class="kpi-icon">${c.icon}</div></div>
-      <div class="kpi-label">${c.label}</div>
-      <div class="kpi-value">${_fmtN(c.val)}</div>
-      <div class="kpi-sub">${c.sub}</div>
-      ${c.bar!==null?`<div class="ov-kpi-bar"><div class="ov-kpi-bar-fill" style="width:${Math.min(c.bar,100).toFixed(1)}%;background:${c.color}"></div></div>`:''}
+      <div class="kpi-icon">${c.icon}</div>
+      <div class="kpi-info">
+        <div class="kpi-label">${c.label}</div>
+        <div class="kpi-value">${_fmtN(c.val)}</div>
+        <div class="kpi-sub">${c.sub}</div>
+      </div>
     </div>`).join('');
   // ── بطاقات الصف الثاني ──
   const _s=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
@@ -7665,6 +7677,9 @@ function processNewData(type,rows){
       // ملف المناديب يُعيد بناء _repSuperMap من الصفر (هو المصدر الرسمي)
       D._repSuperMap={};
       D._superRepsMap={};
+      // ── إعادة بناء REP_CATEGORIES و D._repCatMap من الصفر عند رفع ملف جديد ──
+      Object.keys(REP_CATEGORIES).forEach(k=>{ delete REP_CATEGORIES[k]; });
+      D._repCatMap={};
       // تصفية الصفوف الفارغة
       rows=rows.filter(r=>r&&Object.values(r).some(v=>v!==null&&v!==undefined&&String(v).trim()!==''));
       rows.forEach(r=>{
@@ -7691,8 +7706,7 @@ function processNewData(type,rows){
       });
       // ── تحديث فوري للفئات ──
       if(D.reps_full) D.reps_full.forEach(r=>{ r.cat = REP_CATEGORIES[r.name] || _inferRepCat(r.name) || r.cat || 'أخرى'; });
-      D._repCatMap = D._repCatMap || {};
-      Object.keys(REP_CATEGORIES).forEach(k=>{ D._repCatMap[k]=REP_CATEGORIES[k]; });
+      D._repCatMap = {...REP_CATEGORIES};
       const _existingReps=new Set(D.reps||[]);
       Object.keys(REP_CATEGORIES).forEach(name=>{
         if(name&&!_existingReps.has(name)){
@@ -9948,6 +9962,8 @@ function _syncPageFiltersFromGF(){
     {id:'f-summary-rep', gfKey:'rep'},  {id:'f-summary-cat', gfKey:'cat'},  {id:'f-summary-month',gfKey:'month'},
     // فلاتر إضافية
     {id:'f-coll-month-q',gfKey:'month'},{id:'f-sales-month-q',gfKey:'month'},
+    // المصروفات
+    {id:'f-exp-from',    gfKey:'from'}, {id:'f-exp-to',      gfKey:'to'},
   ];
 
   const gfValues = {sup:GF.sup, rep:GF.rep, cat:GF.cat, month:GF.month, from:GF.dateFrom, to:GF.dateTo};
@@ -9974,10 +9990,11 @@ function _syncPageFiltersFromGF(){
       el.classList.add('gf-locked');
       el.disabled = true;
     } else {
-      // عند الإلغاء: احذف الخيارات المحقونة
+      // عند الإلغاء: احذف الخيارات المحقونة وامسح القيمة
       if(el.tagName === 'SELECT'){
         Array.from(el.querySelectorAll('[data-gf-injected]')).forEach(o=>o.remove());
       }
+      el.value = '';
       el.classList.remove('gf-locked');
       el.disabled = false;
     }
@@ -10525,7 +10542,7 @@ function populateRepSelectsAndCats(){
   const gfCat = document.getElementById('gf-cat');
   const activeCat = gfCat ? gfCat.value : '';
   if(gfCat){
-    const cats = [...new Set(allReps.map(r=>repCatMap[r]||'أخرى').filter(Boolean))].sort();
+    const cats = [...new Set(allReps.map(r=>repCatMap[r]||'').filter(Boolean))].sort();
     gfCat.innerHTML = '<option value="">كل القنوات البيعية</option>' + cats.map(c=>`<option value="${c}">${c}</option>`).join('');
     if(activeCat && [...gfCat.options].some(o=>o.value===activeCat)) gfCat.value = activeCat;
   }
@@ -12835,8 +12852,8 @@ if(document.fonts&&document.fonts.ready){
 ══════════════════════════════════════════════════════════════════ */
 function _expPrint(){
   // ── جمع البيانات ──
-  const fromVal = document.getElementById('f-exp-from')?.value || '';
-  const toVal   = document.getElementById('f-exp-to')?.value   || '';
+  const fromVal = document.getElementById('f-exp-from')?.value || GF.dateFrom || '';
+  const toVal   = document.getElementById('f-exp-to')?.value   || GF.dateTo   || '';
 
   // احسب صافي المبيعات حسب نفس فلتر التاريخ
   let netSales = 0;
