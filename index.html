@@ -2715,83 +2715,84 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
   </div>
 
 
-<!-- ═══════════ PAGE: AI ADVISOR ═══════════ -->
+<!-- ═══════════ PAGE: التحليل الذكي ═══════════ -->
 <div class="page" id="page-ai">
 
-  <!-- KPI bar placeholder (empty) -->
+  <!-- Header -->
   <div style="margin-bottom:var(--gap)">
-    <div style="font-size:18px;font-weight:800;color:var(--gold);margin-bottom:4px">🤖 المستشار الذكي للأعمال</div>
-    <div style="color:var(--muted);font-size:12px">تحليل ذكي مبني على بياناتك الفعلية — توصيات تنفيذية، دراسات جدوى، وخطط عمل للأشهر القادمة</div>
+    <div style="font-size:18px;font-weight:800;color:var(--gold);margin-bottom:4px">📊 التحليل الذكي للأعمال</div>
+    <div style="color:var(--muted);font-size:12px">تحليل ديناميكي مبني على بياناتك الفعلية — يعمل بدون إنترنت</div>
   </div>
 
-  <!-- Mode Selector -->
+  <!-- فلاتر التحليل الذكي -->
   <div class="card" style="margin-bottom:var(--gap)">
-    <div class="card-header"><span class="card-title">🎯 اختر نوع التحليل</span></div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px" id="ai-mode-grid">
-      <button class="ai-mode-btn active" data-mode="executive" onclick="selectAiMode(this,'executive')">
-        <span style="font-size:1.3rem">📊</span><span>تقرير تنفيذي</span>
-      </button>
-      <button class="ai-mode-btn" data-mode="sales" onclick="selectAiMode(this,'sales')">
-        <span style="font-size:1.3rem">👥</span><span>إدارة المبيعات</span>
-      </button>
-      <button class="ai-mode-btn" data-mode="collection" onclick="selectAiMode(this,'collection')">
-        <span style="font-size:1.3rem">💰</span><span>استراتيجية التحصيل</span>
-      </button>
-      <button class="ai-mode-btn" data-mode="products" onclick="selectAiMode(this,'products')">
-        <span style="font-size:1.3rem">📦</span><span>تحليل الأصناف</span>
-      </button>
-      <button class="ai-mode-btn" data-mode="reps" onclick="selectAiMode(this,'reps')">
-        <span style="font-size:1.3rem">🏆</span><span>تقييم المناديب</span>
-      </button>
-      <button class="ai-mode-btn" data-mode="plan" onclick="selectAiMode(this,'plan')">
-        <span style="font-size:1.3rem">🗺️</span><span>خطة الأشهر القادمة</span>
-      </button>
-    </div>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px">
+      <span style="font-size:12px;font-weight:700;color:var(--accent)">🔍 فلتر:</span>
 
-    <!-- Custom question -->
-    <div style="border-top:1px solid var(--border2);padding-top:14px">
-      <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">أو اكتب سؤالاً مخصصاً:</label>
-      <div style="display:flex;gap:10px;align-items:flex-end">
-        <textarea id="ai-custom-q"
-          placeholder="مثال: من هو المندوب الأفضل ROI؟ ما الأصناف الراكدة؟ كيف نخفض المرتجعات؟..."
-          style="flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;color:var(--text);font-family:Cairo,sans-serif;font-size:13px;resize:vertical;min-height:58px;direction:rtl;box-sizing:border-box;outline:none"></textarea>
-        <button id="ai-run-btn" onclick="runAiAnalysis()"
-          style="background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;padding:0 22px;height:44px;color:#000;font-weight:700;font-size:13px;cursor:pointer;font-family:Cairo,sans-serif;white-space:nowrap;flex-shrink:0">
-          ⚡ تحليل
-        </button>
+      <select id="ai-gf-sup" onchange="onAiGfSupChange()"
+        style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:5px 10px;font-family:Cairo,sans-serif;font-size:12px;color:var(--text);min-width:120px">
+        <option value="">كل المشرفين</option>
+      </select>
+
+      <select id="ai-gf-rep" onchange="onAiGfRepChange()"
+        style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:5px 10px;font-family:Cairo,sans-serif;font-size:12px;color:var(--text);min-width:130px">
+        <option value="">كل المندوبين</option>
+      </select>
+
+      <select id="ai-gf-cat" onchange="_runCurrentAiMode()"
+        style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:5px 10px;font-family:Cairo,sans-serif;font-size:12px;color:var(--text);min-width:130px">
+        <option value="">كل القنوات البيعية</option>
+      </select>
+
+      <select id="ai-gf-month" onchange="_runCurrentAiMode()"
+        style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:5px 10px;font-family:Cairo,sans-serif;font-size:12px;color:var(--text);min-width:100px">
+        <option value="">كل الأشهر</option>
+      </select>
+
+      <div style="display:flex;align-items:center;gap:6px">
+        <input type="date" id="ai-gf-from" onchange="_runCurrentAiMode()"
+          style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:5px 8px;font-family:Cairo,sans-serif;font-size:12px;color:var(--text)">
+        <span style="color:var(--muted);font-size:11px">←</span>
+        <input type="date" id="ai-gf-to" onchange="_runCurrentAiMode()"
+          style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:5px 8px;font-family:Cairo,sans-serif;font-size:12px;color:var(--text)">
+      </div>
+
+      <button onclick="resetAiFilters()"
+        style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:5px 12px;font-family:Cairo,sans-serif;font-size:12px;color:var(--muted);cursor:pointer">
+        ↺ إلغاء
+      </button>
+
+      <span id="ai-filter-status" style="font-size:11px;color:var(--accent);font-weight:700"></span>
+    </div>
+  </div>
+
+  <!-- أزرار التقارير -->
+  <div class="card" style="margin-bottom:var(--gap)">
+    <div class="card-header"><span class="card-title">🎯 اختر نوع التقرير</span></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">
+      <button class="ai-mode-btn active" onclick="renderSmartAnalysis('executive',this)"><span style="font-size:1.3rem">📊</span><span>تقرير تنفيذي</span></button>
+      <button class="ai-mode-btn" onclick="renderSmartAnalysis('sales',this)"><span style="font-size:1.3rem">👥</span><span>تحليل المبيعات</span></button>
+      <button class="ai-mode-btn" onclick="renderSmartAnalysis('collection',this)"><span style="font-size:1.3rem">💰</span><span>تحليل التحصيل</span></button>
+      <button class="ai-mode-btn" onclick="renderSmartAnalysis('reps',this)"><span style="font-size:1.3rem">🏆</span><span>تقييم المناديب</span></button>
+      <button class="ai-mode-btn" onclick="renderSmartAnalysis('products',this)"><span style="font-size:1.3rem">📦</span><span>تحليل الأصناف</span></button>
+      <button class="ai-mode-btn" onclick="renderSmartAnalysis('expenses',this)"><span style="font-size:1.3rem">💸</span><span>تحليل المصروفات</span></button>
+      <button class="ai-mode-btn" onclick="renderSmartAnalysis('alerts',this)"><span style="font-size:1.3rem">🚨</span><span>التنبيهات</span></button>
+      <button class="ai-mode-btn" onclick="renderSmartAnalysis('plan',this)"><span style="font-size:1.3rem">🗺️</span><span>خطة عمل</span></button>
+    </div>
+  </div>
+
+  <!-- KPIs الذكية -->
+  <div id="smart-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:var(--gap)"></div>
+
+  <!-- منطقة التقرير -->
+  <div id="smart-report-area" class="card">
+    <div id="smart-report-content" style="direction:rtl;line-height:1.9;font-size:13px;color:var(--text)">
+      <div style="text-align:center;padding:40px 20px;color:var(--muted)">
+        <div style="font-size:3rem;margin-bottom:12px">📊</div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:6px">ارفع البيانات لبدء التحليل</div>
+        <div style="font-size:12px">أو اضغط على أحد أزرار التقارير أعلاه</div>
       </div>
     </div>
-  </div>
-
-  <!-- Loading -->
-  <div id="ai-loading" style="display:none;text-align:center;padding:56px 20px">
-    <div class="ai-spinner"></div>
-    <div style="color:var(--accent);font-size:15px;font-weight:700;margin-top:18px">جاري التحليل...</div>
-    <div style="color:var(--muted);font-size:12px;margin-top:6px" id="ai-loading-msg">يعالج النظام بياناتك</div>
-  </div>
-
-  <!-- Result -->
-  <div id="ai-result-area" style="display:none">
-    <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
-        <div>
-          <div id="ai-result-title" style="font-size:15px;font-weight:800;color:var(--accent)"></div>
-          <div id="ai-result-meta" style="font-size:11px;color:var(--muted);margin-top:3px"></div>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button onclick="copyAiResult()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:6px 14px;color:var(--text);font-size:12px;cursor:pointer;font-family:Cairo,sans-serif">📋 نسخ</button>
-          <button onclick="runAiAnalysis()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:6px 14px;color:var(--accent);font-size:12px;cursor:pointer;font-family:Cairo,sans-serif">🔄 إعادة</button>
-        </div>
-      </div>
-      <div id="ai-content" style="line-height:1.9;font-size:13px;color:var(--text);direction:rtl"></div>
-    </div>
-  </div>
-
-  <!-- Empty State -->
-  <div id="ai-empty" style="text-align:center;padding:60px 20px">
-    <div style="font-size:3.5rem;margin-bottom:16px">🤖</div>
-    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px">اختر نوع التحليل وابدأ</div>
-    <div style="color:var(--muted);font-size:12px;max-width:400px;margin:0 auto">اضغط على أحد أزرار التحليل أعلاه أو اكتب سؤالك المخصص، وسيقوم النظام بتحليل بياناتك الفعلية وتقديم توصيات دقيقة</div>
   </div>
 
 </div><!-- end page-ai -->
@@ -10483,6 +10484,10 @@ function _syncPageFiltersFromGF(){
     {id:'f-coll-month-q',gfKey:'month'},{id:'f-sales-month-q',gfKey:'month'},
     // المصروفات
     {id:'f-exp-from',    gfKey:'from'}, {id:'f-exp-to',      gfKey:'to'},
+    // التحليل الذكي
+    {id:'ai-gf-sup',   gfKey:'sup'},  {id:'ai-gf-rep',   gfKey:'rep'},
+    {id:'ai-gf-cat',   gfKey:'cat'},  {id:'ai-gf-month', gfKey:'month'},
+    {id:'ai-gf-from',  gfKey:'from'}, {id:'ai-gf-to',    gfKey:'to'},
   ];
 
   const gfValues = {sup:GF.sup, rep:GF.rep, cat:GF.cat, month:GF.month, from:GF.dateFrom, to:GF.dateTo};
@@ -12149,307 +12154,999 @@ function printCrossTable(){
 
 
 /* ============================================================
-   🤖 المستشار الذكي — AI Analysis Engine
+   📊 التحليل الذكي الداخلي — Smart Analysis Engine
    ============================================================ */
 
-let _aiCurrentMode = 'executive';
+// الوضع الحالي للتحليل الذكي
+let _aiActiveMode = 'executive';
 
 function renderAiPage() {
-  // Nothing to render — AI page is static HTML with JS interaction
+  // تعبئة الفلاتر عند أول فتح
+  _populateAiFilters();
+  renderSmartAnalysis(_aiActiveMode, document.querySelector('.ai-mode-btn.active'));
+  _buildSmartKPIs();
 }
 
-function selectAiMode(btn, mode) {
-  document.querySelectorAll('.ai-mode-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  _aiCurrentMode = mode;
-  document.getElementById('ai-custom-q').value = '';
+function _populateAiFilters() {
+  // تعبئة المشرفين
+  const supSel = document.getElementById('ai-gf-sup');
+  if (supSel && supSel.options.length <= 1) {
+    const sups = [...new Set(Object.values(D._repSuperMap||{}).filter(Boolean))].sort();
+    sups.forEach(s => { const o=document.createElement('option'); o.value=s; o.textContent=s; supSel.appendChild(o); });
+  }
+  // تعبئة المندوبين
+  const repSel = document.getElementById('ai-gf-rep');
+  if (repSel && repSel.options.length <= 1) {
+    const reps = D.reps || [];
+    reps.forEach(r => { const o=document.createElement('option'); o.value=r; o.textContent=r; repSel.appendChild(o); });
+  }
+  // تعبئة القنوات
+  const catSel = document.getElementById('ai-gf-cat');
+  if (catSel && catSel.options.length <= 1) {
+    const cats = [...new Set(Object.values(D._repCatMap||{}).filter(Boolean))].sort();
+    cats.forEach(c => { const o=document.createElement('option'); o.value=c; o.textContent=c; catSel.appendChild(o); });
+  }
+  // تعبئة الأشهر
+  const monSel = document.getElementById('ai-gf-month');
+  if (monSel && monSel.options.length <= 1) {
+    const months = _getAvailableMonths ? _getAvailableMonths() : [];
+    months.forEach(m => { const o=document.createElement('option'); o.value=m; o.textContent=MONTH_NAMES[m]||m; monSel.appendChild(o); });
+  }
 }
 
-function _buildAiDataSummary() {
-  if (!D || !D.reps_full || !D.reps_full.length) {
-    return 'لا توجد بيانات مرفوعة بعد. يرجى رفع ملفات البيانات أولاً.';
-  }
-
-  const fmt = n => Number(n||0).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
-  const fmtP = n => (Number(n||0)).toFixed(1);
-
-  const reps = D.reps_full;
-  const totalSales   = reps.reduce((s,r)=>s+(r.sales||0),0);
-  const totalNS      = reps.reduce((s,r)=>s+(r.netSales||0),0);
-  const totalReturns = reps.reduce((s,r)=>s+(r.returns||0),0);
-  const totalCol     = reps.reduce((s,r)=>s+(r.col||0),0);
-  const totalGap     = reps.reduce((s,r)=>s+(r.gap||0),0);
-  const retPct       = totalSales>0?((totalReturns/totalSales)*100).toFixed(2):0;
-  const avgROI       = reps.length?(reps.reduce((s,r)=>s+(r.roi||0),0)/reps.length).toFixed(1):0;
-
-  const top5 = [...reps].sort((a,b)=>(b.netSales||0)-(a.netSales||0)).slice(0,5)
-    .map(r=>`• ${r.name} (${r.cat||'—'}): صافي=${fmt(r.netSales)} | ROI=${fmtP(r.roi)}% | مرتجعات=${fmtP(r.retPct)}%`).join('\n');
-
-  const low3 = [...reps].filter(r=>(r.sales||0)>0).sort((a,b)=>(a.roi||0)-(b.roi||0)).slice(0,3)
-    .map(r=>`• ${r.name}: ROI=${fmtP(r.roi)}% | فجوة=${fmt(r.gap)}`).join('\n');
-
-  const highRet = reps.filter(r=>(r.retPct||0)>10).map(r=>`${r.name} (${fmtP(r.retPct)}%)`).join('، ');
-
-  // Category breakdown
-  const cats = {};
-  reps.forEach(r=>{
-    const c = r.cat||'أخرى';
-    if(!cats[c]) cats[c]={ns:0,count:0,col:0};
-    cats[c].ns += (r.netSales||0);
-    cats[c].col += (r.col||0);
-    cats[c].count++;
-  });
-  const catSummary = Object.entries(cats)
-    .map(([c,v])=>`${c}: ${v.count} مناديب، صافي=${fmt(v.ns)}`)
-    .join(' | ');
-
-  // Products summary if available
-  let prodSummary = '';
-  if (D.products_table && D.products_table.length) {
-    const prods = D.products_table;
-    prodSummary = `
-**عدد الأصناف:** ${prods.length}
-`;
-  } else if (D.items_summary) {
-    const itemKeys = Object.keys(D.items_summary).slice(0,5);
-    prodSummary = `
-**أبرز الأصناف:** ${itemKeys.join('، ')}
-`;
-  }
-
-  // Date range
-  const dateRange = D.date_from && D.date_to ? `${D.date_from} إلى ${D.date_to}` : 'غير محدد';
-
-  return `=== ملخص أداء ${D.company||'شركة ركان المتوسط'} ===
-الفترة: ${dateRange}
-
-**الإجماليات:**
-- إجمالي المبيعات: ${fmt(totalSales)} د.ل
-- صافي المبيعات: ${fmt(totalNS)} د.ل
-- إجمالي المرتجعات: ${fmt(totalReturns)} د.ل (${retPct}%)
-- إجمالي التحصيل: ${fmt(totalCol)} د.ل
-- فجوة التحصيل: ${fmt(totalGap)} د.ل
-- متوسط ROI: ${avgROI}%
-- عدد المناديب: ${reps.length}
-${prodSummary}
-**تقسيم الفئات:**
-${catSummary}
-
-**أفضل 5 مناديب (صافي مبيعات):**
-${top5}
-
-**أضعف 3 مناديب (ROI):**
-${low3}
-
-**مناديب ذوو مرتجعات عالية (>10%):**
-${highRet || 'لا يوجد'}`.trim();
-}
-
-function _getAiPrompt(mode, customQ) {
-  const data = _buildAiDataSummary();
-  const today = new Date().toLocaleDateString('ar-LY',{year:'numeric',month:'long',day:'numeric'});
-
-  const baseCtx = `أنت مستشار أعمال استراتيجي خبير في شركات التوزيع والمشروبات الليبية.
-اليوم: ${today}
-
-بيانات الأداء الفعلية:
-${data}
-
-`;
-
-  if (customQ) {
-    return baseCtx + `**السؤال المطلوب:**
-${customQ}
-
-أجب بشكل شامل مستنداً للأرقام الفعلية. اكتب بالعربية بأسلوب احترافي مع عناوين منظمة.`;
-  }
-
-  const prompts = {
-    executive: baseCtx + `اكتب **تقريراً تنفيذياً شاملاً** للإدارة العليا يتضمن:
-### 1. موجز الأداء
-أبرز المؤشرات الرئيسية بالأرقام الفعلية.
-### 2. نقاط القوة
-ما يجب الاستمرار فيه وتعزيزه.
-### 3. نقاط الضعف الحرجة
-مع تحديد الأسباب المحتملة.
-### 4. الفرص الواعدة
-قابلة للتطبيق خلال 90 يوماً.
-### 5. المخاطر العاجلة
-التي تستوجب تدخلاً فورياً.
-### 6. توصيات تنفيذية
-5 إجراءات محددة مع جداول زمنية.
-اكتب بالعربية بأسلوب احترافي.`,
-
-    sales: baseCtx + `قدِّم **تحليلاً شاملاً لإدارة المبيعات** يتضمن:
-### 1. تقييم أداء الفئات
-جملة، تجزئة، أسواق، مقاهي — مقارنة وتحليل.
-### 2. تصنيف المناديب
-متميز / جيد / يحتاج تحسين / حرج — مع أسماء فعلية.
-### 3. تحليل الإنتاجية
-من يستحق مكافأة، من يحتاج تدريباً.
-### 4. خطة حوافز مقترحة
-ربط العمولات بالأهداف والتحصيل.
-### 5. أهداف الشهر القادم
-أهداف واقعية قابلة للقياس لكل فئة.
-اكتب بالعربية بأسلوب تشغيلي عملي.`,
-
-    collection: baseCtx + `قدِّم **استراتيجية تحصيل شاملة** تتضمن:
-### 1. تشخيص مشكلة التحصيل
-تحليل الفجوة والأسباب المحتملة.
-### 2. تصنيف ديون المناديب
-عاجل جداً / قابل للجدولة / طويل الأجل.
-### 3. خطة تحصيل 90 يوماً
-أهداف شهرية محددة بالأرقام.
-### 4. إجراءات منع تراكم الديون
-سياسة ائتمان وحدود تسليف مقترحة.
-### 5. نظام تحفيز التحصيل
-ربط عمولة المندوب بنسبة التحصيل الفعلية.
-### 6. مؤشرات الأداء (KPIs)
-معايير قياس شهرية واضحة.
-اكتب بالعربية بأسلوب عملي.`,
-
-    products: baseCtx + `قدِّم **تحليلاً استراتيجياً للأصناف** يتضمن:
-### 1. تحليل ABC
-أصناف A (ذهبية) / B (جيدة) / C (ضعيفة) بناءً على البيانات.
-### 2. الأصناف ذات المرتجعات العالية
-أسباب محتملة وحلول عملية.
-### 3. فرص التوسع
-أصناف تستحق زيادة الدفع والتوزيع.
-### 4. استراتيجية الأصناف البطيئة
-عروض، حزم، حوافز مناديب.
-### 5. توصيات التوزيع
-كيف يوزع كل صنف على الفئات المناسبة.
-اكتب بالعربية بأسلوب تحليلي دقيق.`,
-
-    reps: baseCtx + `قدِّم **تقييماً تفصيلياً لأداء المناديب** يتضمن:
-### 1. تصنيف شامل لكل مندوب
-بناءً على: صافي المبيعات، ROI، نسبة المرتجعات، نسبة التحصيل.
-### 2. المناديب المتميزون
-تحليل ما يميزهم وكيف نعمم تجربتهم.
-### 3. المناديب الذين يحتاجون دعماً
-خطة تطوير مخصصة لكل حالة.
-### 4. توصيات إعادة التوزيع
-هل يحتاج أي مندوب تغيير منطقة أو فئة عملاء؟
-### 5. خطة حوافز عادلة
-مبنية على الأداء الفعلي بالأرقام.
-اكتب بالعربية بأسلوب موضوعي.`,
-
-    plan: baseCtx + `ضع **خطة عمل للأشهر الثلاثة القادمة** تتضمن:
-### 1. الأهداف الاستراتيجية
-3-5 أهداف قابلة للقياس مع أرقام مستهدفة.
-### 2. الشهر الأول
-أولويات ومهام محددة بالمسؤول والموعد.
-### 3. الشهر الثاني
-مراجعة + مهام الشهر بالتفصيل.
-### 4. الشهر الثالث
-إغلاق الربع ومؤشرات النجاح.
-### 5. الموارد المطلوبة
-ما يلزم تخصيصه من ميزانية وموارد بشرية.
-### 6. مؤشرات الأداء الرئيسية
-جدول متابعة شهري KPIs.
-### 7. خطة الطوارئ
-إذا لم تتحقق الأهداف في المنتصف.
-اكتب بالعربية بأسلوب تشغيلي قابل للتطبيق.`
+function _getAiFilters() {
+  return {
+    sup:   document.getElementById('ai-gf-sup')?.value   || GF.sup   || '',
+    rep:   document.getElementById('ai-gf-rep')?.value   || GF.rep   || '',
+    cat:   document.getElementById('ai-gf-cat')?.value   || GF.cat   || '',
+    month: document.getElementById('ai-gf-month')?.value || GF.month || '',
+    from:  document.getElementById('ai-gf-from')?.value  || GF.dateFrom || '',
+    to:    document.getElementById('ai-gf-to')?.value    || GF.dateTo   || '',
   };
-
-  return prompts[mode] || prompts.executive;
 }
 
-async function runAiAnalysis() {
-  const customQ = document.getElementById('ai-custom-q').value.trim();
-  const mode = _aiCurrentMode;
+function _filterRepsForAi(reps) {
+  const f = _getAiFilters();
+  return reps.filter(r => {
+    if (f.rep && r.name !== f.rep) return false;
+    if (f.cat && (D._repCatMap?.[r.name]||'') !== f.cat) return false;
+    if (f.sup && (D._repSuperMap?.[r.name]||'') !== f.sup) return false;
+    return true;
+  });
+}
 
-  // Check data
+function _filterSalesRowsForAi(rows) {
+  const f = _getAiFilters();
+  if (!rows.length) return rows;
+  const hdrs = Object.keys(rows[0]);
+  const _cn = s => String(s||'').trim();
+  const _fc = (...ns) => { for(const n of ns){ const h=hdrs.find(h=>_cn(h)===n||_cn(h).includes(n)); if(h) return h; } return ns[0]; };
+  const kRep  = _fc('المندوب','اسم المندوب');
+  const kDate = _fc('التاريخ','تاريخ');
+  return rows.filter(r => {
+    const repName = _cn(r[kRep]||'');
+    if (f.rep && repName !== f.rep) return false;
+    if (f.cat && (D._repCatMap?.[repName]||'') !== f.cat) return false;
+    if (f.sup && (D._repSuperMap?.[repName]||'') !== f.sup) return false;
+    if (f.month || f.from || f.to) {
+      const d = new Date(_cn(r[kDate]||''));
+      if (isNaN(d)) return false;
+      if (f.month && (d.getMonth()+1) !== +f.month) return false;
+      if (f.from && d < new Date(f.from)) return false;
+      if (f.to && d > new Date(f.to+'T23:59:59')) return false;
+    }
+    return true;
+  });
+}
+
+function _updateAiFilterStatus() {
+  const f = _getAiFilters();
+  const parts = [];
+  if (f.sup)   parts.push('المشرف: '+f.sup);
+  if (f.rep)   parts.push('المندوب: '+f.rep);
+  if (f.cat)   parts.push('القناة: '+f.cat);
+  if (f.month) parts.push('الشهر: '+(MONTH_NAMES[+f.month]||f.month));
+  if (f.from)  parts.push('من: '+f.from);
+  if (f.to)    parts.push('إلى: '+f.to);
+  const el = document.getElementById('ai-filter-status');
+  if (el) el.textContent = parts.length ? '● مفلتر: '+parts.join(' | ') : '';
+}
+
+function onAiGfSupChange() {
+  // تحديث قائمة المندوبين بناءً على المشرف
+  const supVal = document.getElementById('ai-gf-sup')?.value || '';
+  const repSel = document.getElementById('ai-gf-rep');
+  if (repSel) {
+    const allReps = D.reps || [];
+    const filtReps = supVal ? allReps.filter(r=>(D._repSuperMap?.[r]||'')===supVal) : allReps;
+    const cur = repSel.value;
+    repSel.innerHTML = '<option value="">كل المندوبين</option>' + filtReps.map(r=>`<option value="${r}"${r===cur?' selected':''}>${r}</option>`).join('');
+    if (cur && !filtReps.includes(cur)) repSel.value = '';
+  }
+  _runCurrentAiMode();
+}
+
+function onAiGfRepChange() {
+  const repVal = document.getElementById('ai-gf-rep')?.value || '';
+  const catSel = document.getElementById('ai-gf-cat');
+  if (catSel && repVal && D._repCatMap?.[repVal]) {
+    catSel.value = D._repCatMap[repVal];
+  }
+  _runCurrentAiMode();
+}
+
+function resetAiFilters() {
+  ['ai-gf-sup','ai-gf-rep','ai-gf-cat','ai-gf-month','ai-gf-from','ai-gf-to'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  _runCurrentAiMode();
+}
+
+function _runCurrentAiMode() {
+  _updateAiFilterStatus();
+  _buildSmartKPIs();
+  renderSmartAnalysis(_aiActiveMode, null);
+}
+
+function _buildSmartKPIs() {
+  if (!D || !D.reps_full || !D.reps_full.length) return;
+  const reps = _filterRepsForAi ? _filterRepsForAi(D.reps_full) : D.reps_full;
+  if (!reps.length) { document.getElementById('smart-kpis').innerHTML = ''; return; }
+  const fmt = n => Number(n||0).toLocaleString('ar-LY',{maximumFractionDigits:0});
+  const fmtP = n => Number(n||0).toFixed(1);
+
+  const totalNS    = reps.reduce((s,r)=>s+(r.netSales||0),0);
+  const totalCol   = reps.reduce((s,r)=>s+(r.col||0),0);
+  const totalGap   = reps.reduce((s,r)=>s+(r.gap||0),0);
+  const totalRet   = reps.reduce((s,r)=>s+(r.returns||0),0);
+  const totalSales = reps.reduce((s,r)=>s+(r.sales||0),0);
+  const avgROI     = reps.length ? (reps.reduce((s,r)=>s+(r.roi||0),0)/reps.length) : 0;
+  const roiColor   = avgROI >= 80 ? '#22c55e' : avgROI >= 60 ? '#f59e0b' : '#ef4444';
+  const retPct     = totalSales > 0 ? (totalRet/totalSales*100) : 0;
+  const retColor   = retPct <= 5 ? '#22c55e' : retPct <= 10 ? '#f59e0b' : '#ef4444';
+  const colPct     = totalNS > 0 ? (totalCol/totalNS*100) : 0;
+  const colColor   = colPct >= 80 ? '#22c55e' : colPct >= 60 ? '#f59e0b' : '#ef4444';
+
+  const kpis = [
+    { label:'صافي المبيعات', value: fmt(totalNS)+' د.ل', color:'#3b82f6', icon:'💰' },
+    { label:'التحصيل', value: fmt(totalCol)+' د.ل', sub: fmtP(colPct)+'%', color: colColor, icon:'✅' },
+    { label:'الفجوة', value: fmt(totalGap)+' د.ل', color: totalGap>0?'#ef4444':'#22c55e', icon:'⚠️' },
+    { label:'متوسط ROI', value: fmtP(avgROI)+'%', color: roiColor, icon:'📈' },
+    { label:'المرتجعات', value: fmtP(retPct)+'%', color: retColor, icon:'🔄' },
+    { label:'عدد المناديب', value: reps.length, color:'#8b5cf6', icon:'👥' },
+  ];
+
+  const el = document.getElementById('smart-kpis');
+  if (!el) return;
+  el.innerHTML = kpis.map(k=>`
+    <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:12px;padding:14px 16px;border-right:4px solid ${k.color}">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px">${k.icon} ${k.label}</div>
+      <div style="font-size:18px;font-weight:800;color:${k.color}">${k.value}</div>
+      ${k.sub ? `<div style="font-size:11px;color:var(--muted)">${k.sub}</div>` : ''}
+    </div>`).join('');
+}
+
+function renderSmartAnalysis(mode, btn) {
+  // حفظ الوضع الحالي
+  _aiActiveMode = mode;
+
+  // تحديث الأزرار
+  document.querySelectorAll('.ai-mode-btn').forEach(b=>b.classList.remove('active'));
+  if (btn) {
+    btn.classList.add('active');
+  } else {
+    // تحديث الزر النشط بدون مرجع مباشر
+    document.querySelectorAll('.ai-mode-btn').forEach(b=>{
+      if (b.getAttribute('onclick')?.includes("'"+mode+"'")) b.classList.add('active');
+    });
+  }
+
+  // بناء KPIs
+  _buildSmartKPIs();
+
+  const el = document.getElementById('smart-report-content');
+  if (!el) return;
+
   if (!D || !D.reps_full || !D.reps_full.length) {
-    document.getElementById('ai-empty').style.display = 'none';
-    document.getElementById('ai-result-area').style.display = 'block';
-    document.getElementById('ai-result-title').textContent = '⚠️ لا توجد بيانات';
-    document.getElementById('ai-result-meta').textContent = '';
-    document.getElementById('ai-content').innerHTML = '<div class="ai-warn">يرجى رفع ملفات البيانات (مبيعات، تحصيل...) أولاً ثم إعادة المحاولة.</div>';
+    el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted)">
+      <div style="font-size:3rem;margin-bottom:12px">📂</div>
+      <div style="font-size:14px;font-weight:700">لا توجد بيانات</div>
+      <div style="font-size:12px;margin-top:6px">يرجى رفع ملفات البيانات أولاً</div>
+    </div>`;
     return;
   }
 
-  // Show loading
-  document.getElementById('ai-empty').style.display = 'none';
-  document.getElementById('ai-result-area').style.display = 'none';
-  document.getElementById('ai-loading').style.display = 'block';
-  document.getElementById('ai-run-btn').disabled = true;
-
-  const modeNames = {
-    executive:'📊 التقرير التنفيذي', sales:'👥 تحليل المبيعات',
-    collection:'💰 استراتيجية التحصيل', products:'📦 تحليل الأصناف',
-    reps:'🏆 تقييم المناديب', plan:'🗺️ خطة الأشهر القادمة'
+  const generators = {
+    executive: _genExecutiveReport,
+    sales: _genSalesReport,
+    collection: _genCollectionReport,
+    reps: _genRepsReport,
+    products: _genProductsReport,
+    expenses: _genExpensesReport,
+    alerts: _genAlertsReport,
+    plan: _genPlanReport,
   };
 
-  const msgs = ['يحلل بيانات المناديب...','يحسب المؤشرات والنسب...','يصيغ التوصيات...','ينسّق التقرير...'];
-  let mi = 0;
-  const msgEl = document.getElementById('ai-loading-msg');
-  const msgInt = setInterval(() => { msgEl.textContent = msgs[mi++ % msgs.length]; }, 2000);
-
-  try {
-    const prompt = _getAiPrompt(mode, customQ);
-
-    const res = await fetch('https://rakan-ai.ahmed-alakari52-b8b.workers.dev', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-
-    if (!res.ok) throw new Error('خطأ في الاتصال: ' + res.status);
-    const data = await res.json();
-    const text = data.content?.[0]?.text || '';
-
-    clearInterval(msgInt);
-    document.getElementById('ai-loading').style.display = 'none';
-    document.getElementById('ai-result-area').style.display = 'block';
-    document.getElementById('ai-run-btn').disabled = false;
-
-    document.getElementById('ai-result-title').textContent = customQ ? '💬 تحليل مخصص' : (modeNames[mode]||'تحليل');
-    document.getElementById('ai-result-meta').textContent =
-      `تحليل ${new Date().toLocaleString('ar-LY')} | ${(D.reps_full||[]).length} مندوب`;
-
-    document.getElementById('ai-content').innerHTML = _formatAiResponse(text);
-
-  } catch(err) {
-    clearInterval(msgInt);
-    document.getElementById('ai-loading').style.display = 'none';
-    document.getElementById('ai-run-btn').disabled = false;
-    document.getElementById('ai-result-area').style.display = 'block';
-    document.getElementById('ai-result-title').textContent = '⚠️ خطأ';
-    document.getElementById('ai-result-meta').textContent = '';
-    document.getElementById('ai-content').innerHTML =
-      `<div class="ai-warn">فشل الاتصال: ${err.message}<br>تحقق من الاتصال بالإنترنت وأعد المحاولة.</div>`;
-  }
+  const fn = generators[mode] || generators.executive;
+  el.innerHTML = fn();
 }
 
-function _formatAiResponse(text) {
-  return text
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^## (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^# (.+)$/gm, '<h3>$1</h3>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/^[-•] (.+)$/gm, '<li>$1</li>')
-    .replace(/^(\d+)\. (.+)$/gm, '<li>$2</li>')
-    .replace(/(<li>[^<]*<\/li>\n?)+/g, m => `<ul>${m}</ul>`)
-    .replace(/\n\n+/g, '<br><br>')
-    .replace(/<br><br>(<h3>)/g, '$1')
-    .replace(/(<\/h3>)<br><br>/g, '$1');
+function _fmt(n) { return Number(n||0).toLocaleString('ar-LY',{maximumFractionDigits:0}); }
+function _fmtP(n) { return Number(n||0).toFixed(1); }
+function _badge(val, good, warn) {
+  const color = val>=good?'#22c55e':val>=warn?'#f59e0b':'#ef4444';
+  const label = val>=good?'جيد':val>=warn?'متوسط':'ضعيف';
+  return `<span style="background:${color}22;color:${color};padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700">${label}</span>`;
+}
+function _section(title, content) {
+  return `<div style="margin-bottom:20px">
+    <div style="font-size:14px;font-weight:800;color:var(--accent);border-bottom:2px solid var(--border2);padding-bottom:6px;margin-bottom:10px">${title}</div>
+    ${content}
+  </div>`;
+}
+function _table(headers, rows) {
+  return `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">
+    <thead><tr>${headers.map(h=>`<th style="padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);text-align:center;font-weight:700">${h}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map((r,i)=>`<tr style="background:${i%2===0?'transparent':'var(--surface2)'}">
+      ${r.map(c=>`<td style="padding:7px 10px;border:1px solid var(--border2);text-align:center">${c}</td>`).join('')}
+    </tr>`).join('')}</tbody>
+  </table></div>`;
 }
 
-function copyAiResult() {
-  const txt = document.getElementById('ai-content').innerText;
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(txt).then(() => {
-      const btn = event.currentTarget;
-      const orig = btn.textContent;
-      btn.textContent = '✅ تم';
-      setTimeout(() => btn.textContent = orig, 2000);
-    });
+function _genExecutiveReport() {
+  const reps = _filterRepsForAi(D.reps_full);
+  if (!reps.length) return '<div style="text-align:center;padding:40px;color:var(--muted)">لا توجد بيانات للفلتر المحدد</div>';
+  const totalSales = reps.reduce((s,r)=>s+(r.sales||0),0);
+  const totalNS    = reps.reduce((s,r)=>s+(r.netSales||0),0);
+  const totalRet   = reps.reduce((s,r)=>s+(r.returns||0),0);
+  const totalCol   = reps.reduce((s,r)=>s+(r.col||0),0);
+  const totalGap   = reps.reduce((s,r)=>s+(r.gap||0),0);
+  const avgROI     = reps.reduce((s,r)=>s+(r.roi||0),0)/reps.length;
+  const retPct     = totalSales>0?(totalRet/totalSales*100):0;
+  const colPct     = totalNS>0?(totalCol/totalNS*100):0;
+
+  // تصنيف الأداء
+  const topRep  = [...reps].sort((a,b)=>(b.netSales||0)-(a.netSales||0))[0];
+  const bestROI = [...reps].filter(r=>r.sales>0).sort((a,b)=>(b.roi||0)-(a.roi||0))[0];
+  const worstROI= [...reps].filter(r=>r.sales>0).sort((a,b)=>(a.roi||0)-(b.roi||0))[0];
+  const highGap = [...reps].sort((a,b)=>(b.gap||0)-(a.gap||0))[0];
+
+  // تقسيم فئات
+  const cats = {};
+  reps.forEach(r=>{ const c=r.cat||'أخرى'; if(!cats[c]) cats[c]={ns:0,col:0,count:0}; cats[c].ns+=(r.netSales||0); cats[c].col+=(r.col||0); cats[c].count++; });
+
+  let html = `<div style="background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:16px;border-right:4px solid #3b82f6">
+    <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:8px">📋 ملخص تنفيذي</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;color:var(--muted)">
+      <div>إجمالي المبيعات: <b style="color:var(--text)">${_fmt(totalSales)} د.ل</b></div>
+      <div>صافي المبيعات: <b style="color:var(--text)">${_fmt(totalNS)} د.ل</b></div>
+      <div>إجمالي التحصيل: <b style="color:var(--text)">${_fmt(totalCol)} د.ل</b></div>
+      <div>فجوة التحصيل: <b style="color:#ef4444">${_fmt(totalGap)} د.ل</b></div>
+      <div>نسبة التحصيل: <b style="color:${colPct>=80?'#22c55e':colPct>=60?'#f59e0b':'#ef4444'}">${_fmtP(colPct)}%</b></div>
+      <div>نسبة المرتجعات: <b style="color:${retPct<=5?'#22c55e':retPct<=10?'#f59e0b':'#ef4444'}">${_fmtP(retPct)}%</b></div>
+      <div>متوسط ROI: <b style="color:${avgROI>=80?'#22c55e':avgROI>=60?'#f59e0b':'#ef4444'}">${_fmtP(avgROI)}%</b></div>
+      <div>عدد المناديب: <b style="color:var(--text)">${reps.length}</b></div>
+    </div>
+  </div>`;
+
+  // نقاط القوة
+  let strengths = [];
+  if (colPct >= 80) strengths.push(`نسبة تحصيل ممتازة ${_fmtP(colPct)}%`);
+  if (retPct <= 5) strengths.push(`نسبة مرتجعات منخفضة ${_fmtP(retPct)}%`);
+  if (avgROI >= 80) strengths.push(`متوسط ROI قوي ${_fmtP(avgROI)}%`);
+  if (topRep) strengths.push(`${topRep.name} يقود المبيعات بـ ${_fmt(topRep.netSales)} د.ل`);
+
+  // نقاط الضعف
+  let weaknesses = [];
+  if (colPct < 60) weaknesses.push(`⚠️ نسبة تحصيل منخفضة ${_fmtP(colPct)}% — فجوة ${_fmt(totalGap)} د.ل`);
+  if (retPct > 10) weaknesses.push(`⚠️ مرتجعات مرتفعة ${_fmtP(retPct)}% — تراجع المبيعات`);
+  if (avgROI < 60) weaknesses.push(`⚠️ ROI ضعيف ${_fmtP(avgROI)}% — مراجعة استراتيجية التسعير`);
+  if (highGap && highGap.gap > 0) weaknesses.push(`⚠️ ${highGap.name} لديه أعلى فجوة تحصيل: ${_fmt(highGap.gap)} د.ل`);
+
+  if (strengths.length) {
+    html += _section('✅ نقاط القوة', `<ul style="margin:0;padding-right:18px;color:var(--text)">${strengths.map(s=>`<li style="margin-bottom:4px">${s}</li>`).join('')}</ul>`);
   }
+  if (weaknesses.length) {
+    html += _section('🔴 نقاط تحتاج تحسين', `<ul style="margin:0;padding-right:18px;color:var(--text)">${weaknesses.map(w=>`<li style="margin-bottom:4px">${w}</li>`).join('')}</ul>`);
+  }
+
+  // تقسيم الفئات
+  const catRows = Object.entries(cats).map(([c,v])=>[c, v.count, _fmt(v.ns), _fmt(v.col), v.ns>0?_fmtP(v.col/v.ns*100)+'%':'—']);
+  html += _section('📂 أداء الفئات', _table(['الفئة','المناديب','صافي المبيعات','التحصيل','% التحصيل'], catRows));
+
+  // التوصيات
+  const recs = [];
+  if (colPct < 70) recs.push('تكثيف جهود التحصيل وتحديد أولويات الفجوات الكبرى');
+  if (retPct > 8)  recs.push('مراجعة أسباب المرتجعات مع المناديب ذوي النسب العالية');
+  if (worstROI)    recs.push(`متابعة ${worstROI.name} وتقديم دعم مباشر لتحسين ROI`);
+  recs.push('مراجعة أهداف الشهر القادم بناءً على الأداء الفعلي');
+  recs.push('تحفيز المناديب المتميزين لتعميم تجربتهم على الفريق');
+
+  html += _section('💡 التوصيات التنفيذية', `<ol style="margin:0;padding-right:18px;color:var(--text)">${recs.map(r=>`<li style="margin-bottom:6px">${r}</li>`).join('')}</ol>`);
+
+  return html;
+}
+
+function _genSalesReport() {
+  const reps = _filterRepsForAi(D.reps_full);
+  if (!reps.length) return '<div style="text-align:center;padding:40px;color:var(--muted)">لا توجد بيانات للفلتر المحدد</div>';
+  const totalNS = reps.reduce((s,r)=>s+(r.netSales||0),0);
+
+  // ترتيب حسب صافي المبيعات
+  const sorted = [...reps].filter(r=>r.sales>0).sort((a,b)=>(b.netSales||0)-(a.netSales||0));
+
+  // تصنيف المناديب
+  const excellent = sorted.filter(r=>r.roi>=80 && r.netSales>=totalNS/reps.length);
+  const good      = sorted.filter(r=>r.roi>=60 && r.roi<80);
+  const needsHelp = sorted.filter(r=>r.roi<60);
+
+  let html = '';
+
+  // جدول المناديب الكامل
+  const repRows = sorted.map(r=>{
+    const roiColor = r.roi>=80?'#22c55e':r.roi>=60?'#f59e0b':'#ef4444';
+    return [
+      r.name,
+      r.cat||'—',
+      _fmt(r.netSales),
+      _fmt(r.returns),
+      `<span style="color:${roiColor};font-weight:700">${_fmtP(r.roi)}%</span>`,
+      _fmt(r.col),
+      _fmt(r.gap),
+      _badge(r.roi, 80, 60)
+    ];
+  });
+  html += _section('📊 جدول أداء المناديب', _table(['المندوب','الفئة','صافي المبيعات','المرتجعات','ROI','التحصيل','الفجوة','التقييم'], repRows));
+
+  if (excellent.length) {
+    html += _section('🏆 المناديب المتميزون', `<ul style="margin:0;padding-right:18px;color:var(--text)">${excellent.map(r=>`<li style="margin-bottom:4px"><b>${r.name}</b> — صافي: ${_fmt(r.netSales)} | ROI: ${_fmtP(r.roi)}%</li>`).join('')}</ul>`);
+  }
+  if (needsHelp.length) {
+    html += _section('⚠️ مناديب يحتاجون دعماً', `<ul style="margin:0;padding-right:18px;color:var(--text)">${needsHelp.map(r=>`<li style="margin-bottom:4px"><b>${r.name}</b> — ROI: ${_fmtP(r.roi)}% | فجوة: ${_fmt(r.gap)} د.ل</li>`).join('')}</ul>`);
+  }
+
+  return html;
+}
+
+function _genCollectionReport() {
+  const reps = _filterRepsForAi(D.reps_full);
+  if (!reps.length) return '<div style="text-align:center;padding:40px;color:var(--muted)">لا توجد بيانات للفلتر المحدد</div>';
+  const totalNS  = reps.reduce((s,r)=>s+(r.netSales||0),0);
+  const totalCol = reps.reduce((s,r)=>s+(r.col||0),0);
+  const totalGap = reps.reduce((s,r)=>s+(r.gap||0),0);
+  const colPct   = totalNS>0?(totalCol/totalNS*100):0;
+
+  // ترتيب حسب الفجوة
+  const byGap = [...reps].filter(r=>r.gap>0).sort((a,b)=>(b.gap||0)-(a.gap||0));
+  // ترتيب حسب ROI
+  const byROI = [...reps].filter(r=>r.sales>0).sort((a,b)=>(b.roi||0)-(a.roi||0));
+
+  let html = `<div style="background:${colPct>=80?'#22c55e22':'#ef444422'};border-radius:10px;padding:14px;margin-bottom:16px;border-right:4px solid ${colPct>=80?'#22c55e':'#ef4444'}">
+    <div style="font-size:13px;font-weight:800;margin-bottom:4px">نسبة التحصيل الإجمالية: ${_fmtP(colPct)}% ${_badge(colPct,80,60)}</div>
+    <div style="font-size:12px;color:var(--muted)">إجمالي التحصيل: ${_fmt(totalCol)} | الفجوة: ${_fmt(totalGap)} د.ل</div>
+  </div>`;
+
+  if (byGap.length) {
+    const gapRows = byGap.slice(0,10).map(r=>{
+      const pct = r.netSales>0?_fmtP(r.col/r.netSales*100)+'%':'—';
+      const priority = r.gap>100000?'🔴 عاجل':r.gap>50000?'🟡 متوسط':'🟢 عادي';
+      return [r.name, _fmt(r.netSales), _fmt(r.col), `<b style="color:#ef4444">${_fmt(r.gap)}</b>`, pct, priority];
+    });
+    html += _section('📋 مناديب ذوو فجوات تحصيل (الأعلى أولاً)', _table(['المندوب','صافي المبيعات','المحصّل','الفجوة','% التحصيل','الأولوية'], gapRows));
+  }
+
+  // خطة تحصيل
+  const plan = [];
+  byGap.slice(0,3).forEach(r => {
+    plan.push(`متابعة <b>${r.name}</b> بشكل أسبوعي — فجوة ${_fmt(r.gap)} د.ل`);
+  });
+  if (colPct < 60) plan.push('وضع حد أدنى للتحصيل قبل تسليم بضاعة جديدة');
+  if (colPct < 80) plan.push('ربط عمولة المناديب بنسبة التحصيل الفعلية');
+  plan.push('مراجعة شروط الائتمان مع العملاء ذوي الفجوات المتراكمة');
+
+  html += _section('📅 خطة تحصيل مقترحة', `<ol style="margin:0;padding-right:18px;color:var(--text)">${plan.map(p=>`<li style="margin-bottom:6px">${p}</li>`).join('')}</ol>`);
+
+  return html;
+}
+
+function _genRepsReport() {
+  const reps = [..._filterRepsForAi(D.reps_full)].filter(r=>r.sales>0).sort((a,b)=>(b.netSales||0)-(a.netSales||0));
+  if (!reps.length) return '<div style="text-align:center;padding:40px;color:var(--muted)">لا توجد بيانات للفلتر المحدد</div>';
+
+  // تصنيف رباعي
+  const avgROI = reps.reduce((s,r)=>s+(r.roi||0),0)/reps.length;
+  const avgNS  = reps.reduce((s,r)=>s+(r.netSales||0),0)/reps.length;
+
+  const star    = reps.filter(r=>r.roi>=avgROI && r.netSales>=avgNS);
+  const growing = reps.filter(r=>r.roi>=avgROI && r.netSales<avgNS);
+  const effort  = reps.filter(r=>r.roi<avgROI  && r.netSales>=avgNS);
+  const weak    = reps.filter(r=>r.roi<avgROI  && r.netSales<avgNS);
+
+  let html = '';
+
+  const makeList = (list, color, icon) => list.length ?
+    `<ul style="margin:0;padding-right:18px">${list.map(r=>`<li style="margin-bottom:5px;color:var(--text)">
+      <b>${r.name}</b> <span style="color:var(--muted);font-size:11px">(${r.cat||'—'})</span><br>
+      <span style="font-size:11px;color:var(--muted)">صافي: ${_fmt(r.netSales)} | ROI: ${_fmtP(r.roi)}% | تحصيل: ${_fmtP(r.netSales>0?r.col/r.netSales*100:0)}%</span>
+    </li>`).join('')}</ul>` : '<div style="color:var(--muted);font-size:12px">لا يوجد</div>';
+
+  html += _section(`⭐ النجوم (ROI وحجم مبيعات فوق المتوسط) — ${star.length} مناديب`, makeList(star,'#22c55e','⭐'));
+  html += _section(`📈 واعدون (ROI جيد، مبيعات تحت المتوسط) — ${growing.length} مناديب`, makeList(growing,'#3b82f6','📈'));
+  html += _section(`💪 مجتهدون (مبيعات جيدة، ROI تحت المتوسط) — ${effort.length} مناديب`, makeList(effort,'#f59e0b','💪'));
+  html += _section(`🔴 يحتاجون دعماً (أقل من المتوسط) — ${weak.length} مناديب`, makeList(weak,'#ef4444','🔴'));
+
+  // توصيات
+  const recs = [];
+  if (star.length)    recs.push(`تكريم ${star.map(r=>r.name).slice(0,2).join(' و')} وتعميم أسلوبهم`);
+  if (weak.length)    recs.push(`دعم مباشر لـ ${weak.map(r=>r.name).slice(0,2).join(' و')} بتدريب مكثف`);
+  if (growing.length) recs.push(`توسيع مناطق ${growing.map(r=>r.name).slice(0,1).join('')} لتعزيز حجم مبيعاته`);
+  recs.push('وضع أهداف فردية مبنية على الأداء الفعلي لكل مندوب');
+
+  html += _section('💡 توصيات إدارة الفريق', `<ol style="margin:0;padding-right:18px;color:var(--text)">${recs.map(r=>`<li style="margin-bottom:6px">${r}</li>`).join('')}</ol>`);
+
+  return html;
+}
+
+
+function _genProductsReport() {
+  const salesRows = _filterSalesRowsForAi(D.sales_table || []);
+  if (!salesRows.length) {
+    return `<div style="text-align:center;padding:40px;color:var(--muted)">
+      <div style="font-size:3rem;margin-bottom:12px">📦</div>
+      <div style="font-size:14px;font-weight:700">لا توجد بيانات أصناف</div>
+      <div style="font-size:12px;margin-top:6px">يرجى رفع ملف المبيعات أو تعديل الفلتر</div>
+    </div>`;
+  }
+
+  const hdrs  = Object.keys(salesRows[0] || {});
+  const _cn   = s => String(s||'').trim();
+  const _n    = v => { const x=parseFloat(String(v||'').replace(/,/g,'')); return isNaN(x)?0:x; };
+  const _fc   = (...ns) => { for(const n of ns){ const h=hdrs.find(h=>_cn(h)===n||_cn(h).includes(n)); if(h) return h; } return ns[0]; };
+  const kMat  = _fc('المادة','الصنف','المنتج');
+  const kRep  = _fc('المندوب','اسم المندوب');
+  const kType = _fc('النوع','نوع');
+  const kTotal= _fc('الاجمالي الصافي','الإجمالي الصافي','الصافي');
+  const kQty  = _fc('الكمية الخارجة','الكمية');
+  const kQtyIn= _fc('الكمية الداخلة');
+
+  // ── تجميع حسب الصنف + القناة البيعية ──
+  const map = {}; // map[صنف][قناة] = {sales, qty, retVal, retQty}
+  const allChannels = new Set();
+
+  salesRows.forEach(r => {
+    const name    = _cn(r[kMat] || 'غير محدد');
+    const repName = _cn(r[kRep] || '');
+    const channel = (D._repCatMap && D._repCatMap[repName]) || 'أخرى';
+    const type    = _cn(r[kType] || '');
+    const v = _n(r[kTotal]), q = _n(r[kQty]), qi = _n(r[kQtyIn]);
+
+    if (!map[name]) map[name] = { name, total:{sales:0,qty:0,retVal:0,retQty:0}, byChannel:{} };
+    if (!map[name].byChannel[channel]) map[name].byChannel[channel] = {sales:0,qty:0,retVal:0,retQty:0};
+
+    allChannels.add(channel);
+
+    if (type === 'مبيع') {
+      map[name].total.sales += v; map[name].total.qty += q;
+      map[name].byChannel[channel].sales += v; map[name].byChannel[channel].qty += q;
+    } else if (type === 'مرتجع مبيع') {
+      map[name].total.retVal += v; map[name].total.retQty += (qi>0?qi:q);
+      map[name].byChannel[channel].retVal += v; map[name].byChannel[channel].retQty += (qi>0?qi:q);
+    }
+  });
+
+  const channels = [...allChannels].sort();
+
+  // بناء items مرتبة حسب صافي المبيعات
+  let items = Object.values(map).map(p => {
+    const t  = p.total;
+    t.ns     = t.sales - t.retVal;
+    t.nqty   = t.qty - t.retQty;
+    t.retPct = t.sales > 0 ? +(t.retVal/t.sales*100).toFixed(1) : 0;
+    // إضافة صافي لكل قناة
+    channels.forEach(ch => {
+      const c = p.byChannel[ch] || {sales:0,retVal:0,qty:0,retQty:0};
+      c.ns     = c.sales - c.retVal;
+      c.retPct = c.sales > 0 ? +(c.retVal/c.sales*100).toFixed(1) : 0;
+      p.byChannel[ch] = c;
+    });
+    return { name:p.name, ...t, byChannel:p.byChannel };
+  }).filter(p => p.sales > 0).sort((a,b) => b.ns - a.ns);
+
+  if (!items.length) return '<div style="text-align:center;padding:40px;color:var(--muted)">لا توجد بيانات كافية</div>';
+
+  const totalNS  = items.reduce((s,p)=>s+p.ns,0);
+  const totalRet = items.reduce((s,p)=>s+p.retVal,0);
+  const totalSal = items.reduce((s,p)=>s+p.sales,0);
+  const retPct   = totalSal > 0 ? (totalRet/totalSal*100) : 0;
+
+  // ── تصنيف ABC ──
+  let cumulative = 0;
+  items = items.map(p => {
+    cumulative += p.ns;
+    const sharePct = totalNS > 0 ? (cumulative/totalNS*100) : 0;
+    p.abc   = sharePct <= 70 ? 'A' : sharePct <= 90 ? 'B' : 'C';
+    p.share = totalNS > 0 ? +(p.ns/totalNS*100).toFixed(1) : 0;
+    return p;
+  });
+
+  const aItems   = items.filter(p=>p.abc==='A');
+  const bItems   = items.filter(p=>p.abc==='B');
+  const cItems   = items.filter(p=>p.abc==='C');
+  const highRet  = items.filter(p=>p.retPct>10).sort((a,b)=>b.retPct-a.retPct);
+
+  // ── ألوان القنوات ──
+  const chColors = ['#3b82f6','#22c55e','#f59e0b','#8b5cf6','#ef4444','#06b6d4','#ec4899'];
+  const chColor  = ch => chColors[channels.indexOf(ch) % chColors.length];
+
+  let html = `<div style="background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:16px">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;font-size:12px;text-align:center">
+      <div><div style="color:var(--muted)">عدد الأصناف</div><div style="font-size:18px;font-weight:800;color:#3b82f6">${items.length}</div></div>
+      <div><div style="color:var(--muted)">صافي المبيعات</div><div style="font-size:15px;font-weight:800;color:#22c55e">${_fmt(totalNS)} د.ل</div></div>
+      <div><div style="color:var(--muted)">المرتجعات</div><div style="font-size:15px;font-weight:800;color:#ef4444">${_fmt(totalRet)} (${_fmtP(retPct)}%)</div></div>
+      <div><div style="color:var(--muted)">القنوات</div><div style="font-size:18px;font-weight:800;color:#8b5cf6">${channels.length}</div></div>
+    </div>
+    ${channels.length ? `<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">
+      ${channels.map(ch=>`<span style="background:${chColor(ch)}22;color:${chColor(ch)};padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700">● ${ch}</span>`).join('')}
+    </div>` : ''}
+  </div>`;
+
+  // ── مقارنة القنوات الإجمالية ──
+  if (channels.length > 1) {
+    const chTotals = channels.map(ch => {
+      const ns  = items.reduce((s,p)=>(p.byChannel[ch]?.ns||0)+s,0);
+      const sal = items.reduce((s,p)=>(p.byChannel[ch]?.sales||0)+s,0);
+      const ret = items.reduce((s,p)=>(p.byChannel[ch]?.retVal||0)+s,0);
+      const qty = items.reduce((s,p)=>(p.byChannel[ch]?.qty||0)+s,0);
+      const rPct= sal>0?(ret/sal*100):0;
+      const share=totalNS>0?(ns/totalNS*100):0;
+      return {ch, ns, sal, ret, qty, rPct, share};
+    }).sort((a,b)=>b.ns-a.ns);
+
+    const chRows = chTotals.map(c=>[
+      `<span style="color:${chColor(c.ch)};font-weight:700">● ${c.ch}</span>`,
+      _fmt(c.ns),
+      _fmt(c.qty),
+      `<b style="color:${c.share>=30?'#22c55e':c.share>=15?'#f59e0b':'#3b82f6'}">${_fmtP(c.share)}%</b>`,
+      `<span style="color:${c.rPct<=5?'#22c55e':c.rPct<=10?'#f59e0b':'#ef4444'}">${_fmtP(c.rPct)}%</span>`
+    ]);
+    html += _section('📊 مقارنة القنوات البيعية الإجمالية',
+      _table(['القناة','صافي المبيعات','الكمية','% من الإجمالي','% المرتجعات'], chRows)
+    );
+  }
+
+  // ── جدول الأصناف × القنوات (كل الأصناف) ──
+  const crossHeaders = ['#','الصنف','الإجمالي', ...channels.map(ch=>`<span style="color:${chColor(ch)}">${ch}</span>`), 'ABC'];
+  const crossRows = items.map((p, i) => {
+    const abcColor = p.abc==='A'?'#f59e0b':p.abc==='B'?'#3b82f6':'#9ba5c0';
+    const rowBg    = p.abc==='A'?'rgba(245,158,11,0.04)':p.abc==='B'?'rgba(59,130,246,0.04)':'transparent';
+    const chCells  = channels.map(ch => {
+      const c = p.byChannel[ch] || {ns:0};
+      if (!c.ns) return `<span style="color:var(--muted);font-size:11px">—</span>`;
+      const pctOfItem = p.ns > 0 ? (c.ns/p.ns*100) : 0;
+      const barW = Math.round(pctOfItem);
+      return `<div style="font-size:11px;font-weight:700;color:${chColor(ch)}">${_fmt(c.ns)}</div>
+              <div style="background:var(--border2);border-radius:2px;height:3px;margin-top:2px">
+                <div style="background:${chColor(ch)};width:${barW}%;height:3px;border-radius:2px"></div>
+              </div>
+              <div style="font-size:10px;color:var(--muted)">${_fmtP(pctOfItem)}%</div>`;
+    });
+    return {
+      bg: rowBg,
+      cells: [
+        `<b style="color:var(--muted)">${i+1}</b>`,
+        `<div style="font-size:12px;font-weight:700;color:var(--text)">${p.name.substring(0,32)}</div>
+         <div style="font-size:10px;color:var(--muted)">${_fmtP(p.share)}% من الإجمالي</div>`,
+        `<div style="font-size:12px;font-weight:800;color:#22c55e">${_fmt(p.ns)}</div>
+         <div style="font-size:10px;color:var(--muted)">${_fmt(p.qty)} وحدة</div>`,
+        ...chCells,
+        `<span style="background:${abcColor}22;color:${abcColor};padding:2px 8px;border-radius:20px;font-size:11px;font-weight:800">${p.abc}</span>`
+      ]
+    };
+  });
+  html += _section(`📋 مقارنة الأصناف حسب القنوات البيعية — ${items.length} صنف`,
+    `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">
+      <thead><tr>${crossHeaders.map(h=>`<th style="padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);text-align:center;font-weight:700;white-space:nowrap;position:sticky;top:0">${h}</th>`).join('')}</tr></thead>
+      <tbody>${crossRows.map(r=>`<tr style="background:${r.bg}">
+        ${r.cells.map(c=>`<td style="padding:7px 8px;border:1px solid var(--border2);text-align:center;vertical-align:middle">${c}</td>`).join('')}
+      </tr>`).join('')}</tbody>
+    </table></div>`
+  );
+
+  // ── أفضل صنف في كل قناة ──
+  if (channels.length > 1) {
+    const bestByChannel = channels.map(ch => {
+      const best = items
+        .filter(p => (p.byChannel[ch]?.ns||0) > 0)
+        .sort((a,b) => (b.byChannel[ch]?.ns||0) - (a.byChannel[ch]?.ns||0))[0];
+      return { ch, best };
+    }).filter(x => x.best);
+
+    if (bestByChannel.length) {
+      html += _section('🏆 أفضل صنف في كل قناة بيعية',
+        `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+        ${bestByChannel.map(({ch, best}) => `
+          <div style="background:var(--surface2);border-radius:10px;padding:12px;border-right:4px solid ${chColor(ch)}">
+            <div style="font-size:11px;color:${chColor(ch)};font-weight:700;margin-bottom:4px">● ${ch}</div>
+            <div style="font-size:12px;font-weight:800;color:var(--text)">${best.name.substring(0,25)}</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">${_fmt(best.byChannel[ch]?.ns||0)} د.ل</div>
+          </div>`).join('')}
+        </div>`
+      );
+    }
+  }
+
+  // ── الأصناف C الراكدة ──
+  if (cItems.length) {
+    const cRows = cItems.map((p,i) => {
+      const chCells = channels.map(ch => {
+        const c = p.byChannel[ch] || {ns:0};
+        return c.ns ? `<span style="color:${chColor(ch)};font-size:11px">${_fmt(c.ns)}</span>` : `<span style="color:var(--muted)">—</span>`;
+      });
+      return [
+        `<b style="color:var(--muted)">${i+1}</b>`,
+        `<span style="font-size:12px">${p.name.substring(0,35)}</span>`,
+        `<b style="color:#9ba5c0">${_fmt(p.ns)}</b>`,
+        _fmt(p.qty),
+        `<span style="color:#ef4444">${_fmtP(p.retPct)}%</span>`,
+        ...chCells
+      ];
+    });
+    const cHeaders = ['#','الصنف','صافي المبيعات','الكمية','المرتجعات',
+      ...channels.map(ch=>`<span style="color:${chColor(ch)};font-size:11px">${ch}</span>`)];
+    html += _section(`⚠️ الأصناف C الراكدة — ${cItems.length} صنف`,
+      `<div style="color:var(--muted);font-size:12px;margin-bottom:10px">مرشحة لعروض ترويجية أو تخفيض المخزون أو مراجعة السياسة التسعيرية</div>` +
+      _table(cHeaders, cRows)
+    );
+  }
+
+  // ── أصناف ذات مرتجعات عالية ──
+  if (highRet.length) {
+    // رأس الجدول: أعمدة ثابتة + عمود لكل قناة
+    const retHeaders = [
+      '#', 'الصنف',
+      'إجمالي المبيعات', 'المرتجعات',
+      '<b style="color:#ef4444">نسبة المرتجعات</b>',
+      ...channels.map(ch => `<span style="color:${chColor(ch)};font-size:11px">🔄 ${ch}</span>`)
+    ];
+    const retRows = highRet.map((p, i) => {
+      const chRetCells = channels.map(ch => {
+        const c = p.byChannel[ch] || {};
+        if (!c.sales || c.sales === 0) return `<span style="color:var(--muted)">—</span>`;
+        const rp = (c.retVal||0)/c.sales*100;
+        const col = rp>15?'#ef4444':rp>10?'#f59e0b':'#22c55e';
+        return `<div style="font-size:11px;font-weight:700;color:${col}">${_fmtP(rp)}%</div>
+                <div style="font-size:10px;color:var(--muted)">${_fmt(c.retVal||0)}</div>`;
+      });
+      const badgeColor = p.retPct>20?'#ef4444':p.retPct>15?'#f97316':'#f59e0b';
+      return [
+        `<b style="color:var(--muted)">${i+1}</b>`,
+        `<div style="font-size:12px;font-weight:700">${p.name.substring(0,32)}</div>
+         <div style="font-size:10px;color:var(--muted)">${_fmt(p.qty)} وحدة</div>`,
+        _fmt(p.sales),
+        `<span style="color:#ef4444;font-weight:700">${_fmt(p.retVal)}</span>`,
+        `<span style="background:${badgeColor}22;color:${badgeColor};padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800">${_fmtP(p.retPct)}%</span>`,
+        ...chRetCells
+      ];
+    });
+    html += _section('🔄 أصناف ذات مرتجعات عالية (>10%)', _table(retHeaders, retRows));
+  }
+
+  // ── توصيات ──
+  const recs = [];
+  if (aItems.length <= 5) recs.push(`تنويع محفظة الأصناف — ${aItems.length} أصناف فقط تسيطر على 70% من المبيعات`);
+  if (channels.length > 1) {
+    const topCh = channels.map(ch=>({ch, ns:items.reduce((s,p)=>(p.byChannel[ch]?.ns||0)+s,0)})).sort((a,b)=>b.ns-a.ns)[0];
+    if (topCh) recs.push(`قناة "${topCh.ch}" هي الأقوى — تعزيز دفع الأصناف A فيها`);
+  }
+  if (highRet.length) recs.push(`مراجعة جودة: ${highRet.slice(0,2).map(p=>p.name.substring(0,20)).join('، ')} (مرتجعات مرتفعة)`);
+  if (cItems.length > 10) recs.push(`${cItems.length} صنف ضعيف الحركة — دراسة إيقاف أو تخفيض المخزون`);
+  recs.push('توزيع الأصناف A على جميع القنوات البيعية بالتساوي');
+  recs.push('وضع حوافز خاصة لتنشيط الأصناف B في القنوات الضعيفة');
+
+  html += _section('💡 توصيات الأصناف', `<ol style="margin:0;padding-right:18px;color:var(--text)">${recs.map(r=>`<li style="margin-bottom:6px">${r}</li>`).join('')}</ol>`);
+
+  return html;
+}
+
+function _genExpensesReport() {
+  if (!D.expenses_table || !D.expenses_table.length) {
+    return `<div style="text-align:center;padding:40px;color:var(--muted)">
+      <div style="font-size:3rem;margin-bottom:12px">💸</div>
+      <div style="font-size:14px;font-weight:700">لا توجد بيانات مصروفات</div>
+      <div style="font-size:12px;margin-top:6px">يرجى رفع ملف المصروفات</div>
+    </div>`;
+  }
+
+  const f   = _getAiFilters ? _getAiFilters() : {};
+  const _n  = v => { const x=parseFloat(String(v||'').replace(/,/g,'')); return isNaN(x)?0:x; };
+  const _cn = s => String(s||'').trim();
+
+  // تجميع المصروفات مع فلتر التاريخ
+  const map = {};
+  const monthMap = {}; // map[شهر][حساب] = net
+  D.expenses_table.forEach(r => {
+    const acc    = _cn(r['اسم الحساب']||r['الحساب']||'');
+    const dateStr= _cn(r['التاريخ']||'').substring(0,10);
+    if (!acc) return;
+    // فلتر التاريخ
+    if (f.from && dateStr < f.from) return;
+    if (f.to   && dateStr > f.to)   return;
+    // فلتر الشهر
+    if (f.month) {
+      const d = new Date(dateStr);
+      if (isNaN(d) || (d.getMonth()+1) !== +f.month) return;
+    }
+    const debit  = _n(r['مدين']);
+    const credit = _n(r['دائن']);
+    if (!map[acc]) map[acc] = {debit:0, credit:0};
+    map[acc].debit  += debit;
+    map[acc].credit += credit;
+    // تجميع شهري
+    if (dateStr) {
+      const d = new Date(dateStr);
+      if (!isNaN(d)) {
+        const mKey = d.getMonth()+1;
+        if (!monthMap[mKey]) monthMap[mKey] = {};
+        if (!monthMap[mKey][acc]) monthMap[mKey][acc] = 0;
+        monthMap[mKey][acc] += Math.max(0, debit - credit);
+      }
+    }
+  });
+
+  const cats = Object.entries(map)
+    .map(([name,v]) => ({name, net: Math.max(0, v.debit - v.credit), debit:v.debit, credit:v.credit}))
+    .filter(x => x.net > 0)
+    .sort((a,b) => b.net - a.net);
+
+  if (!cats.length) return '<div style="text-align:center;padding:40px;color:var(--muted)">لا توجد مصروفات للفترة المحددة</div>';
+
+  const totalExp  = cats.reduce((s,c)=>s+c.net, 0);
+  const totalNS   = _filterRepsForAi(D.reps_full||[]).reduce((s,r)=>s+(r.netSales||0), 0);
+  const expToSale = totalNS > 0 ? (totalExp/totalNS*100) : 0;
+  const expColor  = expToSale <= 10 ? '#22c55e' : expToSale <= 20 ? '#f59e0b' : '#ef4444';
+
+  // ألوان للبنود
+  const palette = ['#3b82f6','#22c55e','#f59e0b','#8b5cf6','#ef4444','#06b6d4','#ec4899','#f97316','#84cc16','#a855f7'];
+  const catColor = (i) => palette[i % palette.length];
+
+  let html = '';
+
+  // ── بطاقات KPI المصروفات ──
+  html += `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px">
+    <div style="background:var(--surface2);border-radius:12px;padding:14px;border-right:4px solid #ef4444;text-align:center">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px">💸 إجمالي المصروفات</div>
+      <div style="font-size:20px;font-weight:800;color:#ef4444">${_fmt(totalExp)}</div>
+      <div style="font-size:10px;color:var(--muted)">د.ل</div>
+    </div>
+    <div style="background:var(--surface2);border-radius:12px;padding:14px;border-right:4px solid ${expColor};text-align:center">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px">📊 نسبة من المبيعات</div>
+      <div style="font-size:20px;font-weight:800;color:${expColor}">${_fmtP(expToSale)}%</div>
+      <div style="font-size:10px;color:var(--muted)">${expToSale<=10?'ممتاز':expToSale<=20?'مقبول':'مرتفع'}</div>
+    </div>
+    <div style="background:var(--surface2);border-radius:12px;padding:14px;border-right:4px solid #8b5cf6;text-align:center">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px">📋 عدد بنود الإنفاق</div>
+      <div style="font-size:20px;font-weight:800;color:#8b5cf6">${cats.length}</div>
+      <div style="font-size:10px;color:var(--muted)">بند</div>
+    </div>
+    ${totalNS>0?`<div style="background:var(--surface2);border-radius:12px;padding:14px;border-right:4px solid #3b82f6;text-align:center">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px">💰 صافي المبيعات المرجعي</div>
+      <div style="font-size:16px;font-weight:800;color:#3b82f6">${_fmt(totalNS)}</div>
+      <div style="font-size:10px;color:var(--muted)">د.ل</div>
+    </div>`:''}
+  </div>`;
+
+  // ── أشرطة التقدم البيانية لكل بند ──
+  html += _section('📊 توزيع المصروفات بصرياً',
+    `<div style="display:flex;flex-direction:column;gap:10px">
+    ${cats.map((c,i) => {
+      const pctOfTotal = totalExp>0?(c.net/totalExp*100):0;
+      const pctOfSales = totalNS>0?(c.net/totalNS*100):0;
+      const col = catColor(i);
+      const flag = pctOfSales > 5 ? '🔴' : pctOfSales > 2 ? '🟡' : '🟢';
+      return `<div style="background:var(--surface2);border-radius:10px;padding:12px 14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:14px">${flag}</span>
+            <span style="font-size:12px;font-weight:700;color:var(--text)">${c.name}</span>
+          </div>
+          <div style="text-align:left;direction:ltr">
+            <span style="font-size:13px;font-weight:800;color:${col}">${_fmt(c.net)} د.ل</span>
+            <span style="font-size:11px;color:var(--muted);margin-right:8px">${_fmtP(pctOfTotal)}%</span>
+          </div>
+        </div>
+        <div style="background:var(--border2);border-radius:4px;height:8px;overflow:hidden">
+          <div style="background:${col};width:${Math.min(100,pctOfTotal)}%;height:8px;border-radius:4px;transition:width 0.3s"></div>
+        </div>
+        ${totalNS>0?`<div style="font-size:10px;color:var(--muted);margin-top:3px">نسبة من المبيعات: ${_fmtP(pctOfSales)}%</div>`:''}
+      </div>`;
+    }).join('')}
+    </div>`
+  );
+
+  // ── جدول تفصيلي شامل ──
+  const detailRows = cats.map((c,i) => {
+    const pctOfTotal = totalExp>0?(c.net/totalExp*100):0;
+    const pctOfSales = totalNS>0?(c.net/totalNS*100):0;
+    const flag = pctOfSales>5?'🔴 مرتفع':pctOfSales>2?'🟡 مراقبة':'🟢 طبيعي';
+    const col  = catColor(i);
+    return [
+      `<span style="color:${col};font-weight:700">${i+1}</span>`,
+      `<span style="font-weight:700">${c.name}</span>`,
+      `<b style="color:${col}">${_fmt(c.net)}</b>`,
+      _fmt(c.debit),
+      _fmt(c.credit),
+      `<div style="display:flex;align-items:center;gap:4px">
+        <div style="background:var(--border2);border-radius:2px;height:4px;width:60px;flex-shrink:0">
+          <div style="background:${col};width:${Math.min(100,pctOfTotal)}%;height:4px;border-radius:2px"></div>
+        </div>
+        <span>${_fmtP(pctOfTotal)}%</span>
+       </div>`,
+      totalNS>0?`<span style="color:${pctOfSales>5?'#ef4444':pctOfSales>2?'#f59e0b':'#22c55e'}">${_fmtP(pctOfSales)}%</span>`:'—',
+      flag
+    ];
+  });
+  html += _section('📋 جدول تفصيل المصروفات',
+    _table(['#','البند','الصافي (د.ل)','المدين','الدائن','% من الإجمالي','% من المبيعات','التقييم'], detailRows)
+  );
+
+  // ── تحليل شهري إذا وجد تاريخ ──
+  const months = Object.keys(monthMap).map(Number).sort((a,b)=>a-b);
+  if (months.length > 1) {
+    const top5Cats = cats.slice(0,5).map(c=>c.name);
+    const monthHeaders = ['الشهر', ...top5Cats, 'الإجمالي'];
+    const monthRows = months.map(m => {
+      const mData = monthMap[m] || {};
+      const mTotal = Object.values(mData).reduce((s,v)=>s+v,0);
+      return [
+        `<b>${MONTH_NAMES[m]||m}</b>`,
+        ...top5Cats.map(cat => mData[cat]?`<span style="font-size:11px">${_fmt(mData[cat]||0)}</span>`:`<span style="color:var(--muted)">—</span>`),
+        `<b style="color:#ef4444">${_fmt(mTotal)}</b>`
+      ];
+    });
+    html += _section('📅 التحليل الشهري للمصروفات', _table(monthHeaders, monthRows));
+  }
+
+  // ── المقارنة مع المبيعات ──
+  if (totalNS > 0) {
+    const highExp = cats.filter(c => (c.net/totalNS*100) > 3);
+    const okExp   = cats.filter(c => (c.net/totalNS*100) <= 3);
+    if (highExp.length) {
+      html += _section('⚠️ بنود تتجاوز 3% من المبيعات',
+        `<div style="display:flex;flex-direction:column;gap:6px">
+        ${highExp.map(c => {
+          const pct = (c.net/totalNS*100);
+          const col = pct>5?'#ef4444':'#f59e0b';
+          return `<div style="background:${col}11;border-right:3px solid ${col};padding:8px 12px;border-radius:6px;display:flex;justify-content:space-between">
+            <span style="font-size:12px;font-weight:700">${c.name}</span>
+            <span style="font-size:12px;color:${col};font-weight:800">${_fmt(c.net)} د.ل &nbsp;(${_fmtP(pct)}%)</span>
+          </div>`;
+        }).join('')}
+        </div>`
+      );
+    }
+  }
+
+  // ── توصيات ──
+  const recs = [];
+  if (expToSale > 20) recs.push(`⚠️ المصروفات ${_fmtP(expToSale)}% من المبيعات — مرتفعة جداً، مراجعة شاملة عاجلة`);
+  else if (expToSale > 10) recs.push(`المصروفات ${_fmtP(expToSale)}% من المبيعات — يمكن تحسينها`);
+  const topBand = cats[0];
+  if (topBand) recs.push(`أكبر بند إنفاق: "${topBand.name}" بـ ${_fmt(topBand.net)} د.ل — مراجعة الجدوى`);
+  if (months.length > 2) recs.push('متابعة التحليل الشهري لرصد أي ارتفاع غير مبرر');
+  recs.push('وضع ميزانية تقديرية شهرية لكل بند ومقارنتها بالفعلي');
+  recs.push('الحصول على 3 عروض لأي مصروف يتجاوز 5,000 د.ل');
+
+  html += _section('💡 توصيات إدارة المصروفات',
+    `<ol style="margin:0;padding-right:18px;color:var(--text)">${recs.map(r=>`<li style="margin-bottom:6px">${r}</li>`).join('')}</ol>`
+  );
+
+  return html;
+}
+
+function _genAlertsReport() {
+  const reps = _filterRepsForAi(D.reps_full);
+  if (!reps.length) return '<div style="text-align:center;padding:40px;color:var(--muted)">لا توجد بيانات للفلتر المحدد</div>';
+  const totalNS  = reps.reduce((s,r)=>s+(r.netSales||0),0);
+  const totalCol = reps.reduce((s,r)=>s+(r.col||0),0);
+  const colPct   = totalNS>0?(totalCol/totalNS*100):0;
+
+  const alerts = [];
+  const warnings = [];
+  const good = [];
+
+  // تنبيهات حرجة
+  const highGap = reps.filter(r=>(r.gap||0)>100000);
+  if (highGap.length) alerts.push(`🔴 ${highGap.length} مناديب لديهم فجوة تحصيل تجاوزت 100,000 د.ل: ${highGap.map(r=>r.name).join('، ')}`);
+
+  const highRet = reps.filter(r=>(r.retPct||0)>15);
+  if (highRet.length) alerts.push(`🔴 مرتجعات مرتفعة جداً (>15%): ${highRet.map(r=>r.name+'('+_fmtP(r.retPct)+'%)').join('، ')}`);
+
+  const zeroROI = reps.filter(r=>r.sales>0&&(r.roi||0)<20);
+  if (zeroROI.length) alerts.push(`🔴 ROI خطير (<20%): ${zeroROI.map(r=>r.name).join('، ')}`);
+
+  if (colPct < 50) alerts.push(`🔴 نسبة التحصيل الإجمالية منخفضة جداً: ${_fmtP(colPct)}%`);
+
+  // تحذيرات
+  const medGap = reps.filter(r=>(r.gap||0)>=50000&&(r.gap||0)<=100000);
+  if (medGap.length) warnings.push(`🟡 فجوة تحصيل متوسطة (50-100 ألف): ${medGap.map(r=>r.name).join('، ')}`);
+
+  const medRet = reps.filter(r=>(r.retPct||0)>=8&&(r.retPct||0)<=15);
+  if (medRet.length) warnings.push(`🟡 مرتجعات متوسطة (8-15%): ${medRet.map(r=>r.name).join('، ')}`);
+
+  const medROI = reps.filter(r=>r.sales>0&&(r.roi||0)>=20&&(r.roi||0)<60);
+  if (medROI.length) warnings.push(`🟡 ROI يحتاج تحسين (20-60%): ${medROI.map(r=>r.name).join('، ')}`);
+
+  // إيجابيات
+  const topCol = reps.filter(r=>r.netSales>0&&(r.col/r.netSales*100)>=90);
+  if (topCol.length) good.push(`✅ تحصيل ممتاز (≥90%): ${topCol.map(r=>r.name).join('، ')}`);
+
+  const topROI = reps.filter(r=>(r.roi||0)>=90);
+  if (topROI.length) good.push(`✅ ROI ممتاز (≥90%): ${topROI.map(r=>r.name).join('، ')}`);
+
+  let html = '';
+
+  if (alerts.length) {
+    html += _section(`🚨 تنبيهات حرجة (${alerts.length})`, `<div style="display:flex;flex-direction:column;gap:8px">${alerts.map(a=>`<div style="background:#ef444422;border-right:3px solid #ef4444;padding:8px 12px;border-radius:6px;font-size:12px;color:var(--text)">${a}</div>`).join('')}</div>`);
+  }
+  if (warnings.length) {
+    html += _section(`⚠️ تحذيرات (${warnings.length})`, `<div style="display:flex;flex-direction:column;gap:8px">${warnings.map(w=>`<div style="background:#f59e0b22;border-right:3px solid #f59e0b;padding:8px 12px;border-radius:6px;font-size:12px;color:var(--text)">${w}</div>`).join('')}</div>`);
+  }
+  if (good.length) {
+    html += _section(`✅ نقاط إيجابية (${good.length})`, `<div style="display:flex;flex-direction:column;gap:8px">${good.map(g=>`<div style="background:#22c55e22;border-right:3px solid #22c55e;padding:8px 12px;border-radius:6px;font-size:12px;color:var(--text)">${g}</div>`).join('')}</div>`);
+  }
+
+  if (!alerts.length && !warnings.length) {
+    html += `<div style="text-align:center;padding:30px;color:#22c55e;font-size:14px;font-weight:700">✅ لا توجد تنبيهات حرجة — الأداء ضمن المعدل الطبيعي</div>`;
+  }
+
+  return html;
+}
+
+function _genPlanReport() {
+  const reps = _filterRepsForAi(D.reps_full);
+  if (!reps.length) return '<div style="text-align:center;padding:40px;color:var(--muted)">لا توجد بيانات للفلتر المحدد</div>';
+  const totalNS  = reps.reduce((s,r)=>s+(r.netSales||0),0);
+  const totalCol = reps.reduce((s,r)=>s+(r.col||0),0);
+  const colPct   = totalNS>0?(totalCol/totalNS*100):0;
+  const avgROI   = reps.reduce((s,r)=>s+(r.roi||0),0)/reps.length;
+
+  // أهداف مقترحة بناءً على الأداء الفعلي
+  const targetNS  = Math.round(totalNS * 1.1);
+  const targetCol = Math.round(totalCol * 1.15);
+  const targetROI = Math.min(95, avgROI * 1.1);
+
+  let html = `<div style="background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:16px">
+    <div style="font-size:13px;font-weight:800;margin-bottom:8px">🎯 الأهداف المقترحة للشهر القادم</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:12px">
+      <div style="text-align:center"><div style="color:var(--muted)">صافي المبيعات</div><div style="font-size:16px;font-weight:800;color:#3b82f6">${_fmt(targetNS)} د.ل</div><div style="color:#22c55e;font-size:11px">+10%</div></div>
+      <div style="text-align:center"><div style="color:var(--muted)">التحصيل</div><div style="font-size:16px;font-weight:800;color:#22c55e">${_fmt(targetCol)} د.ل</div><div style="color:#22c55e;font-size:11px">+15%</div></div>
+      <div style="text-align:center"><div style="color:var(--muted)">متوسط ROI</div><div style="font-size:16px;font-weight:800;color:#8b5cf6">${_fmtP(targetROI)}%</div><div style="color:#22c55e;font-size:11px">+10%</div></div>
+    </div>
+  </div>`;
+
+  html += _section('📅 الشهر الأول — تصحيح المسار', `<ol style="margin:0;padding-right:18px;color:var(--text)">
+    <li style="margin-bottom:6px">مراجعة فجوات التحصيل مع كل مندوب وتحديد خطة سداد</li>
+    <li style="margin-bottom:6px">تدريب المناديب ذوي ROI المنخفض على تقنيات البيع</li>
+    <li style="margin-bottom:6px">تحديد الأصناف الراكدة وعمل عروض ترويجية</li>
+    <li style="margin-bottom:6px">مراجعة شروط الائتمان مع العملاء المتأخرين</li>
+  </ol>`);
+
+  html += _section('📅 الشهر الثاني — التعزيز', `<ol style="margin:0;padding-right:18px;color:var(--text)">
+    <li style="margin-bottom:6px">قياس نتائج الشهر الأول ومقارنتها بالأهداف</li>
+    <li style="margin-bottom:6px">تكريم المناديب المتميزين وتحفيز الفريق</li>
+    <li style="margin-bottom:6px">توسيع قاعدة العملاء في المناطق الضعيفة</li>
+    <li style="margin-bottom:6px">متابعة خطة التحصيل وتعديلها حسب الواقع</li>
+  </ol>`);
+
+  html += _section('📅 الشهر الثالث — النمو', `<ol style="margin:0;padding-right:18px;color:var(--text)">
+    <li style="margin-bottom:6px">مراجعة الأهداف الربعية وتحضير تقرير شامل</li>
+    <li style="margin-bottom:6px">تحديد أهداف الربع القادم بناءً على الأداء الفعلي</li>
+    <li style="margin-bottom:6px">تقييم فريق المناديب وإعادة توزيع المناطق إن لزم</li>
+    <li style="margin-bottom:6px">وضع خطة حوافز للربع القادم</li>
+  </ol>`);
+
+  return html;
 }
 </script>
 
