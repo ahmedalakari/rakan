@@ -3894,11 +3894,44 @@ function resetSalesFilters(){
 ═══════════════════════════════════════════════════════════════ */
 
 /* ── تنظيف اسم المندوب من الملف (حذف الكلمات الوصفية) ── */
+/* ── خريطة الأسماء البديلة (زيارات → تصنيف) ── */
+const _VISIT_ALIAS_MAP={
+  'محمد العربي' :'محمد عريبي',
+  'محمد عربي'  :'محمد عريبي',
+  'عصام موسي'  :'عصام التميمي',
+  'عصام موسى'  :'عصام التميمي',
+  'احمد بوضوه' :'احمد ابو ضوة',
+  'احمد بوضوة' :'احمد ابو ضوة',
+  'معاذ البدري الشوشان':'معاد الشوشان',
+  'معاذ الشوشان':'معاد الشوشان',
+  'طالل المشبك':'طلال',
+  'طلال المشبك':'طلال',
+  'سيف بن يونس':'سيف يونس',
+  'المبروك الخمسي':'مبروك رجب',
+  'مبروك الخمسي':'مبروك رجب',
+  'سند الدوادي':'سند',
+  'فيراس المشبك':'فراس المشبك',
+  'عبدالرؤف نصر':'عبد الرؤوف نصر',
+};
+
 function _cleanRepName(s){
-  return String(s||'')
-    .replace(/منذوب|مندوب|منطقة|منطقه|جفارة|جفاره|تاجوراء|تاجورا|عين\s*زاره|زاره|جنزور|جملة|جمله|شرق|غرب|وسط|البلاد|الزاويه|الزاوية|الكريميه|الكريمية|طرابلس|مقاهي|مطاعم|سوق|الجمعه|ومطاعم|أ\b|ب\b|ج\b/g,' ')
-    .replace(/\s+/g,' ').trim().toLowerCase()
-    .replace(/[أإآ]/g,'ا').replace(/[ةه]/g,'ه').replace(/ى/g,'ي');
+  // تطبيع الحروف
+  let raw=String(s||'')
+    .replace(/[أإآ]/g,'ا').replace(/[ةه]/g,'ه').replace(/ى/g,'ي')
+    .replace(/\s+/g,' ').trim();
+  const rawLow=raw.toLowerCase();
+  // البحث في خريطة الأسماء البديلة أولاً
+  for(const [alias,canonical] of Object.entries(_VISIT_ALIAS_MAP)){
+    const aliasN=alias.replace(/[أإآ]/g,'ا').replace(/[ةه]/g,'ه').replace(/ى/g,'ي').toLowerCase();
+    if(rawLow.includes(aliasN)||aliasN.includes(rawLow)){
+      return canonical.replace(/[أإآ]/g,'ا').replace(/[ةه]/g,'ه').replace(/ى/g,'ي').toLowerCase();
+    }
+  }
+  // حذف الألقاب والمناطق والكلمات الزائدة
+  let clean=rawLow
+    .replace(/\bمنذوب\b|\bمندوب\b|\bمنطقه?\b|\bجفاره?\b|\bتاجوراء\b|\bتاجورا\b|قصر\s*بن\s*غشير|\bعين\s*زاره?\b|\bجنزور\b|\bجمله?\b|\bشرق\b|\bغرب\b|\bوسط\b|\bالبلاد\b|\bالبالد\b|\bالزاويه?\b|\bالكريميه?\b|\bطرابلس\b|\bابو\s*سليم\b|\bالدريبي\b|حي\s*الاندلس|اسواق\s*كبري?|\bمباشر\b|\bمقاهي\b|\bومقاهي\b|\bمطاعم\b|\bومطاعم\b|\bسوق\b|\bالجمعه?\b|\bالغربيه?\b/g,' ')
+    .replace(/\s+/g,' ').trim();
+  return clean;
 }
 
 /* ── مسافة ليفنشتاين للمقارنة التقريبية ── */
@@ -3946,15 +3979,19 @@ function _buildVisitsMap(){
 function _matchVisits(repName){
   if(!D._visitsMap||!repName) return 0;
   const cleanRep=_cleanRepName(repName);
-  // مطابقة مباشرة
+  // مطابقة مباشرة بعد التنظيف
   if(D._visitsMap[cleanRep]) return D._visitsMap[cleanRep].visits;
-  // مطابقة تقريبية
+  // محاولة مطابقة بالاسم الأصلي من ملف الزيارات
+  for(const [,v] of Object.entries(D._visitsMap)){
+    if(_cleanRepName(v.original||'')===cleanRep) return v.visits;
+  }
+  // مطابقة تقريبية مخففة
   let bestScore=0, bestVisits=0;
   Object.entries(D._visitsMap).forEach(([cleanFile,v])=>{
     const score=_nameSimilarity(cleanRep,cleanFile);
     if(score>bestScore){ bestScore=score; bestVisits=v.visits; }
   });
-  return bestScore>=0.5 ? bestVisits : 0;
+  return bestScore>=0.45 ? bestVisits : 0;
 }
 
 
