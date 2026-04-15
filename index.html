@@ -7111,7 +7111,42 @@ function _renderInvTable(){
 // ══════════════════════════════════════════════════════
 //  EXCEL PARSER — شامل وموثوق
 // ══════════════════════════════════════════════════════
+/* ── تحليل ملف HTML (تقرير الزيارات) ── */
+function parseHTMLTable(buffer){
+  const decoder=new TextDecoder('utf-8');
+  const html=decoder.decode(buffer);
+  const parser=new DOMParser();
+  const doc=parser.parseFromString(html,'text/html');
+  const table=doc.querySelector('table');
+  if(!table) throw new Error('لم يتم العثور على جدول في ملف HTML');
+  const rows=[];
+  const ths=Array.from(table.querySelectorAll('thead th'));
+  const headers=ths.map(th=>th.textContent.trim());
+  if(!headers.length) throw new Error('لم يتم العثور على رؤوس الأعمدة');
+  const trs=Array.from(table.querySelectorAll('tbody tr'));
+  trs.forEach(tr=>{
+    const tds=Array.from(tr.querySelectorAll('td'));
+    if(!tds.length) return;
+    // تجاهل صف الإجماليات (أول خلية فارغة وباقيها أرقام)
+    const firstVal=tds[0]?.textContent.trim();
+    if(!firstVal) return;
+    const row={};
+    headers.forEach((h,i)=>{
+      const val=tds[i]?.textContent.trim()||'';
+      row[h]=val===''?null:val;
+    });
+    rows.push(row);
+  });
+  return rows;
+}
+
 function parseExcel(buffer){
+  // كشف إذا كان الملف HTML
+  const magic=new Uint8Array(buffer.slice(0,5));
+  const magicStr=String.fromCharCode(...magic).toLowerCase();
+  if(magicStr.startsWith('<!doc')||magicStr.startsWith('<html')){
+    return parseHTMLTable(buffer);
+  }
   const wb=XLSX.read(buffer,{type:'array',cellDates:true});
   const sheet=wb.Sheets[wb.SheetNames[0]];
 
