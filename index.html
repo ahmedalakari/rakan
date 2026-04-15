@@ -12389,7 +12389,7 @@ async function runAiAnalysis() {
   try {
     const prompt = _getAiPrompt(mode, customQ);
 
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('https://rakan-ai.ahmed-alakari52-b8b.workers.dev', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
