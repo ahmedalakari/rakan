@@ -1782,6 +1782,17 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
       </div>
     </div>
 
+    <!-- ── المستشار الذكي ── -->
+    <div class="nav-group">
+      <div class="nav-section">الذكاء الاصطناعي</div>
+      <div class="nav-item" onclick="showPage('ai')" data-page="ai" data-tooltip="المستشار الذكي">
+        <div class="nav-icon-wrap">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2a9 9 0 0 1 9 9c0 3.18-1.65 5.98-4.13 7.6L17 21H7l.13-2.4A9 9 0 0 1 3 11a9 9 0 0 1 9-9z"/><path d="M9 11h6M9 14h4"/></svg>
+        </div>
+        <span class="nav-label">المستشار الذكي</span>
+      </div>
+    </div>
+
   </div><!-- end nav-scroll -->
 
   <!-- Footer: sync status -->
@@ -2704,6 +2715,88 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
   </div>
 
 
+<!-- ═══════════ PAGE: AI ADVISOR ═══════════ -->
+<div class="page" id="page-ai">
+
+  <!-- KPI bar placeholder (empty) -->
+  <div style="margin-bottom:var(--gap)">
+    <div style="font-size:18px;font-weight:800;color:var(--gold);margin-bottom:4px">🤖 المستشار الذكي للأعمال</div>
+    <div style="color:var(--muted);font-size:12px">تحليل ذكي مبني على بياناتك الفعلية — توصيات تنفيذية، دراسات جدوى، وخطط عمل للأشهر القادمة</div>
+  </div>
+
+  <!-- Mode Selector -->
+  <div class="card" style="margin-bottom:var(--gap)">
+    <div class="card-header"><span class="card-title">🎯 اختر نوع التحليل</span></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px" id="ai-mode-grid">
+      <button class="ai-mode-btn active" data-mode="executive" onclick="selectAiMode(this,'executive')">
+        <span style="font-size:1.3rem">📊</span><span>تقرير تنفيذي</span>
+      </button>
+      <button class="ai-mode-btn" data-mode="sales" onclick="selectAiMode(this,'sales')">
+        <span style="font-size:1.3rem">👥</span><span>إدارة المبيعات</span>
+      </button>
+      <button class="ai-mode-btn" data-mode="collection" onclick="selectAiMode(this,'collection')">
+        <span style="font-size:1.3rem">💰</span><span>استراتيجية التحصيل</span>
+      </button>
+      <button class="ai-mode-btn" data-mode="products" onclick="selectAiMode(this,'products')">
+        <span style="font-size:1.3rem">📦</span><span>تحليل الأصناف</span>
+      </button>
+      <button class="ai-mode-btn" data-mode="reps" onclick="selectAiMode(this,'reps')">
+        <span style="font-size:1.3rem">🏆</span><span>تقييم المناديب</span>
+      </button>
+      <button class="ai-mode-btn" data-mode="plan" onclick="selectAiMode(this,'plan')">
+        <span style="font-size:1.3rem">🗺️</span><span>خطة الأشهر القادمة</span>
+      </button>
+    </div>
+
+    <!-- Custom question -->
+    <div style="border-top:1px solid var(--border2);padding-top:14px">
+      <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">أو اكتب سؤالاً مخصصاً:</label>
+      <div style="display:flex;gap:10px;align-items:flex-end">
+        <textarea id="ai-custom-q"
+          placeholder="مثال: من هو المندوب الأفضل ROI؟ ما الأصناف الراكدة؟ كيف نخفض المرتجعات؟..."
+          style="flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;color:var(--text);font-family:Cairo,sans-serif;font-size:13px;resize:vertical;min-height:58px;direction:rtl;box-sizing:border-box;outline:none"></textarea>
+        <button id="ai-run-btn" onclick="runAiAnalysis()"
+          style="background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;padding:0 22px;height:44px;color:#000;font-weight:700;font-size:13px;cursor:pointer;font-family:Cairo,sans-serif;white-space:nowrap;flex-shrink:0">
+          ⚡ تحليل
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div id="ai-loading" style="display:none;text-align:center;padding:56px 20px">
+    <div class="ai-spinner"></div>
+    <div style="color:var(--accent);font-size:15px;font-weight:700;margin-top:18px">جاري التحليل...</div>
+    <div style="color:var(--muted);font-size:12px;margin-top:6px" id="ai-loading-msg">يعالج النظام بياناتك</div>
+  </div>
+
+  <!-- Result -->
+  <div id="ai-result-area" style="display:none">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+        <div>
+          <div id="ai-result-title" style="font-size:15px;font-weight:800;color:var(--accent)"></div>
+          <div id="ai-result-meta" style="font-size:11px;color:var(--muted);margin-top:3px"></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button onclick="copyAiResult()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:6px 14px;color:var(--text);font-size:12px;cursor:pointer;font-family:Cairo,sans-serif">📋 نسخ</button>
+          <button onclick="runAiAnalysis()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:6px 14px;color:var(--accent);font-size:12px;cursor:pointer;font-family:Cairo,sans-serif">🔄 إعادة</button>
+        </div>
+      </div>
+      <div id="ai-content" style="line-height:1.9;font-size:13px;color:var(--text);direction:rtl"></div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div id="ai-empty" style="text-align:center;padding:60px 20px">
+    <div style="font-size:3.5rem;margin-bottom:16px">🤖</div>
+    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px">اختر نوع التحليل وابدأ</div>
+    <div style="color:var(--muted);font-size:12px;max-width:400px;margin:0 auto">اضغط على أحد أزرار التحليل أعلاه أو اكتب سؤالك المخصص، وسيقوم النظام بتحليل بياناتك الفعلية وتقديم توصيات دقيقة</div>
+  </div>
+
+</div><!-- end page-ai -->
+
+
 <!-- ═══════════ DAILY REPORT MODAL ═══════════ -->
 <div id="daily-report-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(10,18,40,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center" onclick="if(event.target===this)_closeDailyModal()">
   <div style="background:var(--surface);border-radius:20px;padding:28px 28px 24px;width:420px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.25);border:1px solid var(--border);font-family:Cairo,sans-serif;direction:rtl">
@@ -2727,7 +2820,7 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
     </div>
 
     <!-- Collection date input -->
-    <div style="margin-bottom:20px">
+    <div style="margin-bottom:16px">
       <label style="display:block;font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">
         💰 تاريخ التحصيل
         <span style="font-size:10px;font-weight:400;color:var(--muted);margin-right:6px">(افتراضي: اليوم السابق)</span>
@@ -2744,6 +2837,21 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
         <span style="font-weight:700;color:var(--accent2);">الأعمدة التي ستتفاعل بتاريخ التحصيل هذا:</span><br>
         التحصيل &nbsp;·&nbsp; ROI% &nbsp;·&nbsp; الفجوة &nbsp;·&nbsp; حوالات &nbsp;·&nbsp; كاش
       </div>
+    </div>
+
+    <!-- Visits date input -->
+    <div style="margin-bottom:20px">
+      <label style="display:block;font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">
+        🗓 تاريخ الزيارات
+        <span style="font-size:10px;font-weight:400;color:var(--muted);margin-right:6px">(افتراضي: يوم المبيعات)</span>
+      </label>
+      <div style="position:relative">
+        <input type="date" id="drm-visits-date"
+          style="width:100%;padding:10px 14px;border-radius:10px;border:2px solid var(--border2);background:var(--surface);color:var(--text);font-family:Cairo,sans-serif;font-size:14px;font-weight:700;outline:none;transition:border-color .2s"
+          onfocus="this.style.borderColor='var(--purple)'"
+          onblur="this.style.borderColor='var(--border2)'">
+      </div>
+      <div id="drm-visits-hint" style="margin-top:6px;font-size:10px;color:var(--muted);display:none"></div>
     </div>
 
     <!-- Buttons -->
@@ -2846,6 +2954,12 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
             <div class="scard-icon">🗓</div>
             <div class="scard-name">الزيارات</div>
             <div class="scard-status" id="ss-visits">⬜ لم يُرفع</div>
+            <div id="visits-date-wrap" style="display:none;margin-top:6px">
+              <input type="date" id="visits-file-date"
+                style="width:100%;padding:3px 6px;border-radius:6px;border:1px solid var(--border2);background:var(--surface);color:var(--text);font-family:Cairo,sans-serif;font-size:10px;outline:none"
+                title="تاريخ ملف الزيارات"
+                onchange="D._visitsDateFrom=this.value;D._visitsDateTo=this.value;if(PAGE_RENDERS[currentPage])PAGE_RENDERS[currentPage]();">
+            </div>
           </div>
         </div>
 
@@ -3192,8 +3306,8 @@ function lineChart(id,labels,datasets){
 // ══════════════════════════════════════════════════════
 //  NAVIGATION
 // ══════════════════════════════════════════════════════
-const PAGE_TITLES={'overview':'📈 نظرة عامة — لوحة القيادة','sales':'📊 تحليل المبيعات','reps':'👥 تقرير المندوبين','rep-goals':'🎯 أهداف المناديب','customers':'🏪 إدارة الزبائن','products':'📦 تحليل الأصناف','debt':'💳 المديونية','aging':'⏳ أعمار الذمم','collection':'💰 التحصيل','inventory':'🏭 جرد المخازن','expenses':'💸 تحليل المصروفات'};
-const PAGE_RENDERS={'overview':renderOverviewPage,'sales':renderSalesPage,'reps':renderRepPage,'rep-goals':renderRepGoalsPage,'customers':renderCustomersPage,'products':renderProductsPage,'debt':renderDebtPage,'aging':renderAgingPage,'collection':renderCollectionPage,'inventory':renderInventoryPage,'expenses':renderExpensesPage};
+const PAGE_TITLES={'overview':'📈 نظرة عامة — لوحة القيادة','sales':'📊 تحليل المبيعات','reps':'👥 تقرير المندوبين','rep-goals':'🎯 أهداف المناديب','customers':'🏪 إدارة الزبائن','products':'📦 تحليل الأصناف','debt':'💳 المديونية','aging':'⏳ أعمار الذمم','collection':'💰 التحصيل','inventory':'🏭 جرد المخازن','expenses':'💸 تحليل المصروفات','ai':'🤖 المستشار الذكي'};
+const PAGE_RENDERS={'overview':renderOverviewPage,'sales':renderSalesPage,'reps':renderRepPage,'rep-goals':renderRepGoalsPage,'customers':renderCustomersPage,'products':renderProductsPage,'debt':renderDebtPage,'aging':renderAgingPage,'collection':renderCollectionPage,'inventory':renderInventoryPage,'expenses':renderExpensesPage,'ai':renderAiPage};
 
 let currentPage='overview';
 const _renderedPages=new Set(); // تتبّع الصفحات المرسومة
@@ -3912,6 +4026,11 @@ const _VISIT_ALIAS_MAP={
   'سند الدوادي':'سند',
   'فيراس المشبك':'فراس المشبك',
   'عبدالرؤف نصر':'عبد الرؤوف نصر',
+  'جلال رحال'  :'جلال رحال',
+  'محمد الصادق عثمان':'محمد الصادق',
+  'محمود العزري':'محمود العزري',
+  'هيثم الصغير':'هيتم الصغير',
+  'احمد عون نوري':'احمد نوري',
 };
 
 function _cleanRepName(s){
@@ -3959,39 +4078,67 @@ function _nameSimilarity(a,b){
 /* ── بناء خريطة الزيارات ── */
 function _buildVisitsMap(){
   const rows=D.visits_table||[];
-  if(!rows.length){ D._visitsMap={}; return; }
-  // كشف عمود الاسم وعدد الزيارات
+  if(!rows.length){ D._visitsList=[]; D._visitsMap={}; return; }
   const h=Object.keys(rows[0]||{});
   const kName=h.find(k=>k.includes('مندوب')||k.includes('اسم'))||h[0];
   const kVisit=h.find(k=>k.includes('زيارة')||k.includes('زيارات')||k.includes('visit'))||h[1];
-  const map={};
+  const list=[];
   rows.forEach(r=>{
     const rawName=String(r[kName]||'').trim();
     const visits=parseInt(String(r[kVisit]||'0').replace(/[^\d]/g,''))||0;
     if(!rawName||rawName===kName) return;
-    const clean=_cleanRepName(rawName);
-    if(clean) map[clean]={original:rawName,visits};
+    list.push({raw:rawName,visits});
   });
-  D._visitsMap=map;
+  D._visitsList=list;
+  D._visitsMap={};
+  // إذا لم يُستخرج التاريخ بعد (رُفع الملف بنسخة قديمة) حاول من D._visitsRawHTML
+  if(!D._visitsDateFrom && D._visitsRawHTML){
+    const m=D._visitsRawHTML.match(/(\d{2}-\d{2}-\d{4})/g);
+    if(m&&m.length){
+      const toISO=d=>{const[dd,mm,yyyy]=d.split('-');return `${yyyy}-${mm}-${dd}`;};
+      D._visitsDateFrom=toISO(m[0]);
+      D._visitsDateTo=toISO(m[m.length-1]);
+    }
+  }
 }
 
-/* ── مطابقة اسم مندوب مع خريطة الزيارات ── */
-function _matchVisits(repName){
-  if(!D._visitsMap||!repName) return 0;
-  const cleanRep=_cleanRepName(repName);
-  // مطابقة مباشرة بعد التنظيف
-  if(D._visitsMap[cleanRep]) return D._visitsMap[cleanRep].visits;
-  // محاولة مطابقة بالاسم الأصلي من ملف الزيارات
-  for(const [,v] of Object.entries(D._visitsMap)){
-    if(_cleanRepName(v.original||'')===cleanRep) return v.visits;
+/* ── مطابقة اسم مندوب (من التصنيف/المبيعات) مع قائمة الزيارات ── */
+function _matchVisits(repName, overrideDate){
+  if(!D._visitsList||!D._visitsList.length||!repName) return 0;
+  // تحقق من تطابق التاريخ مع نطاق ملف الزيارات
+  if(D._visitsDateFrom||D._visitsDateTo){
+    // إذا مُرر تاريخ صريح (من نافذة التقرير) استخدمه، وإلا اقرأ الفلتر العام
+    const checkDate = overrideDate !== undefined
+      ? overrideDate
+      : (document.getElementById('f-rep-to')?.value||
+         document.getElementById('f-rep-from')?.value||
+         document.getElementById('f-sales-from')?.value||'');
+    if(checkDate){
+      const vFrom=D._visitsDateFrom||'0000-00-00';
+      const vTo  =D._visitsDateTo  ||'9999-99-99';
+      if(checkDate < vFrom || checkDate > vTo) return 0;
+    }
   }
-  // مطابقة تقريبية مخففة
+  const _norm=s=>String(s||'').replace(/[أإآ]/g,'ا').replace(/[ةه]/g,'ه').replace(/ى/g,'ي').toLowerCase();
+  const cleanRep=_cleanRepName(repName);
+  const normRep=_norm(repName);
+  for(const entry of D._visitsList){
+    const rawLow=_norm(entry.raw);
+    if(_cleanRepName(entry.raw)===cleanRep) return entry.visits;
+    const words=cleanRep.split(' ').filter(w=>w.length>2);
+    if(words.length>=1 && words.every(w=>rawLow.includes(w))) return entry.visits;
+    for(const [alias,canonical] of Object.entries(_VISIT_ALIAS_MAP)){
+      const aliasN=_norm(alias);
+      const canonN=_norm(canonical);
+      if(canonN===normRep && rawLow.includes(aliasN)) return entry.visits;
+    }
+  }
   let bestScore=0, bestVisits=0;
-  Object.entries(D._visitsMap).forEach(([cleanFile,v])=>{
-    const score=_nameSimilarity(cleanRep,cleanFile);
-    if(score>bestScore){ bestScore=score; bestVisits=v.visits; }
+  D._visitsList.forEach(entry=>{
+    const score=_nameSimilarity(cleanRep,_cleanRepName(entry.raw));
+    if(score>bestScore){ bestScore=score; bestVisits=entry.visits; }
   });
-  return bestScore>=0.45 ? bestVisits : 0;
+  return bestScore>=0.55 ? bestVisits : 0;
 }
 
 
@@ -4091,7 +4238,7 @@ function renderRepPage(){
           items:d.items?d.items.size:0,
           colBank,colCash,
           netQty:Math.max(0,(d.qty||0)-(d.retQty||0)),
-          visits:_matchVisits(name)||0};
+          visits:0};
       };
       // مناديب لديهم مبيعات في النطاق
       const fromSales2=Object.entries(repMap2).map(([name,d])=>_buildFiltered(name,d));
@@ -4979,7 +5126,7 @@ function _renderRepsTable(){
       <td class="td-num col-coll ${r.gap>0?'td-red':'td-green'}">${fmt(r.gap)}</td>
       <td class="td-num col-coll">${fmt(r.colBank)}</td>
       <td class="td-num col-coll">${fmt(r.colCash)}</td>
-      <td style="text-align:center;font-weight:700;color:var(--purple)">${r.visits||'—'}</td>
+      <td style="text-align:center;font-weight:700;color:var(--purple)">${(_matchVisits&&_matchVisits(r.name))||'—'}</td>
       <td class="td-num td-gold">${r.invoices}</td>
       <td class="td-num">${r.customers}</td>
       <td class="td-num">${r.items}</td>
@@ -5000,7 +5147,7 @@ function _renderRepsTable(){
       <td class="td-num ${(PAG_STATE['reps']?.data||[]).reduce((s,r)=>s+r.gap,0)>0?'td-red':'td-green'}" style="padding:8px 13px">${fmt((PAG_STATE['reps']?.data||[]).reduce((s,r)=>s+r.gap,0))}</td>
       <td class="td-num" style="padding:8px 13px">${fmt((PAG_STATE['reps']?.data||[]).reduce((s,r)=>s+(r.colBank||0),0))}</td>
       <td class="td-num" style="padding:8px 13px">${fmt((PAG_STATE['reps']?.data||[]).reduce((s,r)=>s+(r.colCash||0),0))}</td>
-      <td class="td-num" style="padding:8px 13px;color:var(--purple)">${(PAG_STATE['reps']?.data||[]).reduce((s,r)=>s+(r.visits||0),0)||'—'}</td>
+      <td class="td-num" style="padding:8px 13px;color:var(--purple)">${(PAG_STATE['reps']?.data||[]).reduce((s,r)=>s+(_matchVisits?(_matchVisits(r.name)||0):0),0)||'—'}</td>
       <td class="td-num td-gold" style="padding:8px 13px">${(PAG_STATE['reps']?.data||[]).reduce((s,r)=>s+(r.invoices||0),0)}</td>
       <td class="td-num" style="padding:8px 13px">${(PAG_STATE['reps']?.data||[]).reduce((s,r)=>s+(r.customers||0),0)}</td>
       <td class="td-num" style="padding:8px 13px">${(PAG_STATE['reps']?.data||[]).reduce((s,r)=>s+(r.items||0),0)}</td>
@@ -7115,10 +7262,24 @@ function _renderInvTable(){
 function parseHTMLTable(buffer){
   const decoder=new TextDecoder('utf-8');
   const html=decoder.decode(buffer);
+  D._visitsRawHTML=html;
+  D._visitsDateFrom=null; // سيُعاد تعيينه أدناه
+  D._visitsDateTo=null;
   const parser=new DOMParser();
   const doc=parser.parseFromString(html,'text/html');
   const table=doc.querySelector('table');
   if(!table) throw new Error('لم يتم العثور على جدول في ملف HTML');
+  // استخراج نطاق التاريخ من العنوان (من تاريخ DD-MM-YYYY الى تاريخ DD-MM-YYYY)
+  const h3=doc.querySelector('h3');
+  if(h3){
+    const txt=h3.textContent||'';
+    const dates=txt.match(/(\d{2}-\d{2}-\d{4})/g);
+    if(dates&&dates.length>=1){
+      const toISO=d=>{const[dd,mm,yyyy]=d.split('-');return `${yyyy}-${mm}-${dd}`;};
+      D._visitsDateFrom=toISO(dates[0]);
+      D._visitsDateTo=toISO(dates[dates.length-1]);
+    }
+  }
   const rows=[];
   const ths=Array.from(table.querySelectorAll('thead th'));
   const headers=ths.map(th=>th.textContent.trim());
@@ -7127,7 +7288,6 @@ function parseHTMLTable(buffer){
   trs.forEach(tr=>{
     const tds=Array.from(tr.querySelectorAll('td'));
     if(!tds.length) return;
-    // تجاهل صف الإجماليات (أول خلية فارغة وباقيها أرقام)
     const firstVal=tds[0]?.textContent.trim();
     if(!firstVal) return;
     const row={};
@@ -7604,7 +7764,7 @@ function _rebuildRepData(){
     const netQty=Math.max(0,qty-retQty);
     return {name,invoices,customers,items,sales,qty,returns,retQty,netQty,netSales,retPct,avgInvoice,col,colOps,colBank,colCash,roi,gap,debtTotal,debtPaid,debtNet,debtPct,debtCusts,
             cat: REP_CATEGORIES[name] || _inferRepCat(name) || 'أخرى',
-            visits: (D._visitsMap && _matchVisits(name)) || 0,
+            visits: 0,
             tSales:(D._repTargets&&D._repTargets[name])?D._repTargets[name].tSales:0,
             tQty  :(D._repTargets&&D._repTargets[name])?D._repTargets[name].tQty  :0,
             tCol  :(D._repTargets&&D._repTargets[name])?D._repTargets[name].tCol  :0};
@@ -7618,7 +7778,16 @@ function _rebuildRepData(){
     .filter(name=>name&&name!=='غير محدد'&&!salesRepNames.has(name))
     .map(name=>_buildRepEntry(name,{invoices:new Set(),customers:new Set(),items:new Set(),sales:0,qty:0,returns:0,retQty:0}));
 
-  D.reps_full=[...repsFromSales,...repsFromColOnly].sort((a,b)=>b.netSales-a.netSales);
+  // ── إضافة المناديب الذين لديهم زيارات فقط (بدون مبيعات أو تحصيل) ──
+  // نبحث في أسماء التصنيف المعيارية فقط — لا نضيف أسماء خام من ملف الزيارات
+  const knownNames=new Set([...salesRepNames,...Object.keys(repColMap)]);
+  const repsFromVisitsOnly=Object.keys(REP_CATEGORIES||{})
+    .filter(name=>name&&name!=='غير محدد'&&!knownNames.has(name))
+    .filter(name=>(_matchVisits(name)||0)>0)
+    .filter((v,i,a)=>a.indexOf(v)===i)
+    .map(name=>_buildRepEntry(name,{invoices:new Set(),customers:new Set(),items:new Set(),sales:0,qty:0,returns:0,retQty:0}));
+
+  D.reps_full=[...repsFromSales,...repsFromColOnly,...repsFromVisitsOnly].sort((a,b)=>b.netSales-a.netSales);
 
   // تحديث ملخصات المناديب للرسوم
   D.sales_by_rep=Object.fromEntries(D.reps_full.map(r=>[r.name,r.sales]));
@@ -8235,9 +8404,29 @@ function processNewData(type,rows){
       return;
     }
     case 'visits':{
-      D.visits_table = rows;
-      D._visitsMap = null;
+      D.visits_table    = rows;
+      D._visitsMap      = null;
+      D._visitsList     = null;
+      // لا نُصفّر _visitsDateFrom هنا — تم حفظه في parseHTMLTable قبل هذا
+      // فقط نُصفّره إذا لم يكن محفوظاً (ملف غير HTML)
+      if(!D._visitsRawHTML){
+        D._visitsDateFrom = null;
+        D._visitsDateTo   = null;
+      }
       _buildVisitsMap();
+      // إظهار حقل التاريخ وتعبئته
+      const _vdw=document.getElementById('visits-date-wrap');
+      const _vdi=document.getElementById('visits-file-date');
+      if(_vdw) _vdw.style.display='block';
+      if(_vdi){
+        if(D._visitsDateFrom) _vdi.value=D._visitsDateFrom;
+        else{
+          _vdi.value=new Date().toISOString().slice(0,10);
+          D._visitsDateFrom=_vdi.value;
+          D._visitsDateTo=_vdi.value;
+        }
+      }
+      if(D._repMap) _rebuildRepData();
       if(PAGE_RENDERS[currentPage]) PAGE_RENDERS[currentPage]();
       return;
     }
@@ -11059,6 +11248,21 @@ tfoot td,tfoot th{background:#dde3ff;font-weight:800;color:#1e2749;padding:5px 3
   tr{page-break-inside:avoid}
   .print-footer{position:fixed;bottom:0;left:0;right:0;padding:0 8mm;height:12mm;background:#fff;border-top:1px solid #e4e6ef;display:flex;align-items:center;justify-content:space-between;font-size:8px;color:#9ba5bf;margin-top:0}
 }
+/* ===== AI Advisor Styles ===== */
+.ai-mode-btn{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--surface2);border:1.5px solid var(--border2);border-radius:12px;padding:15px 10px;color:var(--muted);font-family:Cairo,sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;text-align:center}
+.ai-mode-btn:hover{border-color:var(--accent);color:var(--text)}
+.ai-mode-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,.08)}
+.ai-spinner{width:46px;height:46px;border:4px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:ai-spin .8s linear infinite;margin:0 auto}
+@keyframes ai-spin{to{transform:rotate(360deg)}}
+#ai-content h3{font-size:14px;font-weight:800;color:var(--gold);margin:18px 0 9px;padding-bottom:5px;border-bottom:1px solid var(--border2)}
+#ai-content h4{font-size:13px;font-weight:700;color:var(--accent);margin:14px 0 7px}
+#ai-content ul,#ai-content ol{margin:6px 0 10px;padding-right:18px}
+#ai-content li{margin-bottom:5px}
+#ai-content strong{color:var(--accent2)}
+#ai-content .ai-highlight{background:rgba(0,212,255,.06);border-right:3px solid var(--accent);padding:9px 13px;border-radius:0 10px 10px 0;margin:10px 0}
+#ai-content .ai-warn{background:rgba(255,71,87,.06);border-right:3px solid var(--red);padding:9px 13px;border-radius:0 10px 10px 0;margin:10px 0}
+#ai-content .ai-success{background:rgba(0,255,136,.06);border-right:3px solid var(--accent2);padding:9px 13px;border-radius:0 10px 10px 0;margin:10px 0}
+
 </style>
 </head>
 <body>
@@ -11941,6 +12145,311 @@ function _openPrintWindowAllBySup(){
 
 function printCrossTable(){
   _openPrintWindowForTargets('cross');
+}
+
+
+/* ============================================================
+   🤖 المستشار الذكي — AI Analysis Engine
+   ============================================================ */
+
+let _aiCurrentMode = 'executive';
+
+function renderAiPage() {
+  // Nothing to render — AI page is static HTML with JS interaction
+}
+
+function selectAiMode(btn, mode) {
+  document.querySelectorAll('.ai-mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  _aiCurrentMode = mode;
+  document.getElementById('ai-custom-q').value = '';
+}
+
+function _buildAiDataSummary() {
+  if (!D || !D.reps_full || !D.reps_full.length) {
+    return 'لا توجد بيانات مرفوعة بعد. يرجى رفع ملفات البيانات أولاً.';
+  }
+
+  const fmt = n => Number(n||0).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
+  const fmtP = n => (Number(n||0)).toFixed(1);
+
+  const reps = D.reps_full;
+  const totalSales   = reps.reduce((s,r)=>s+(r.sales||0),0);
+  const totalNS      = reps.reduce((s,r)=>s+(r.netSales||0),0);
+  const totalReturns = reps.reduce((s,r)=>s+(r.returns||0),0);
+  const totalCol     = reps.reduce((s,r)=>s+(r.col||0),0);
+  const totalGap     = reps.reduce((s,r)=>s+(r.gap||0),0);
+  const retPct       = totalSales>0?((totalReturns/totalSales)*100).toFixed(2):0;
+  const avgROI       = reps.length?(reps.reduce((s,r)=>s+(r.roi||0),0)/reps.length).toFixed(1):0;
+
+  const top5 = [...reps].sort((a,b)=>(b.netSales||0)-(a.netSales||0)).slice(0,5)
+    .map(r=>`• ${r.name} (${r.cat||'—'}): صافي=${fmt(r.netSales)} | ROI=${fmtP(r.roi)}% | مرتجعات=${fmtP(r.retPct)}%`).join('\n');
+
+  const low3 = [...reps].filter(r=>(r.sales||0)>0).sort((a,b)=>(a.roi||0)-(b.roi||0)).slice(0,3)
+    .map(r=>`• ${r.name}: ROI=${fmtP(r.roi)}% | فجوة=${fmt(r.gap)}`).join('\n');
+
+  const highRet = reps.filter(r=>(r.retPct||0)>10).map(r=>`${r.name} (${fmtP(r.retPct)}%)`).join('، ');
+
+  // Category breakdown
+  const cats = {};
+  reps.forEach(r=>{
+    const c = r.cat||'أخرى';
+    if(!cats[c]) cats[c]={ns:0,count:0,col:0};
+    cats[c].ns += (r.netSales||0);
+    cats[c].col += (r.col||0);
+    cats[c].count++;
+  });
+  const catSummary = Object.entries(cats)
+    .map(([c,v])=>`${c}: ${v.count} مناديب، صافي=${fmt(v.ns)}`)
+    .join(' | ');
+
+  // Products summary if available
+  let prodSummary = '';
+  if (D.products_table && D.products_table.length) {
+    const prods = D.products_table;
+    prodSummary = `
+**عدد الأصناف:** ${prods.length}
+`;
+  } else if (D.items_summary) {
+    const itemKeys = Object.keys(D.items_summary).slice(0,5);
+    prodSummary = `
+**أبرز الأصناف:** ${itemKeys.join('، ')}
+`;
+  }
+
+  // Date range
+  const dateRange = D.date_from && D.date_to ? `${D.date_from} إلى ${D.date_to}` : 'غير محدد';
+
+  return `=== ملخص أداء ${D.company||'شركة ركان المتوسط'} ===
+الفترة: ${dateRange}
+
+**الإجماليات:**
+- إجمالي المبيعات: ${fmt(totalSales)} د.ل
+- صافي المبيعات: ${fmt(totalNS)} د.ل
+- إجمالي المرتجعات: ${fmt(totalReturns)} د.ل (${retPct}%)
+- إجمالي التحصيل: ${fmt(totalCol)} د.ل
+- فجوة التحصيل: ${fmt(totalGap)} د.ل
+- متوسط ROI: ${avgROI}%
+- عدد المناديب: ${reps.length}
+${prodSummary}
+**تقسيم الفئات:**
+${catSummary}
+
+**أفضل 5 مناديب (صافي مبيعات):**
+${top5}
+
+**أضعف 3 مناديب (ROI):**
+${low3}
+
+**مناديب ذوو مرتجعات عالية (>10%):**
+${highRet || 'لا يوجد'}`.trim();
+}
+
+function _getAiPrompt(mode, customQ) {
+  const data = _buildAiDataSummary();
+  const today = new Date().toLocaleDateString('ar-LY',{year:'numeric',month:'long',day:'numeric'});
+
+  const baseCtx = `أنت مستشار أعمال استراتيجي خبير في شركات التوزيع والمشروبات الليبية.
+اليوم: ${today}
+
+بيانات الأداء الفعلية:
+${data}
+
+`;
+
+  if (customQ) {
+    return baseCtx + `**السؤال المطلوب:**
+${customQ}
+
+أجب بشكل شامل مستنداً للأرقام الفعلية. اكتب بالعربية بأسلوب احترافي مع عناوين منظمة.`;
+  }
+
+  const prompts = {
+    executive: baseCtx + `اكتب **تقريراً تنفيذياً شاملاً** للإدارة العليا يتضمن:
+### 1. موجز الأداء
+أبرز المؤشرات الرئيسية بالأرقام الفعلية.
+### 2. نقاط القوة
+ما يجب الاستمرار فيه وتعزيزه.
+### 3. نقاط الضعف الحرجة
+مع تحديد الأسباب المحتملة.
+### 4. الفرص الواعدة
+قابلة للتطبيق خلال 90 يوماً.
+### 5. المخاطر العاجلة
+التي تستوجب تدخلاً فورياً.
+### 6. توصيات تنفيذية
+5 إجراءات محددة مع جداول زمنية.
+اكتب بالعربية بأسلوب احترافي.`,
+
+    sales: baseCtx + `قدِّم **تحليلاً شاملاً لإدارة المبيعات** يتضمن:
+### 1. تقييم أداء الفئات
+جملة، تجزئة، أسواق، مقاهي — مقارنة وتحليل.
+### 2. تصنيف المناديب
+متميز / جيد / يحتاج تحسين / حرج — مع أسماء فعلية.
+### 3. تحليل الإنتاجية
+من يستحق مكافأة، من يحتاج تدريباً.
+### 4. خطة حوافز مقترحة
+ربط العمولات بالأهداف والتحصيل.
+### 5. أهداف الشهر القادم
+أهداف واقعية قابلة للقياس لكل فئة.
+اكتب بالعربية بأسلوب تشغيلي عملي.`,
+
+    collection: baseCtx + `قدِّم **استراتيجية تحصيل شاملة** تتضمن:
+### 1. تشخيص مشكلة التحصيل
+تحليل الفجوة والأسباب المحتملة.
+### 2. تصنيف ديون المناديب
+عاجل جداً / قابل للجدولة / طويل الأجل.
+### 3. خطة تحصيل 90 يوماً
+أهداف شهرية محددة بالأرقام.
+### 4. إجراءات منع تراكم الديون
+سياسة ائتمان وحدود تسليف مقترحة.
+### 5. نظام تحفيز التحصيل
+ربط عمولة المندوب بنسبة التحصيل الفعلية.
+### 6. مؤشرات الأداء (KPIs)
+معايير قياس شهرية واضحة.
+اكتب بالعربية بأسلوب عملي.`,
+
+    products: baseCtx + `قدِّم **تحليلاً استراتيجياً للأصناف** يتضمن:
+### 1. تحليل ABC
+أصناف A (ذهبية) / B (جيدة) / C (ضعيفة) بناءً على البيانات.
+### 2. الأصناف ذات المرتجعات العالية
+أسباب محتملة وحلول عملية.
+### 3. فرص التوسع
+أصناف تستحق زيادة الدفع والتوزيع.
+### 4. استراتيجية الأصناف البطيئة
+عروض، حزم، حوافز مناديب.
+### 5. توصيات التوزيع
+كيف يوزع كل صنف على الفئات المناسبة.
+اكتب بالعربية بأسلوب تحليلي دقيق.`,
+
+    reps: baseCtx + `قدِّم **تقييماً تفصيلياً لأداء المناديب** يتضمن:
+### 1. تصنيف شامل لكل مندوب
+بناءً على: صافي المبيعات، ROI، نسبة المرتجعات، نسبة التحصيل.
+### 2. المناديب المتميزون
+تحليل ما يميزهم وكيف نعمم تجربتهم.
+### 3. المناديب الذين يحتاجون دعماً
+خطة تطوير مخصصة لكل حالة.
+### 4. توصيات إعادة التوزيع
+هل يحتاج أي مندوب تغيير منطقة أو فئة عملاء؟
+### 5. خطة حوافز عادلة
+مبنية على الأداء الفعلي بالأرقام.
+اكتب بالعربية بأسلوب موضوعي.`,
+
+    plan: baseCtx + `ضع **خطة عمل للأشهر الثلاثة القادمة** تتضمن:
+### 1. الأهداف الاستراتيجية
+3-5 أهداف قابلة للقياس مع أرقام مستهدفة.
+### 2. الشهر الأول
+أولويات ومهام محددة بالمسؤول والموعد.
+### 3. الشهر الثاني
+مراجعة + مهام الشهر بالتفصيل.
+### 4. الشهر الثالث
+إغلاق الربع ومؤشرات النجاح.
+### 5. الموارد المطلوبة
+ما يلزم تخصيصه من ميزانية وموارد بشرية.
+### 6. مؤشرات الأداء الرئيسية
+جدول متابعة شهري KPIs.
+### 7. خطة الطوارئ
+إذا لم تتحقق الأهداف في المنتصف.
+اكتب بالعربية بأسلوب تشغيلي قابل للتطبيق.`
+  };
+
+  return prompts[mode] || prompts.executive;
+}
+
+async function runAiAnalysis() {
+  const customQ = document.getElementById('ai-custom-q').value.trim();
+  const mode = _aiCurrentMode;
+
+  // Check data
+  if (!D || !D.reps_full || !D.reps_full.length) {
+    document.getElementById('ai-empty').style.display = 'none';
+    document.getElementById('ai-result-area').style.display = 'block';
+    document.getElementById('ai-result-title').textContent = '⚠️ لا توجد بيانات';
+    document.getElementById('ai-result-meta').textContent = '';
+    document.getElementById('ai-content').innerHTML = '<div class="ai-warn">يرجى رفع ملفات البيانات (مبيعات، تحصيل...) أولاً ثم إعادة المحاولة.</div>';
+    return;
+  }
+
+  // Show loading
+  document.getElementById('ai-empty').style.display = 'none';
+  document.getElementById('ai-result-area').style.display = 'none';
+  document.getElementById('ai-loading').style.display = 'block';
+  document.getElementById('ai-run-btn').disabled = true;
+
+  const modeNames = {
+    executive:'📊 التقرير التنفيذي', sales:'👥 تحليل المبيعات',
+    collection:'💰 استراتيجية التحصيل', products:'📦 تحليل الأصناف',
+    reps:'🏆 تقييم المناديب', plan:'🗺️ خطة الأشهر القادمة'
+  };
+
+  const msgs = ['يحلل بيانات المناديب...','يحسب المؤشرات والنسب...','يصيغ التوصيات...','ينسّق التقرير...'];
+  let mi = 0;
+  const msgEl = document.getElementById('ai-loading-msg');
+  const msgInt = setInterval(() => { msgEl.textContent = msgs[mi++ % msgs.length]; }, 2000);
+
+  try {
+    const prompt = _getAiPrompt(mode, customQ);
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!res.ok) throw new Error('خطأ في الاتصال: ' + res.status);
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '';
+
+    clearInterval(msgInt);
+    document.getElementById('ai-loading').style.display = 'none';
+    document.getElementById('ai-result-area').style.display = 'block';
+    document.getElementById('ai-run-btn').disabled = false;
+
+    document.getElementById('ai-result-title').textContent = customQ ? '💬 تحليل مخصص' : (modeNames[mode]||'تحليل');
+    document.getElementById('ai-result-meta').textContent =
+      `تحليل ${new Date().toLocaleString('ar-LY')} | ${(D.reps_full||[]).length} مندوب`;
+
+    document.getElementById('ai-content').innerHTML = _formatAiResponse(text);
+
+  } catch(err) {
+    clearInterval(msgInt);
+    document.getElementById('ai-loading').style.display = 'none';
+    document.getElementById('ai-run-btn').disabled = false;
+    document.getElementById('ai-result-area').style.display = 'block';
+    document.getElementById('ai-result-title').textContent = '⚠️ خطأ';
+    document.getElementById('ai-result-meta').textContent = '';
+    document.getElementById('ai-content').innerHTML =
+      `<div class="ai-warn">فشل الاتصال: ${err.message}<br>تحقق من الاتصال بالإنترنت وأعد المحاولة.</div>`;
+  }
+}
+
+function _formatAiResponse(text) {
+  return text
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^# (.+)$/gm, '<h3>$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^[-•] (.+)$/gm, '<li>$1</li>')
+    .replace(/^(\d+)\. (.+)$/gm, '<li>$2</li>')
+    .replace(/(<li>[^<]*<\/li>\n?)+/g, m => `<ul>${m}</ul>`)
+    .replace(/\n\n+/g, '<br><br>')
+    .replace(/<br><br>(<h3>)/g, '$1')
+    .replace(/(<\/h3>)<br><br>/g, '$1');
+}
+
+function copyAiResult() {
+  const txt = document.getElementById('ai-content').innerText;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(txt).then(() => {
+      const btn = event.currentTarget;
+      const orig = btn.textContent;
+      btn.textContent = '✅ تم';
+      setTimeout(() => btn.textContent = orig, 2000);
+    });
+  }
 }
 </script>
 
@@ -13556,6 +14065,23 @@ function printDailyRepsReport(){
   var inp=document.getElementById('drm-coll-date');
   if(inp){inp.value=defaultColl;_updateDailyModalPreview();}
 
+  // تاريخ الزيارات — افتراضي: يوم المبيعات، أو تاريخ الملف المرفوع إن طابق
+  var visInp=document.getElementById('drm-visits-date');
+  var visHint=document.getElementById('drm-visits-hint');
+  if(visInp){
+    var defaultVis=salesDay;
+    if(D._visitsDateFrom){
+      defaultVis=D._visitsDateFrom;
+      if(visHint){
+        visHint.textContent='📂 ملف الزيارات المرفوع: '+_fmtDateAr(D._visitsDateFrom)+(D._visitsDateTo&&D._visitsDateTo!==D._visitsDateFrom?' → '+_fmtDateAr(D._visitsDateTo):'');
+        visHint.style.display='block';
+      }
+    } else {
+      if(visHint)visHint.style.display='none';
+    }
+    visInp.value=defaultVis;
+  }
+
   // إظهار الـ modal
   var m=document.getElementById('daily-report-modal');
   if(m){m.style.display='flex';}
@@ -13580,12 +14106,13 @@ function _updateDailyModalPreview(){
 
 function _confirmDailyPrint(){
   var collDay=document.getElementById('drm-coll-date')?.value||'';
+  var visDay =document.getElementById('drm-visits-date')?.value||'';
   _closeDailyModal();
-  _execDailyRepsReport(collDay);
+  _execDailyRepsReport(collDay,visDay);
 }
 
 /* ── التنفيذ الفعلي للتقرير بعد تحديد تاريخ التحصيل ── */
-function _execDailyRepsReport(collDay){
+function _execDailyRepsReport(collDay,visDay){
   var _cn=function(s){return String(s||'').replace(/^\uFEFF/,'').trim();};
   var _pN=function(v){var s=String(v||'').replace(/[,،٬]/g,'').replace(/٫/g,'.').replace(/[^\d.\-]/g,'');return parseFloat(s)||0;};
   var fmt=function(n){return n===0?'—':Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2});};
@@ -13674,6 +14201,17 @@ function _execDailyRepsReport(collDay){
   var repNames=new Set();
   Object.keys(dayMap).forEach(function(n){if(n)repNames.add(n);});
   Object.keys(colMap).forEach(function(n){if(n)repNames.add(n);});
+  // إضافة المناديب الذين لديهم زيارات فقط في هذا اليوم (أسماء معيارية من reps_full)
+  if(D._visitsList&&D._visitsList.length&&visDay){
+    var vFrom=D._visitsDateFrom||'0000-00-00';
+    var vTo  =D._visitsDateTo  ||'9999-99-99';
+    if(visDay>=vFrom&&visDay<=vTo){
+      (D.reps_full||[]).forEach(function(r){
+        if(r.name&&!repNames.has(r.name)&&(_matchVisits(r.name,visDay)||0)>0)
+          repNames.add(r.name);
+      });
+    }
+  }
   var allNames=[...repNames].sort();
 
   // ── تجميع حسب المشرف — فقط المشرفون الذين لديهم مناديب بحركة ──
@@ -13682,7 +14220,8 @@ function _execDailyRepsReport(collDay){
     var dm=dayMap[name]||{};var cm=colMap[name]||{};
     var hasSales=(dm.sales||0)>0||(dm.returns||0)>0;
     var hasCol=(cm.total||0)!==0;
-    if(!hasSales&&!hasCol)return; // تجاهل من لا حركة لهم
+    var hasVisits=(_matchVisits&&visDay?(_matchVisits(name,visDay)||0):0)>0;
+    if(!hasSales&&!hasCol&&!hasVisits)return; // تجاهل من لا حركة لهم
     var sup=(D._repSuperMap&&D._repSuperMap[name])||'غير مصنف';
     if(supF && sup!==supF) return;
     if(repF && name!==repF) return;
@@ -13708,7 +14247,10 @@ function _execDailyRepsReport(collDay){
     var gap=ns-col;
     var invCount=dm.invoices instanceof Set?dm.invoices.size:(dm.invoices||0);
     var custCount=dm.customers instanceof Set?dm.customers.size:(dm.customers||0);
-    var visits=_matchVisits?_matchVisits(name):0;
+    var visits=0;
+    if(_matchVisits && D._visitsList && D._visitsList.length){
+      visits=_matchVisits(name, visDay)||0;
+    }
     var qty=dm.qty||0;
     var retQty=dm.retQty||0;
     var netQty=Math.max(0,qty-retQty);
@@ -13740,7 +14282,7 @@ function _execDailyRepsReport(collDay){
       tBank+=(cm.bank||0);tCash+=(cm.cash||0);
       tInv+=(dm.invoices instanceof Set?dm.invoices.size:(dm.invoices||0));
       tCust+=(dm.customers instanceof Set?dm.customers.size:(dm.customers||0));
-      tV+=(_matchVisits?_matchVisits(n):0);
+      tV+=(_matchVisits&&D._visitsList&&D._visitsList.length?(_matchVisits(n,visDay)||0):0);
       tQty+=(dm.qty||0);tRetQty+=(dm.retQty||0);
       var re=(D.reps_full||[]).find(function(r){return r.name===n;})||{};
       tDebt+=(re.debtTotal||0);
@@ -13782,6 +14324,7 @@ function _execDailyRepsReport(collDay){
   if(repF)filterLabel.push('المندوب: '+repF);
   if(fromF||toF)filterLabel.push('المبيعات: '+(_fmtD(fromF)||'')+(toF&&fromF!==toF?' → '+_fmtD(toF):''));
   filterLabel.push('التحصيل من يوم: '+_fmtD(collDay));
+  if(visDay) filterLabel.push('🗓 الزيارات: '+_fmtD(visDay));
   var filterStr=filterLabel.join('  |  ');
 
   var logoEl=document.querySelector('.sidebar-logo img, #sidebar-open-btn img');
@@ -13877,7 +14420,8 @@ function _execDailyRepsReport(collDay){
     // ملاحظة التحصيل
     +'<div style="background:#fff8e1;border:1px solid #ffd54f;border-right:4px solid #f07820;border-radius:0 4px 4px 0;padding:5px 12px;font-size:9px;color:#7c4a00;margin-bottom:10px;display:flex;gap:16px">'
     +'<span>📊 <b>المبيعات:</b> '+_fmtD(fromF||salesDay)+(toF&&toF!==fromF?' → '+_fmtD(toF):'')+'</span>'
-    +'<span>💰 <b>التحصيل (اليوم السابق):</b> '+_fmtD(collDay)+'</span>'
+    +'<span>💰 <b>التحصيل:</b> '+_fmtD(collDay)+'</span>'
+    +(visDay?'<span>🗓 <b>الزيارات:</b> '+_fmtD(visDay)+'</span>':'')
     +'</div>'
 
     // أزرار الطباعة
