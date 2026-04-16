@@ -10983,7 +10983,7 @@ function _reprocessSales(rows){
 const _DEDUCT_KEYWORDS=['ملغي','ملغية','مكرر','مكررة','متكرر','متكررة','بالخطأ','بالغلط','خاطئ','خاطئة','داخلة بالخطأ','نازلة بالخطأ','الغاء الحركة','الغاء','إلغاء','لا يخص الشركة','تخص سعيد','تخص العباني','تخص فراس','نازلة للقاضي','مش في حسابنا','ليست في حسابنا','مش في حسابها','غلط مش','حوالة غلط','غلط مش في'];
 // ─── كلمات الإضافة: حركات تُضاف للتحصيل ────────────────────────────────────
 // المنطق: المصرف مدين (تحصيل حقيقي) وعملاء متعددون دائنون → توزيع صك/حوالة صحيح
-const _ADD_KEYWORDS=['تم تقسيم','مقسوم','مقسومة','توزيع','صك','شيك','حوالة','حولة'];
+const _ADD_KEYWORDS=['تم تقسيم','مقسوم','مقسومة','توزيع','صك','شيك','حوالة','حولة','مرجعي','رقم العملية','رمز المعملة','ايداع','إيداع'];
 
 function _classifyCollectionRow(r,_n,_c){
   // تصنيف الصف: 'deduct' | 'add_cust' | 'add_bank' | 'normal' | 'skip'
@@ -11011,9 +11011,10 @@ function _classifyCollectionRow(r,_n,_c){
   // ── شرط الإضافة — مقيّد بسند قيد ────────────────────────────────────────
   // تحقق: إذا كان البيان يحتوي كلمة خصم أيضاً → لا تُعالَج كإضافة
   const hasDeductKwGlobal=_DEDUCT_KEYWORDS.some(k=>bayanLower.includes(k));
+  // صف المصرف في سند القيد: إذا كان بيانه يحتوي كلمة إضافة → تجاهل (الزبائن يُحسبون)
   if(isQaid && debit>0 && isBankAcc && !hasDeductKwGlobal){
     const hasAddKw=_ADD_KEYWORDS.some(k=>bayanLower.includes(k));
-    if(hasAddKw) return 'add_bank';
+    if(hasAddKw) return 'skip'; // تجنب الحساب المزدوج — الزبائن الدائنون يُحسبون
   }
   if(isQaid && credit>0 && !isBankAcc && !hasDeductKwGlobal){
     const hasAddKw=_ADD_KEYWORDS.some(k=>bayanLower.includes(k));
