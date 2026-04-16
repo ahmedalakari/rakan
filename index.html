@@ -368,10 +368,13 @@ body.nav-collapsed #main{
 }
 
 .kpi-card{
-  background:var(--surface2);border-radius:14px;
+  background:var(--surface);border-radius:14px;
   padding:16px 18px;
   display:flex;align-items:center;gap:14px;
   transition:transform .18s,box-shadow .18s;cursor:default;
+  border:1px solid var(--border);
+  border-left:4px solid var(--kpi-color,var(--accent));
+  box-shadow:var(--shadow-card);
 }
 .kpi-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08)}
 .kpi-icon{
@@ -1626,6 +1629,32 @@ body.dark .aging-bucket {
 body.dark #sidebar { background: var(--surface) !important; }
 body.dark #topbar { background: rgba(26,33,80,.95) !important; }
 
+
+/* ===== AI Report Buttons ===== */
+.ai-mode-btn{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:6px !important;
+  padding:8px 16px !important;
+  border-radius:var(--r-md) !important;
+  border:none !important;
+  background:var(--surface2) !important;
+  color:var(--text2) !important;
+  font-family:Cairo,sans-serif !important;
+  font-size:12.5px !important;
+  font-weight:700 !important;
+  cursor:pointer !important;
+  transition:all .17s ease !important;
+  white-space:nowrap !important;
+  box-shadow:0 1px 3px rgba(0,0,0,.07) !important;
+}
+.ai-mode-btn:hover{
+  opacity:.88 !important;
+  transform:translateY(-1px) !important;
+  box-shadow:0 4px 14px rgba(0,0,0,.12) !important;
+}
+.ai-btn-icon{ font-size:1rem; line-height:1; }
+.ai-btn-label{ font-size:12.5px; font-weight:700; }
 </style></head>
 <body>
 
@@ -2769,24 +2798,35 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
   <!-- أزرار التقارير -->
   <div class="card" style="margin-bottom:var(--gap)">
     <div class="card-header"><span class="card-title">🎯 اختر نوع التقرير</span></div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">
-      <button class="ai-mode-btn active" onclick="renderSmartAnalysis('executive',this)"><span style="font-size:1.3rem">📊</span><span>تقرير تنفيذي</span></button>
-      <button class="ai-mode-btn" onclick="renderSmartAnalysis('sales',this)"><span style="font-size:1.3rem">👥</span><span>تحليل المبيعات</span></button>
-      <button class="ai-mode-btn" onclick="renderSmartAnalysis('collection',this)"><span style="font-size:1.3rem">💰</span><span>تحليل التحصيل</span></button>
-      <button class="ai-mode-btn" onclick="renderSmartAnalysis('reps',this)"><span style="font-size:1.3rem">🏆</span><span>تقييم المناديب</span></button>
-      <button class="ai-mode-btn" onclick="renderSmartAnalysis('products',this)"><span style="font-size:1.3rem">📦</span><span>تحليل الأصناف</span></button>
-      <button class="ai-mode-btn" onclick="renderSmartAnalysis('expenses',this)"><span style="font-size:1.3rem">💸</span><span>تحليل المصروفات</span></button>
-      <button class="ai-mode-btn" onclick="renderSmartAnalysis('alerts',this)"><span style="font-size:1.3rem">🚨</span><span>التنبيهات</span></button>
-      <button class="ai-mode-btn" onclick="renderSmartAnalysis('plan',this)"><span style="font-size:1.3rem">🗺️</span><span>خطة عمل</span></button>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;padding:6px 2px">
+      <button class="ai-mode-btn active" data-clr="#2c5de5" data-shd="rgba(44,93,229,.3)" onclick="renderSmartAnalysis('executive',this)" style="background:#2c5de5;color:#fff;box-shadow:0 4px 16px rgba(44,93,229,.3)"><span class="ai-btn-icon">📊</span><span class="ai-btn-label">تقرير تنفيذي</span></button>
+      <button class="ai-mode-btn" data-clr="#2c5de5" data-shd="rgba(44,93,229,.3)" onclick="renderSmartAnalysis('sales',this)" style="background:var(--surface2)"><span class="ai-btn-icon">👥</span><span class="ai-btn-label">تحليل المبيعات</span></button>
+      <button class="ai-mode-btn" data-clr="#f07820" data-shd="rgba(240,120,32,.3)" onclick="renderSmartAnalysis('collection',this)" style="background:var(--surface2)"><span class="ai-btn-icon">💰</span><span class="ai-btn-label">تحليل التحصيل</span></button>
+      <button class="ai-mode-btn" data-clr="#7c3aed" data-shd="rgba(124,58,237,.3)" onclick="renderSmartAnalysis('reps',this)" style="background:var(--surface2)"><span class="ai-btn-icon">🏆</span><span class="ai-btn-label">تقييم المناديب</span></button>
+      <button class="ai-mode-btn" data-clr="#2c5de5" data-shd="rgba(44,93,229,.3)" onclick="renderSmartAnalysis('products',this)" style="background:var(--surface2)"><span class="ai-btn-icon">📦</span><span class="ai-btn-label">تحليل الأصناف</span></button>
+      <button class="ai-mode-btn" data-clr="#f07820" data-shd="rgba(240,120,32,.3)" onclick="renderSmartAnalysis('expenses',this)" style="background:var(--surface2)"><span class="ai-btn-icon">💸</span><span class="ai-btn-label">تحليل المصروفات</span></button>
+      <button class="ai-mode-btn" data-clr="#f05252" data-shd="rgba(240,82,82,.3)" onclick="renderSmartAnalysis('alerts',this)" style="background:var(--surface2)"><span class="ai-btn-icon">🚨</span><span class="ai-btn-label">التنبيهات</span></button>
+      <button class="ai-mode-btn" data-clr="#7c3aed" data-shd="rgba(124,58,237,.3)" onclick="renderSmartAnalysis('plan',this)" style="background:var(--surface2)"><span class="ai-btn-icon">🗺️</span><span class="ai-btn-label">خطة عمل</span></button>
     </div>
   </div>
 
   <!-- KPIs الذكية -->
-  <div id="smart-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:var(--gap)"></div>
+  <div id="smart-kpis" class="kpi-grid" style="margin-bottom:var(--gap)"></div>
 
   <!-- منطقة التقرير -->
   <div id="smart-report-area" class="card">
-    <div id="smart-report-content" style="direction:rtl;line-height:1.9;font-size:13px;color:var(--text)">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px 0;flex-wrap:wrap;gap:8px" id="smart-report-toolbar">
+      <div id="smart-report-title-bar" style="font-size:13px;font-weight:800;color:var(--text)">📊 التقرير</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="_printAIReport()" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r-md);border:none;background:var(--accent);color:#fff;font-family:Cairo,sans-serif;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(44,93,229,.3);transition:all .17s">
+          🖨️ طباعة التقرير
+        </button>
+        <button onclick="_printAIReportA4()" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r-md);border:1.5px solid var(--border2);background:var(--surface2);color:var(--text2);font-family:Cairo,sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .17s">
+          📄 تصدير PDF
+        </button>
+      </div>
+    </div>
+    <div id="smart-report-content" style="direction:rtl;line-height:1.9;font-size:13px;color:var(--text);padding:16px">
       <div style="text-align:center;padding:40px 20px;color:var(--muted)">
         <div style="font-size:3rem;margin-bottom:12px">📊</div>
         <div style="font-size:14px;font-weight:700;margin-bottom:6px">ارفع البيانات لبدء التحليل</div>
@@ -2842,17 +2882,8 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
 
     <!-- Visits date input -->
     <div style="margin-bottom:20px">
-      <label style="display:block;font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">
-        🗓 تاريخ الزيارات
-        <span style="font-size:10px;font-weight:400;color:var(--muted);margin-right:6px">(افتراضي: يوم المبيعات)</span>
-      </label>
-      <div style="position:relative">
-        <input type="date" id="drm-visits-date"
-          style="width:100%;padding:10px 14px;border-radius:10px;border:2px solid var(--border2);background:var(--surface);color:var(--text);font-family:Cairo,sans-serif;font-size:14px;font-weight:700;outline:none;transition:border-color .2s"
-          onfocus="this.style.borderColor='var(--purple)'"
-          onblur="this.style.borderColor='var(--border2)'">
-      </div>
-      <div id="drm-visits-hint" style="margin-top:6px;font-size:10px;color:var(--muted);display:none"></div>
+      <input type="date" id="drm-visits-date" style="display:none">
+      <div id="drm-visits-hint" style="display:none"></div>
     </div>
 
     <!-- Buttons -->
@@ -2956,10 +2987,7 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
             <div class="scard-name">الزيارات</div>
             <div class="scard-status" id="ss-visits">⬜ لم يُرفع</div>
             <div id="visits-date-wrap" style="display:none;margin-top:6px">
-              <input type="date" id="visits-file-date"
-                style="width:100%;padding:3px 6px;border-radius:6px;border:1px solid var(--border2);background:var(--surface);color:var(--text);font-family:Cairo,sans-serif;font-size:10px;outline:none"
-                title="تاريخ ملف الزيارات"
-                onchange="D._visitsDateFrom=this.value;D._visitsDateTo=this.value;if(PAGE_RENDERS[currentPage])PAGE_RENDERS[currentPage]();">
+              <input type="date" id="visits-file-date" style="display:none">
             </div>
           </div>
         </div>
@@ -3368,6 +3396,11 @@ function showPage(p){
     // إعادة تعيين ترتيب الجداول
     if(prev==='reps'){window._repSort=null;}
     if(prev==='customers'){window._custSort=null;}
+    if(prev==='sales'){window._salesSort=null;}
+    if(prev==='debt'){window._debtSort=null;}
+    if(prev==='aging'){window._agingSort=null;}
+    if(prev==='collection'){window._collSort=null;}
+    if(prev==='inventory'){window._invSort=null;}
     // إعادة class جدول الزبائن والمنتجات للوضع الافتراضي
     if(prev==='customers'){const t=document.getElementById('cust-table-wrap');if(t)t.className='table-wrap table-compact';}
     if(prev==='products'){const t=document.getElementById('prod-table-wrap');if(t)t.className='table-wrap table-compact';}
@@ -3796,17 +3829,18 @@ function _renderMonthlyTable(repF,monthF,typeF,supF_s,catF_s=''){
   ];
   const thead=document.getElementById('monthly-thead');
   if(thead)thead.innerHTML='<tr><th>المؤشر</th>'+months.map(m=>'<th style="text-align:center">'+m+'</th>').join('')+'<th style="text-align:center;color:var(--gold)">الإجمالي</th></tr>';
+  const _tc='text-align:center;';
   tbody.innerHTML=rows2.map(row=>
     '<tr><td style="font-weight:700">'+row.lbl+'</td>'+
-    row.vals.map(v=>'<td class="td-num '+row.cls+'">'+fmt(v)+'</td>').join('')+
-    '<td class="td-num td-gold" style="font-weight:900">'+fmt(row.tot)+'</td></tr>'
+    row.vals.map(v=>'<td class="td-num '+row.cls+'" style="'+_tc+'">'+fmt(v)+'</td>').join('')+
+    '<td class="td-num td-gold" style="font-weight:900;'+_tc+'">'+fmt(row.tot)+'</td></tr>'
   ).join('')+
-  '<tr><td style="font-weight:700;color:var(--gold)">📊 ROI التحصيل%</td>'+
-  ms.net.map((_,i)=>{const r=ms.net[i]>0?ms.col[i]/ms.net[i]*100:0;return '<td class="td-num '+tagCls(r)+'">'+r.toFixed(1)+'%</td>'}).join('')+
-  '<td class="td-num '+tagCls(totalRoi)+'" style="font-weight:900">'+totalRoi.toFixed(1)+'%</td></tr>'+
+  '<tr><td style="font-weight:700;color:var(--gold)">📊 نسبة التحصيل%</td>'+
+  ms.net.map((_,i)=>{const r=ms.net[i]>0?ms.col[i]/ms.net[i]*100:0;return '<td class="td-num '+tagCls(r)+'" style="'+_tc+'">'+r.toFixed(1)+'%</td>'}).join('')+
+  '<td class="td-num '+tagCls(totalRoi)+'" style="font-weight:900;'+_tc+'">'+totalRoi.toFixed(1)+'%</td></tr>'+
   '<tr><td style="font-weight:700;color:var(--muted)">نسبة المرتجعات%</td>'+
-  ms.sales.map((_,i)=>{const r=ms.sales[i]>0?ms.returns[i]/ms.sales[i]*100:0;const c=r>=15?'td-red':r>=8?'td-gold':'td-green';return '<td class="td-num '+c+'">'+r.toFixed(1)+'%</td>'}).join('')+
-  '<td class="td-num '+tagCls(100-totalRetPct)+'" style="font-weight:900">'+totalRetPct.toFixed(1)+'%</td></tr>';
+  ms.sales.map((_,i)=>{const r=ms.sales[i]>0?ms.returns[i]/ms.sales[i]*100:0;const c=r>=15?'td-red':r>=8?'td-gold':'td-green';return '<td class="td-num '+c+'" style="'+_tc+'">'+r.toFixed(1)+'%</td>'}).join('')+
+  '<td class="td-num '+tagCls(100-totalRetPct)+'" style="font-weight:900;'+_tc+'">'+totalRetPct.toFixed(1)+'%</td></tr>';
 }
 
 function _buildMonthlyStats(repF,monthF,typeF,supF_s,catF_s=''){D.monthly_stats=null;
@@ -3906,6 +3940,28 @@ function buildSalesTable(){
   pagState('sales',rows,true);
   _renderSalesTable();
 }
+/* ── دالة مساعدة عامة لرأس عمود قابل للترتيب ──
+   tableKey: مفتاح PAG_STATE
+   colKey: مفتاح الترتيب
+   label: نص العمود
+   renderFn: دالة إعادة الرسم
+   varName: اسم متغير الترتيب (window._XSort)
+   style: style إضافي اختياري
+*/
+function _mkSH(tableKey, colKey, label, renderFn, varName, style=''){
+  const cur = window[varName] || {key:null, dir:'desc'};
+  const isActive = cur.key === colKey;
+  const nextDir = isActive && cur.dir==='desc' ? 'asc' : 'desc';
+  const arrow = isActive ? (cur.dir==='desc' ? ' ▼' : ' ▲') : ' ⇅';
+  const arrowStyle = isActive ? 'color:var(--accent)' : 'color:var(--muted);opacity:.5';
+  const cursor = 'cursor:pointer;user-select:none;';
+  const hoverColor = isActive ? 'color:var(--accent)' : '';
+  const styleAttr = style ? `style="${cursor}${hoverColor}${style}"` : `style="${cursor}${hoverColor}"`;
+  return `<th ${styleAttr} onclick="window.${varName}={key:'${colKey}',dir:'${nextDir}'};${renderFn}()" title="ترتيب حسب ${label}">
+    ${label}<span style="font-size:9px;${arrowStyle}">${arrow}</span>
+  </th>`;
+}
+
 function _renderSalesTable(){
   const rows=pageSlice('sales');
   const wrap=document.getElementById('sales-table-wrap');
@@ -3925,13 +3981,32 @@ function _renderSalesTable(){
   const kCust=_fc('اسم الزبون','الزبون','العميل');
   const kRep=_fc('المندوب','اسم المندوب');
   const kDate=_fc('التاريخ','تاريخ');
+  // ترتيب المبيعات
+  const _ssk=window._salesSort?.key||null, _ssd=window._salesSort?.dir||'desc';
+  if(_ssk){
+    rows.sort((a,b)=>{
+      const _n=v=>_parseNum(v);
+      let va,vb;
+      if(_ssk==='date'){va=String(a[kDate]||'');vb=String(b[kDate]||'');return _ssd==='asc'?va.localeCompare(vb):vb.localeCompare(va);}
+      if(_ssk==='inv'){va=String(a[kInv]||'');vb=String(b[kInv]||'');return _ssd==='asc'?va.localeCompare(vb):vb.localeCompare(va);}
+      if(_ssk==='cust'){va=String(a[kCust]||'');vb=String(b[kCust]||'');return _ssd==='asc'?va.localeCompare(vb,'ar'):vb.localeCompare(va,'ar');}
+      if(_ssk==='rep'){va=String(a[kRep]||'');vb=String(b[kRep]||'');return _ssd==='asc'?va.localeCompare(vb,'ar'):vb.localeCompare(va,'ar');}
+      if(_ssk==='mat'){va=String(a[kMat]||'');vb=String(b[kMat]||'');return _ssd==='asc'?va.localeCompare(vb,'ar'):vb.localeCompare(va,'ar');}
+      if(_ssk==='qtyO'){va=_n(a[kQtyO]);vb=_n(b[kQtyO]);}
+      else if(_ssk==='price'){va=_n(a[kPrice]);vb=_n(b[kPrice]);}
+      else if(_ssk==='total'){va=_n(a[kTotal]);vb=_n(b[kTotal]);}
+      else{va=0;vb=0;}
+      return _ssd==='asc'?va-vb:vb-va;
+    });
+  }
+  const _ssh=(k,lbl,sty='')=>_mkSH('sales',k,lbl,'_renderSalesTable','_salesSort',sty);
   wrap.innerHTML=`<table>
     <thead><tr>
-      <th>#</th><th>التاريخ</th><th>رقم الفاتورة</th><th>النوع</th>
-      <th>اسم الزبون</th><th>المندوب</th>
-      <th style="min-width:200px">المادة</th>
-      <th>الكمية الداخلة</th><th>الكمية الخارجة</th>
-      <th>السعر الإفرادي</th><th>الحسم</th><th>الإجمالي الصافي</th>
+      <th>#</th>${_ssh('date','التاريخ')}${_ssh('inv','رقم الفاتورة')}<th>النوع</th>
+      ${_ssh('cust','اسم الزبون')}${_ssh('rep','المندوب')}
+      ${_ssh('mat','المادة','min-width:200px')}
+      <th>الكمية الداخلة</th>${_ssh('qtyO','الكمية الخارجة')}
+      ${_ssh('price','السعر الإفرادي')}<th>الحسم</th>${_ssh('total','الإجمالي الصافي')}
     </tr></thead>
     <tbody>${rows.map((r,i)=>{
       const type=String(r[kType]||'');
@@ -4032,6 +4107,11 @@ const _VISIT_ALIAS_MAP={
   'محمود العزري':'محمود العزري',
   'هيثم الصغير':'هيتم الصغير',
   'احمد عون نوري':'احمد نوري',
+  'ammar_sale'       :'__ignore__',
+  'عبدالمعين مقاتل' :'__ignore__',
+  'رضا ابوكثير'      :'رضا ابو كتير',
+  'رضا ابو كثير'     :'رضا ابو كتير',
+  'عبد الرؤوف بريم'  :'عبدالرؤوف بريم',
 };
 
 function _cleanRepName(s){
@@ -4049,7 +4129,7 @@ function _cleanRepName(s){
   }
   // حذف الألقاب والمناطق والكلمات الزائدة
   let clean=rawLow
-    .replace(/\bمنذوب\b|\bمندوب\b|\bمنطقه?\b|\bجفاره?\b|\bتاجوراء\b|\bتاجورا\b|قصر\s*بن\s*غشير|\bعين\s*زاره?\b|\bجنزور\b|\bجمله?\b|\bشرق\b|\bغرب\b|\bوسط\b|\bالبلاد\b|\bالبالد\b|\bالزاويه?\b|\bالكريميه?\b|\bطرابلس\b|\bابو\s*سليم\b|\bالدريبي\b|حي\s*الاندلس|اسواق\s*كبري?|\bمباشر\b|\bمقاهي\b|\bومقاهي\b|\bمطاعم\b|\bومطاعم\b|\bسوق\b|\bالجمعه?\b|\bالغربيه?\b/g,' ')
+    .replace(/\bمنذوب\b|\bمندوب\b|\bمنطقه?\b|\bالجفاره?\b|\bجفاره?\b|\bتاجوراء\b|\bتاجورا\b|قصر\s*بن\s*غشير|\bعين\s*زاره?\b|\bجنزور\b|\bجمله?\b|\bشرق\b|\bغرب\b|\bوسط\b|\bالبلاد\b|\bالبالد\b|\bالزاويه?\b|\bالكريميه?\b|\bكريميه?\b|\bطرابلس\b|\bابو\s*سليم\b|\bالدريبي\b|حي\s*الاندلس|اسواق\s*كبري?|\bمباشر\b|\bمقاهي\b|\bومقاهي\b|\bمطاعم\b|\bومطاعم\b|\bسوق\b|\bالجمعه?\b|\bالغربيه?\b|\bبطاطا\b|\bماريو\b|\bمساعد\b|\bب\b|\bا\b/g,' ')
     .replace(/\s+/g,' ').trim();
   return clean;
 }
@@ -4088,17 +4168,23 @@ function _buildVisitsMap(){
     const rawName=String(r[kName]||'').trim();
     const visits=parseInt(String(r[kVisit]||'0').replace(/[^\d]/g,''))||0;
     if(!rawName||rawName===kName) return;
+    const _cn=_cleanRepName(rawName);
+    if(_cn==='__ignore__') return;
     list.push({raw:rawName,visits});
   });
   D._visitsList=list;
   D._visitsMap={};
   // إذا لم يُستخرج التاريخ بعد (رُفع الملف بنسخة قديمة) حاول من D._visitsRawHTML
   if(!D._visitsDateFrom && D._visitsRawHTML){
-    const m=D._visitsRawHTML.match(/(\d{2}-\d{2}-\d{4})/g);
-    if(m&&m.length){
+    const m2=D._visitsRawHTML.match(/(\d{4}-\d{2}-\d{2})/g);
+    const m1=D._visitsRawHTML.match(/(\d{2}-\d{2}-\d{4})/g);
+    if(m2&&m2.length){
+      D._visitsDateFrom=m2[0];
+      D._visitsDateTo=m2[m2.length-1];
+    } else if(m1&&m1.length){
       const toISO=d=>{const[dd,mm,yyyy]=d.split('-');return `${yyyy}-${mm}-${dd}`;};
-      D._visitsDateFrom=toISO(m[0]);
-      D._visitsDateTo=toISO(m[m.length-1]);
+      D._visitsDateFrom=toISO(m1[0]);
+      D._visitsDateTo=toISO(m1[m1.length-1]);
     }
   }
 }
@@ -5451,6 +5537,7 @@ function _renderCustTable(){
       <th class="col-coll" onclick="window._custSort={key:'cp',dir:'desc'};renderCustomersPage()" style="cursor:pointer">% التحصيل</th>
       <th class="col-ret" onclick="window._custSort={key:'rp',dir:'desc'};renderCustomersPage()" style="cursor:pointer">% المرتجعات</th>
       <th class="col-coll" onclick="window._custSort={key:'g',dir:'desc'};renderCustomersPage()" style="cursor:pointer">الفجوة</th>
+      <th class="col-debt" style="color:var(--red)" onclick="window._custSort={key:'dn',dir:'desc'};renderCustomersPage()">💳 صافي المديونية</th>
       <th class="col-debt" style="color:var(--accent2)" onclick="window._custSort={key:'age30',dir:'desc'};renderCustomersPage()" style="cursor:pointer">ذمة ≤30 يوم</th>
       <th class="col-debt" style="color:var(--accent3)" onclick="window._custSort={key:'age60',dir:'desc'};renderCustomersPage()" style="cursor:pointer">ذمة ≤60 يوم</th>
       <th class="col-debt" style="color:var(--red)" onclick="window._custSort={key:'ageOld',dir:'desc'};renderCustomersPage()" style="cursor:pointer">ذمة > 60 يوم</th>
@@ -5470,6 +5557,7 @@ function _renderCustTable(){
       <td class="col-coll" style="text-align:center">${tagCP(c.cp)}</td>
       <td class="col-ret" style="text-align:center;color:${c.rp>=15?'var(--red)':c.rp>=8?'var(--accent3)':'var(--accent2)'}">${c.rp.toFixed(1)}%</td>
       <td class="td-num col-coll ${c.g>0?'td-red':'td-green'}">${fmt(c.g)}</td>
+      <td class="td-num col-debt" style="color:${(c.dn||0)>0?'var(--red)':'var(--muted)'};font-weight:700">${(c.dn||0)>0?fmt(c.dn):'—'}</td>
       <td class="td-num col-debt" style="color:var(--accent2)">${c.age30>0?fmt(c.age30):'—'}</td>
       <td class="td-num col-debt" style="color:var(--accent3)">${c.age60>0?fmt(c.age60):'—'}</td>
       <td class="td-num td-red col-debt">${c.ageOld>0?fmt(c.ageOld):'—'}</td>
@@ -5487,6 +5575,7 @@ function _renderCustTable(){
       <td class="td-num" style="padding:8px 13px;color:var(--accent2)">${tNet>0?(tCol/tNet*100).toFixed(1)+'%':'—'}</td>
       <td></td>
       <td class="td-num ${tGap>0?'td-red':'td-green'}" style="padding:8px 13px">${fmt(tGap)}</td>
+      <td class="td-num td-red" style="padding:8px 13px;font-weight:700">${fmt(allCust.reduce((s,c)=>s+(c.dn||0),0))||'—'}</td>
       <td class="td-num" style="padding:8px 13px;color:var(--accent2)">${tAge30>0?fmt(tAge30):'—'}</td>
       <td class="td-num" style="padding:8px 13px;color:var(--accent3)">${tAge60>0?fmt(tAge60):'—'}</td>
       <td class="td-num td-red" style="padding:8px 13px">${tAgeOld>0?fmt(tAgeOld):'—'}</td>
@@ -5594,7 +5683,7 @@ function renderProductsPage(){
   const totalNetQtyProd=items.reduce((s,p)=>s+(p.nqty||0),0);
   document.getElementById('kpi-products').innerHTML=
     kpiCard('📦','عدد الأصناف',items.length,'var(--accent)',isFiltered?'(مفلتر)':'صنف مباع')+
-    kpiCard('💵','إجمالي صافي المبيعات',totalNet,'var(--accent2)','')+
+    kpiCard('💵','صافي المبيعات',totalNet,'var(--accent2)','')+
     kpiCard('🔢','صافي مبيعات الكميات',totalNetQtyProd.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0}),'var(--accent)','وحدة (مبيع − مرتجع)')+
     kpiCard('↩','إجمالي المرتجعات',totalRet,'var(--red)',retPct.toFixed(1)+'%')+
     kpiCard('🏆','أفضل صنف',items[0]?.ns||0,'var(--gold)',items[0]?.name.substring(0,20)||'—')+
@@ -5642,6 +5731,38 @@ function _renderProdTable(){
   const tPRet=allProd.reduce((s,p)=>s+p.retVal,0);
   const tPQty=allProd.reduce((s,p)=>s+p.qty,0);
   const tPRQty=allProd.reduce((s,p)=>s+p.retQty,0);
+  // ── حساب عدد أيام نطاق البيانات ──
+  const _prodDays=(()=>{
+    const tbl=D.sales_table||[];
+    if(!tbl.length) return 1;
+    const hdrs2=Object.keys(tbl[0]||{});
+    const kD=hdrs2.find(h=>h.includes('تاريخ'))||'التاريخ';
+    const fromV=document.getElementById('f-prod-from')?.value||'';
+    const toV  =document.getElementById('f-prod-to')?.value||'';
+    const monthV=document.getElementById('f-prod-month')?.value||'';
+    // فلتر من/إلى صريح
+    if(fromV&&toV){
+      return Math.max(1,Math.round((new Date(toV)-new Date(fromV))/(864e5))+1);
+    }
+    // فلتر شهر — نحسب أيام الشهر الفعلية من البيانات
+    if(monthV){
+      // ابحث عن السنة من أول صف يطابق الشهر
+      let yr=null;
+      for(const r of tbl){
+        const d=new Date(String(r[kD]||'').substring(0,10));
+        if(!isNaN(d)&&(d.getMonth()+1)===+monthV){yr=d.getFullYear();break;}
+      }
+      if(yr){
+        // عدد أيام الشهر الفعلي
+        return new Date(yr,+monthV,0).getDate();
+      }
+    }
+    // لا فلتر — أول وآخر تاريخ في البيانات المفلترة فعلياً (حسب الأصناف المعروضة)
+    let mn=null,mx=null;
+    tbl.forEach(r=>{const d=new Date(String(r[kD]||'').substring(0,10));if(!isNaN(d)){if(!mn||d<mn)mn=d;if(!mx||d>mx)mx=d;}});
+    if(!mn||!mx) return 1;
+    return Math.max(1,Math.round((mx-mn)/864e5)+1);
+  })();
   wrap.innerHTML=`<table>
     <thead><tr>
       <th>#</th><th>الصنف</th>
@@ -5654,6 +5775,8 @@ function _renderProdTable(){
       <th class="pcol-ret-val">نسبة المرتجع</th>
       <th class="pcol-avg">متوسط السعر</th>
       <th class="pcol-pct">% من الإجمالي</th>
+      <th class="pcol-davg" style="color:var(--purple)">📅 متوسط المبيعات يومي</th>
+      <th class="pcol-dqty" style="color:var(--purple)">📦 متوسط كمية يومي</th>
     </tr></thead>
     <tbody>${rows.map((p,i)=>`<tr>
       <td class="td-num td-gold">${(PAG_STATE['prod'].page-1)*PAGE_SIZE+i+1}</td>
@@ -5667,6 +5790,8 @@ function _renderProdTable(){
       <td class="pcol-ret-val" style="text-align:center">${tagRet(p.retPct)}</td>
       <td class="td-num pcol-avg">${fmt(p.avgP)}</td>
       <td class="td-num pcol-pct">${(p.sales/tPSales*100).toFixed(2)}%</td>
+      <td class="td-num" style="color:var(--purple);font-weight:700">${fmt(p.ns/_prodDays)}</td>
+      <td class="td-num" style="color:var(--purple);font-weight:700">${(p.nqty/_prodDays).toFixed(1)}</td>
     </tr>`).join('')}</tbody>
     <tfoot><tr style="background:var(--surface2);font-weight:700;font-size:11px;position:sticky;bottom:0">
       <td colspan="2" style="padding:8px 13px;color:var(--text2)">📊 المجموع (${allProd.length} صنف)</td>
@@ -5677,7 +5802,10 @@ function _renderProdTable(){
       <td class="td-num td-red" style="padding:8px 13px">${fmt(tPRQty)}</td>
       <td class="td-num td-green" style="padding:8px 13px">${fmt(tPQty-tPRQty)}</td>
       <td style="padding:8px 13px;color:var(--accent3)">${tPSales>0?(tPRet/tPSales*100).toFixed(1)+'%':'—'}</td>
-      <td></td><td></td>
+      <td style="padding:8px 13px">—</td>
+      <td style="padding:8px 13px">—</td>
+      <td class="td-num" style="padding:8px 13px;color:var(--purple);font-weight:700">${fmt(tPNet/_prodDays)}</td>
+      <td class="td-num" style="padding:8px 13px;color:var(--purple);font-weight:700">${((tPQty-tPRQty)/_prodDays).toFixed(1)}</td>
     </tr></tfoot>
   </table>`;
   renderPag('prod',_renderProdTable);
@@ -5864,10 +5992,26 @@ function _renderDebtTable(){
   const wrap=document.getElementById('debt-table-wrap');
   const _n=v=>_parseNum(v);
   if(!rows.length){wrap.innerHTML='<div style="padding:24px;text-align:center;color:var(--muted)">لا توجد بيانات</div>';_updateStatBar('debt-stat-bar',[]);renderPag('debt',_renderDebtTable);return}
+  // ترتيب المديونية
+  const _dsk=window._debtSort?.key||null, _dsd=window._debtSort?.dir||'desc';
+  const _nD=v=>_parseNum(v);
+  if(_dsk){
+    rows.sort((a,b)=>{
+      let va,vb;
+      if(_dsk==='name'){va=String(a['اسم الحساب']||'');vb=String(b['اسم الحساب']||'');return _dsd==='asc'?va.localeCompare(vb,'ar'):vb.localeCompare(va,'ar');}
+      if(_dsk==='rep'){va=String(a['المندوب']||'');vb=String(b['المندوب']||'');return _dsd==='asc'?va.localeCompare(vb,'ar'):vb.localeCompare(va,'ar');}
+      if(_dsk==='deb'){va=_nD(a['رصيد حالي مدين']||a['مدين']||0);vb=_nD(b['رصيد حالي مدين']||b['مدين']||0);}
+      else if(_dsk==='cred'){va=_nD(a['رصيد حالي دائن']||a['دائن']||0);vb=_nD(b['رصيد حالي دائن']||b['دائن']||0);}
+      else if(_dsk==='net'){va=_nD(a['الرصيد']||0)||(_nD(a['رصيد حالي مدين']||a['مدين']||0)-_nD(a['رصيد حالي دائن']||a['دائن']||0));vb=_nD(b['الرصيد']||0)||(_nD(b['رصيد حالي مدين']||b['مدين']||0)-_nD(b['رصيد حالي دائن']||b['دائن']||0));}
+      else{va=0;vb=0;}
+      return _dsd==='asc'?va-vb:vb-va;
+    });
+  }
+  const _dsh=(k,lbl,sty='')=>_mkSH('debt',k,lbl,'_renderDebtTable','_debtSort',sty);
   wrap.innerHTML=`<table>
     <thead><tr>
-      <th>#</th><th>رمز الحساب</th><th>اسم العميل</th><th>المندوب</th>
-      <th>مجموع مدين</th><th>مجموع دائن</th><th>صافي المديونية</th><th>الحالة</th>
+      <th>#</th><th>رمز الحساب</th>${_dsh('name','اسم العميل')}${_dsh('rep','المندوب')}
+      ${_dsh('deb','مجموع مدين')}${_dsh('cred','مجموع دائن')}${_dsh('net','صافي المديونية')}<th>الحالة</th>
     </tr></thead>
     <tbody>${rows.map((r,i)=>{
       const deb=_n(r['رصيد حالي مدين']||r['مدين']||0);
@@ -6094,12 +6238,29 @@ function _renderAgingTable(){
     // أعمدة ثابتة
     const fixedCols=['#','اسم الحساب','المندوب','إجمالي الذمم',...ageCols];
 
+    // ترتيب أعمار الذمم
+    const _agsk=window._agingSort?.key||null, _agsd=window._agingSort?.dir||'desc';
+    const _nAg=v=>_parseNum(v);
+    if(_agsk){
+      rows.sort((a,b)=>{
+        let va,vb;
+        if(_agsk==='name'){va=String(a['اسم الحساب']||a['العميل']||'');vb=String(b['اسم الحساب']||b['العميل']||'');return _agsd==='asc'?va.localeCompare(vb,'ar'):vb.localeCompare(va,'ar');}
+        if(_agsk==='rep'){va=String(a['المندوب']||'');vb=String(b['المندوب']||'');return _agsd==='asc'?va.localeCompare(vb,'ar'):vb.localeCompare(va,'ar');}
+        if(_agsk==='total'){va=ageCols.reduce((s,c)=>s+_nAg(a[c]),0);vb=ageCols.reduce((s,c)=>s+_nAg(b[c]),0);}
+        else if(ageCols.includes(_agsk)){va=_nAg(a[_agsk]);vb=_nAg(b[_agsk]);}
+        else{va=0;vb=0;}
+        return _agsd==='asc'?va-vb:vb-va;
+      });
+    }
+    const _agsh=(k,lbl,sty='')=>_mkSH('aging',k,lbl,'_renderAgingTable','_agingSort',sty);
     wrap.innerHTML=`<table>
       <thead><tr>
         ${fixedCols.map(c=>{
           if(c==='#')return '<th>#</th>';
-          if(ageCols.includes(c))return `<th style="color:${ageColors[c]||'var(--gold)'}">${ageLabels[c]||c}</th>`;
-          if(c==='إجمالي الذمم')return `<th style="color:var(--gold)">إجمالي الذمم</th>`;
+          if(ageCols.includes(c))return _agsh(c, ageLabels[c]||c, `color:${ageColors[c]||'var(--gold)'}`);
+          if(c==='إجمالي الذمم')return _agsh('total','إجمالي الذمم','color:var(--gold)');
+          if(c==='اسم الحساب')return _agsh('name','اسم الحساب');
+          if(c==='المندوب')return _agsh('rep','المندوب');
           return `<th>${c}</th>`;
         }).join('')}
       </tr></thead>
@@ -6527,11 +6688,28 @@ function _renderCollTable(){
     'عادي':'background:rgba(100,100,100,.1);color:var(--muted);border:1px solid rgba(100,100,100,.2)',
     'تجاهل':'background:rgba(200,200,0,.1);color:#ccc;border:1px solid rgba(200,200,0,.2)'
   };
+  // ترتيب التحصيل
+  const _colsk=window._collSort?.key||null, _colsd=window._collSort?.dir||'desc';
+  const _nC=v=>_parseNum(v);
+  if(_colsk){
+    rows.sort((a,b)=>{
+      let va,vb;
+      if(_colsk==='date'){va=String(a['التاريخ']||'').substring(0,10);vb=String(b['التاريخ']||'').substring(0,10);return _colsd==='asc'?va.localeCompare(vb):vb.localeCompare(va);}
+      if(_colsk==='acct'){va=String(a['اسم الحساب']||'');vb=String(b['اسم الحساب']||'');return _colsd==='asc'?va.localeCompare(vb,'ar'):vb.localeCompare(va,'ar');}
+      if(_colsk==='rep'){va=String(a['المندوب']||'');vb=String(b['المندوب']||'');return _colsd==='asc'?va.localeCompare(vb,'ar'):vb.localeCompare(va,'ar');}
+      if(_colsk==='deb'){va=_nC(a['مدين']);vb=_nC(b['مدين']);}
+      else if(_colsk==='cred'){va=_nC(a['دائن']);vb=_nC(b['دائن']);}
+      else if(_colsk==='tag'){va=String(a._colTag||'');vb=String(b._colTag||'');return _colsd==='asc'?va.localeCompare(vb):vb.localeCompare(va);}
+      else{va=0;vb=0;}
+      return _colsd==='asc'?va-vb:vb-va;
+    });
+  }
+  const _colsh=(k,lbl,sty='')=>_mkSH('coll',k,lbl,'_renderCollTable','_collSort',sty);
   wrap.innerHTML=`<table>
     <thead><tr>
-      <th>#</th><th>التاريخ</th><th>النوع / السند</th><th>اسم الحساب</th>
-      <th>مدين</th><th>دائن</th><th>الرصيد التراكمي</th>
-      <th>التصنيف</th><th>المندوب</th><th>البيان</th>
+      <th>#</th>${_colsh('date','التاريخ')}${_colsh('type','النوع / السند')}${_colsh('acct','اسم الحساب')}
+      ${_colsh('deb','مدين')}${_colsh('cred','دائن')}<th>الرصيد التراكمي</th>
+      ${_colsh('tag','التصنيف')}${_colsh('rep','المندوب')}<th>البيان</th>
     </tr></thead>
     <tbody>${rows.map((r,i)=>{
       const cred=_n(r['دائن']);const deb=_n(r['مدين']);
@@ -6705,7 +6883,7 @@ function _expRating(name, pctSales){
 
 /* ── توصيات ذكية ── */
 function _expAdvice(name, pctSales, amount){
-  const fmt = v=>v.toLocaleString('ar-LY',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fmt = v=>v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
   const n = name;
   if(n.includes('تخفيض') && pctSales>1.5)
     return `التخفيضات بلغت ${fmt(amount)} د.ل (${pctSales.toFixed(2)}% من المبيعات) وتتجاوز المعيار (1–2%). يُنصح بـ: (1) تقييد التخفيضات الفردية >1,000 د.ل بموافقة المدير التجاري. (2) فصل الخصومات التجارية عن إلغاءات الديون في الحسابات. (3) ربط كل تخفيض بهدف حجم مبيعات محدد مسبقاً.`;
@@ -6771,7 +6949,7 @@ function renderExpensesPage(){
   }
 
   // ── صافي المبيعات مع تطبيق نفس فلتر التاريخ ──
-  const fmt  = v=>v.toLocaleString('ar-LY',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fmt  = v=>v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
   const fmtP = v=>v.toFixed(2)+'%';
 
   let netSales = 0;
@@ -7164,22 +7342,33 @@ function _renderInvTable(){
   const tExp90 =exp90Col ?allInvRows.reduce((s,r)=>s+_n(r[exp90Col] ),0):0;
   const tExp120=exp120Col?allInvRows.reduce((s,r)=>s+_n(r[exp120Col]),0):0;
 
+  // ترتيب المخزون
+  const _ivsk=window._invSort?.key||null, _ivsd=window._invSort?.dir||'desc';
+  const _nI=v=>_parseNum(v);
+  if(_ivsk){
+    rows.sort((a,b)=>{
+      let va,vb;
+      if(_ivsk==='mat'){va=String(a['المادة']||a['الصنف']||'');vb=String(b['المادة']||b['الصنف']||'');return _ivsd==='asc'?va.localeCompare(vb,'ar'):vb.localeCompare(va,'ar');}
+      if(_ivsk==='wh'){va=String(a['المستودع']||'');vb=String(b['المستودع']||'');return _ivsd==='asc'?va.localeCompare(vb,'ar'):vb.localeCompare(va,'ar');}
+      if(_ivsk==='qty'){va=_nI(a['الكمية']);vb=_nI(b['الكمية']);}
+      else if(_ivsk==='e1'&&exp30Col){va=_nI(a[exp30Col]);vb=_nI(b[exp30Col]);}
+      else if(_ivsk==='e2'&&exp60Col){va=_nI(a[exp60Col]);vb=_nI(b[exp60Col]);}
+      else if(_ivsk==='e3'&&exp90Col){va=_nI(a[exp90Col]);vb=_nI(b[exp90Col]);}
+      else if(_ivsk==='e4'&&exp120Col){va=_nI(a[exp120Col]);vb=_nI(b[exp120Col]);}
+      else{va=0;vb=0;}
+      return _ivsd==='asc'?va-vb:vb-va;
+    });
+  }
+  const _ivsh=(k,lbl,sty='')=>_mkSH('inv',k,lbl,'_renderInvTable','_invSort',sty);
   wrap.innerHTML=`<table>
     <thead><tr>
-      <th>#</th><th>م</th><th>المادة</th><th>الكمية</th>
+      <th>#</th><th>م</th>${_ivsh('mat','المادة')}${_ivsh('qty','الكمية')}
       <th>% من المخزون</th>
-      ${hasExpiry?`
-      <th style="color:var(--accent2);background:color-mix(in srgb,var(--accent2) 8%,transparent)">صلاحية 1</th>
-      <th style="color:var(--accent3);background:color-mix(in srgb,var(--accent3) 8%,transparent)">صلاحية 2</th>
-      <th style="color:var(--red);background:color-mix(in srgb,var(--red) 8%,transparent)">صلاحية 3</th>
-      <th style="color:var(--purple);background:color-mix(in srgb,var(--purple) 8%,transparent)">صلاحية 4</th>
-      `:`
-      <th style="color:var(--accent2);background:color-mix(in srgb,var(--accent2) 8%,transparent)">صلاحية 1</th>
-      <th style="color:var(--accent3);background:color-mix(in srgb,var(--accent3) 8%,transparent)">صلاحية 2</th>
-      <th style="color:var(--red);background:color-mix(in srgb,var(--red) 8%,transparent)">صلاحية 3</th>
-      <th style="color:var(--purple);background:color-mix(in srgb,var(--purple) 8%,transparent)">صلاحية 4</th>
-      `}
-      <th>المستودع</th>
+      <th style="color:var(--accent2);background:color-mix(in srgb,var(--accent2) 8%,transparent)">${_ivsh('e1','صلاحية 1','color:var(--accent2)')}</th>
+      <th style="color:var(--accent3);background:color-mix(in srgb,var(--accent3) 8%,transparent)">${_ivsh('e2','صلاحية 2','color:var(--accent3)')}</th>
+      <th style="color:var(--red);background:color-mix(in srgb,var(--red) 8%,transparent)">${_ivsh('e3','صلاحية 3','color:var(--red)')}</th>
+      <th style="color:var(--purple);background:color-mix(in srgb,var(--purple) 8%,transparent)">${_ivsh('e4','صلاحية 4','color:var(--purple)')}</th>
+      ${_ivsh('wh','المستودع')}
     </tr></thead>
     <tbody>${rows.map((r,i)=>{
       const qty=_n(r['الكمية']);
@@ -7274,11 +7463,16 @@ function parseHTMLTable(buffer){
   const h3=doc.querySelector('h3');
   if(h3){
     const txt=h3.textContent||'';
-    const dates=txt.match(/(\d{2}-\d{2}-\d{4})/g);
-    if(dates&&dates.length>=1){
+    // يدعم صيغتين: DD-MM-YYYY و YYYY-MM-DD
+    const dates2=txt.match(/(\d{4}-\d{2}-\d{2})/g);
+    const dates1=txt.match(/(\d{2}-\d{2}-\d{4})/g);
+    if(dates2&&dates2.length>=1){
+      D._visitsDateFrom=dates2[0];
+      D._visitsDateTo=dates2[dates2.length-1];
+    } else if(dates1&&dates1.length>=1){
       const toISO=d=>{const[dd,mm,yyyy]=d.split('-');return `${yyyy}-${mm}-${dd}`;};
-      D._visitsDateFrom=toISO(dates[0]);
-      D._visitsDateTo=toISO(dates[dates.length-1]);
+      D._visitsDateFrom=toISO(dates1[0]);
+      D._visitsDateTo=toISO(dates1[dates1.length-1]);
     }
   }
   const rows=[];
@@ -7825,7 +8019,8 @@ function _rebuildCustData(){
     else if(gap>20000)cat='متوسط';
     else if(cp>=80)cat='ممتاز';
     else cat='جيد';
-    return {n:name,rep:d.rep||'',inv,s,itm,qty,ret,c:col_val,ns,cp,rp,g:gap,cat,age30,age60,ageOld};
+    const dn=age30+age60+ageOld;
+    return {n:name,rep:d.rep||'',inv,s,itm,qty,ret,c:col_val,ns,cp,rp,g:gap,cat,age30,age60,ageOld,dn};
   };
 
   const custsFromSales=Object.entries(custMap).map(([name,d])=>_buildCustEntry(name,d));
@@ -10182,7 +10377,10 @@ const REP_CATEGORIES = {
   'سند':'مقاهي ومطاعم',
   'علي سليمان':'مقاهي ومطاعم',
   'فؤاد مسعود':'مقاهي ومطاعم',
-  'محمود العزري':'مقاهي ومطاعم'
+  'محمود العزري':'مقاهي ومطاعم',
+  'طلال':'تجزئة',
+  'رضا ابو كتير':'تجزئة',
+  'محمد كانون':'تجزئة'
 };
 
 // الحالة الأصلية الكاملة لكل البيانات الخام
@@ -11254,9 +11452,30 @@ tfoot td,tfoot th{background:#dde3ff;font-weight:800;color:#1e2749;padding:5px 3
   .print-footer{position:fixed;bottom:0;left:0;right:0;padding:0 8mm;height:12mm;background:#fff;border-top:1px solid #e4e6ef;display:flex;align-items:center;justify-content:space-between;font-size:8px;color:#9ba5bf;margin-top:0}
 }
 /* ===== AI Advisor Styles ===== */
-.ai-mode-btn{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--surface2);border:1.5px solid var(--border2);border-radius:12px;padding:15px 10px;color:var(--muted);font-family:Cairo,sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;text-align:center}
-.ai-mode-btn:hover{border-color:var(--accent);color:var(--text)}
-.ai-mode-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,.08)}
+.ai-mode-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 16px;
+  border-radius:var(--r-md);
+  border:none;
+  background:var(--surface2);
+  color:var(--text2);
+  font-family:Cairo,sans-serif;font-size:12.5px;font-weight:700;
+  cursor:pointer;
+  transition:all .17s ease;
+  white-space:nowrap;
+  box-shadow:0 1px 3px rgba(0,0,0,.07);
+}
+.ai-mode-btn:hover{
+  opacity:.88;
+  transform:translateY(-1px);
+  box-shadow:0 4px 14px rgba(0,0,0,.12);
+}
+.ai-mode-btn.active{
+  color:#fff;
+  transform:translateY(-1px);
+}
+.ai-btn-icon{font-size:1rem;line-height:1}
+.ai-btn-label{font-size:12.5px;font-weight:700}
 .ai-spinner{width:46px;height:46px;border:4px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:ai-spin .8s linear infinite;margin:0 auto}
 @keyframes ai-spin{to{transform:rotate(360deg)}}
 #ai-content h3{font-size:14px;font-weight:800;color:var(--gold);margin:18px 0 9px;padding-bottom:5px;border-bottom:1px solid var(--border2)}
@@ -12293,7 +12512,7 @@ function _buildSmartKPIs() {
   if (!D || !D.reps_full || !D.reps_full.length) return;
   const reps = _filterRepsForAi ? _filterRepsForAi(D.reps_full) : D.reps_full;
   if (!reps.length) { document.getElementById('smart-kpis').innerHTML = ''; return; }
-  const fmt = n => Number(n||0).toLocaleString('ar-LY',{maximumFractionDigits:0});
+  const fmt = n => Number(n||0).toLocaleString('en-US',{maximumFractionDigits:0});
   const fmtP = n => Number(n||0).toFixed(1);
 
   const totalNS    = reps.reduce((s,r)=>s+(r.netSales||0),0);
@@ -12319,26 +12538,33 @@ function _buildSmartKPIs() {
 
   const el = document.getElementById('smart-kpis');
   if (!el) return;
-  el.innerHTML = kpis.map(k=>`
-    <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:12px;padding:14px 16px;border-right:4px solid ${k.color}">
-      <div style="font-size:11px;color:var(--muted);margin-bottom:4px">${k.icon} ${k.label}</div>
-      <div style="font-size:18px;font-weight:800;color:${k.color}">${k.value}</div>
-      ${k.sub ? `<div style="font-size:11px;color:var(--muted)">${k.sub}</div>` : ''}
-    </div>`).join('');
+  el.innerHTML = kpis.map(k=>kpiCard(k.icon,k.label,k.value,k.color,k.sub||'')).join('');
 }
 
 function renderSmartAnalysis(mode, btn) {
   // حفظ الوضع الحالي
   _aiActiveMode = mode;
 
-  // تحديث الأزرار
-  document.querySelectorAll('.ai-mode-btn').forEach(b=>b.classList.remove('active'));
+  // تحديث الأزرار — تطبيق اللون حسب data-clr
+  document.querySelectorAll('.ai-mode-btn').forEach(b=>{
+    b.classList.remove('active');
+    b.style.background='var(--surface2)';
+    b.style.color='';
+    b.style.boxShadow='0 1px 3px rgba(0,0,0,.07)';
+  });
+  const _activateBtn=b=>{
+    b.classList.add('active');
+    const clr=b.dataset.clr||'var(--accent)';
+    const shd=b.dataset.shd||'rgba(44,93,229,.3)';
+    b.style.background=clr;
+    b.style.color='#fff';
+    b.style.boxShadow=`0 4px 16px ${shd}`;
+  };
   if (btn) {
-    btn.classList.add('active');
+    _activateBtn(btn);
   } else {
-    // تحديث الزر النشط بدون مرجع مباشر
     document.querySelectorAll('.ai-mode-btn').forEach(b=>{
-      if (b.getAttribute('onclick')?.includes("'"+mode+"'")) b.classList.add('active');
+      if (b.getAttribute('onclick')?.includes("'"+mode+"'")) _activateBtn(b);
     });
   }
 
@@ -12370,9 +12596,19 @@ function renderSmartAnalysis(mode, btn) {
 
   const fn = generators[mode] || generators.executive;
   el.innerHTML = fn();
+
+  // تحديث عنوان شريط الطباعة
+  const _modeLabels = {
+    executive:'📊 التقرير التنفيذي', sales:'👥 تحليل المبيعات',
+    collection:'💰 تحليل التحصيل', reps:'🏆 تقييم المناديب',
+    products:'📦 تحليل الأصناف', expenses:'💸 تحليل المصروفات',
+    alerts:'🚨 التنبيهات', plan:'🗺️ خطة العمل',
+  };
+  const titleBar = document.getElementById('smart-report-title-bar');
+  if(titleBar) titleBar.textContent = _modeLabels[mode] || '📊 التقرير';
 }
 
-function _fmt(n) { return Number(n||0).toLocaleString('ar-LY',{maximumFractionDigits:0}); }
+function _fmt(n) { return Number(n||0).toLocaleString('en-US',{maximumFractionDigits:0}); }
 function _fmtP(n) { return Number(n||0).toFixed(1); }
 function _badge(val, good, warn) {
   const color = val>=good?'#22c55e':val>=warn?'#f59e0b':'#ef4444';
@@ -12392,6 +12628,181 @@ function _table(headers, rows) {
       ${r.map(c=>`<td style="padding:7px 10px;border:1px solid var(--border2);text-align:center">${c}</td>`).join('')}
     </tr>`).join('')}</tbody>
   </table></div>`;
+}
+
+/* ── استنتاج معدل يومي وإسقاط الشهر الكامل ── */
+function _getMonthProjection(totalNS, totalCol) {
+  const f   = _getAiFilters();
+  const tbl = D.sales_table || [];
+  const _n  = v => { const x=parseFloat(String(v||'').replace(/,/g,'')); return isNaN(x)?0:x; };
+  const kDate = Object.keys(tbl[0]||{}).find(h=>h.includes('تاريخ'))||'التاريخ';
+  const kRep  = Object.keys(tbl[0]||{}).find(h=>h.includes('مندوب'))||'المندوب';
+  const kType = Object.keys(tbl[0]||{}).find(h=>h.includes('نوع'))||'النوع';
+  const kNet  = Object.keys(tbl[0]||{}).find(h=>h.includes('الاجمالي الصافي')||h.includes('الإجمالي الصافي')||h.includes('الصافي'))||'الاجمالي الصافي';
+  const MONTH_AR = {1:'يناير',2:'فبراير',3:'مارس',4:'أبريل',5:'مايو',6:'يونيو',7:'يوليو',8:'أغسطس',9:'سبتمبر',10:'أكتوبر',11:'نوفمبر',12:'ديسمبر'};
+
+  // ── دالة: احسب NS+Col من مجموعة صفوف ──
+  const _calcFromRows = (rows) => {
+    let ns=0, col=0;
+    rows.forEach(r=>{
+      const type=String(r[kType]||'').trim();
+      const v=_n(r[kNet]);
+      if(type==='مبيع') ns+=v;
+      else if(type==='مرتجع مبيع') ns-=v;
+    });
+    // التحصيل من collection_table
+    const colTbl = D.collection_table||[];
+    const repFilter = f.rep||'';
+    colTbl.forEach(r=>{
+      const type=String(r['النوع']||'').trim();
+      const ds=String(r['التاريخ']||'').substring(0,10);
+      if(type.includes('سند قبض')){
+        const dObj=new Date(ds);
+        if(!isNaN(dObj)){
+          // نفس فلتر المندوب
+          if(repFilter&&String(r['المندوب']||'').trim()!==repFilter) return;
+          col+=_n(r['دائن']);
+        }
+      }
+    });
+    return {ns:Math.max(0,ns), col};
+  };
+
+  // ── تحديد نطاق الفلتر الحالي ──
+  let fromDate=null, toDate=null, filterMonth=null, filterYear=null;
+  if(f.month){
+    filterMonth=+f.month;
+    // ابحث عن السنة
+    for(const r of tbl){
+      const d=new Date(String(r[kDate]||'').substring(0,10));
+      if(!isNaN(d)&&(d.getMonth()+1)===filterMonth){filterYear=d.getFullYear();break;}
+    }
+    if(!filterYear) filterYear=new Date().getFullYear();
+    fromDate=new Date(filterYear,filterMonth-1,1);
+    toDate  =new Date(filterYear,filterMonth,0); // آخر يوم
+  } else if(f.from&&f.to){
+    fromDate=new Date(f.from);
+    toDate  =new Date(f.to+'T23:59:59');
+    if(!isNaN(fromDate)&&!isNaN(toDate)){
+      if(fromDate.getMonth()===toDate.getMonth()){
+        filterMonth=fromDate.getMonth()+1;
+        filterYear =fromDate.getFullYear();
+      }
+    }
+  }
+
+  if(!fromDate||isNaN(fromDate)) return null;
+
+  const daysInMonth = filterMonth ? new Date(filterYear,filterMonth,0).getDate() : null;
+
+  // ── صفوف الفترة الحالية ──
+  const curRows = tbl.filter(r=>{
+    const ds=String(r[kDate]||'').substring(0,10);
+    const d=new Date(ds); if(isNaN(d)) return false;
+    return d>=fromDate && d<=toDate;
+  });
+
+  // ── أيام البيانات الفعلية في الفترة ──
+  const actualDates = new Set(curRows.map(r=>String(r[kDate]||'').substring(0,10)));
+  const daysActual  = actualDates.size;
+
+  // ── ٣ سيناريوهات ──
+  let scenario = null; // 'full' | 'partial_month' | 'partial_range' | 'no_data'
+
+  if(daysActual===0){
+    scenario = 'no_data';
+  } else if(f.month){
+    // فلتر شهر كامل
+    scenario = daysActual < daysInMonth ? 'partial_month' : 'full';
+  } else if(f.from&&f.to&&filterMonth){
+    // فلتر نطاق داخل شهر واحد
+    const filteredDays = Math.round((toDate-fromDate)/864e5)+1;
+    scenario = daysActual < filteredDays*0.9 ? 'partial_range' : 'partial_range';
+  } else {
+    scenario = 'full';
+  }
+
+  // ── حساب الفترة السابقة (نفس الطول من الشهر/الفترة السابقة) ──
+  const _getPrevRows = () => {
+    let prevFrom, prevTo;
+    if(filterMonth){
+      const pm = filterMonth===1?12:filterMonth-1;
+      const py = filterMonth===1?filterYear-1:filterYear;
+      prevFrom = new Date(py,pm-1,1);
+      prevTo   = new Date(py,pm,0);
+    } else if(f.from&&f.to){
+      const span=(toDate-fromDate);
+      prevTo  =new Date(fromDate.getTime()-864e5);
+      prevFrom=new Date(prevTo.getTime()-span);
+    } else return [];
+    return tbl.filter(r=>{
+      const d=new Date(String(r[kDate]||'').substring(0,10));
+      return !isNaN(d)&&d>=prevFrom&&d<=prevTo;
+    });
+  };
+
+  const prevRows  = _getPrevRows();
+  const prevCalc  = _calcFromRows(prevRows);
+  const prevNS    = prevCalc.ns;
+  const prevCol   = prevCalc.col;
+  const hasPrev   = prevNS>0||prevCol>0;
+
+  // ── بناء النتيجة حسب السيناريو ──
+  if(scenario==='no_data'){
+    if(!hasPrev) return null;
+    const tgtNS  = Math.round(prevNS*1.10);
+    const tgtCol = Math.round(prevCol*1.10);
+    const prevLabel = filterMonth?`${MONTH_AR[filterMonth===1?12:filterMonth-1]||'الشهر السابق'}`:'الفترة السابقة';
+    return {
+      scenario:'no_data', filterMonth, filterYear, daysInMonth,
+      monthName: filterMonth?MONTH_AR[filterMonth]:'الفترة',
+      daysActual:0, totalNS:0, totalCol:0,
+      prevNS, prevCol, prevLabel,
+      targetNS:tgtNS, targetCol:tgtCol,
+      projNS:null, projCol:null,
+      achievePctNS:null, achievePctCol:null,
+    };
+  }
+
+  // للسيناريوهات التي تحتوي بيانات
+  const dailyNS  = totalNS  / Math.max(1,daysActual);
+  const dailyCol = totalCol / Math.max(1,daysActual);
+
+  if(scenario==='partial_month'){
+    // إسقاط الشهر الكامل
+    const projNS  = Math.round(dailyNS  * daysInMonth);
+    const projCol = Math.round(dailyCol * daysInMonth);
+    const tgtNS   = Math.round(projNS   * 1.10);
+    const tgtCol  = Math.round(projCol  * 1.10);
+    return {
+      scenario:'partial_month', filterMonth, filterYear, daysInMonth,
+      monthName:MONTH_AR[filterMonth]||('شهر '+filterMonth),
+      daysActual, totalNS, totalCol, dailyNS, dailyCol,
+      projNS, projCol, targetNS:tgtNS, targetCol:tgtCol,
+      prevNS, prevCol, hasPrev,
+      achievePctNS : projNS>0  ? +(totalNS /projNS *100).toFixed(1) : null,
+      achievePctCol: projCol>0 ? +(totalCol/projCol*100).toFixed(1) : null,
+    };
+  }
+
+  // partial_range أو full — مقارنة بالفترة السابقة
+  const tgtNS  = hasPrev ? Math.round(prevNS *1.10) : Math.round(totalNS *1.10);
+  const tgtCol = hasPrev ? Math.round(prevCol*1.10) : Math.round(totalCol*1.10);
+  const growNS  = hasPrev&&prevNS>0  ? +((totalNS /prevNS -1)*100).toFixed(1) : null;
+  const growCol = hasPrev&&prevCol>0 ? +((totalCol/prevCol-1)*100).toFixed(1) : null;
+  const prevLabel = filterMonth
+    ? (MONTH_AR[filterMonth===1?12:filterMonth-1]||'الشهر السابق')
+    : 'الفترة السابقة';
+  return {
+    scenario:'full', filterMonth, filterYear, daysInMonth,
+    monthName: filterMonth?MONTH_AR[filterMonth]:('الفترة'),
+    daysActual, totalNS, totalCol,
+    projNS:null, projCol:null,
+    targetNS:tgtNS, targetCol:tgtCol,
+    prevNS, prevCol, prevLabel, hasPrev, growNS, growCol,
+    achievePctNS : hasPrev&&prevNS>0  ? +(totalNS /prevNS *100).toFixed(1) : null,
+    achievePctCol: hasPrev&&prevCol>0 ? +(totalCol/prevCol*100).toFixed(1) : null,
+  };
 }
 
 function _genExecutiveReport() {
@@ -12465,6 +12876,188 @@ function _genExecutiveReport() {
 
   html += _section('💡 التوصيات التنفيذية', `<ol style="margin:0;padding-right:18px;color:var(--text)">${recs.map(r=>`<li style="margin-bottom:6px">${r}</li>`).join('')}</ol>`);
 
+  // ── مؤشر الأداء المركب (0-100) ──
+  const kpiScore = Math.round(
+    (Math.min(colPct,100)*0.4) +
+    (Math.max(0,100-retPct*5)*0.3) +
+    (Math.min(avgROI,100)*0.3)
+  );
+  const scoreColor = kpiScore>=75?'#22c55e':kpiScore>=50?'#f59e0b':'#ef4444';
+  const scoreLabel = kpiScore>=75?'ممتاز':kpiScore>=50?'متوسط':'ضعيف';
+  html += _section('🎯 مؤشر الأداء المركب للشركة',
+    `<div style="display:flex;align-items:center;gap:20px;padding:8px 0">
+      <div style="position:relative;width:80px;height:80px;flex-shrink:0">
+        <svg viewBox="0 0 36 36" style="width:80px;height:80px;transform:rotate(-90deg)">
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--border2)" stroke-width="3"/>
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="${scoreColor}" stroke-width="3"
+            stroke-dasharray="${kpiScore} ${100-kpiScore}" stroke-linecap="round"/>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <span style="font-size:18px;font-weight:800;color:${scoreColor}">${kpiScore}</span>
+          <span style="font-size:9px;color:var(--muted)">/ 100</span>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:16px;font-weight:800;color:${scoreColor}">${scoreLabel}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">يعتمد على: التحصيل (40%) + المرتجعات (30%) + ROI (30%)</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+          <span style="background:${colPct>=80?'#22c55e22':'#ef444422'};color:${colPct>=80?'#22c55e':'#ef4444'};padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700">تحصيل: ${_fmtP(colPct)}%</span>
+          <span style="background:${retPct<=5?'#22c55e22':'#ef444422'};color:${retPct<=5?'#22c55e':'#ef4444'};padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700">مرتجعات: ${_fmtP(retPct)}%</span>
+          <span style="background:${avgROI>=80?'#22c55e22':'#f59e0b22'};color:${avgROI>=80?'#22c55e':'#f59e0b'};padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700">ROI: ${_fmtP(avgROI)}%</span>
+        </div>
+      </div>
+    </div>`
+  );
+
+  // ── ترتيب المشرفين (إن وجد) ──
+  const supMap = {};
+  reps.forEach(r=>{const s=(D._repSuperMap&&D._repSuperMap[r.name])||'غير محدد';if(!supMap[s])supMap[s]={ns:0,col:0,count:0,gap:0};supMap[s].ns+=(r.netSales||0);supMap[s].col+=(r.col||0);supMap[s].count++;supMap[s].gap+=(r.gap||0);});
+  const sups = Object.entries(supMap).filter(([k])=>k&&k!=='غير محدد'&&k!=='ترك الفرع'&&k!=='موقوف');
+  if(sups.length>1){
+    const supRows = sups.sort((a,b)=>b[1].ns-a[1].ns).map(([name,v])=>[
+      `<b>${name}</b>`,v.count,_fmt(v.ns),_fmt(v.col),_fmt(v.gap),
+      v.ns>0?`<span style="color:${v.col/v.ns>=0.8?'#22c55e':v.col/v.ns>=0.6?'#f59e0b':'#ef4444'};font-weight:700">${_fmtP(v.col/v.ns*100)}%</span>`:'—'
+    ]);
+    html += _section('👔 أداء المشرفين', _table(['المشرف','المناديب','صافي المبيعات','التحصيل','الفجوة','% التحصيل'], supRows));
+  }
+
+  // ── أهداف ذكية بالإسقاط المتكيف ──
+  const _proj = _getMonthProjection(totalNS, totalCol);
+  const nextROI = Math.min(95, avgROI*1.1);
+
+  const _renderTargets = (p) => {
+    if(!p) return `<div style="font-size:11px;color:var(--muted);text-align:center;padding:20px">
+      💡 حدد فلتر شهر أو نطاق تاريخ للحصول على أهداف دقيقة</div>`;
+
+    const nsColor  = c => c>=100?'#22c55e':c>=80?'#3b82f6':c>=60?'#f59e0b':'#ef4444';
+    const growIcon = g => g===null?'':'<span style="font-size:10px;font-weight:700;color:'+(g>=0?'#22c55e':'#ef4444')+'">'+(g>=0?'▲':'▼')+Math.abs(g)+'%</span>';
+
+    // ── سيناريو: لا بيانات → هدف من الفترة السابقة ──
+    if(p.scenario==='no_data'){
+      return `<div style="background:#f59e0b11;border-radius:10px;padding:12px;margin-bottom:10px;border-right:3px solid #f59e0b;font-size:11px;color:var(--text)">
+        ⚠️ لا توجد بيانات في الفترة المحددة — الهدف مبني على أداء ${p.prevLabel}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div style="background:var(--surface2);border-radius:10px;padding:12px;border-top:3px solid var(--muted);text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px">📊 الفترة الحالية</div>
+          <div style="font-size:15px;font-weight:800;color:var(--muted)">— د.ل</div>
+          <div style="font-size:10px;color:var(--muted)">لا بيانات</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:10px;padding:12px;border-top:3px solid #f59e0b;text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px">📅 ${p.prevLabel}</div>
+          <div style="font-size:15px;font-weight:800;color:#f59e0b">${_fmt(p.prevNS)} د.ل</div>
+          <div style="font-size:10px;color:var(--muted)">تحصيل: ${_fmt(p.prevCol)}</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:10px;padding:12px;border-top:3px solid #22c55e;text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px">🎯 هدف مقترح (+10%)</div>
+          <div style="font-size:15px;font-weight:800;color:#22c55e">${_fmt(p.targetNS)} د.ل</div>
+          <div style="font-size:10px;color:var(--muted)">تحصيل: ${_fmt(p.targetCol)}</div>
+        </div>
+      </div>`;
+    }
+
+    // ── سيناريو: بيانات جزئية مع فلتر شهر كامل → إسقاط ──
+    if(p.scenario==='partial_month'){
+      const nsAch  = nsColor(p.achievePctNS);
+      const colAch = nsColor(p.achievePctCol);
+      return `<div style="background:#3b82f611;border-radius:10px;padding:8px 12px;margin-bottom:10px;border-right:3px solid #3b82f6;font-size:11px">
+        ⏱ بيانات ${p.daysActual} من ${p.daysInMonth} يوم — معدل يومي: مبيعات ${_fmt(p.dailyNS)} | تحصيل ${_fmt(p.dailyCol)} د.ل
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+        <div style="background:var(--surface2);border-radius:10px;padding:12px;border-top:3px solid var(--accent);text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px">📊 المحقق حتى الآن</div>
+          <div style="font-size:15px;font-weight:800;color:var(--accent)">${_fmt(p.totalNS)} د.ل</div>
+          <div style="font-size:10px;color:var(--muted)">تحصيل: ${_fmt(p.totalCol)}</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:10px;padding:12px;border-top:3px solid #f59e0b;text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px">🔮 توقع ${p.monthName} كاملاً</div>
+          <div style="font-size:15px;font-weight:800;color:#f59e0b">${_fmt(p.projNS)} د.ل</div>
+          <div style="font-size:10px;color:var(--muted)">تحصيل: ${_fmt(p.projCol)}</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:10px;padding:12px;border-top:3px solid #22c55e;text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px">🎯 هدف الشهر القادم (+10%)</div>
+          <div style="font-size:15px;font-weight:800;color:#22c55e">${_fmt(p.targetNS)} د.ل</div>
+          <div style="font-size:10px;color:var(--muted)">تحصيل: ${_fmt(p.targetCol)}</div>
+        </div>
+      </div>
+      <div style="background:var(--surface2);border-radius:10px;padding:12px">
+        <div style="font-size:11px;font-weight:700;margin-bottom:8px">📊 تقدم ${p.monthName} — ${p.daysActual}/${p.daysInMonth} يوم (${Math.round(p.daysActual/p.daysInMonth*100)}%)</div>
+        <div style="margin-bottom:6px">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:3px">
+            <span>صافي المبيعات</span>
+            <span style="font-weight:700;color:${nsAch}">${_fmt(p.totalNS)} / ${_fmt(p.projNS)} &nbsp;(${p.achievePctNS}%)</span>
+          </div>
+          <div style="background:var(--border2);border-radius:4px;height:8px;overflow:hidden">
+            <div style="background:${nsAch};width:${Math.min(100,p.achievePctNS)}%;height:8px;border-radius:4px"></div>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:3px">
+            <span>التحصيل</span>
+            <span style="font-weight:700;color:${colAch}">${_fmt(p.totalCol)} / ${_fmt(p.projCol)} &nbsp;(${p.achievePctCol}%)</span>
+          </div>
+          <div style="background:var(--border2);border-radius:4px;height:8px;overflow:hidden">
+            <div style="background:${colAch};width:${Math.min(100,p.achievePctCol)}%;height:8px;border-radius:4px"></div>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    // ── سيناريو: بيانات كاملة → مقارنة بالفترة السابقة ──
+    const nsAch  = p.achievePctNS  ? nsColor(p.achievePctNS)  : '#3b82f6';
+    const colAch = p.achievePctCol ? nsColor(p.achievePctCol) : '#3b82f6';
+    return `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+      <div style="background:var(--surface2);border-radius:10px;padding:12px;border-top:3px solid var(--accent);text-align:center">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:4px">📊 ${p.monthName||'الفترة الحالية'}</div>
+        <div style="font-size:15px;font-weight:800;color:var(--accent)">${_fmt(p.totalNS)} د.ل</div>
+        <div style="font-size:10px;color:var(--muted)">تحصيل: ${_fmt(p.totalCol)}</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:10px;padding:12px;border-top:3px solid #f59e0b;text-align:center">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:4px">📅 ${p.prevLabel||'الفترة السابقة'}</div>
+        <div style="font-size:15px;font-weight:800;color:#f59e0b">${p.hasPrev?_fmt(p.prevNS)+'  '+growIcon(p.growNS):'—'} د.ل</div>
+        <div style="font-size:10px;color:var(--muted)">${p.hasPrev?'تحصيل: '+_fmt(p.prevCol)+'  '+growIcon(p.growCol):'لا بيانات'}</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:10px;padding:12px;border-top:3px solid #22c55e;text-align:center">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:4px">🎯 هدف الشهر القادم (+10%)</div>
+        <div style="font-size:15px;font-weight:800;color:#22c55e">${_fmt(p.targetNS)} د.ل</div>
+        <div style="font-size:10px;color:var(--muted)">تحصيل: ${_fmt(p.targetCol)}</div>
+      </div>
+    </div>
+    ${p.hasPrev&&p.achievePctNS ? `
+    <div style="background:var(--surface2);border-radius:10px;padding:12px">
+      <div style="font-size:11px;font-weight:700;margin-bottom:8px">📊 مقارنة بـ ${p.prevLabel}</div>
+      <div style="margin-bottom:6px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:3px">
+          <span>صافي المبيعات</span>
+          <span style="font-weight:700;color:${nsAch}">${_fmt(p.totalNS)} vs ${_fmt(p.prevNS)} &nbsp;(${p.achievePctNS}%)</span>
+        </div>
+        <div style="background:var(--border2);border-radius:4px;height:8px;overflow:hidden">
+          <div style="background:${nsAch};width:${Math.min(100,p.achievePctNS)}%;height:8px;border-radius:4px"></div>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:3px">
+          <span>التحصيل</span>
+          <span style="font-weight:700;color:${colAch}">${_fmt(p.totalCol)} vs ${_fmt(p.prevCol)} &nbsp;(${p.achievePctCol}%)</span>
+        </div>
+        <div style="background:var(--border2);border-radius:4px;height:8px;overflow:hidden">
+          <div style="background:${colAch};width:${Math.min(100,p.achievePctCol)}%;height:8px;border-radius:4px"></div>
+        </div>
+      </div>
+    </div>` : ''}`;
+  };
+
+  const _projTitle = _proj
+    ? (_proj.scenario==='no_data' ? `📈 أهداف ${_proj.monthName||'الفترة'} (مبني على الفترة السابقة)`
+      :_proj.scenario==='partial_month' ? `📈 أهداف ${_proj.monthName} ${_proj.year||''} — بيانات جزئية`
+      : `📈 أهداف ${_proj.monthName||'الفترة'} ومقارنة بالسابق`)
+    : '📈 أهداف الشهر القادم المقترحة';
+
+  html += _section(_projTitle,
+    _renderTargets(_proj) +
+    `<div style="margin-top:8px;font-size:11px;color:var(--accent);font-weight:700;text-align:center">📊 ROI المستهدف: ${_fmtP(nextROI)}%</div>`
+  );
+
   return html;
 }
 
@@ -12505,6 +13098,58 @@ function _genSalesReport() {
   if (needsHelp.length) {
     html += _section('⚠️ مناديب يحتاجون دعماً', `<ul style="margin:0;padding-right:18px;color:var(--text)">${needsHelp.map(r=>`<li style="margin-bottom:4px"><b>${r.name}</b> — ROI: ${_fmtP(r.roi)}% | فجوة: ${_fmt(r.gap)} د.ل</li>`).join('')}</ul>`);
   }
+
+  // ── تحليل الفئات البيعية ──
+  const catSales = {};
+  sorted.forEach(r=>{const c=r.cat||'أخرى';if(!catSales[c])catSales[c]={ns:0,col:0,count:0,ret:0};catSales[c].ns+=(r.netSales||0);catSales[c].col+=(r.col||0);catSales[c].count++;catSales[c].ret+=(r.returns||0);});
+  const catEntries = Object.entries(catSales).sort((a,b)=>b[1].ns-a[1].ns);
+  if(catEntries.length>1){
+    const catRows = catEntries.map(([cat,v])=>{
+      const roi = v.ns>0?_fmtP(v.col/v.ns*100)+'%':'—';
+      const retP = (v.ns+v.ret)>0?_fmtP(v.ret/(v.ns+v.ret)*100)+'%':'—';
+      return [`<b>${cat}</b>`,v.count,_fmt(v.ns),_fmt(v.col),roi,retP];
+    });
+    html += _section('📂 أداء القنوات البيعية', _table(['الفئة','المناديب','صافي المبيعات','التحصيل','% التحصيل','% المرتجع'], catRows));
+  }
+
+  // ── مقارنة بين أفضل وأضعف مندوب ──
+  if(sorted.length>=2){
+    const best = sorted[0];
+    const worst = sorted[sorted.length-1];
+    const gap2 = best.netSales - worst.netSales;
+    html += _section('⚖️ مقارنة الأداء: الأفضل vs الأضعف',
+      `<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center">
+        <div style="background:#22c55e11;border-radius:10px;padding:12px;border:1px solid #22c55e33;text-align:center">
+          <div style="font-size:10px;color:var(--muted)">🏆 الأفضل</div>
+          <div style="font-size:14px;font-weight:800;color:#22c55e">${best.name}</div>
+          <div style="font-size:12px;color:var(--text);margin-top:4px">${_fmt(best.netSales)} د.ل</div>
+          <div style="font-size:11px;color:var(--muted)">ROI: ${_fmtP(best.roi)}%</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:11px;color:var(--muted)">الفجوة</div>
+          <div style="font-size:14px;font-weight:800;color:#f59e0b">${_fmt(gap2)}</div>
+          <div style="font-size:10px;color:var(--muted)">د.ل</div>
+        </div>
+        <div style="background:#ef444411;border-radius:10px;padding:12px;border:1px solid #ef444433;text-align:center">
+          <div style="font-size:10px;color:var(--muted)">🔴 يحتاج دعم</div>
+          <div style="font-size:14px;font-weight:800;color:#ef4444">${worst.name}</div>
+          <div style="font-size:12px;color:var(--text);margin-top:4px">${_fmt(worst.netSales)} د.ل</div>
+          <div style="font-size:11px;color:var(--muted)">ROI: ${_fmtP(worst.roi)}%</div>
+        </div>
+      </div>`
+    );
+  }
+
+  // ── توصيات المبيعات ──
+  const salesRecs = [];
+  if(excellent.length) salesRecs.push(`تعميم أسلوب ${excellent[0].name} على باقي الفريق`);
+  if(needsHelp.length>=3) salesRecs.push(`${needsHelp.length} مناديب تحت الأداء المطلوب — جلسة مراجعة فورية`);
+  const avgInv = sorted.reduce((s,r)=>s+(r.avgInvoice||0),0)/sorted.length;
+  if(avgInv>0) salesRecs.push(`متوسط قيمة الفاتورة ${_fmt(avgInv)} د.ل — العمل على رفعه بتوسيع التشكيلة`);
+  salesRecs.push('وضع حد أدنى لصافي المبيعات الشهري لكل مندوب حسب المنطقة');
+  salesRecs.push('تطبيق نظام حوافز تدريجي يرتفع مع تجاوز الأهداف');
+  salesRecs.push('زيادة تركيز المناديب على العملاء ذوي أعلى حجم شراء');
+  html += _section('💡 توصيات تحسين المبيعات', `<ol style="margin:0;padding-right:18px;color:var(--text)">${salesRecs.map(r=>`<li style="margin-bottom:6px">${r}</li>`).join('')}</ol>`);
 
   return html;
 }
@@ -12547,6 +13192,58 @@ function _genCollectionReport() {
 
   html += _section('📅 خطة تحصيل مقترحة', `<ol style="margin:0;padding-right:18px;color:var(--text)">${plan.map(p=>`<li style="margin-bottom:6px">${p}</li>`).join('')}</ol>`);
 
+  // ── تصنيف مناديب التحصيل (جيد / متوسط / ضعيف) ──
+  const colGood    = reps.filter(r=>r.netSales>0&&(r.col/r.netSales*100)>=80);
+  const colMed     = reps.filter(r=>r.netSales>0&&(r.col/r.netSales*100)>=50&&(r.col/r.netSales*100)<80);
+  const colWeak    = reps.filter(r=>r.netSales>0&&(r.col/r.netSales*100)<50);
+  const colZero    = reps.filter(r=>r.sales>0&&(r.col||0)===0);
+
+  const tiers = [
+    {label:'✅ تحصيل ممتاز (≥80%)', list:colGood, color:'#22c55e'},
+    {label:'🟡 تحصيل متوسط (50-80%)', list:colMed, color:'#f59e0b'},
+    {label:'🔴 تحصيل ضعيف (<50%)', list:colWeak, color:'#ef4444'},
+    {label:'⛔ لم يحصّل شيئاً', list:colZero, color:'#9ba5c0'},
+  ];
+  const tierHTML = tiers.filter(t=>t.list.length>0).map(t=>`
+    <div style="background:${t.color}11;border-radius:8px;padding:10px 12px;border-right:3px solid ${t.color}">
+      <div style="font-size:12px;font-weight:700;color:${t.color};margin-bottom:4px">${t.label} — ${t.list.length} مناديب</div>
+      <div style="font-size:11px;color:var(--text)">${t.list.map(r=>`<b>${r.name}</b> (${_fmtP(r.netSales>0?r.col/r.netSales*100:0)}%)`).join(' ، ')}</div>
+    </div>`).join('');
+  if(tierHTML) html += _section('📊 تصنيف المناديب حسب كفاءة التحصيل', `<div style="display:flex;flex-direction:column;gap:8px">${tierHTML}</div>`);
+
+  // ── مؤشر مخاطر التحصيل ──
+  const totalDebt = reps.reduce((s,r)=>s+(r.debtNet||r.gap||0),0);
+  const riskScore = Math.min(100, Math.round((totalGap / Math.max(totalNS,1)) * 100));
+  const riskColor = riskScore<=20?'#22c55e':riskScore<=40?'#f59e0b':'#ef4444';
+  const riskLabel = riskScore<=20?'منخفض':riskScore<=40?'متوسط':'مرتفع';
+  html += _section('⚠️ مؤشر مخاطر التحصيل',
+    `<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div style="flex-shrink:0">
+        <div style="font-size:32px;font-weight:800;color:${riskColor}">${riskScore}%</div>
+        <div style="font-size:12px;font-weight:700;color:${riskColor}">${riskLabel}</div>
+      </div>
+      <div style="flex:1;min-width:200px">
+        <div style="background:var(--border2);border-radius:6px;height:12px;overflow:hidden;margin-bottom:6px">
+          <div style="background:linear-gradient(90deg,#22c55e,${riskColor});width:${riskScore}%;height:12px;border-radius:6px;transition:width 0.5s"></div>
+        </div>
+        <div style="font-size:11px;color:var(--muted)">الفجوة الكلية: <b style="color:${riskColor}">${_fmt(totalGap)} د.ل</b> من أصل <b>${_fmt(totalNS)} د.ل</b> صافي مبيعات</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px">
+          ${riskScore<=20?'✅ وضع صحي — الفجوة تحت السيطرة':riskScore<=40?'🟡 يستدعي المتابعة الدورية':'🔴 خطر — يجب اتخاذ إجراءات فورية'}
+        </div>
+      </div>
+    </div>`
+  );
+
+  // ── توصيات إدارة التحصيل ──
+  const colRecs = [];
+  if(colWeak.length) colRecs.push(`متابعة يومية لـ ${colWeak.map(r=>r.name).slice(0,3).join('، ')} — تحصيلهم دون 50%`);
+  if(colZero.length) colRecs.push(`${colZero.length} مناديب لم يحصّلوا شيئاً — مراجعة فورية ومنع تسليم بضاعة جديدة`);
+  if(colPct<70) colRecs.push('ربط التسليم الجديد بنسبة تحصيل لا تقل عن 70% من الرصيد القائم');
+  colRecs.push('اعتماد يوم أسبوعي ثابت لمراجعة حسابات التحصيل مع كل مندوب');
+  colRecs.push('تطبيق نظام تحفيز: مكافأة لمن يحقق 100% تحصيل شهرياً');
+  colRecs.push('تحديد سقف ائتماني لكل عميل بناءً على سجل الدفع');
+  html += _section('💡 توصيات إدارة التحصيل', `<ol style="margin:0;padding-right:18px;color:var(--text)">${colRecs.map(r=>`<li style="margin-bottom:6px">${r}</li>`).join('')}</ol>`);
+
   return html;
 }
 
@@ -12584,6 +13281,51 @@ function _genRepsReport() {
   recs.push('وضع أهداف فردية مبنية على الأداء الفعلي لكل مندوب');
 
   html += _section('💡 توصيات إدارة الفريق', `<ol style="margin:0;padding-right:18px;color:var(--text)">${recs.map(r=>`<li style="margin-bottom:6px">${r}</li>`).join('')}</ol>`);
+
+  // ── جدول الأداء الشامل مع درجة مركبة ──
+  const maxNS  = Math.max(...reps.map(r=>r.netSales||0)) || 1;
+  const maxCol = Math.max(...reps.map(r=>r.col||0)) || 1;
+  const scoredReps = reps.map(r=>{
+    const nsScore  = (r.netSales/maxNS)*40;
+    const roiScore = Math.min(r.roi||0,100)/100*30;
+    const colRate  = r.netSales>0?(r.col/r.netSales):0;
+    const colScore = Math.min(colRate,1)*30;
+    const total    = Math.round(nsScore+roiScore+colScore);
+    return {...r, score:total};
+  }).sort((a,b)=>b.score-a.score);
+
+  const scoreRows = scoredReps.map((r,i)=>{
+    const sc = r.score;
+    const scColor = sc>=70?'#22c55e':sc>=50?'#f59e0b':'#ef4444';
+    const colRate = r.netSales>0?_fmtP(r.col/r.netSales*100)+'%':'—';
+    const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+    return [
+      `${medal} <b style="color:var(--muted)">${i+1}</b>`,
+      `<b>${r.name}</b><br><span style="font-size:10px;color:var(--muted)">${r.cat||'—'}</span>`,
+      _fmt(r.netSales),
+      `<span style="color:${r.roi>=80?'#22c55e':r.roi>=60?'#f59e0b':'#ef4444'};font-weight:700">${_fmtP(r.roi)}%</span>`,
+      colRate,
+      _fmt(r.gap),
+      `<div style="display:flex;align-items:center;gap:6px">
+        <div style="background:var(--border2);border-radius:3px;height:6px;width:50px;flex-shrink:0">
+          <div style="background:${scColor};width:${sc}%;height:6px;border-radius:3px"></div>
+        </div>
+        <span style="font-size:12px;font-weight:800;color:${scColor}">${sc}</span>
+      </div>`
+    ];
+  });
+  html += _section('📊 جدول الترتيب الشامل بالدرجات', _table(['#','المندوب','صافي المبيعات','ROI','% التحصيل','الفجوة','الدرجة /100'], scoreRows));
+
+  // ── أهداف فردية مقترحة ──
+  const topHalf = scoredReps.slice(0,Math.ceil(scoredReps.length/2));
+  const botHalf = scoredReps.slice(Math.ceil(scoredReps.length/2));
+  const goalRows = [...topHalf.slice(0,3), ...botHalf.slice(0,3)].map(r=>{
+    const targetNS = Math.round((r.netSales||0)*1.1);
+    const targetROI = Math.min(95,(r.roi||0)*1.1);
+    const note = r.score>=70?'الحفاظ على الأداء + التوسع':r.score>=50?'تحسين ROI + رفع التحصيل':'تدريب مكثف + متابعة أسبوعية';
+    return [`<b>${r.name}</b>`,_fmt(r.netSales),_fmt(targetNS),`${_fmtP(r.roi)}% → ${_fmtP(targetROI)}%`,note];
+  });
+  html += _section('🎯 أهداف فردية مقترحة (الشهر القادم)', _table(['المندوب','الحالي','الهدف','ROI المستهدف','ملاحظة'], goalRows));
 
   return html;
 }
@@ -12721,15 +13463,17 @@ function _genProductsReport() {
     const abcColor = p.abc==='A'?'#f59e0b':p.abc==='B'?'#3b82f6':'#9ba5c0';
     const rowBg    = p.abc==='A'?'rgba(245,158,11,0.04)':p.abc==='B'?'rgba(59,130,246,0.04)':'transparent';
     const chCells  = channels.map(ch => {
-      const c = p.byChannel[ch] || {ns:0};
-      if (!c.ns) return `<span style="color:var(--muted);font-size:11px">—</span>`;
+      const c = p.byChannel[ch] || {ns:0,nqty:0,qty:0,retQty:0};
+      if (!c.ns && !(c.qty||c.nqty)) return `<span style="color:var(--muted);font-size:11px">—</span>`;
       const pctOfItem = p.ns > 0 ? (c.ns/p.ns*100) : 0;
       const barW = Math.round(pctOfItem);
+      const chNqty = (c.qty||0) - (c.retQty||0);
       return `<div style="font-size:11px;font-weight:700;color:${chColor(ch)}">${_fmt(c.ns)}</div>
               <div style="background:var(--border2);border-radius:2px;height:3px;margin-top:2px">
                 <div style="background:${chColor(ch)};width:${barW}%;height:3px;border-radius:2px"></div>
               </div>
-              <div style="font-size:10px;color:var(--muted)">${_fmtP(pctOfItem)}%</div>`;
+              <div style="font-size:10px;color:var(--muted)">${_fmtP(pctOfItem)}%</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:1px">📦 ${_fmt(chNqty)} وحدة</div>`;
     });
     return {
       bg: rowBg,
@@ -13100,6 +13844,52 @@ function _genAlertsReport() {
     html += `<div style="text-align:center;padding:30px;color:#22c55e;font-size:14px;font-weight:700">✅ لا توجد تنبيهات حرجة — الأداء ضمن المعدل الطبيعي</div>`;
   }
 
+  // ── ملخص التنبيهات بالأرقام ──
+  html += _section('📋 ملخص حالة الفريق',
+    `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;text-align:center">
+      <div style="background:#ef444411;border-radius:10px;padding:12px;border-top:3px solid #ef4444">
+        <div style="font-size:24px;font-weight:800;color:#ef4444">${alerts.length}</div>
+        <div style="font-size:11px;color:var(--muted)">تنبيه حرج</div>
+      </div>
+      <div style="background:#f59e0b11;border-radius:10px;padding:12px;border-top:3px solid #f59e0b">
+        <div style="font-size:24px;font-weight:800;color:#f59e0b">${warnings.length}</div>
+        <div style="font-size:11px;color:var(--muted)">تحذير</div>
+      </div>
+      <div style="background:#22c55e11;border-radius:10px;padding:12px;border-top:3px solid #22c55e">
+        <div style="font-size:24px;font-weight:800;color:#22c55e">${good.length}</div>
+        <div style="font-size:11px;color:var(--muted)">نقطة إيجابية</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:10px;padding:12px;border-top:3px solid var(--accent)">
+        <div style="font-size:24px;font-weight:800;color:var(--accent)">${reps.length}</div>
+        <div style="font-size:11px;color:var(--muted)">إجمالي المناديب</div>
+      </div>
+    </div>`
+  );
+
+  // ── أولويات الأسبوع ──
+  const weekPriorities = [];
+  if(highGap.length) weekPriorities.push({p:1,icon:'🚨',text:`تحصيل فوري من: ${highGap.map(r=>r.name).slice(0,3).join('، ')}`,color:'#ef4444'});
+  if(zeroROI.length) weekPriorities.push({p:2,icon:'📉',text:`مراجعة مباشرة مع: ${zeroROI.map(r=>r.name).slice(0,3).join('، ')}`,color:'#ef4444'});
+  if(medGap.length) weekPriorities.push({p:3,icon:'⚠️',text:`متابعة تحصيل: ${medGap.map(r=>r.name).slice(0,3).join('، ')}`,color:'#f59e0b'});
+  if(medROI.length) weekPriorities.push({p:4,icon:'📊',text:`دعم وتدريب: ${medROI.map(r=>r.name).slice(0,3).join('، ')}`,color:'#f59e0b'});
+  weekPriorities.push({p:5,icon:'✅',text:'اجتماع أسبوعي لمراجعة الأداء مع الفريق',color:'#3b82f6'});
+  weekPriorities.push({p:6,icon:'📋',text:'مراجعة أهداف الشهر ونسبة الإنجاز',color:'#3b82f6'});
+
+  if(weekPriorities.length){
+    html += _section('📅 أولويات هذا الأسبوع',
+      `<div style="display:flex;flex-direction:column;gap:8px">
+      ${weekPriorities.map(p=>`
+        <div style="display:flex;align-items:center;gap:10px;background:${p.color}11;border-radius:8px;padding:10px 12px">
+          <span style="font-size:18px;flex-shrink:0">${p.icon}</span>
+          <div style="flex:1">
+            <span style="font-size:12px;font-weight:600;color:var(--text)">${p.text}</span>
+          </div>
+          <span style="background:${p.color}22;color:${p.color};padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;flex-shrink:0">P${p.p}</span>
+        </div>`).join('')}
+      </div>`
+    );
+  }
+
   return html;
 }
 
@@ -13111,18 +13901,89 @@ function _genPlanReport() {
   const colPct   = totalNS>0?(totalCol/totalNS*100):0;
   const avgROI   = reps.reduce((s,r)=>s+(r.roi||0),0)/reps.length;
 
-  // أهداف مقترحة بناءً على الأداء الفعلي
-  const targetNS  = Math.round(totalNS * 1.1);
-  const targetCol = Math.round(totalCol * 1.15);
+  // أهداف مقترحة بالإسقاط الذكي
+  const _planProj = _getMonthProjection(totalNS, totalCol);
   const targetROI = Math.min(95, avgROI * 1.1);
 
   let html = `<div style="background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:16px">
-    <div style="font-size:13px;font-weight:800;margin-bottom:8px">🎯 الأهداف المقترحة للشهر القادم</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:12px">
-      <div style="text-align:center"><div style="color:var(--muted)">صافي المبيعات</div><div style="font-size:16px;font-weight:800;color:#3b82f6">${_fmt(targetNS)} د.ل</div><div style="color:#22c55e;font-size:11px">+10%</div></div>
-      <div style="text-align:center"><div style="color:var(--muted)">التحصيل</div><div style="font-size:16px;font-weight:800;color:#22c55e">${_fmt(targetCol)} د.ل</div><div style="color:#22c55e;font-size:11px">+15%</div></div>
-      <div style="text-align:center"><div style="color:var(--muted)">متوسط ROI</div><div style="font-size:16px;font-weight:800;color:#8b5cf6">${_fmtP(targetROI)}%</div><div style="color:#22c55e;font-size:11px">+10%</div></div>
-    </div>
+    <div style="font-size:13px;font-weight:800;margin-bottom:10px">🎯 ${
+      !_planProj?'الأهداف المقترحة':
+      _planProj.scenario==='no_data'?`أهداف ${_planProj.monthName||'الفترة'} (من الفترة السابقة)`:
+      _planProj.scenario==='partial_month'?`أهداف ${_planProj.monthName} ${_planProj.year||''} — إسقاط ذكي`:
+      `أهداف ${_planProj.monthName||'الفترة'} ومقارنة بالسابق`
+    }</div>
+    ${_planProj ? (() => {
+      const p=_planProj;
+      const nsC  = c=>c>=100?'#22c55e':c>=80?'#3b82f6':c>=60?'#f59e0b':'#ef4444';
+      const gi   = g=>g===null?'':'<span style="font-size:10px;font-weight:700;color:'+(g>=0?'#22c55e':'#ef4444')+'">'+(g>=0?'▲':'▼')+Math.abs(g)+'%</span>';
+
+      if(p.scenario==='no_data') return `
+        <div style="font-size:11px;color:#f59e0b;margin-bottom:10px">⚠️ لا بيانات — الهدف من ${p.prevLabel}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px">
+          <div style="text-align:center;padding:10px;background:var(--surface);border-radius:8px;border-top:2px solid #f59e0b">
+            <div style="color:var(--muted);font-size:10px">📅 ${p.prevLabel}</div>
+            <div style="font-size:15px;font-weight:800;color:#f59e0b">${_fmt(p.prevNS)} د.ل</div>
+            <div style="font-size:10px;color:var(--muted)">تحصيل: ${_fmt(p.prevCol)}</div>
+          </div>
+          <div style="text-align:center;padding:10px;background:var(--surface);border-radius:8px;border-top:2px solid #22c55e">
+            <div style="color:var(--muted);font-size:10px">🎯 هدف مقترح (+10%)</div>
+            <div style="font-size:15px;font-weight:800;color:#22c55e">${_fmt(p.targetNS)} د.ل</div>
+            <div style="font-size:10px;color:var(--muted)">تحصيل: ${_fmt(p.targetCol)}</div>
+          </div>
+        </div>`;
+
+      if(p.scenario==='partial_month') return `
+        <div style="font-size:11px;color:#3b82f6;margin-bottom:8px">⏱ ${p.daysActual}/${p.daysInMonth} يوم — يومي: ${_fmt(p.dailyNS)} مبيعات | ${_fmt(p.dailyCol)} تحصيل</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:12px;margin-bottom:10px">
+          <div style="text-align:center;padding:10px;background:var(--surface);border-radius:8px;border-top:2px solid var(--accent)">
+            <div style="color:var(--muted);font-size:10px">📊 المحقق</div>
+            <div style="font-size:14px;font-weight:800;color:var(--accent)">${_fmt(p.totalNS)} د.ل</div>
+            <div style="font-size:10px;color:var(--muted)">تحصيل: ${_fmt(p.totalCol)}</div>
+          </div>
+          <div style="text-align:center;padding:10px;background:var(--surface);border-radius:8px;border-top:2px solid #f59e0b">
+            <div style="color:var(--muted);font-size:10px">🔮 توقع الشهر</div>
+            <div style="font-size:14px;font-weight:800;color:#f59e0b">${_fmt(p.projNS)} د.ل</div>
+            <div style="font-size:10px;color:var(--muted)">تحصيل: ${_fmt(p.projCol)}</div>
+          </div>
+          <div style="text-align:center;padding:10px;background:var(--surface);border-radius:8px;border-top:2px solid #22c55e">
+            <div style="color:var(--muted);font-size:10px">🎯 هدف الشهر القادم</div>
+            <div style="font-size:14px;font-weight:800;color:#22c55e">${_fmt(p.targetNS)} د.ل</div>
+            <div style="font-size:10px;color:var(--muted)">تحصيل: ${_fmt(p.targetCol)}</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:2px"><span>المبيعات</span><span style="color:${nsC(p.achievePctNS)};font-weight:700">${p.achievePctNS}%</span></div>
+          <div style="background:var(--border2);border-radius:3px;height:6px;overflow:hidden"><div style="background:${nsC(p.achievePctNS)};width:${Math.min(100,p.achievePctNS)}%;height:6px;border-radius:3px"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:2px"><span>التحصيل</span><span style="color:${nsC(p.achievePctCol)};font-weight:700">${p.achievePctCol}%</span></div>
+          <div style="background:var(--border2);border-radius:3px;height:6px;overflow:hidden"><div style="background:${nsC(p.achievePctCol)};width:${Math.min(100,p.achievePctCol)}%;height:6px;border-radius:3px"></div></div></div>
+        </div>`;
+
+      return `
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:12px;margin-bottom:${p.hasPrev?'10':'0'}px">
+          <div style="text-align:center;padding:10px;background:var(--surface);border-radius:8px;border-top:2px solid var(--accent)">
+            <div style="color:var(--muted);font-size:10px">📊 ${p.monthName}</div>
+            <div style="font-size:14px;font-weight:800;color:var(--accent)">${_fmt(p.totalNS)} د.ل</div>
+            <div style="font-size:10px;color:var(--muted)">تحصيل: ${_fmt(p.totalCol)}</div>
+          </div>
+          <div style="text-align:center;padding:10px;background:var(--surface);border-radius:8px;border-top:2px solid #f59e0b">
+            <div style="color:var(--muted);font-size:10px">📅 ${p.prevLabel||'السابق'}</div>
+            <div style="font-size:14px;font-weight:800;color:#f59e0b">${p.hasPrev?_fmt(p.prevNS):'—'} ${gi(p.growNS)}</div>
+            <div style="font-size:10px;color:var(--muted)">${p.hasPrev?'تحصيل: '+_fmt(p.prevCol)+' '+gi(p.growCol):'لا بيانات'}</div>
+          </div>
+          <div style="text-align:center;padding:10px;background:var(--surface);border-radius:8px;border-top:2px solid #22c55e">
+            <div style="color:var(--muted);font-size:10px">🎯 هدف الشهر القادم</div>
+            <div style="font-size:14px;font-weight:800;color:#22c55e">${_fmt(p.targetNS)} د.ل</div>
+            <div style="font-size:10px;color:var(--muted)">تحصيل: ${_fmt(p.targetCol)}</div>
+          </div>
+        </div>
+        ${p.hasPrev&&p.achievePctNS?`<div style="display:flex;flex-direction:column;gap:5px">
+          <div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:2px"><span>المبيعات vs السابق</span><span style="color:${nsC(p.achievePctNS)};font-weight:700">${p.achievePctNS}%</span></div>
+          <div style="background:var(--border2);border-radius:3px;height:6px;overflow:hidden"><div style="background:${nsC(p.achievePctNS)};width:${Math.min(100,p.achievePctNS)}%;height:6px;border-radius:3px"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:2px"><span>التحصيل vs السابق</span><span style="color:${nsC(p.achievePctCol)};font-weight:700">${p.achievePctCol}%</span></div>
+          <div style="background:var(--border2);border-radius:3px;height:6px;overflow:hidden"><div style="background:${nsC(p.achievePctCol)};width:${Math.min(100,p.achievePctCol)}%;height:6px;border-radius:3px"></div></div></div>
+        </div>`:''}`;
+    })() : `<div style="font-size:11px;color:var(--muted);text-align:center">💡 حدد فلتر شهر للحصول على أهداف دقيقة</div>`}
+    <div style="margin-top:8px;font-size:11px;color:var(--accent);font-weight:700;text-align:center">📊 ROI المستهدف: ${_fmtP(targetROI)}%</div>
   </div>`;
 
   html += _section('📅 الشهر الأول — تصحيح المسار', `<ol style="margin:0;padding-right:18px;color:var(--text)">
@@ -13146,9 +14007,324 @@ function _genPlanReport() {
     <li style="margin-bottom:6px">وضع خطة حوافز للربع القادم</li>
   </ol>`);
 
+  // ── مهام فورية مخصصة بالأسماء ──
+  const urgentTasks = [];
+  const weakReps  = reps.filter(r=>r.sales>0&&(r.roi||0)<50).sort((a,b)=>(a.roi||0)-(b.roi||0));
+  const highGapR  = reps.filter(r=>(r.gap||0)>50000).sort((a,b)=>(b.gap||0)-(a.gap||0));
+  const highRetR  = reps.filter(r=>(r.retPct||0)>10).sort((a,b)=>(b.retPct||0)-(a.retPct||0));
+
+  if(highGapR.length){
+    urgentTasks.push({priority:'عاجل',color:'#ef4444',icon:'🔴',
+      task:`تحصيل فوري من ${highGapR.slice(0,3).map(r=>`${r.name} (${_fmt(r.gap)} د.ل)`).join('، ')}`,
+      responsible:'مدير المبيعات'});
+  }
+  if(weakReps.length){
+    urgentTasks.push({priority:'هذا الأسبوع',color:'#f59e0b',icon:'🟡',
+      task:`جلسة تطوير مع ${weakReps.slice(0,3).map(r=>r.name).join('، ')} — ROI دون 50%`,
+      responsible:'المشرف المباشر'});
+  }
+  if(highRetR.length){
+    urgentTasks.push({priority:'هذا الأسبوع',color:'#f97316',icon:'🟠',
+      task:`تحقيق في أسباب مرتجعات ${highRetR.slice(0,2).map(r=>`${r.name} (${_fmtP(r.retPct)}%)`).join('، ')}`,
+      responsible:'جودة المنتج'});
+  }
+  urgentTasks.push({priority:'هذا الشهر',color:'#3b82f6',icon:'🔵',task:'تحديث أهداف كل مندوب بناءً على نتائج التقرير الحالي',responsible:'الإدارة'});
+  urgentTasks.push({priority:'هذا الشهر',color:'#8b5cf6',icon:'🟣',task:'إطلاق برنامج تحفيز ربطاً بنسبة التحصيل',responsible:'الإدارة'});
+
+  html += _section('📌 مهام فورية مقترحة',
+    `<div style="display:flex;flex-direction:column;gap:8px">
+    ${urgentTasks.map(t=>`
+      <div style="background:${t.color}0d;border-radius:10px;padding:12px 14px;border-right:4px solid ${t.color}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+          <div style="font-size:12px;font-weight:600;color:var(--text);flex:1">${t.icon} ${t.task}</div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+            <span style="background:${t.color}22;color:${t.color};padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700">${t.priority}</span>
+            <span style="font-size:10px;color:var(--muted)">${t.responsible}</span>
+          </div>
+        </div>
+      </div>`).join('')}
+    </div>`
+  );
+
+  // ── مؤشرات النجاح المستهدفة ──
+  html += _section('🎯 مؤشرات النجاح المستهدفة للربع القادم',
+    `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+      <div style="background:var(--surface2);border-radius:10px;padding:12px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px">📈 نمو المبيعات</div>
+        <div style="font-size:18px;font-weight:800;color:#3b82f6">+10%</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">من ${_fmt(totalNS)} إلى ${_fmt(Math.round(totalNS*1.1))} د.ل</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:10px;padding:12px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px">💰 هدف التحصيل</div>
+        <div style="font-size:18px;font-weight:800;color:#22c55e">${_fmtP(Math.min(95,colPct*1.1))}%</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">من ${_fmtP(colPct)}% الحالي</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:10px;padding:12px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px">📉 هدف المرتجعات</div>
+        <div style="font-size:18px;font-weight:800;color:#f59e0b">أقل من 8%</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">المستوى الحالي: ${_fmtP(reps.reduce((s,r)=>s+(r.retPct||0),0)/reps.length)}%</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:10px;padding:12px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px">🏆 مناديب فوق المتوسط</div>
+        <div style="font-size:18px;font-weight:800;color:#8b5cf6">${Math.round(reps.length*0.7)}+</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">من أصل ${reps.length} مندوب</div>
+      </div>
+    </div>`
+  );
+
   return html;
 }
+
+/* ══════════════════════════════════════════
+   طباعة تقرير المستشار الذكي
+══════════════════════════════════════════ */
+function _printAIReport(isLandscape) {
+  const contentEl = document.getElementById('smart-report-content');
+  const kpisEl    = document.getElementById('smart-kpis');
+  if (!contentEl || !contentEl.innerHTML.trim() || contentEl.innerHTML.includes('ارفع البيانات')) {
+    alert('لا يوجد تقرير للطباعة — يرجى اختيار تقرير أولاً'); return;
+  }
+
+  // ── جمع المعلومات ──
+  const activeBtn   = document.querySelector('.ai-mode-btn.active .ai-btn-label');
+  const reportTitle = activeBtn ? activeBtn.textContent.trim() : 'التقرير التحليلي';
+
+  const logoEl  = document.querySelector('.sidebar-logo img');
+  const logoSrc = logoEl ? logoEl.src : '';
+  const companyEl = document.querySelector('.sidebar-title');
+  const company   = companyEl ? companyEl.textContent.trim() : 'الندى';
+
+  const f = _getAiFilters ? _getAiFilters() : {};
+  const MONTH_AR = {1:'يناير',2:'فبراير',3:'مارس',4:'أبريل',5:'مايو',6:'يونيو',7:'يوليو',8:'أغسطس',9:'سبتمبر',10:'أكتوبر',11:'نوفمبر',12:'ديسمبر'};
+  const _fmtD = d => { if(!d)return '—'; const[y,m,dd]=d.split('-'); return `${parseInt(dd)} ${MONTH_AR[parseInt(m)]} ${y}`; };
+
+  const filterRows = [];
+  if (f.sup)   filterRows.push({l:'المشرف', v: f.sup});
+  if (f.rep)   filterRows.push({l:'المندوب', v: f.rep});
+  if (f.cat)   filterRows.push({l:'القناة البيعية', v: f.cat});
+  if (f.month) filterRows.push({l:'الشهر', v: MONTH_AR[+f.month]||f.month});
+  if (f.from)  filterRows.push({l:'من تاريخ', v: _fmtD(f.from)});
+  if (f.to)    filterRows.push({l:'إلى تاريخ', v: _fmtD(f.to)});
+  if (!filterRows.length) filterRows.push({l:'النطاق', v:'كل البيانات'});
+
+  const now = new Date();
+  const printDate = _fmtD(now.toISOString().slice(0,10));
+  const timeStr   = now.toLocaleTimeString('ar-LY',{hour:'2-digit',minute:'2-digit'});
+
+  // ── تحويل KPI cards إلى جدول بيانات ──
+  const kpisEl2 = document.getElementById('smart-kpis');
+  let kpiTableHTML = '';
+  if (kpisEl2 && kpisEl2.children.length) {
+    const cards = [...kpisEl2.querySelectorAll('.kpi-card')];
+    if (cards.length) {
+      const kpiRows = cards.map(card => {
+        const icon  = card.querySelector('.kpi-icon')?.textContent?.trim() || '';
+        const lbl   = card.querySelector('.kpi-label')?.textContent?.trim() || '';
+        const val   = card.querySelector('.kpi-value')?.textContent?.trim() || '';
+        const sub   = card.querySelector('.kpi-sub')?.textContent?.trim()  || '';
+        return `<tr><td class="row-label">${icon} ${lbl}</td><td class="val-num">${val}</td><td class="val-muted">${sub}</td></tr>`;
+      }).join('');
+      kpiTableHTML = `
+      <div class="sec-hdr">📊 مؤشرات الأداء الرئيسية</div>
+      <table class="data-table">
+        <thead><tr><th>المؤشر</th><th>القيمة</th><th>ملاحظة</th></tr></thead>
+        <tbody>${kpiRows}</tbody>
+      </table>`;
+    }
+  }
+
+  // ── تحويل محتوى التقرير إلى HTML نظيف احترافي ──
+  // نستخرج الأقسام (_section) ونعيد بناءها بتصميم التقرير المالي
+  const tmpDiv = document.createElement('div');
+  tmpDiv.innerHTML = contentEl.innerHTML;
+
+  // إزالة الأزرار والـ inputs
+  tmpDiv.querySelectorAll('button,input,select,.ai-mode-btn').forEach(el=>el.remove());
+
+  let sectionsHTML = '';
+  // كل قسم محاط بـ div يبدأ بـ margin-bottom:20px
+  const sectionDivs = tmpDiv.querySelectorAll('div[style*="margin-bottom:20px"]');
+
+  if (sectionDivs.length) {
+    sectionDivs.forEach(sec => {
+      // عنوان القسم
+      const titleEl = sec.querySelector('div[style*="font-size:14px"], div[style*="font-weight:800"]');
+      const title   = titleEl ? titleEl.textContent.trim() : '';
+      // محتوى القسم
+      const bodyClone = sec.cloneNode(true);
+      if (titleEl) bodyClone.removeChild(bodyClone.querySelector('div[style*="font-size:14px"], div[style*="font-weight:800"]') || bodyClone.firstChild);
+
+      // إذا كان يحتوي جدول
+      const table = sec.querySelector('table');
+      if (table) {
+        // أعد بناء الجدول بـ CSS التقرير المالي
+        const tableClone = table.cloneNode(true);
+        // أزل sortable arrows
+        tableClone.querySelectorAll('span[style*="font-size:9px"]').forEach(s=>s.remove());
+        tableClone.querySelectorAll('th').forEach(th=>{ th.removeAttribute('onclick'); th.removeAttribute('title'); th.style.cursor=''; });
+        sectionsHTML += `<div class="sec-hdr">${title}</div><div class="table-wrap">${tableClone.outerHTML}</div>`;
+      } else {
+        // محتوى نصي / قوائم / بطاقات
+        const innerText = bodyClone.innerHTML;
+        sectionsHTML += `<div class="sec-hdr">${title}</div><div class="sec-body">${innerText}</div>`;
+      }
+    });
+  } else {
+    // fallback: المحتوى كاملاً
+    sectionsHTML = `<div class="sec-body">${tmpDiv.innerHTML}</div>`;
+  }
+
+  const orient = isLandscape !== false ? 'landscape' : 'portrait';
+  const pw = window.open('', '_blank', 'width=1100,height=850');
+  if (!pw) { alert('يرجى السماح بالنوافذ المنبثقة'); return; }
+
+  pw.document.write(`<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>${reportTitle} — ${company}</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+@page{size:A4 ${orient};margin:0}
+html,body{font-family:'Cairo',sans-serif;font-size:9pt;color:#1a1a2e;background:#fff;direction:rtl;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+body{padding:12mm 14mm 18mm 14mm}
+
+/* ── رأس الصفحة ── */
+.header{display:flex;align-items:stretch;justify-content:space-between;margin-bottom:8px;border-radius:6px 6px 0 0;overflow:hidden}
+.header-accent{width:6px;background:#002f7a;flex-shrink:0}
+.header-body{flex:1;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fff}
+.hdr-logo-wrap{display:flex;align-items:center;gap:12px}
+.hdr-logo{width:38px;height:38px;border-radius:4px;overflow:hidden;flex-shrink:0;border:1px solid #d0dce8;background:#f5f7fb;display:flex;align-items:center;justify-content:center}
+.hdr-logo img{width:100%;height:100%;object-fit:contain}
+.company-name{font-size:7.5pt;font-weight:700;color:#5a6a85;letter-spacing:.4px;text-transform:uppercase;margin-bottom:1px}
+.report-title{font-size:15pt;font-weight:900;color:#002f7a;line-height:1;letter-spacing:-.3px}
+.hdr-right{text-align:left;font-size:8pt;color:#5a6a85;line-height:1.9;padding-right:4px}
+.hdr-right .date-val{font-size:10.5pt;font-weight:900;color:#002f7a;display:block;margin-bottom:1px}
+.header-rule{height:3px;background:linear-gradient(to left,#f05a1e 0%,#f05a1e 60px,#002f7a 60px,#002f7a 100%);margin-bottom:12px}
+
+/* ── بطاقة المراسلة ── */
+.memo-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:8.5pt}
+.memo-table .m-lbl{width:80px;padding:0 0 5px 0;color:#7a8aaa;font-weight:700;font-size:7pt;letter-spacing:.6px;text-transform:uppercase;vertical-align:top;white-space:nowrap;padding-top:2px}
+.memo-table .m-sep{width:8px;text-align:center;color:#c5d0e8;padding-bottom:5px;vertical-align:top;padding-top:2px}
+.memo-table .m-val{padding:0 10px 5px 0;color:#1a1a2e;font-weight:700;font-size:9pt;vertical-align:top;line-height:1.4}
+.memo-table tr:first-child .m-val{font-size:10pt;color:#003c96;font-weight:900}
+.memo-table tr:last-child .m-val{color:#003c96;font-weight:800;border-top:1.5px solid #d0ddf5;padding-top:5px}
+.memo-table tr:last-child .m-lbl,.memo-table tr:last-child .m-sep{border-top:1.5px solid #d0ddf5;padding-top:5px}
+
+/* ── عنوان القسم ── */
+.sec-hdr{background:#003c96;color:#fff;padding:5px 12px 5px 14px;font-size:8.5pt;font-weight:700;letter-spacing:.2px;margin-bottom:0;margin-top:10px;border-radius:5px 5px 0 0;border-right:4px solid #f05a1e}
+
+/* ── جدول البيانات ── */
+.data-table,.sec-body table{width:100%;border-collapse:collapse;margin-bottom:0;font-size:8pt}
+.data-table thead th,.sec-body table thead th{background:#eef3fc;color:#003c96;font-weight:700;padding:5px 10px;text-align:center;border:1px solid #d0ddf5;font-size:7.5pt}
+.data-table thead th:first-child,.sec-body table thead th:first-child{text-align:right}
+.data-table tbody td,.sec-body table tbody td{padding:4px 10px;border:1px solid #e4ecf8;color:#1a1a2e;vertical-align:middle;text-align:center;font-size:8pt}
+.data-table tbody td:first-child,.sec-body table tbody td:first-child{text-align:right;font-weight:600}
+.data-table tbody tr:nth-child(even) td,.sec-body table tbody tr:nth-child(even) td{background:#f8faff}
+.data-table tfoot td,.sec-body table tfoot td{background:#003c96!important;color:#fff!important;font-weight:800!important;font-size:8.5pt!important;padding:5px 10px;text-align:center;border-color:#003c96!important}
+.data-table tfoot td:first-child,.sec-body table tfoot td:first-child{border-right:4px solid #f05a1e!important;text-align:right}
+.val-num{text-align:center;font-weight:800;color:#003c96}
+.val-muted{text-align:center;color:#aaa}
+.row-label{text-align:right;font-weight:600;color:#2d3748}
+.table-wrap{border:1px solid #d0ddf5;border-top:none;border-radius:0 0 5px 5px;overflow:hidden;margin-bottom:10px}
+
+/* ── محتوى نصي ── */
+.sec-body{padding:10px 14px;background:#fafbff;border:1px solid #d0ddf5;border-top:none;border-radius:0 0 5px 5px;margin-bottom:10px;font-size:8.5pt;line-height:1.8;color:#2c3e60}
+.sec-body ul,.sec-body ol{padding-right:18px;margin:4px 0}
+.sec-body li{margin-bottom:3px}
+.sec-body b{color:#003c96}
+/* ألوان المؤشرات */
+[style*="color:#22c55e"],[style*="color:var(--accent2)"]{color:#1d6b45!important;font-weight:700}
+[style*="color:#ef4444"],[style*="color:#f05252"],[style*="color:var(--red)"]{color:#c0392b!important;font-weight:700}
+[style*="color:#f59e0b"],[style*="color:var(--gold)"]{color:#b45309!important;font-weight:700}
+[style*="color:#3b82f6"],[style*="color:var(--accent)"]{color:#003c96!important;font-weight:700}
+[style*="color:#8b5cf6"],[style*="color:var(--purple)"]{color:#6d28d9!important;font-weight:700}
+/* إخفاء ما لا يُطبع */
+button,input,select,.ai-mode-btn,[onclick]{display:none!important}
+/* SVG دائري (مؤشر أداء) */
+svg{display:block}
+
+/* ── فوتر ── */
+.footer{position:fixed;bottom:12mm;left:14mm;right:14mm;border-top:3px solid #002f7a;position:relative;margin-top:14px}
+.footer::before{content:'';display:block;height:3px;width:56px;background:#f05a1e;position:absolute;top:-3px;left:0}
+.footer-inner{display:flex;align-items:center;justify-content:space-between;padding-top:7px;font-size:7.5pt;color:#7a8aaa}
+.footer-sig{font-weight:700;color:#002f7a;font-size:8pt}
+.footer-copy{color:#aaa;font-size:7pt}
+.footer-dot{color:#f05a1e;font-weight:900;margin:0 4px}
+
+@media print{
+  body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .sec-hdr{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .data-table thead th,.sec-body table thead th{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .data-table tfoot td,.sec-body table tfoot td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+
+<!-- ── رأس الصفحة ── -->
+<div class="header">
+  <div class="header-accent"></div>
+  <div class="header-body">
+    <div class="hdr-logo-wrap">
+      ${logoSrc ? `<div class="hdr-logo"><img src="${logoSrc}"></div>` : ''}
+      <div>
+        <div class="company-name">${company}</div>
+        <div class="report-title">${reportTitle}</div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <span class="date-val">${printDate}</span>
+      الساعة: ${timeStr}
+    </div>
+  </div>
+</div>
+<div class="header-rule"></div>
+
+<!-- ── بطاقة المراسلة ── -->
+<table class="memo-table">
+  <tr><td class="m-lbl">إلى</td><td class="m-sep">:</td><td class="m-val">الإدارة العليا</td></tr>
+  <tr><td class="m-lbl">من</td><td class="m-sep">:</td><td class="m-val">نظام التحليل الاستراتيجي — ${company}</td></tr>
+  <tr><td class="m-lbl">التاريخ</td><td class="m-sep">:</td><td class="m-val">${printDate} — ${timeStr}</td></tr>
+  ${filterRows.map(r=>`<tr><td class="m-lbl">${r.l}</td><td class="m-sep">:</td><td class="m-val">${r.v}</td></tr>`).join('')}
+  <tr><td class="m-lbl">الموضوع</td><td class="m-sep">:</td><td class="m-val">${reportTitle}</td></tr>
+</table>
+
+<!-- ── مؤشرات الأداء ── -->
+${kpiTableHTML}
+
+<!-- ── محتوى التقرير ── -->
+${sectionsHTML}
+
+<!-- ── فوتر ── -->
+<div class="footer">
+  <div class="footer-inner">
+    <span class="footer-sig">${company} — ${reportTitle}</span>
+    <span><span class="footer-dot">●</span>لوحة الندى للتحليل الاستراتيجي<span class="footer-dot">●</span>${printDate}</span>
+    <span class="footer-copy">وثيقة سرية — للاستخدام الداخلي فقط</span>
+  </div>
+</div>
+
+<script>
+window.onload = function() {
+  document.fonts.ready.then(function() {
+    setTimeout(function() { window.print(); }, 800);
+  });
+};
+<\/script>
+</body>
+</html>`);
+  pw.document.close();
+}
+
+function _printAIReportA4() {
+  _printAIReport(false);
+}
+
 </script>
+
+
 
 
 <div id="loading-overlay" style="position: fixed; inset: 0px; z-index: 9997; display: none; align-items: center; justify-content: center;">
@@ -14437,7 +15613,7 @@ function _expPrint(){
   const opIncome = netSales > 0 ? netSales - totalExp : null;
   const opMargin = netSales > 0 ? (opIncome/netSales*100) : null;
 
-  const fmt  = v => v.toLocaleString('ar-LY',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' د.ل';
+  const fmt  = v => v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' د.ل';
   const fmtP = v => v.toFixed(2) + '%';
 
   const _fmtDate = d => {
