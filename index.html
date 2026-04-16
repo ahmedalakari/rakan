@@ -12856,16 +12856,38 @@ function _genExecutiveReport() {
   if (avgROI < 60) weaknesses.push(`⚠️ ROI ضعيف ${_fmtP(avgROI)}% — مراجعة استراتيجية التسعير`);
   if (highGap && highGap.gap > 0) weaknesses.push(`⚠️ ${highGap.name} لديه أعلى فجوة تحصيل: ${_fmt(highGap.gap)} د.ل`);
 
-  if (strengths.length) {
-    html += _section('✅ نقاط القوة', `<ul style="margin:0;padding-right:18px;color:var(--text)">${strengths.map(s=>`<li style="margin-bottom:4px">${s}</li>`).join('')}</ul>`);
-  }
-  if (weaknesses.length) {
-    html += _section('🔴 نقاط تحتاج تحسين', `<ul style="margin:0;padding-right:18px;color:var(--text)">${weaknesses.map(w=>`<li style="margin-bottom:4px">${w}</li>`).join('')}</ul>`);
+  // ── نقاط القوة والضعف في نفس القسم ──
+  if(strengths.length || weaknesses.length){
+    html += _section('📋 نقاط القوة والتحسين',
+      `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          <div style="font-size:12px;font-weight:800;color:#22c55e;margin-bottom:6px">✅ نقاط القوة</div>
+          ${strengths.length?`<ul style="margin:0;padding-right:18px;color:var(--text)">${strengths.map(s=>`<li style="margin-bottom:4px">${s}</li>`).join('')}</ul>`:'<div style="color:var(--muted);font-size:11px">—</div>'}
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:800;color:#ef4444;margin-bottom:6px">🔴 نقاط تحتاج تحسين</div>
+          ${weaknesses.length?`<ul style="margin:0;padding-right:18px;color:var(--text)">${weaknesses.map(w=>`<li style="margin-bottom:4px">${w}</li>`).join('')}</ul>`:'<div style="color:var(--muted);font-size:11px">—</div>'}
+        </div>
+      </div>`
+    );
   }
 
   // تقسيم الفئات
   const catRows = Object.entries(cats).map(([c,v])=>[c, v.count, _fmt(v.ns), _fmt(v.col), v.ns>0?_fmtP(v.col/v.ns*100)+'%':'—']);
+  // ── أداء المشرفين بعد الفئات مباشرة ──
+  const supMap = {};
+  reps.forEach(r=>{const s=(D._repSuperMap&&D._repSuperMap[r.name])||'غير محدد';if(!supMap[s])supMap[s]={ns:0,col:0,count:0,gap:0};supMap[s].ns+=(r.netSales||0);supMap[s].col+=(r.col||0);supMap[s].count++;supMap[s].gap+=(r.gap||0);});
+  const sups = Object.entries(supMap).filter(([k])=>k&&k!=='غير محدد'&&k!=='ترك الفرع'&&k!=='موقوف');
+
   html += _section('📂 أداء الفئات', _table(['الفئة','المناديب','صافي المبيعات','التحصيل','% التحصيل'], catRows));
+
+  if(sups.length>1){
+    const supRows = sups.sort((a,b)=>b[1].ns-a[1].ns).map(([name,v])=>[
+      `<b>${name}</b>`,v.count,_fmt(v.ns),_fmt(v.col),_fmt(v.gap),
+      v.ns>0?`<span style="color:${v.col/v.ns>=0.8?'#22c55e':v.col/v.ns>=0.6?'#f59e0b':'#ef4444'};font-weight:700">${_fmtP(v.col/v.ns*100)}%</span>`:'—'
+    ]);
+    html += _section('👔 أداء المشرفين', _table(['المشرف','المناديب','صافي المبيعات','التحصيل','الفجوة','% التحصيل'], supRows));
+  }
 
   // التوصيات
   const recs = [];
@@ -12909,18 +12931,6 @@ function _genExecutiveReport() {
       </div>
     </div>`
   );
-
-  // ── ترتيب المشرفين (إن وجد) ──
-  const supMap = {};
-  reps.forEach(r=>{const s=(D._repSuperMap&&D._repSuperMap[r.name])||'غير محدد';if(!supMap[s])supMap[s]={ns:0,col:0,count:0,gap:0};supMap[s].ns+=(r.netSales||0);supMap[s].col+=(r.col||0);supMap[s].count++;supMap[s].gap+=(r.gap||0);});
-  const sups = Object.entries(supMap).filter(([k])=>k&&k!=='غير محدد'&&k!=='ترك الفرع'&&k!=='موقوف');
-  if(sups.length>1){
-    const supRows = sups.sort((a,b)=>b[1].ns-a[1].ns).map(([name,v])=>[
-      `<b>${name}</b>`,v.count,_fmt(v.ns),_fmt(v.col),_fmt(v.gap),
-      v.ns>0?`<span style="color:${v.col/v.ns>=0.8?'#22c55e':v.col/v.ns>=0.6?'#f59e0b':'#ef4444'};font-weight:700">${_fmtP(v.col/v.ns*100)}%</span>`:'—'
-    ]);
-    html += _section('👔 أداء المشرفين', _table(['المشرف','المناديب','صافي المبيعات','التحصيل','الفجوة','% التحصيل'], supRows));
-  }
 
   // ── أهداف ذكية بالإسقاط المتكيف ──
   const _proj = _getMonthProjection(totalNS, totalCol);
@@ -13054,10 +13064,11 @@ function _genExecutiveReport() {
       : `📈 أهداف ${_proj.monthName||'الفترة'} ومقارنة بالسابق`)
     : '📈 أهداف الشهر القادم المقترحة';
 
-  html += _section(_projTitle,
-    _renderTargets(_proj) +
-    `<div style="margin-top:8px;font-size:11px;color:var(--accent);font-weight:700;text-align:center">📊 ROI المستهدف: ${_fmtP(nextROI)}%</div>`
-  );
+  html += `<div class="no-print-section">` +
+    _section(_projTitle,
+      _renderTargets(_proj) +
+      `<div style="margin-top:8px;font-size:11px;color:var(--accent);font-weight:700;text-align:center">📊 ROI المستهدف: ${_fmtP(nextROI)}%</div>`
+    ) + `</div>`;
 
   return html;
 }
@@ -13458,6 +13469,47 @@ function _genProductsReport() {
     );
   }
 
+  // ── مقارنة المشرفين ──
+  if(D._repSuperMap && Object.keys(D._repSuperMap).length){
+    const supProdMap = {};
+    salesRows.forEach(r => {
+      const repName = String(r[kRep]||'').trim();
+      const sup     = (D._repSuperMap&&D._repSuperMap[repName]) || 'غير محدد';
+      if(!sup || sup==='ترك الفرع' || sup==='موقوف') return;
+      const type    = String(r[kType]||'').trim();
+      const v       = _n(r[kTotal]);
+      const q       = _n(r[kQty]);
+      const qi      = _n(r[kQtyIn]);
+      if(!supProdMap[sup]) supProdMap[sup] = {ns:0,qty:0,retVal:0,retQty:0,reps:new Set()};
+      supProdMap[sup].reps.add(repName);
+      if(type==='مبيع')         { supProdMap[sup].ns+=v; supProdMap[sup].qty+=q; }
+      else if(type==='مرتجع مبيع'){ supProdMap[sup].retVal+=v; supProdMap[sup].retQty+=(qi>0?qi:q); }
+    });
+    const supEntries = Object.entries(supProdMap)
+      .map(([name,d])=>({name, ns:d.ns-d.retVal, qty:d.qty-d.retQty, sales:d.ns, retVal:d.retVal, reps:d.reps.size}))
+      .filter(s=>s.sales>0)
+      .sort((a,b)=>b.ns-a.ns);
+    if(supEntries.length > 1){
+      const supTotalNS = supEntries.reduce((s,x)=>s+x.ns,0)||1;
+      const supRows2 = supEntries.map(s=>{
+        const retPct = s.sales>0?_fmtP(s.retVal/s.sales*100)+'%':'—';
+        const share  = _fmtP(s.ns/supTotalNS*100)+'%';
+        const barW   = Math.round(s.ns/supTotalNS*100);
+        return [
+          `<b>${s.name}</b>`,
+          s.reps,
+          _fmt(s.ns),
+          _fmt(s.qty),
+          `<span style="color:${s.retVal/s.sales>=0.1?'var(--red)':'var(--muted)'}">${retPct}</span>`,
+          `<b style="color:var(--accent)">${share}</b>`
+        ];
+      });
+      html += _section('👔 مقارنة المشرفين',
+        _table(['المشرف','المناديب','صافي المبيعات','صافي الكمية','% المرتجعات','% من الإجمالي'], supRows2)
+      );
+    }
+  }
+
   // ── جدول الأصناف × القنوات (كل الأصناف) ──
   const crossHeaders = ['#','الصنف','الإجمالي', ...channels.map(ch=>`<span style="color:${chColor(ch)}">${ch}</span>`), 'ABC'];
   const crossRows = items.map((p, i) => {
@@ -13497,6 +13549,81 @@ function _genProductsReport() {
       </tr>`).join('')}</tbody>
     </table></div>`
   );
+
+  // ── مقارنة الأصناف حسب المشرفين ──
+  if(D._repSuperMap && Object.keys(D._repSuperMap).length){
+    // بناء خريطة: صنف → مشرف → {ns, nqty}
+    const supNames = [...new Set(
+      Object.values(D._repSuperMap)
+        .filter(s=>s&&s!=='ترك الفرع'&&s!=='موقوف'&&s!=='غير محدد')
+    )].sort();
+
+    if(supNames.length > 1){
+      const itemSupMap = {}; // itemSupMap[صنف][مشرف] = {ns,qty,retVal,retQty}
+      salesRows.forEach(r => {
+        const repName = String(r[kRep]||'').trim();
+        const sup     = (D._repSuperMap&&D._repSuperMap[repName])||'غير محدد';
+        if(!supNames.includes(sup)) return;
+        const name = String(r[kMat]||'غير محدد').trim();
+        const type = String(r[kType]||'').trim();
+        const v    = _n(r[kTotal]), q = _n(r[kQty]), qi = _n(r[kQtyIn]);
+        if(!itemSupMap[name]) itemSupMap[name] = {};
+        if(!itemSupMap[name][sup]) itemSupMap[name][sup] = {ns:0,qty:0,retVal:0,retQty:0};
+        if(type==='مبيع')          { itemSupMap[name][sup].ns+=v; itemSupMap[name][sup].qty+=q; }
+        else if(type==='مرتجع مبيع'){ itemSupMap[name][sup].retVal+=v; itemSupMap[name][sup].retQty+=(qi>0?qi:q); }
+      });
+
+      // احسب صافي لكل صنف/مشرف
+      const supItems = Object.entries(itemSupMap).map(([name,byS])=>{
+        let totalNS2=0;
+        supNames.forEach(s=>{ const d=byS[s]||{ns:0,retVal:0}; totalNS2+=(d.ns-d.retVal); });
+        return {name, byS, totalNS2};
+      }).filter(p=>p.totalNS2>0).sort((a,b)=>b.totalNS2-a.totalNS2);
+
+      const supColors = ['#2c5de5','#f07820','#7c3aed','#22c55e','#ef4444','#06b6d4'];
+      const supColor  = i => supColors[i % supColors.length];
+
+      const supCrossHeaders = ['#','الصنف','الإجمالي',
+        ...supNames.map((s,i)=>`<span style="color:${supColor(i)}">${s}</span>`),
+        'ABC'
+      ];
+
+      const supCrossRows = supItems.map((p,i)=>{
+        const abcColor = i/supItems.length<0.7?'#f59e0b':i/supItems.length<0.9?'#3b82f6':'#9ba5c0';
+        const abcLbl   = i/supItems.length<0.7?'A':i/supItems.length<0.9?'B':'C';
+        const supCells = supNames.map((s,si)=>{
+          const d = p.byS[s]||{ns:0,retVal:0,qty:0,retQty:0};
+          const ns = d.ns-d.retVal;
+          if(!ns) return `<span style="color:var(--muted);font-size:11px">—</span>`;
+          const pct = p.totalNS2>0?(ns/p.totalNS2*100):0;
+          return `<div style="font-size:11px;font-weight:700;color:${supColor(si)}">${_fmt(ns)}</div>
+                  <div style="background:var(--border2);border-radius:2px;height:3px;margin-top:2px">
+                    <div style="background:${supColor(si)};width:${Math.round(pct)}%;height:3px;border-radius:2px"></div>
+                  </div>
+                  <div style="font-size:10px;color:var(--muted)">${_fmtP(pct)}%</div>`;
+        });
+        return {
+          bg: i%2===0?'transparent':'var(--surface2)',
+          cells: [
+            `<b style="color:var(--muted)">${i+1}</b>`,
+            `<div style="font-size:12px;font-weight:700;color:var(--text)">${p.name.substring(0,32)}</div>`,
+            `<div style="font-size:12px;font-weight:800;color:#22c55e">${_fmt(p.totalNS2)}</div>`,
+            ...supCells,
+            `<span style="background:${abcColor}22;color:${abcColor};padding:2px 8px;border-radius:20px;font-size:11px;font-weight:800">${abcLbl}</span>`
+          ]
+        };
+      });
+
+      html += _section(`📋 مقارنة الأصناف حسب المشرفين — ${supItems.length} صنف`,
+        `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">
+          <thead><tr>${supCrossHeaders.map(h=>`<th style="padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);text-align:center;font-weight:700;white-space:nowrap;position:sticky;top:0">${h}</th>`).join('')}</tr></thead>
+          <tbody>${supCrossRows.map(r=>`<tr style="background:${r.bg}">
+            ${r.cells.map(c=>`<td style="padding:7px 8px;border:1px solid var(--border2);text-align:center;vertical-align:middle">${c}</td>`).join('')}
+          </tr>`).join('')}</tbody>
+        </table></div>`
+      );
+    }
+  }
 
   // ── أفضل صنف في كل قناة ──
   if (channels.length > 1) {
@@ -14081,103 +14208,127 @@ function _genPlanReport() {
 ══════════════════════════════════════════ */
 function _printAIReport(isLandscape) {
   const contentEl = document.getElementById('smart-report-content');
-  const kpisEl    = document.getElementById('smart-kpis');
   if (!contentEl || !contentEl.innerHTML.trim() || contentEl.innerHTML.includes('ارفع البيانات')) {
     alert('لا يوجد تقرير للطباعة — يرجى اختيار تقرير أولاً'); return;
   }
 
-  // ── جمع المعلومات ──
   const activeBtn   = document.querySelector('.ai-mode-btn.active .ai-btn-label');
   const reportTitle = activeBtn ? activeBtn.textContent.trim() : 'التقرير التحليلي';
-
-  const logoEl  = document.querySelector('.sidebar-logo img');
-  const logoSrc = logoEl ? logoEl.src : '';
-  const companyEl = document.querySelector('.sidebar-title');
-  const company   = companyEl ? companyEl.textContent.trim() : 'الندى';
-
-  const f = _getAiFilters ? _getAiFilters() : {};
-  const MONTH_AR = {1:'يناير',2:'فبراير',3:'مارس',4:'أبريل',5:'مايو',6:'يونيو',7:'يوليو',8:'أغسطس',9:'سبتمبر',10:'أكتوبر',11:'نوفمبر',12:'ديسمبر'};
+  const logoEl      = document.querySelector('.sidebar-logo img');
+  const logoSrc     = logoEl ? logoEl.src : '';
+  const companyEl   = document.querySelector('.sidebar-title');
+  const company     = companyEl ? companyEl.textContent.trim() : 'الندى';
+  const f           = _getAiFilters ? _getAiFilters() : {};
+  const MONTH_AR    = {1:'يناير',2:'فبراير',3:'مارس',4:'أبريل',5:'مايو',6:'يونيو',7:'يوليو',8:'أغسطس',9:'سبتمبر',10:'أكتوبر',11:'نوفمبر',12:'ديسمبر'};
   const _fmtD = d => { if(!d)return '—'; const[y,m,dd]=d.split('-'); return `${parseInt(dd)} ${MONTH_AR[parseInt(m)]} ${y}`; };
-
-  const filterRows = [];
-  if (f.sup)   filterRows.push({l:'المشرف', v: f.sup});
-  if (f.rep)   filterRows.push({l:'المندوب', v: f.rep});
-  if (f.cat)   filterRows.push({l:'القناة البيعية', v: f.cat});
-  if (f.month) filterRows.push({l:'الشهر', v: MONTH_AR[+f.month]||f.month});
-  if (f.from)  filterRows.push({l:'من تاريخ', v: _fmtD(f.from)});
-  if (f.to)    filterRows.push({l:'إلى تاريخ', v: _fmtD(f.to)});
-  if (!filterRows.length) filterRows.push({l:'النطاق', v:'كل البيانات'});
-
-  const now = new Date();
+  const now       = new Date();
   const printDate = _fmtD(now.toISOString().slice(0,10));
   const timeStr   = now.toLocaleTimeString('ar-LY',{hour:'2-digit',minute:'2-digit'});
 
-  // ── تحويل KPI cards إلى جدول بيانات ──
+  const filterRows = [];
+  if(f.sup)   filterRows.push({l:'المشرف',     v:f.sup});
+  if(f.rep)   filterRows.push({l:'المندوب',    v:f.rep});
+  if(f.cat)   filterRows.push({l:'القناة',     v:f.cat});
+  if(f.month) filterRows.push({l:'الشهر',      v:MONTH_AR[+f.month]||f.month});
+  if(f.from)  filterRows.push({l:'من تاريخ',   v:_fmtD(f.from)});
+  if(f.to)    filterRows.push({l:'إلى تاريخ',  v:_fmtD(f.to)});
+  if(!filterRows.length) filterRows.push({l:'النطاق', v:'كل البيانات'});
+
+  /* ── KPI: استخرج من بطاقات ── */
   const kpisEl2 = document.getElementById('smart-kpis');
   let kpiTableHTML = '';
-  if (kpisEl2 && kpisEl2.children.length) {
+  if(kpisEl2){
     const cards = [...kpisEl2.querySelectorAll('.kpi-card')];
-    if (cards.length) {
-      const kpiRows = cards.map(card => {
-        const icon  = card.querySelector('.kpi-icon')?.textContent?.trim() || '';
-        const lbl   = card.querySelector('.kpi-label')?.textContent?.trim() || '';
-        const val   = card.querySelector('.kpi-value')?.textContent?.trim() || '';
-        const sub   = card.querySelector('.kpi-sub')?.textContent?.trim()  || '';
-        return `<tr><td class="row-label">${icon} ${lbl}</td><td class="val-num">${val}</td><td class="val-muted">${sub}</td></tr>`;
+    if(cards.length){
+      const rows = cards.map(c=>{
+        const icon = c.querySelector('.kpi-icon')?.textContent?.trim()||'';
+        const lbl  = c.querySelector('.kpi-label')?.textContent?.trim()||'';
+        const val  = c.querySelector('.kpi-value')?.textContent?.trim()||'';
+        const sub  = c.querySelector('.kpi-sub')?.textContent?.trim()||'';
+        return `<tr><td class="rl">${icon} ${lbl}</td><td class="vn">${val}</td><td class="vm">${sub}</td></tr>`;
       }).join('');
-      kpiTableHTML = `
-      <div class="sec-hdr">📊 مؤشرات الأداء الرئيسية</div>
-      <table class="data-table">
-        <thead><tr><th>المؤشر</th><th>القيمة</th><th>ملاحظة</th></tr></thead>
-        <tbody>${kpiRows}</tbody>
-      </table>`;
+      kpiTableHTML = `<div class="sec-hdr">📊 مؤشرات الأداء الرئيسية</div>
+<table class="dt"><thead><tr><th style="text-align:right">المؤشر</th><th>القيمة</th><th>ملاحظة</th></tr></thead>
+<tbody>${rows}</tbody></table>`;
     }
   }
 
-  // ── تحويل محتوى التقرير إلى HTML نظيف احترافي ──
-  // نستخرج الأقسام (_section) ونعيد بناءها بتصميم التقرير المالي
-  const tmpDiv = document.createElement('div');
-  tmpDiv.innerHTML = contentEl.innerHTML;
+  /* ── استخرج الأقسام بشكل نظيف ── */
+  const tmp = document.createElement('div');
+  tmp.innerHTML = contentEl.innerHTML;
 
-  // إزالة الأزرار والـ inputs
-  tmpDiv.querySelectorAll('button,input,select,.ai-mode-btn').forEach(el=>el.remove());
+  // أزل عناصر لا تُطبع
+  tmp.querySelectorAll('button,input,select,svg,.ai-mode-btn').forEach(el=>el.remove());
 
+  // أزل الأقسام المحددة بـ no-print-section (الأهداف وغيرها)
+  tmp.querySelectorAll('.no-print-section').forEach(el=>el.remove());
+
+  // أزل فقط قسم "أفضل صنف في كل قناة"
+  tmp.querySelectorAll('div[style*="margin-bottom:20px"]').forEach(sec=>{
+    const titleEl = sec.querySelector('div[style*="font-size:14px"],div[style*="font-weight:800"]');
+    if(titleEl && titleEl.textContent.includes('أفضل صنف في كل قناة')) {
+      sec.remove();
+    }
+  });
+
+  // أزل تكرار الأصناف C (الراكدة)
+  tmp.querySelectorAll('div[style*="margin-bottom:20px"]').forEach(sec=>{
+    const titleEl = sec.querySelector('div[style*="font-size:14px"],div[style*="font-weight:800"]');
+    if(titleEl && titleEl.textContent.includes('الأصناف C الراكدة')) {
+      sec.remove();
+    }
+  });
+
+  // أزل أي رسوم بيانية (canvas, svg, chart)
+  tmp.querySelectorAll('canvas,[id^="ch-"],[class*="chart"]').forEach(el=>el.remove());
+
+  /* بناء HTML الأقسام */
   let sectionsHTML = '';
-  // كل قسم محاط بـ div يبدأ بـ margin-bottom:20px
-  const sectionDivs = tmpDiv.querySelectorAll('div[style*="margin-bottom:20px"]');
+  const sectionDivs = tmp.querySelectorAll('div[style*="margin-bottom:20px"]');
 
-  if (sectionDivs.length) {
-    sectionDivs.forEach(sec => {
-      // عنوان القسم
-      const titleEl = sec.querySelector('div[style*="font-size:14px"], div[style*="font-weight:800"]');
+  if(sectionDivs.length){
+    sectionDivs.forEach((sec,idx)=>{
+      const titleEl = sec.querySelector('div[style*="font-size:14px"],div[style*="font-weight:800"]');
       const title   = titleEl ? titleEl.textContent.trim() : '';
-      // محتوى القسم
-      const bodyClone = sec.cloneNode(true);
-      if (titleEl) bodyClone.removeChild(bodyClone.querySelector('div[style*="font-size:14px"], div[style*="font-weight:800"]') || bodyClone.firstChild);
+      if(!title) return;
 
-      // إذا كان يحتوي جدول
       const table = sec.querySelector('table');
-      if (table) {
-        // أعد بناء الجدول بـ CSS التقرير المالي
-        const tableClone = table.cloneNode(true);
-        // أزل sortable arrows
-        tableClone.querySelectorAll('span[style*="font-size:9px"]').forEach(s=>s.remove());
-        tableClone.querySelectorAll('th').forEach(th=>{ th.removeAttribute('onclick'); th.removeAttribute('title'); th.style.cursor=''; });
-        sectionsHTML += `<div class="sec-hdr">${title}</div><div class="table-wrap">${tableClone.outerHTML}</div>`;
+      if(table){
+        const tClone = table.cloneNode(true);
+        // نظّف الـ headers
+        tClone.querySelectorAll('th').forEach(th=>{
+          th.removeAttribute('onclick'); th.removeAttribute('title'); th.style.cursor='';
+          th.querySelectorAll('span[style*="font-size:9px"]').forEach(s=>s.remove());
+        });
+        // للجداول العريضة (أصناف × قنوات) استخدم خط أصغر وتدوير الرأس
+        const colCount = tClone.querySelectorAll('thead tr th').length;
+        const wideStyle = colCount > 6
+          ? 'font-size:6pt!important;overflow-x:visible'
+          : '';
+        const wideClass = colCount > 6 ? ' wide-tbl' : '';
+        sectionsHTML += `<div class="sec-wrap${idx>0?' page-break':''}${wideClass}">
+<div class="sec-hdr">${title}</div>
+<div class="tbl-wrap"${wideStyle?` style="${wideStyle}"`:''}>${tClone.outerHTML}</div></div>`;
       } else {
-        // محتوى نصي / قوائم / بطاقات
-        const innerText = bodyClone.innerHTML;
-        sectionsHTML += `<div class="sec-hdr">${title}</div><div class="sec-body">${innerText}</div>`;
+        // محتوى نصي: قوائم / نقاط / بطاقات
+        const bodyClone = sec.cloneNode(true);
+        if(titleEl) { const t=bodyClone.querySelector('div[style*="font-size:14px"],div[style*="font-weight:800"]'); if(t) t.remove(); }
+        // حوّل الـ divs الداخلية إلى نص منسق
+        bodyClone.querySelectorAll('ul,ol').forEach(list=>{
+          list.style.paddingRight='18px'; list.style.margin='4px 0';
+        });
+        sectionsHTML += `<div class="sec-wrap${idx>0?' page-break':''}">
+<div class="sec-hdr">${title}</div>
+<div class="sec-body">${bodyClone.innerHTML}</div></div>`;
       }
     });
   } else {
-    // fallback: المحتوى كاملاً
-    sectionsHTML = `<div class="sec-body">${tmpDiv.innerHTML}</div>`;
+    sectionsHTML = `<div class="sec-body">${tmp.innerHTML}</div>`;
   }
 
   const orient = isLandscape !== false ? 'landscape' : 'portrait';
-  const pw = window.open('', '_blank', 'width=1100,height=850');
-  if (!pw) { alert('يرجى السماح بالنوافذ المنبثقة'); return; }
+  const pw = window.open('','_blank','width=1100,height=850');
+  if(!pw){ alert('يرجى السماح بالنوافذ المنبثقة'); return; }
 
   pw.document.write(`<!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -14189,128 +14340,157 @@ function _printAIReport(isLandscape) {
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 @page{size:A4 ${orient};margin:0}
 html,body{font-family:'Cairo',sans-serif;font-size:9pt;color:#1a1a2e;background:#fff;direction:rtl;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-body{padding:12mm 14mm 18mm 14mm}
+body{padding:10mm 12mm 15mm 12mm}
 
-/* ── رأس الصفحة ── */
-.header{display:flex;align-items:stretch;justify-content:space-between;margin-bottom:8px;border-radius:6px 6px 0 0;overflow:hidden}
-.header-accent{width:6px;background:#002f7a;flex-shrink:0}
-.header-body{flex:1;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fff}
-.hdr-logo-wrap{display:flex;align-items:center;gap:12px}
-.hdr-logo{width:38px;height:38px;border-radius:4px;overflow:hidden;flex-shrink:0;border:1px solid #d0dce8;background:#f5f7fb;display:flex;align-items:center;justify-content:center}
+/* ── هيدر ── */
+.hdr{display:flex;align-items:stretch;margin-bottom:6px;border-radius:5px 5px 0 0;overflow:hidden;border:1px solid #d0dce8}
+.hdr-accent{width:5px;background:#002f7a;flex-shrink:0}
+.hdr-body{flex:1;display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:#fff}
+.hdr-left{display:flex;align-items:center;gap:12px}
+.hdr-logo{width:36px;height:36px;border-radius:4px;overflow:hidden;border:1px solid #d0dce8;background:#f5f7fb;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .hdr-logo img{width:100%;height:100%;object-fit:contain}
-.company-name{font-size:7.5pt;font-weight:700;color:#5a6a85;letter-spacing:.4px;text-transform:uppercase;margin-bottom:1px}
-.report-title{font-size:15pt;font-weight:900;color:#002f7a;line-height:1;letter-spacing:-.3px}
-.hdr-right{text-align:left;font-size:8pt;color:#5a6a85;line-height:1.9;padding-right:4px}
-.hdr-right .date-val{font-size:10.5pt;font-weight:900;color:#002f7a;display:block;margin-bottom:1px}
-.header-rule{height:3px;background:linear-gradient(to left,#f05a1e 0%,#f05a1e 60px,#002f7a 60px,#002f7a 100%);margin-bottom:12px}
+.co-name{font-size:7pt;font-weight:700;color:#5a6a85;letter-spacing:.4px;text-transform:uppercase;margin-bottom:1px}
+.rpt-title{font-size:14pt;font-weight:900;color:#002f7a;line-height:1;letter-spacing:-.3px}
+.hdr-right{text-align:left;font-size:8pt;color:#5a6a85;line-height:1.9}
+.hdr-right .dv{font-size:10pt;font-weight:900;color:#002f7a;display:block;margin-bottom:1px}
+.rule{height:3px;background:linear-gradient(to left,#f05a1e 0%,#f05a1e 56px,#002f7a 56px,#002f7a 100%);margin-bottom:10px}
 
 /* ── بطاقة المراسلة ── */
-.memo-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:8.5pt}
-.memo-table .m-lbl{width:80px;padding:0 0 5px 0;color:#7a8aaa;font-weight:700;font-size:7pt;letter-spacing:.6px;text-transform:uppercase;vertical-align:top;white-space:nowrap;padding-top:2px}
-.memo-table .m-sep{width:8px;text-align:center;color:#c5d0e8;padding-bottom:5px;vertical-align:top;padding-top:2px}
-.memo-table .m-val{padding:0 10px 5px 0;color:#1a1a2e;font-weight:700;font-size:9pt;vertical-align:top;line-height:1.4}
-.memo-table tr:first-child .m-val{font-size:10pt;color:#003c96;font-weight:900}
-.memo-table tr:last-child .m-val{color:#003c96;font-weight:800;border-top:1.5px solid #d0ddf5;padding-top:5px}
-.memo-table tr:last-child .m-lbl,.memo-table tr:last-child .m-sep{border-top:1.5px solid #d0ddf5;padding-top:5px}
+.memo{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:8.5pt;border:1px solid #d0ddf5;border-radius:4px;overflow:hidden}
+.memo td{padding:4px 10px;border-bottom:1px solid #eef2fb}
+.memo tr:last-child td{border-bottom:none;border-top:1.5px solid #d0ddf5;background:#f8faff}
+.memo .ml{width:76px;color:#7a8aaa;font-weight:700;font-size:7pt;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap}
+.memo .ms{width:10px;color:#c5d0e8;text-align:center}
+.memo .mv{color:#1a1a2e;font-weight:700;font-size:9pt}
+.memo tr:first-child .mv{font-size:9.5pt;color:#003c96;font-weight:900}
+.memo tr:last-child .mv{color:#003c96;font-weight:800}
 
 /* ── عنوان القسم ── */
-.sec-hdr{background:#003c96;color:#fff;padding:5px 12px 5px 14px;font-size:8.5pt;font-weight:700;letter-spacing:.2px;margin-bottom:0;margin-top:10px;border-radius:5px 5px 0 0;border-right:4px solid #f05a1e}
+.sec-hdr{background:#003c96;color:#fff;padding:5px 12px 5px 14px;font-size:8.5pt;font-weight:700;letter-spacing:.2px;border-right:4px solid #f05a1e;margin-top:0;border-radius:4px 4px 0 0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 
-/* ── جدول البيانات ── */
-.data-table,.sec-body table{width:100%;border-collapse:collapse;margin-bottom:0;font-size:8pt}
-.data-table thead th,.sec-body table thead th{background:#eef3fc;color:#003c96;font-weight:700;padding:5px 10px;text-align:center;border:1px solid #d0ddf5;font-size:7.5pt}
-.data-table thead th:first-child,.sec-body table thead th:first-child{text-align:right}
-.data-table tbody td,.sec-body table tbody td{padding:4px 10px;border:1px solid #e4ecf8;color:#1a1a2e;vertical-align:middle;text-align:center;font-size:8pt}
-.data-table tbody td:first-child,.sec-body table tbody td:first-child{text-align:right;font-weight:600}
-.data-table tbody tr:nth-child(even) td,.sec-body table tbody tr:nth-child(even) td{background:#f8faff}
-.data-table tfoot td,.sec-body table tfoot td{background:#003c96!important;color:#fff!important;font-weight:800!important;font-size:8.5pt!important;padding:5px 10px;text-align:center;border-color:#003c96!important}
-.data-table tfoot td:first-child,.sec-body table tfoot td:first-child{border-right:4px solid #f05a1e!important;text-align:right}
-.val-num{text-align:center;font-weight:800;color:#003c96}
-.val-muted{text-align:center;color:#aaa}
-.row-label{text-align:right;font-weight:600;color:#2d3748}
-.table-wrap{border:1px solid #d0ddf5;border-top:none;border-radius:0 0 5px 5px;overflow:hidden;margin-bottom:10px}
+/* ── wrapper لكل قسم ── */
+.sec-wrap{margin-bottom:14px;page-break-inside:avoid}
+.page-break{page-break-before:always;padding-top:4mm}
+
+/* ── جداول البيانات ── */
+.tbl-wrap{border:1px solid #d0ddf5;border-top:none;border-radius:0 0 4px 4px;overflow:hidden}
+.dt,.tbl-wrap table{width:100%;border-collapse:collapse;font-size:7.5pt}
+.dt thead th,.tbl-wrap table thead th{
+  background:#eef3fc;color:#003c96;font-weight:700;
+  padding:5px 8px;border:1px solid #d0ddf5;text-align:center;font-size:7pt;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact
+}
+.dt thead th:first-child,.tbl-wrap table thead th:first-child{text-align:right}
+.dt tbody td,.tbl-wrap table tbody td{
+  padding:4px 8px;border:1px solid #e4ecf8;color:#1a1a2e;
+  vertical-align:middle;text-align:center;font-size:7.5pt
+}
+.dt tbody td:first-child,.tbl-wrap table tbody td:first-child{text-align:right;font-weight:600;color:#2d3748}
+.dt tbody tr:nth-child(even) td,.tbl-wrap table tbody tr:nth-child(even) td{background:#f8faff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.dt tfoot td,.tbl-wrap table tfoot td{
+  background:#003c96!important;color:#fff!important;font-weight:800!important;
+  font-size:8pt!important;padding:5px 8px;text-align:center;border-color:#003c96!important;
+  -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important
+}
+.dt tfoot td:first-child,.tbl-wrap table tfoot td:first-child{text-align:right;border-right:4px solid #f05a1e!important}
+.rl{text-align:right!important;font-weight:600;color:#2d3748}
+.vn{text-align:center;font-weight:800;color:#003c96}
+.vm{text-align:center;color:#888;font-size:7pt}
 
 /* ── محتوى نصي ── */
-.sec-body{padding:10px 14px;background:#fafbff;border:1px solid #d0ddf5;border-top:none;border-radius:0 0 5px 5px;margin-bottom:10px;font-size:8.5pt;line-height:1.8;color:#2c3e60}
-.sec-body ul,.sec-body ol{padding-right:18px;margin:4px 0}
-.sec-body li{margin-bottom:3px}
-.sec-body b{color:#003c96}
-/* ألوان المؤشرات */
-[style*="color:#22c55e"],[style*="color:var(--accent2)"]{color:#1d6b45!important;font-weight:700}
-[style*="color:#ef4444"],[style*="color:#f05252"],[style*="color:var(--red)"]{color:#c0392b!important;font-weight:700}
-[style*="color:#f59e0b"],[style*="color:var(--gold)"]{color:#b45309!important;font-weight:700}
-[style*="color:#3b82f6"],[style*="color:var(--accent)"]{color:#003c96!important;font-weight:700}
-[style*="color:#8b5cf6"],[style*="color:var(--purple)"]{color:#6d28d9!important;font-weight:700}
+.sec-body{padding:10px 14px;background:#fafbff;border:1px solid #d0ddf5;border-top:none;border-radius:0 0 4px 4px;font-size:8.5pt;line-height:1.9;color:#2c3e60}
+.sec-body ul,.sec-body ol{padding-right:16px;margin:4px 0 6px}
+.sec-body li{margin-bottom:3px;color:#1a1a2e}
+.sec-body b,.sec-body strong{color:#003c96}
+
+/* ── ألوان النصوص ── */
+[style*="color:#22c55e"],[style*="color:var(--accent2)"],[class*="td-green"],[class*="td-accent"]{color:#1d6b45!important;font-weight:700}
+[style*="color:#ef4444"],[style*="color:#f05252"],[style*="color:var(--red)"],[class*="td-red"]{color:#c0392b!important;font-weight:700}
+[style*="color:#f59e0b"],[class*="td-gold"]{color:#b45309!important;font-weight:700}
+[style*="color:#3b82f6"],[style*="color:var(--accent)"],[class*="td-accent"]{color:#003c96!important}
+[style*="color:#8b5cf6"],[style*="color:var(--purple)"]{color:#6d28d9!important}
+[style*="color:#22c55e"]{color:#1d6b45!important}
+/* الجداول العريضة */
+.wide-tbl .tbl-wrap,.wide-tbl .dt,.wide-tbl table{font-size:5.5pt!important}
+.wide-tbl .tbl-wrap td,.wide-tbl .tbl-wrap th{padding:3px 4px!important;font-size:5.5pt!important}
+.wide-tbl{page-break-before:always}
+/* إخفاء الأهداف من الطباعة */
+.no-print-section{display:none!important}
+/* نقاط القوة والضعف في عمودين */
+.sec-body [style*="grid-template-columns:1fr 1fr"]{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 /* إخفاء ما لا يُطبع */
-button,input,select,.ai-mode-btn,[onclick]{display:none!important}
-/* SVG دائري (مؤشر أداء) */
-svg{display:block}
+button,input,select,.ai-mode-btn,[onclick],canvas{display:none!important}
+/* أشرطة التقدم */
+[style*="border-radius:4px"][style*="height:8px"],
+[style*="border-radius:3px"][style*="height:6px"]{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+/* Badges */
+span[style*="border-radius:20px"],span[style*="border-radius:10px"]{
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  border:1px solid currentColor;
+}
 
 /* ── فوتر ── */
-.footer{position:fixed;bottom:12mm;left:14mm;right:14mm;border-top:3px solid #002f7a;position:relative;margin-top:14px}
-.footer::before{content:'';display:block;height:3px;width:56px;background:#f05a1e;position:absolute;top:-3px;left:0}
-.footer-inner{display:flex;align-items:center;justify-content:space-between;padding-top:7px;font-size:7.5pt;color:#7a8aaa}
-.footer-sig{font-weight:700;color:#002f7a;font-size:8pt}
-.footer-copy{color:#aaa;font-size:7pt}
-.footer-dot{color:#f05a1e;font-weight:900;margin:0 4px}
+.footer{margin-top:10mm;border-top:3px solid #002f7a;position:relative}
+.footer::before{content:'';display:block;height:3px;width:50px;background:#f05a1e;position:absolute;top:-3px;left:0}
+.footer-in{display:flex;align-items:center;justify-content:space-between;padding-top:6px;font-size:7.5pt;color:#7a8aaa}
+.f-sig{font-weight:700;color:#002f7a;font-size:8pt}
+.f-dot{color:#f05a1e;font-weight:900;margin:0 3px}
+.f-copy{color:#aaa;font-size:7pt}
 
 @media print{
   body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .sec-hdr{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .data-table thead th,.sec-body table thead th{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .data-table tfoot td,.sec-body table tfoot td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .sec-hdr,.dt thead th,.tbl-wrap table thead th,.dt tfoot td,.tbl-wrap table tfoot td,.dt tbody tr:nth-child(even) td,.tbl-wrap table tbody tr:nth-child(even) td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .page-break{page-break-before:always}
+  .sec-wrap{page-break-inside:avoid}
 }
 </style>
 </head>
 <body>
 
-<!-- ── رأس الصفحة ── -->
-<div class="header">
-  <div class="header-accent"></div>
-  <div class="header-body">
-    <div class="hdr-logo-wrap">
-      ${logoSrc ? `<div class="hdr-logo"><img src="${logoSrc}"></div>` : ''}
+<!-- هيدر -->
+<div class="hdr">
+  <div class="hdr-accent"></div>
+  <div class="hdr-body">
+    <div class="hdr-left">
+      ${logoSrc?`<div class="hdr-logo"><img src="${logoSrc}"></div>`:''}
       <div>
-        <div class="company-name">${company}</div>
-        <div class="report-title">${reportTitle}</div>
+        <div class="co-name">${company}</div>
+        <div class="rpt-title">${reportTitle}</div>
       </div>
     </div>
     <div class="hdr-right">
-      <span class="date-val">${printDate}</span>
-      الساعة: ${timeStr}
+      <span class="dv">${printDate}</span>الساعة: ${timeStr}
     </div>
   </div>
 </div>
-<div class="header-rule"></div>
+<div class="rule"></div>
 
-<!-- ── بطاقة المراسلة ── -->
-<table class="memo-table">
-  <tr><td class="m-lbl">إلى</td><td class="m-sep">:</td><td class="m-val">الإدارة العليا</td></tr>
-  <tr><td class="m-lbl">من</td><td class="m-sep">:</td><td class="m-val">نظام التحليل الاستراتيجي — ${company}</td></tr>
-  <tr><td class="m-lbl">التاريخ</td><td class="m-sep">:</td><td class="m-val">${printDate} — ${timeStr}</td></tr>
-  ${filterRows.map(r=>`<tr><td class="m-lbl">${r.l}</td><td class="m-sep">:</td><td class="m-val">${r.v}</td></tr>`).join('')}
-  <tr><td class="m-lbl">الموضوع</td><td class="m-sep">:</td><td class="m-val">${reportTitle}</td></tr>
+<!-- بطاقة المراسلة -->
+<table class="memo">
+  <tr><td class="ml">إلى</td><td class="ms">:</td><td class="mv">الإدارة العليا</td></tr>
+  <tr><td class="ml">من</td><td class="ms">:</td><td class="mv">نظام التحليل — ${company}</td></tr>
+  <tr><td class="ml">التاريخ</td><td class="ms">:</td><td class="mv">${printDate} الساعة ${timeStr}</td></tr>
+  ${filterRows.map(r=>`<tr><td class="ml">${r.l}</td><td class="ms">:</td><td class="mv">${r.v}</td></tr>`).join('')}
+  <tr><td class="ml">الموضوع</td><td class="ms">:</td><td class="mv">${reportTitle}</td></tr>
 </table>
 
-<!-- ── مؤشرات الأداء ── -->
-${kpiTableHTML}
 
-<!-- ── محتوى التقرير ── -->
+<!-- أقسام التقرير -->
 ${sectionsHTML}
 
-<!-- ── فوتر ── -->
+<!-- فوتر -->
 <div class="footer">
-  <div class="footer-inner">
-    <span class="footer-sig">${company} — ${reportTitle}</span>
-    <span><span class="footer-dot">●</span>لوحة الندى للتحليل الاستراتيجي<span class="footer-dot">●</span>${printDate}</span>
-    <span class="footer-copy">وثيقة سرية — للاستخدام الداخلي فقط</span>
+  <div class="footer-in">
+    <span class="f-sig">${company} — ${reportTitle}</span>
+    <span><span class="f-dot">●</span>لوحة الندى التحليلية<span class="f-dot">●</span>${printDate}</span>
+    <span class="f-copy">للاستخدام الداخلي فقط</span>
   </div>
 </div>
 
 <script>
-window.onload = function() {
-  document.fonts.ready.then(function() {
-    setTimeout(function() { window.print(); }, 800);
+window.onload=function(){
+  document.fonts.ready.then(function(){
+    setTimeout(function(){ window.print(); },800);
   });
 };
 <\/script>
@@ -14324,6 +14504,8 @@ function _printAIReportA4() {
 }
 
 </script>
+
+
 
 
 
