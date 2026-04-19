@@ -4431,9 +4431,9 @@ function _initRepProdTargetsCard_fillOnly(){
   // ملء المشرفين إذا فارغة
   if(supSel&&supSel.options.length<=1){
     const _invSup=s=>!s||s.includes('إجمالي')||s.includes('اجمالي')||s.includes('الإجمالي');
-    const sups=D._supTotals&&Object.keys(D._supTotals).length>0
-      ?Object.keys(D._supTotals).filter(s=>!_invSup(s)).sort()
-      :[...new Set(Object.values(D._repSuperMap||{}).filter(s=>s&&!_invSup(s)))].sort();
+    const _supsFromTotals=D._supTotals?Object.keys(D._supTotals).filter(s=>!_invSup(s)):[];
+    const _supsFromMap=[...new Set(Object.values(D._repSuperMap||{}).filter(s=>s&&!_invSup(s)))];
+    const sups=[...new Set([..._supsFromTotals,..._supsFromMap])].sort();
     supSel.innerHTML='<option value="">كل المشرفين</option>'+sups.map(s=>`<option value="${s}">${s}</option>`).join('');
   }
   // ملء القنوات إذا فارغة
@@ -4466,12 +4466,12 @@ function _initRepProdTargetsCard(selectedRep){
   const catSel=document.getElementById('f-rpt-cat');
   const repSel=document.getElementById('f-rpt-rep');
 
-  // ── ملء قائمة المشرفين دائماً من D._supTotals (ملف الأهداف) ──
+  // ── ملء قائمة المشرفين دائماً من مصدرين: ملف الأهداف + ملف التصنيف ──
   if(supSel){
     const _invSup=s=>!s||s.includes('إجمالي')||s.includes('اجمالي')||s.includes('الإجمالي');
-    const sups=D._supTotals&&Object.keys(D._supTotals).length>0
-      ?Object.keys(D._supTotals).filter(s=>!_invSup(s)).sort()
-      :[...new Set(Object.values(D._repSuperMap||{}).filter(s=>s&&!_invSup(s)))].sort();
+    const _supsFromTotals=D._supTotals?Object.keys(D._supTotals).filter(s=>!_invSup(s)):[];
+    const _supsFromMap=[...new Set(Object.values(D._repSuperMap||{}).filter(s=>s&&!_invSup(s)))];
+    const sups=[...new Set([..._supsFromTotals,..._supsFromMap])].sort();
     const curSup=supSel.value||'';
     supSel.innerHTML='<option value="">كل المشرفين</option>'+sups.map(s=>`<option value="${s}"${s===curSup?' selected':''}>${s}</option>`).join('');
   }
@@ -11865,10 +11865,10 @@ function _openPrintWindowForTargets(mode){
   const allReps = [...new Set([..._repsFromTargets, ..._repsFromClassif])].sort();
 
   const _invSup = s=>!s||s.includes('إجمالي')||s.includes('اجمالي')||s.includes('الإجمالي');
-  // قائمة المشرفين: من _supTotals أو من _repSuperMap — مع استبعاد المشرفين الفارغين
-  const allSups = D._supTotals
-    ? Object.keys(D._supTotals).filter(s=>!_invSup(s)).sort()
-    : [...new Set(Object.values(D._repSuperMap||{}).filter(s=>s&&!_invSup(s)))].sort();
+  // قائمة المشرفين: دمج من _supTotals + _repSuperMap — جميعهم بدون قيد
+  const _supsFromTotals = D._supTotals ? Object.keys(D._supTotals).filter(s=>!_invSup(s)) : [];
+  const _supsFromMap = [...new Set(Object.values(D._repSuperMap||{}).filter(s=>s&&!_invSup(s)))];
+  const allSups = [...new Set([..._supsFromTotals,..._supsFromMap])].sort();
 
   // نقسّم فقط إذا لا يوجد فلتر مشرف أو مندوب
   const splitBySup = !supF && !repF;
@@ -11958,6 +11958,7 @@ function _openPrintWindowForTargets(mode){
     repsGroup.forEach(rn=>{
       const targets=D.rep_product_targets[rn]||{};
       const repNormKeysP=actualByRepNorm[rn]?Object.keys(actualByRepNorm[rn]):[];
+      // ── أولاً: أصناف الأهداف ──
       Object.entries(targets).forEach(([prod,tgt])=>{
         let actual=(actualByRep[rn]&&actualByRep[rn][prod]!==undefined)?actualByRep[rn][prod]:null;
         if(actual===null){const norm=_normProd(prod);actual=(actualByRepNorm[rn]&&actualByRepNorm[rn][norm]!==undefined)?actualByRepNorm[rn][norm]:null;}
@@ -11970,6 +11971,17 @@ function _openPrintWindowForTargets(mode){
         if(!prodMap[prod])prodMap[prod]={target:0,actual:0};
         prodMap[prod].target+=Math.round(tgt||0);prodMap[prod].actual+=actual;
       });
+      // ── ثانياً: أصناف المبيعات الفعلية التي ليست في الأهداف ──
+      if(actualByRep[rn]){
+        const targProds=new Set(Object.keys(targets));
+        const targProdsNorm=new Set(Object.keys(targets).map(p=>_normProd(p)));
+        Object.entries(actualByRep[rn]).forEach(([prod,qty])=>{
+          if(targProds.has(prod))return;
+          if(targProdsNorm.has(_normProd(prod)))return;
+          if(!prodMap[prod])prodMap[prod]={target:0,actual:0};
+          prodMap[prod].actual+=qty;
+        });
+      }
     });
     let products=Object.entries(prodMap).map(([prod,d])=>{const tgt=d.target,actual=d.actual;return{prod,target:tgt,actual,ach:tgt>0?(actual/tgt*100):0};});
     if(search)products=products.filter(p=>p.prod.includes(search)||p.prod.toLowerCase().includes(search.toLowerCase()));
@@ -12147,7 +12159,8 @@ function _openPrintWindowForTargets(mode){
     allSups.forEach((sup,i)=>{
       const supReps=allReps.filter(r=>(D._repSuperMap&&D._repSuperMap[r])===sup);
       const filtReps=catF?supReps.filter(r=>(D._repCatMap&&D._repCatMap[r])===catF):supReps;
-      if(!filtReps.length)return;
+      // نعرض المشرف حتى لو لم يكن له مناديب في ملف الأهداف (قد تكون له مبيعات فعلية)
+      if(!filtReps.length && !supReps.length)return;
       const supTgt=D._supTotals&&D._supTotals[sup]!=null?Math.round(D._supTotals[sup]):0;
       const tableHtml=mode==='cross'?buildCrossTable(filtReps):buildSummaryTable(filtReps,sup);
       sectionsHtml+=`
@@ -12498,21 +12511,24 @@ function _openPrintWindowAllBySup(){
   var toF   =document.getElementById('f-rpt-to')?.value||'';
   var hasDate=!!(monthF||fromF||toF);
 
-  // تصفية المناديب حسب الفلاتر
-  var allRepsBase=Object.keys(D.rep_product_targets||{});
+  // تصفية المناديب حسب الفلاتر — اتحاد ملف الأهداف + ملف التصنيف
+  var _repsFromTargets=new Set(Object.keys(D.rep_product_targets||{}));
+  var _repsFromClassif=new Set(Object.keys(D._repSuperMap||{}));
+  var allRepsBase=[...new Set([..._repsFromTargets,..._repsFromClassif])].sort();
   var allReps=repF?[repF]:allRepsBase;
   if(!repF){
     if(supF){var _nS=function(s){return String(s||'').trim().replace(/[\s]+/g,' ');};allReps=allReps.filter(function(r){return _nS((D._repSuperMap&&D._repSuperMap[r])||'')=== _nS(supF);});}
     if(catF) allReps=allReps.filter(function(r){return (D._repCatMap&&D._repCatMap[r])===catF;});
   }
 
-  // المشرفين بعد الفلترة
+  // المشرفين بعد الفلترة — جميعهم من مصدري الأهداف والتصنيف
   var allSups;
   if(supF){
     allSups=[supF];
   } else {
-    var _supsSet=new Set(allReps.map(function(r){return (D._repSuperMap&&D._repSuperMap[r])||'';}).filter(function(s){return s&&!_invSup(s);}));
-    allSups=[..._supsSet].sort();
+    var _supsFromReps=allReps.map(function(r){return (D._repSuperMap&&D._repSuperMap[r])||'';}).filter(function(s){return s&&!_invSup(s);});
+    var _supsFromTotalsB=D._supTotals?Object.keys(D._supTotals).filter(function(s){return !_invSup(s);}):[];
+    allSups=[...new Set([..._supsFromReps,..._supsFromTotalsB])].sort();
   }
 
   // تسميات الفلاتر للتقرير
