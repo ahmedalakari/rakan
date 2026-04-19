@@ -2254,11 +2254,15 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
     <div class="kpi-grid" id="kpi-rep-goals"></div>
     <div class="card" style="margin-bottom:var(--gap)">
       <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-        <span class="card-title">📦 مقارنة أهداف الأصناف — مندوب لمندوب</span>
+        <span class="card-title">📦 مقارنة أهداف الأصناف</span>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
           <button class="btn-print-a4" onclick="printRepProdTargets()" title="طباعة الفلتر الحالي">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
             طباعة A4
+          </button>
+          <button onclick="printRepProdTargetsDirect()" title="طباعة مقارنة أهداف الأصناف" style="display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:var(--r-md);border:1.5px solid #f07820;background:#f07820;color:#fff;font-family:Cairo,sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .18s;box-shadow:0 1px 4px rgba(240,120,32,.3)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            📦 مقارنة أهداف الأصناف
           </button>
           <button onclick="printAllRepsBySupvisor()" title="طباعة كل المناديب مرتبين حسب المشرف" style="display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:var(--r-md);border:1.5px solid var(--purple);background:var(--purple);color:#fff;font-family:Cairo,sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .18s;box-shadow:0 1px 4px rgba(124,58,237,.2)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
@@ -4669,12 +4673,12 @@ function renderRepProdTargets(){
     const sN=saleQtyNorm[rn]||{},  rN=retQtyNorm[rn]||{};
     actualByRep[rn]={};
     [...new Set([...Object.keys(sP),...Object.keys(rP)])].forEach(p=>{
-      const net=Math.max(0,(sP[p]||0)-(rP[p]||0));
+      const net=(sP[p]||0)-(rP[p]||0);
       actualByRep[rn][p]=net;
     });
     actualByRepNorm[rn]={};
     [...new Set([...Object.keys(sN),...Object.keys(rN)])].forEach(n=>{
-      const net=Math.max(0,(sN[n]||0)-(rN[n]||0));
+      const net=(sN[n]||0)-(rN[n]||0);
       actualByRepNorm[rn][n]=net;
     });
   });
@@ -4702,14 +4706,15 @@ function renderRepProdTargets(){
     const targets=D.rep_product_targets[rn]||{};
     const repNormKeys=actualByRepNorm[rn]?Object.keys(actualByRepNorm[rn]):[];
     Object.entries(targets).forEach(([prod,tgt])=>{
-      let actual=(actualByRep[rn]&&actualByRep[rn][prod])||0;
-      if(!actual){const norm=_normProd(prod);actual=(actualByRepNorm[rn]&&actualByRepNorm[rn][norm])||0;}
+      let actual=(actualByRep[rn]&&actualByRep[rn][prod]!==undefined)?actualByRep[rn][prod]:null;
+      if(actual===null){const norm=_normProd(prod);actual=(actualByRepNorm[rn]&&actualByRepNorm[rn][norm]!==undefined)?actualByRepNorm[rn][norm]:null;}
       // fallback: بحث جزئي في أسماء الأصناف المُطبَّعة
-      if(!actual&&repNormKeys.length){
+      if(actual===null&&repNormKeys.length){
         const normProd=_normProd(prod);
         const matched=repNormKeys.find(k=>k&&normProd&&(k.includes(normProd)||normProd.includes(k))&&Math.min(k.length,normProd.length)>3);
-        if(matched)actual=(actualByRepNorm[rn][matched])||0;
+        if(matched)actual=actualByRepNorm[rn][matched];
       }
+      if(actual===null)actual=0;
       if(!prodMap[prod])prodMap[prod]={target:0,actual:0};
       prodMap[prod].target+=Math.round(tgt||0);
       prodMap[prod].actual+=actual;
@@ -4783,38 +4788,55 @@ function renderRepProdTargets(){
   const supLabel_s=supF_s||(repName&&D._repSuperMap&&D._repSuperMap[repName])||'كل المشرفين';
   const catLabel_s=catF_s||'كل القنوات البيعية';
   const remaining=totalTarget-totalActual;
-  const summaryHtml=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:14px;padding:4px 0">
-    <div style="background:var(--surface2);border-radius:var(--r-md);padding:8px 10px;text-align:center;border-top:3px solid var(--purple)">
-      <div style="font-size:10px;color:var(--muted);margin-bottom:3px">المشرف</div>
-      <div style="font-size:12px;font-weight:700;color:var(--purple)">${supLabel_s}</div>
+  const achBarW=Math.min(overallAch,100).toFixed(1);
+
+  const summaryHtml=`
+  <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;font-family:'Cairo',sans-serif;direction:rtl">
+
+    <!-- ── الصف الأول: الفلاتر ── -->
+    <div style="display:flex;align-items:stretch;border-bottom:1px solid var(--border)">
+      <div style="flex:1;padding:9px 14px;border-left:1px solid var(--border);text-align:center">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:3px">المشرف</div>
+        <div style="font-size:12px;font-weight:800;color:var(--purple)">${supLabel_s}</div>
+      </div>
+      <div style="flex:1;padding:9px 14px;border-left:1px solid var(--border);text-align:center">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:3px">القناة البيعية</div>
+        <div style="font-size:12px;font-weight:800;color:var(--pink)">${catLabel_s}</div>
+      </div>
+      <div style="flex:1;padding:9px 14px;border-left:1px solid var(--border);text-align:center">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:3px">المندوب</div>
+        <div style="font-size:12px;font-weight:800;color:var(--text)">${repLabel}</div>
+      </div>
+      <div style="flex:1;padding:9px 14px;text-align:center">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:3px">الفترة الزمنية</div>
+        <div style="font-size:12px;font-weight:800;color:var(--accent)">${dateLabel}</div>
+      </div>
     </div>
-    <div style="background:var(--surface2);border-radius:var(--r-md);padding:10px 12px;text-align:center;border-top:3px solid var(--pink)">
-      <div style="font-size:10px;color:var(--muted);margin-bottom:3px">القناة البيعية</div>
-      <div style="font-size:12px;font-weight:700;color:var(--pink)">${catLabel_s}</div>
-    </div>
-    <div style="background:var(--surface2);border-radius:var(--r-md);padding:10px 12px;text-align:center;border-top:3px solid var(--accent)">
-      <div style="font-size:10px;color:var(--muted);margin-bottom:3px">المندوب</div>
-      <div style="font-size:12px;font-weight:700;color:var(--text)">${repLabel}</div>
-    </div>
-    <div style="background:var(--surface2);border-radius:var(--r-md);padding:10px 12px;text-align:center;border-top:3px solid var(--accent3)">
-      <div style="font-size:10px;color:var(--muted);margin-bottom:3px">الفترة الزمنية</div>
-      <div style="font-size:11px;font-weight:600;color:var(--accent)">${dateLabel}</div>
-    </div>
-    <div style="background:var(--surface2);border-radius:var(--r-md);padding:10px 12px;text-align:center;border-top:3px solid var(--gold)">
-      <div style="font-size:10px;color:var(--muted);margin-bottom:3px">إجمالي الهدف</div>
-      <div style="font-size:14px;font-weight:700;color:var(--gold)">${fmt(totalTarget)}</div>
-    </div>
-    <div style="background:var(--surface2);border-radius:var(--r-md);padding:10px 12px;text-align:center;border-top:3px solid var(--accent)">
-      <div style="font-size:10px;color:var(--muted);margin-bottom:3px">إجمالي الفعلي (صافي)</div>
-      <div style="font-size:14px;font-weight:700;color:var(--accent)">${fmt(totalActual)}</div>
-    </div>
-    <div style="background:var(--surface2);border-radius:var(--r-md);padding:10px 12px;text-align:center;border-top:3px solid ${remaining>0?'var(--red)':'var(--accent2)'}">
-      <div style="font-size:10px;color:var(--muted);margin-bottom:3px">الكميات المحققة</div>
-      <div style="font-size:12px;font-weight:700;color:${remaining>0?'var(--red)':'var(--accent2)'}">${remaining>0?'متبقي: '+fmt(remaining):'✅ '+fmt(totalActual)}</div>
-    </div>
-    <div style="background:var(--surface2);border-radius:var(--r-md);padding:10px 12px;text-align:center;border-top:3px solid ${achColor(overallAch)}">
-      <div style="font-size:10px;color:var(--muted);margin-bottom:3px">نسبة الإنجاز</div>
-      <div style="font-size:14px;font-weight:700;color:${achColor(overallAch)}">${overallAch.toFixed(1)}%</div>
+
+    <!-- ── الصف الثاني: الأرقام ── -->
+    <div style="display:flex;align-items:stretch">
+      <div style="flex:1;padding:11px 14px;border-left:1px solid var(--border);text-align:center;border-top:3px solid var(--gold)">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:4px">إجمالي الهدف</div>
+        <div style="font-size:18px;font-weight:900;color:var(--gold);letter-spacing:-.5px;line-height:1">${fmt(totalTarget)}</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:2px">وحدة</div>
+      </div>
+      <div style="flex:1;padding:11px 14px;border-left:1px solid var(--border);text-align:center;border-top:3px solid var(--accent)">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:4px">إجمالي الفعلي (صافي)</div>
+        <div style="font-size:18px;font-weight:900;color:var(--accent);letter-spacing:-.5px;line-height:1">${fmt(totalActual)}</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:2px">وحدة</div>
+      </div>
+      <div style="flex:1;padding:11px 14px;border-left:1px solid var(--border);text-align:center;border-top:3px solid ${remaining>0?'var(--red)':'var(--accent2)'}">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:4px">${remaining>0?'الكميات المتبقية':'الكميات المحققة'}</div>
+        <div style="font-size:18px;font-weight:900;color:${remaining>0?'var(--red)':'var(--accent2)'};letter-spacing:-.5px;line-height:1">${fmt(Math.abs(remaining))}</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:2px">${remaining>0?'متبقي للهدف':'تجاوز الهدف'}</div>
+      </div>
+      <div style="flex:1;padding:11px 14px;text-align:center;border-top:3px solid ${achColor(overallAch)}">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:4px">نسبة الإنجاز</div>
+        <div style="font-size:18px;font-weight:900;color:${achColor(overallAch)};letter-spacing:-.5px;line-height:1">${overallAch.toFixed(1)}%</div>
+        <div style="margin-top:5px;background:var(--surface3);border-radius:20px;height:4px;overflow:hidden">
+          <div style="width:${achBarW}%;height:100%;background:${achColor(overallAch)};border-radius:20px"></div>
+        </div>
+      </div>
     </div>
   </div>`;
 
@@ -4851,8 +4873,9 @@ function renderRepProdTargets(){
     const targets=D.rep_product_targets[rn]||{};
     crossProds.forEach(prod=>{
       const tgt=Math.round(targets[prod]||0);
-      let act=(actualByRep[rn]&&actualByRep[rn][prod])||0;
-      if(!act){const norm=_normProd(prod);act=(actualByRepNorm[rn]&&actualByRepNorm[rn][norm])||0;}
+      let act=(actualByRep[rn]&&actualByRep[rn][prod]!==undefined)?actualByRep[rn][prod]:null;
+      if(act===null){const norm=_normProd(prod);act=(actualByRepNorm[rn]&&actualByRepNorm[rn][norm]!==undefined)?actualByRepNorm[rn][norm]:null;}
+      if(act===null)act=0;
       crossData[rn][prod]={tgt,act};
     });
   });
@@ -4964,8 +4987,8 @@ function renderRepProdTargets(){
     </div>
   </div>`;
 
-  wrap.innerHTML=summaryHtml+`<div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-    <table style="width:100%;min-width:520px;border-collapse:collapse;font-family:'Cairo',sans-serif;direction:rtl">
+  wrap.innerHTML=summaryHtml+`<div id="rpt-products-table-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+    <table id="rpt-products-table" style="width:100%;min-width:520px;border-collapse:collapse;font-family:'Cairo',sans-serif;direction:rtl">
       <thead>
         <tr style="background:var(--surface2);border-bottom:2px solid var(--border2)">
           <th style="padding:9px 12px;text-align:right;font-size:11px;color:var(--text2);font-weight:700">الصنف</th>
@@ -4986,7 +5009,7 @@ function renderRepProdTargets(){
         </tr>
       </tfoot>
     </table>
-  </div>`+crossTableHtml;
+  </div>`;
 }
 
 
@@ -5050,14 +5073,14 @@ function renderRepGoalsPage(){
   filtRepsG.forEach(r=>_filtRepsNorm[_normRepG(r)]=r);
   const _resolveRepG=rn=>{
     if(_filtRepsSet.has(rn))return rn;
-    return _filtRepsNorm[_normRepG(rn)]||null;
+    return _filtRepsNorm[_normRepG(rn)]||rn;
   };
   // مبيعات ومرتجعات منفصلة ثم صافي الكمية
   const _sQG={},_rQG={},_sNG={},_rNG={};
   sR.forEach(r=>{
     const rnRaw=_cN(r[kR]);
     const rn=_resolveRepG(rnRaw);
-    if(!rn)return;
+    if(!_filtRepsSet.has(rn))return;
     if(hasDateF){
       const rawD=String(r[kD]||'');const d=new Date(rawD);if(isNaN(d))return;
       if(monthF_g){const rowM=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;if(rowM!==monthF_g)return;}
@@ -5085,9 +5108,9 @@ function renderRepGoalsPage(){
     const sP=_sQG[rn]||{},rP=_rQG[rn]||{};
     const sN=_sNG[rn]||{},rN=_rNG[rn]||{};
     aqR[rn]={};
-    [...new Set([...Object.keys(sP),...Object.keys(rP)])].forEach(p=>{aqR[rn][p]=Math.max(0,(sP[p]||0)-(rP[p]||0));});
+    [...new Set([...Object.keys(sP),...Object.keys(rP)])].forEach(p=>{aqR[rn][p]=(sP[p]||0)-(rP[p]||0);});
     aqN[rn]={};
-    [...new Set([...Object.keys(sN),...Object.keys(rN)])].forEach(n=>{aqN[rn][n]=Math.max(0,(sN[n]||0)-(rN[n]||0));});
+    [...new Set([...Object.keys(sN),...Object.keys(rN)])].forEach(n=>{aqN[rn][n]=(sN[n]||0)-(rN[n]||0);});
   });
 
   let totalTarget=0,totalActual=0,above100=0,below80=0;
@@ -5104,13 +5127,14 @@ function renderRepGoalsPage(){
     const _handledProds=new Set();
     const _handledNorms=new Set();
     Object.entries(targets).forEach(([prod,tgt])=>{
-      let actual=(aqR[rn]&&aqR[rn][prod])||0;
-      if(!actual){const norm=_nP(prod);actual=(aqN[rn]&&aqN[rn][norm])||0;}
-      if(!actual&&repNormKeysG.length){
+      let actual=(aqR[rn]&&aqR[rn][prod]!==undefined)?aqR[rn][prod]:null;
+      if(actual===null){const norm=_nP(prod);actual=(aqN[rn]&&aqN[rn][norm]!==undefined)?aqN[rn][norm]:null;}
+      if(actual===null&&repNormKeysG.length){
         const normProd=_nP(prod);
         const matched=repNormKeysG.find(k=>k&&normProd&&(k.includes(normProd)||normProd.includes(k))&&Math.min(k.length,normProd.length)>3);
-        if(matched)actual=(aqN[rn][matched])||0;
+        if(matched)actual=aqN[rn][matched];
       }
+      if(actual===null)actual=0;
       rTgt+=Math.round(tgt||0);rAct+=actual;
       _handledProds.add(prod);_handledNorms.add(_nP(prod));
     });
@@ -10517,6 +10541,8 @@ function toggleGlobalFilter(){
 
 function resetGlobalFilter(){
   GF = { sup:'', rep:'', cat:'', month:'', dateFrom:'', dateTo:'' };
+  window._gfAutoDateFrom = '';
+  window._gfAutoDateTo   = '';
   ['gf-date-from','gf-date-to'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
@@ -10639,8 +10665,44 @@ function applyGlobalFilter(){
   GF.rep      = document.getElementById('gf-rep')?.value || '';
   GF.cat      = document.getElementById('gf-cat')?.value || '';
   GF.month    = document.getElementById('gf-month')?.value || '';
-  GF.dateFrom = document.getElementById('gf-date-from')?.value || '';
-  GF.dateTo   = document.getElementById('gf-date-to')?.value || '';
+  // التواريخ اليدوية فقط — تجاهل التواريخ المُولَّدة تلقائياً من شهر سابق
+  const _manualFrom = document.getElementById('gf-date-from')?.value || '';
+  const _manualTo   = document.getElementById('gf-date-to')?.value   || '';
+  const _wasAutoFrom = window._gfAutoDateFrom || '';
+  const _wasAutoTo   = window._gfAutoDateTo   || '';
+  GF.dateFrom = (_manualFrom && _manualFrom !== _wasAutoFrom) ? _manualFrom : '';
+  GF.dateTo   = (_manualTo   && _manualTo   !== _wasAutoTo)   ? _manualTo   : '';
+
+  // ── إذا تم تحديد شهر → احسب دائماً أول وآخر يوم في الشهر ──
+  if(GF.month && !GF.dateFrom && !GF.dateTo){
+    let yr = new Date().getFullYear();
+    const salesR = (RAW.sales_table.length ? RAW.sales_table : D.sales_table) || [];
+    if(salesR.length){
+      const kD = Object.keys(salesR[0]||{}).find(h=>String(h).trim()==='التاريخ'||String(h).trim()==='تاريخ');
+      if(kD){
+        const mo = +GF.month;
+        const years = new Set();
+        salesR.forEach(r=>{ const d=new Date(String(r[kD]||'').trim()); if(!isNaN(d)) years.add(d.getFullYear()); });
+        const matchYr = [...years].sort().find(y => salesR.some(r=>{ const d=new Date(String(r[kD]||'').trim()); return !isNaN(d)&&d.getFullYear()===y&&(d.getMonth()+1)===mo; }));
+        if(matchYr) yr = matchYr;
+        else if(years.size) yr = Math.max(...years);
+      }
+    }
+    const mo2 = String(GF.month).padStart(2,'0');
+    const lastDay = new Date(yr, +GF.month, 0).getDate();
+    GF.dateFrom = `${yr}-${mo2}-01`;
+    GF.dateTo   = `${yr}-${mo2}-${String(lastDay).padStart(2,'0')}`;
+    window._gfAutoDateFrom = GF.dateFrom;
+    window._gfAutoDateTo   = GF.dateTo;
+    const elFrom = document.getElementById('gf-date-from');
+    const elTo   = document.getElementById('gf-date-to');
+    if(elFrom) elFrom.value = GF.dateFrom;
+    if(elTo)   elTo.value   = GF.dateTo;
+  } else if(!GF.month){
+    window._gfAutoDateFrom = '';
+    window._gfAutoDateTo   = '';
+  }
+
   _applyGFtoD();
   _updateGFBadge();
   _syncPageFiltersFromGF();
@@ -10696,7 +10758,15 @@ function _syncPageFiltersFromGF(){
     if(active && gfValues[gfKey]){
       // إذا كان العنصر select ولم يوجد الخيار بعد → أضفه مؤقتاً
       if(el.tagName === 'SELECT'){
-        const val = gfValues[gfKey];
+        let val = gfValues[gfKey];
+        // f-rpt-month يستخدم YYYY-MM بينما gf-month يستخدم رقم الشهر → تحويل
+        if(id === 'f-rpt-month' && val && /^\d{1,2}$/.test(val)){
+          const yr = new Date().getFullYear();
+          const mo = String(+val).padStart(2,'0');
+          // ابحث عن الخيار المناسب في القائمة (أي سنة)
+          const matchOpt = Array.from(el.options).find(o => o.value.endsWith('-'+mo));
+          val = matchOpt ? matchOpt.value : `${yr}-${mo}`;
+        }
         const exists = Array.from(el.options).some(o => o.value === val);
         if(!exists){
           const opt = document.createElement('option');
@@ -10704,8 +10774,10 @@ function _syncPageFiltersFromGF(){
           opt.setAttribute('data-gf-injected','1');
           el.appendChild(opt);
         }
+        el.value = val;
+      } else {
+        el.value = gfValues[gfKey];
       }
-      el.value = gfValues[gfKey];
       el.classList.add('gf-locked');
       el.disabled = true;
     } else if(active && !gfValues[gfKey]){
@@ -10750,8 +10822,8 @@ function _updateGFBadge(){
     if(GF.rep) parts.push('المندوب: '+GF.rep);
     if(GF.cat) parts.push('القناة البيعية: '+GF.cat);
     if(GF.month) parts.push('الشهر: '+MONTH_NAMES[+GF.month]);
-    if(GF.dateFrom) parts.push('من: '+GF.dateFrom);
-    if(GF.dateTo) parts.push('إلى: '+GF.dateTo);
+    if(GF.dateFrom && !GF.month) parts.push('من: '+GF.dateFrom);
+    if(GF.dateTo   && !GF.month) parts.push('إلى: '+GF.dateTo);
     statusEl.textContent = parts.length ? '● '+parts.join(' | ') : '';
   }
 }
@@ -10759,12 +10831,15 @@ function _updateGFBadge(){
 function _dateInRange(dateStr){
   if(!GF.dateFrom && !GF.dateTo && !GF.month) return true;
   if(!dateStr) return false;
-  const d = new Date(dateStr);
-  if(isNaN(d)) return false;
-  if(GF.month && (d.getMonth()+1) !== +GF.month) return false;
   const ds = dateStr.substring(0,10);
   if(GF.dateFrom && ds < GF.dateFrom) return false;
-  if(GF.dateTo && ds > GF.dateTo) return false;
+  if(GF.dateTo   && ds > GF.dateTo)   return false;
+  // fallback: إذا كان هناك شهر فقط بدون from/to (لا يحدث بعد الإصلاح، لكن احتياطاً)
+  if(GF.month && !GF.dateFrom && !GF.dateTo){
+    const d = new Date(dateStr);
+    if(isNaN(d)) return false;
+    if((d.getMonth()+1) !== +GF.month) return false;
+  }
   return true;
 }
 
@@ -11783,15 +11858,20 @@ function _openPrintWindowForTargets(mode){
   const fromF = document.getElementById('f-rpt-from')?.value || '';
   const toF   = document.getElementById('f-rpt-to')?.value   || '';
 
-  // --- قائمة المشرفين للتقسيم ---
-  const allReps = Object.keys(D.rep_product_targets||{}).sort();
+  // --- قائمة المناديب: اتحاد ملف الأهداف + ملف التصنيف ---
+  const _repsFromTargets = new Set(Object.keys(D.rep_product_targets||{}));
+  const _repsFromClassif = new Set(Object.keys(D._repSuperMap||{}));
+  // دمج الاثنين: المندوب الموجود في أي منهما يُضاف
+  const allReps = [...new Set([..._repsFromTargets, ..._repsFromClassif])].sort();
+
   const _invSup = s=>!s||s.includes('إجمالي')||s.includes('اجمالي')||s.includes('الإجمالي');
+  // قائمة المشرفين: من _supTotals أو من _repSuperMap — مع استبعاد المشرفين الفارغين
   const allSups = D._supTotals
     ? Object.keys(D._supTotals).filter(s=>!_invSup(s)).sort()
     : [...new Set(Object.values(D._repSuperMap||{}).filter(s=>s&&!_invSup(s)))].sort();
 
   // نقسّم فقط إذا لا يوجد فلتر مشرف أو مندوب
-  const splitBySup = !supF && !repF && allSups.length > 1;
+  const splitBySup = !supF && !repF;
 
   // --- CSS مشترك ---
   const PRINT_CSS = `
@@ -11820,49 +11900,73 @@ function _openPrintWindowForTargets(mode){
     const _normProd=s=>String(s||'').trim().replace(/[\s]+/g,' ').replace(/[*×]/g,'').replace(/\s*\*\s*\d+$/,'').replace(/زجاج|بلاستيك/g,'').replace(/[\s]+/g,' ').trim();
     const sortBy = document.getElementById('f-rpt-sort')?.value||'name';
     const search = (document.getElementById('f-rpt-search')?.value||'').trim();
-    const hasDateFilter=!!(monthF||fromF||toF);
     const MONTH_NAMES_P={1:'يناير',2:'فبراير',3:'مارس',4:'أبريل',5:'مايو',6:'يونيو',7:'يوليو',8:'أغسطس',9:'سبتمبر',10:'أكتوبر',11:'نوفمبر',12:'ديسمبر'};
 
-    // حساب الفعلي
+    // حساب الفعلي — نفس منطق renderRepProdTargets
+    // D.sales_table مُفلتر مسبقاً بالفلتر الشامل، لا نُعيد تطبيق الفلتر
     const salesRows=D.sales_table||[];
+    // نُطبق فلتر التاريخ فقط إذا كان مختلفاً عن الفلتر الشامل (فلتر خاص بتبويب الأهداف)
+    const _gfFrom = (typeof GF!=='undefined')?GF.dateFrom:'';
+    const _gfTo   = (typeof GF!=='undefined')?GF.dateTo:'';
+    const _extraFromF = (fromF && fromF!==_gfFrom) ? fromF : '';
+    const _extraToF   = (toF   && toF!==_gfTo)     ? toF   : '';
+    const _extraMonthF= (monthF && (!_gfFrom || !monthF)) ? monthF : '';
+    const hasDateFilter=!!(_extraFromF||_extraToF||_extraMonthF);
     const hdrs=salesRows.length?Object.keys(salesRows[0]||{}):[];
     const _cn=s=>String(s||'').trim();
     const _normRepP=s=>String(s||'').trim().replace(/[\s]+/g,' ');
     const _fc=(...ns)=>{for(const n of ns){const h=hdrs.find(h=>_cn(h).replace(/[\u200b-\u200f\ufeff]/g,'').trim()===n.replace(/[\u200b-\u200f\ufeff]/g,'').trim());if(h)return h}return null};
     const kRep=_fc('المندوب','اسم المندوب'),kProd=_fc('الصنف','اسم الصنف','المادة','اسم المادة');
-    const kQty=_fc('الكمية الخارجة','الكمية'),kType=_fc('النوع','نوع'),kDate=_fc('التاريخ','تاريخ');
-    // بناء خريطة تطبيع أسماء المناديب
+    const kQty=_fc('الكمية الخارجة','الكمية'),kQtyIn=_fc('الكمية الداخلة'),kType=_fc('النوع','نوع'),kDate=_fc('التاريخ','تاريخ');
     const _repsGroupNorm={};
     repsGroup.forEach(r=>_repsGroupNorm[_normRepP(r)]=r);
     const _resolveRepP=rn=>{if(repsGroup.includes(rn))return rn;return _repsGroupNorm[_normRepP(rn)]||null;};
-    const actualByRep={},actualByRepNorm={};
+    // مبيعات ومرتجعات منفصلة
+    const sQtyByRep={},rQtyByRep={},sQtyNorm={},rQtyNorm={};
     salesRows.forEach(r=>{
       const rnRaw=_cn(r[kRep]);const rn=_resolveRepP(rnRaw);if(!rn)return;
       if(hasDateFilter){const rawD=String(r[kDate]||'');const d=new Date(rawD);if(isNaN(d))return;
-        if(monthF){const rowM=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;if(rowM!==monthF)return;}
-        const ds=rawD.substring(0,10);if(fromF&&ds<fromF)return;if(toF&&ds>toF)return;}
+        if(_extraMonthF){const rowM=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;if(rowM!==_extraMonthF)return;}
+        const ds=rawD.substring(0,10);if(_extraFromF&&ds<_extraFromF)return;if(_extraToF&&ds>_extraToF)return;}
       const type=_cn(r[kType]||''),prod=_cn(r[kProd]||'');if(!prod)return;
-      const qty=_parseNum(r[kQty]);if(qty<=0)return;
       const norm=_normProd(prod);
-      if(!actualByRep[rn]){actualByRep[rn]={};actualByRepNorm[rn]={};}
-      if(type==='مبيع'){actualByRep[rn][prod]=(actualByRep[rn][prod]||0)+qty;actualByRepNorm[rn][norm]=(actualByRepNorm[rn][norm]||0)+qty;}
-      else if(type==='مرتجع مبيع'){actualByRep[rn][prod]=(actualByRep[rn][prod]||0)-qty;actualByRepNorm[rn][norm]=(actualByRepNorm[rn][norm]||0)-qty;}
+      const qO=_parseNum(r[kQty]),qI=kQtyIn?_parseNum(r[kQtyIn]):0;
+      if(type==='مبيع'){
+        if(qO<=0)return;
+        if(!sQtyByRep[rn]){sQtyByRep[rn]={};sQtyNorm[rn]={};}
+        sQtyByRep[rn][prod]=(sQtyByRep[rn][prod]||0)+qO;
+        sQtyNorm[rn][norm]=(sQtyNorm[rn][norm]||0)+qO;
+      } else if(type==='مرتجع مبيع'){
+        const rq=qI>0?qI:qO;if(rq<=0)return;
+        if(!rQtyByRep[rn]){rQtyByRep[rn]={};rQtyNorm[rn]={};}
+        rQtyByRep[rn][prod]=(rQtyByRep[rn][prod]||0)+rq;
+        rQtyNorm[rn][norm]=(rQtyNorm[rn][norm]||0)+rq;
+      }
     });
-    Object.values(actualByRep).forEach(m=>Object.keys(m).forEach(k=>{if(m[k]<0)m[k]=0;}));
-    Object.values(actualByRepNorm).forEach(m=>Object.keys(m).forEach(k=>{if(m[k]<0)m[k]=0;}));
+    // صافي الكمية بدون Math.max لكل صنف
+    const actualByRep={},actualByRepNorm={};
+    [...new Set([...Object.keys(sQtyByRep),...Object.keys(rQtyByRep)])].forEach(rn=>{
+      const sP=sQtyByRep[rn]||{},rP=rQtyByRep[rn]||{};
+      const sN=sQtyNorm[rn]||{},rN=rQtyNorm[rn]||{};
+      actualByRep[rn]={};
+      [...new Set([...Object.keys(sP),...Object.keys(rP)])].forEach(p=>{actualByRep[rn][p]=(sP[p]||0)-(rP[p]||0);});
+      actualByRepNorm[rn]={};
+      [...new Set([...Object.keys(sN),...Object.keys(rN)])].forEach(n=>{actualByRepNorm[rn][n]=(sN[n]||0)-(rN[n]||0);});
+    });
 
     const prodMap={};
     repsGroup.forEach(rn=>{
       const targets=D.rep_product_targets[rn]||{};
       const repNormKeysP=actualByRepNorm[rn]?Object.keys(actualByRepNorm[rn]):[];
       Object.entries(targets).forEach(([prod,tgt])=>{
-        let actual=(actualByRep[rn]&&actualByRep[rn][prod])||0;
-        if(!actual){const norm=_normProd(prod);actual=(actualByRepNorm[rn]&&actualByRepNorm[rn][norm])||0;}
-        if(!actual&&repNormKeysP.length){
+        let actual=(actualByRep[rn]&&actualByRep[rn][prod]!==undefined)?actualByRep[rn][prod]:null;
+        if(actual===null){const norm=_normProd(prod);actual=(actualByRepNorm[rn]&&actualByRepNorm[rn][norm]!==undefined)?actualByRepNorm[rn][norm]:null;}
+        if(actual===null&&repNormKeysP.length){
           const normProd=_normProd(prod);
           const matched=repNormKeysP.find(k=>k&&normProd&&(k.includes(normProd)||normProd.includes(k))&&Math.min(k.length,normProd.length)>3);
-          if(matched)actual=(actualByRepNorm[rn][matched])||0;
+          if(matched)actual=actualByRepNorm[rn][matched];
         }
+        if(actual===null)actual=0;
         if(!prodMap[prod])prodMap[prod]={target:0,actual:0};
         prodMap[prod].target+=Math.round(tgt||0);prodMap[prod].actual+=actual;
       });
@@ -11914,32 +12018,47 @@ function _openPrintWindowForTargets(mode){
     // نستخدم innerHTML المُبنى مسبقاً ونصفيه لهذه المجموعة فقط
     // — نبني جدولاً بسيطاً من البيانات مباشرة —
     const _normProd=s=>String(s||'').trim().replace(/[\s]+/g,' ').replace(/[*×]/g,'').replace(/\s*\*\s*\d+$/,'').replace(/زجاج|بلاستيك/g,'').replace(/[\s]+/g,' ').trim();
-    const hasDateFilter=!!(monthF||fromF||toF);
     const salesRows=D.sales_table||[];
+    const _gfFromC=(typeof GF!=='undefined')?GF.dateFrom:'';
+    const _gfToC  =(typeof GF!=='undefined')?GF.dateTo:'';
+    const _exFromC=(fromF&&fromF!==_gfFromC)?fromF:'';
+    const _exToC  =(toF  &&toF!==_gfToC)   ?toF  :'';
+    const _exMonC =(monthF&&(!_gfFromC||!monthF))?monthF:'';
+    const hasDateFilter=!!(_exFromC||_exToC||_exMonC);
     const hdrs=salesRows.length?Object.keys(salesRows[0]||{}):[];
     const _cn=s=>String(s||'').trim();
     const _normRepC=s=>String(s||'').trim().replace(/[\s]+/g,' ');
     const _fc=(...ns)=>{for(const n of ns){const h=hdrs.find(h=>_cn(h).replace(/[\u200b-\u200f\ufeff]/g,'').trim()===n.replace(/[\u200b-\u200f\ufeff]/g,'').trim());if(h)return h}return null};
     const kRep=_fc('المندوب','اسم المندوب'),kProd=_fc('الصنف','اسم الصنف','المادة','اسم المادة');
-    const kQty=_fc('الكمية الخارجة','الكمية'),kType=_fc('النوع','نوع'),kDate=_fc('التاريخ','تاريخ');
+    const kQty=_fc('الكمية الخارجة','الكمية'),kQtyIn=_fc('الكمية الداخلة'),kType=_fc('النوع','نوع'),kDate=_fc('التاريخ','تاريخ');
     const _repsGroupNormC={};
     repsGroup.forEach(r=>_repsGroupNormC[_normRepC(r)]=r);
     const _resolveRepC=rn=>{if(repsGroup.includes(rn))return rn;return _repsGroupNormC[_normRepC(rn)]||null;};
-    const actualByRep={},actualByRepNorm={};
+    const sQtyC={},rQtyC={},sNormC={},rNormC={};
     salesRows.forEach(r=>{
       const rnRaw=_cn(r[kRep]);const rn=_resolveRepC(rnRaw);if(!rn)return;
       if(hasDateFilter){const rawD=String(r[kDate]||'');const d=new Date(rawD);if(isNaN(d))return;
-        if(monthF){const rowM=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;if(rowM!==monthF)return;}
-        const ds=rawD.substring(0,10);if(fromF&&ds<fromF)return;if(toF&&ds>toF)return;}
+        if(_exMonC){const rowM=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;if(rowM!==_exMonC)return;}
+        const ds=rawD.substring(0,10);if(_exFromC&&ds<_exFromC)return;if(_exToC&&ds>_exToC)return;}
       const type=_cn(r[kType]||''),prod=_cn(r[kProd]||'');if(!prod)return;
-      const qty=_parseNum(r[kQty]);if(qty<=0)return;
       const norm=_normProd(prod);
-      if(!actualByRep[rn]){actualByRep[rn]={};actualByRepNorm[rn]={};}
-      if(type==='مبيع'){actualByRep[rn][prod]=(actualByRep[rn][prod]||0)+qty;actualByRepNorm[rn][norm]=(actualByRepNorm[rn][norm]||0)+qty;}
-      else if(type==='مرتجع مبيع'){actualByRep[rn][prod]=(actualByRep[rn][prod]||0)-qty;actualByRepNorm[rn][norm]=(actualByRepNorm[rn][norm]||0)-qty;}
+      const qO=_parseNum(r[kQty]),qI=kQtyIn?_parseNum(r[kQtyIn]):0;
+      if(type==='مبيع'){
+        if(qO<=0)return;
+        if(!sQtyC[rn]){sQtyC[rn]={};sNormC[rn]={};}
+        sQtyC[rn][prod]=(sQtyC[rn][prod]||0)+qO;sNormC[rn][norm]=(sNormC[rn][norm]||0)+qO;
+      } else if(type==='مرتجع مبيع'){
+        const rq=qI>0?qI:qO;if(rq<=0)return;
+        if(!rQtyC[rn]){rQtyC[rn]={};rNormC[rn]={};}
+        rQtyC[rn][prod]=(rQtyC[rn][prod]||0)+rq;rNormC[rn][norm]=(rNormC[rn][norm]||0)+rq;
+      }
     });
-    Object.values(actualByRep).forEach(m=>Object.keys(m).forEach(k=>{if(m[k]<0)m[k]=0;}));
-    Object.values(actualByRepNorm).forEach(m=>Object.keys(m).forEach(k=>{if(m[k]<0)m[k]=0;}));
+    const actualByRep={},actualByRepNorm={};
+    [...new Set([...Object.keys(sQtyC),...Object.keys(rQtyC)])].forEach(rn=>{
+      const sP=sQtyC[rn]||{},rP=rQtyC[rn]||{},sN=sNormC[rn]||{},rN=rNormC[rn]||{};
+      actualByRep[rn]={};[...new Set([...Object.keys(sP),...Object.keys(rP)])].forEach(p=>{actualByRep[rn][p]=(sP[p]||0)-(rP[p]||0);});
+      actualByRepNorm[rn]={};[...new Set([...Object.keys(sN),...Object.keys(rN)])].forEach(n=>{actualByRepNorm[rn][n]=(sN[n]||0)-(rN[n]||0);});
+    });
 
     // تجميع الأصناف
     const prodSet=new Set();
@@ -11957,13 +12076,14 @@ function _openPrintWindowForTargets(mode){
       const targets=D.rep_product_targets[rn]||{};
       prods.forEach(prod=>{
         const tgt=Math.round(targets[prod]||0);
-        let act=(actualByRep[rn]&&actualByRep[rn][prod])||0;
-        if(!act){const norm=_normProd(prod);act=(actualByRepNorm[rn]&&actualByRepNorm[rn][norm])||0;}
-        if(!act&&actualByRepNorm[rn]){
+        let act=(actualByRep[rn]&&actualByRep[rn][prod]!==undefined)?actualByRep[rn][prod]:null;
+        if(act===null){const norm=_normProd(prod);act=(actualByRepNorm[rn]&&actualByRepNorm[rn][norm]!==undefined)?actualByRepNorm[rn][norm]:null;}
+        if(act===null&&actualByRepNorm[rn]){
           const normProd=_normProd(prod);
           const matched=Object.keys(actualByRepNorm[rn]).find(k=>k&&normProd&&(k.includes(normProd)||normProd.includes(k))&&Math.min(k.length,normProd.length)>3);
-          if(matched)act=(actualByRepNorm[rn][matched])||0;
+          if(matched)act=actualByRepNorm[rn][matched];
         }
+        if(act===null)act=0;
         crossData[rn][prod]={tgt,act};
       });
     });
@@ -12044,7 +12164,7 @@ function _openPrintWindowForTargets(mode){
     const grandTotal=D._allSupTotal||Math.round(Object.values(D._supTotals||{}).reduce((s,v)=>s+v,0));
     const summaryTable=mode==='cross'?buildCrossTable(allFilteredReps):buildSummaryTable(allFilteredReps,'');
     sectionsHtml+=`
-      <div class="page-break"></div>
+      ${sectionsHtml?'<div class="page-break"></div>':''} 
       <div class="section-header" style="background:#2c5de5">
         <span>📊 الإجمالي الكلي — كل المشرفين</span>
         <span style="font-size:11px;opacity:.85">🎯 الهدف الكلي: ${grandTotal>0?grandTotal.toLocaleString('en-US'):'—'}</span>
@@ -12067,7 +12187,7 @@ function _openPrintWindowForTargets(mode){
       ${tableHtml}`;
   }
 
-  const titleStr=mode==='cross'?'📊 جدول المقارنة — المناديب × الأصناف':'📦 مقارنة أهداف الأصناف — مندوب لمندوب';
+  const titleStr=mode==='cross'?'📊 جدول المقارنة — المناديب × الأصناف':'📦 مقارنة أهداف الأصناف';
   const w=window.open('','_blank','width=1400,height=900');
   if(!w)return;
   w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head>
@@ -12088,6 +12208,274 @@ function _openPrintWindowForTargets(mode){
 function printRepProdTargets(){
   _openPrintWindowForTargets('summary');
 }
+
+function printRepProdTargetsDirect(){
+  // ── قراءة الفلاتر ──
+  const supF  = document.getElementById('f-rpt-sup')?.value  || '';
+  const catF  = document.getElementById('f-rpt-cat')?.value  || '';
+  const repF  = document.getElementById('f-rpt-rep')?.value  || '';
+  const monthF= document.getElementById('f-rpt-month')?.value|| '';
+  const fromF = document.getElementById('f-rpt-from')?.value || '';
+  const toF   = document.getElementById('f-rpt-to')?.value   || '';
+
+  // ── التحقق من وجود جدول الأصناف بـ id محدد ──
+  const prodTbl = document.getElementById('rpt-products-table');
+  if(!prodTbl){alert('لا توجد بيانات للطباعة — تأكد من رفع ملف الأهداف');return;}
+
+  const MONTH_NAMES_P={1:'يناير',2:'فبراير',3:'مارس',4:'أبريل',5:'مايو',6:'يونيو',7:'يوليو',8:'أغسطس',9:'سبتمبر',10:'أكتوبر',11:'نوفمبر',12:'ديسمبر'};
+  const dateLabel = monthF
+    ? (()=>{const[y,m]=monthF.split('-');return (MONTH_NAMES_P[+m]||m)+' '+y;})()
+    : (fromF||toF)?`${fromF||''}→${toF||''}`:'كل الفترات';
+  const supLabel  = supF || 'كل المشرفين';
+  const catLabel  = catF || 'كل القنوات البيعية';
+  const repLabel  = repF || (()=>{
+    const allR=Object.keys(D.rep_product_targets||{});
+    const n=repF?1:allR.length;
+    return `كل المناديب (${n})`;
+  })();
+
+  // ── نسخ جدول الأصناف وتحويل CSS vars لقيم ثابتة ──
+  const CSS_MAP={
+    'var(--gold)':'#b45309','var(--accent)':'#003c96','var(--accent2)':'#f05a1e',
+    'var(--red)':'#c0392b','var(--green)':'#1d6b45','var(--text)':'#1a1a2e',
+    'var(--text2)':'#4a5568','var(--muted)':'#6b7280',
+    'var(--surface2)':'#eef3fc','var(--surface3)':'#f5f8ff',
+    'var(--border)':'#d0ddf5','var(--border2)':'#d0d4e8',
+    'var(--accent3)':'#0369a1','var(--purple)':'#5b21b6','var(--pink)':'#be185d'
+  };
+  const resolveCss=s=>s.replace(/var\(--[^)]+\)/g,m=>CSS_MAP[m]||'inherit');
+
+  const tblClone = prodTbl.cloneNode(true);
+  tblClone.removeAttribute('id');
+  tblClone.querySelectorAll('[style]').forEach(el=>{
+    el.setAttribute('style', resolveCss(el.getAttribute('style')||''));
+  });
+
+  // ── قراءة إجماليات الملخص من DOM ──
+  const wrap = document.getElementById('rep-prod-targets-wrap');
+  let totalTarget=0, totalActual=0, overallAch=0, remaining=0;
+  if(wrap){
+    // نقرأ القيم من tfoot جدول الأصناف مباشرة
+    const tfCells=[...prodTbl.querySelectorAll('tfoot td')];
+    if(tfCells.length>=3){
+      const _pn=s=>parseFloat(String(s||'').replace(/[^\d.\-]/g,''))||0;
+      totalTarget=_pn(tfCells[1]?.textContent);
+      totalActual=_pn(tfCells[2]?.textContent);
+      overallAch=totalTarget>0?(totalActual/totalTarget*100):0;
+      remaining=totalTarget-totalActual;
+    }
+  }
+  const achBarW=Math.min(overallAch,100).toFixed(1);
+  const fmtN=n=>Math.round(n).toLocaleString('en-US');
+  const achColor=v=>v>=100?'#1d6b45':v>=80?'#b45309':'#c0392b';
+
+  // ── استخراج الشعار من اللوحة ──
+  const logoEl = document.querySelector('.sidebar-logo img, #sidebar-open-btn img');
+  const logoSrc = logoEl ? logoEl.src : '';
+  const logoHtml = logoSrc
+    ? `<div style="width:44px;height:44px;border-radius:4px;overflow:hidden;border:1px solid #d0dce8;flex-shrink:0"><img src="${logoSrc}" style="width:100%;height:100%;object-fit:contain"></div>`
+    : `<div class="hdr-logo-placeholder">ر</div>`;
+
+  // ── تاريخ الطباعة ──
+  const now=new Date();
+  const _fd=d=>{if(!d)return'—';const[y,m,dd]=d.split('-');const mn=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];return `${parseInt(dd,10)} ${mn[parseInt(m,10)-1]} ${y}`;};
+  const printDate=_fd(now.toISOString().slice(0,10));
+  const timeStr=now.toLocaleTimeString('ar-LY',{hour:'2-digit',minute:'2-digit'});
+
+  // ── CSS بأسلوب التقرير المالي ──
+  const CSS=`
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    @page{size:A4 portrait;margin:0}
+    html,body{font-family:'Cairo',sans-serif;font-size:9pt;color:#1a1a2e;background:#fff;direction:rtl;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+    body{padding:12mm 14mm 10mm 14mm}
+    @media print{.no-print{display:none!important}table tr{page-break-inside:avoid}tfoot{display:table-row-group}}
+
+    /* ── رأس الصفحة ── */
+    .header{display:flex;align-items:stretch;margin-bottom:0;border-radius:6px 6px 0 0;overflow:hidden}
+    .header-accent{width:6px;background:#002f7a;flex-shrink:0}
+    .header-body{flex:1;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fff}
+    .hdr-logo-wrap{display:flex;align-items:center;gap:12px}
+    .hdr-logo-placeholder{width:44px;height:44px;border-radius:4px;background:#002f7a;display:flex;align-items:center;justify-content:center;font-size:17pt;font-weight:900;color:#fff;flex-shrink:0}
+    .company-name{font-size:7.5pt;font-weight:700;color:#5a6a85;letter-spacing:.4px;text-transform:uppercase;margin-bottom:1px}
+    .report-title{font-size:15pt;font-weight:900;color:#002f7a;line-height:1;letter-spacing:-.3px}
+    .hdr-divider{width:1px;background:#d0dce8;margin:6px 0}
+    .hdr-right{text-align:left;font-size:8pt;color:#5a6a85;line-height:1.9;padding-right:4px}
+    .hdr-right .date-val{font-size:10pt;font-weight:900;color:#002f7a;display:block;margin-bottom:1px}
+    .header-rule{height:3px;background:linear-gradient(to left,#f05a1e 0%,#f05a1e 56px,#002f7a 56px,#002f7a 100%);margin-bottom:14px}
+
+    /* ── بطاقة المراسلة ── */
+    .memo-card-wrap{margin-bottom:12px}
+    .memo-card{width:100%;border-collapse:collapse;font-size:9pt}
+    .memo-card tr{border-bottom:1px solid #edf2f8}
+    .memo-card tr:last-child{border-bottom:none}
+    .mc-lbl{width:70px;padding:5px 0 5px 8px;color:#002f7a;font-weight:800;font-size:8.5pt;text-align:right;white-space:nowrap;vertical-align:middle}
+    .mc-sep{width:14px;padding:5px 2px;color:#a0b0cc;text-align:center;vertical-align:middle}
+    .mc-val{padding:5px 10px 5px 0;color:#1a2540;font-weight:600;font-size:9pt;vertical-align:middle;text-align:right}
+    .mc-val.subj{color:#002f7a;font-weight:800;border-top:1.5px solid #d0ddf5;padding-top:7px}
+    .mc-lbl.subj,.mc-sep.subj{border-top:1.5px solid #d0ddf5;padding-top:7px}
+
+    /* ── عنوان القسم ── */
+    .sec-hdr{background:#003c96;color:#fff;padding:5px 14px;font-size:8.5pt;font-weight:700;border-right:4px solid #f05a1e;margin-bottom:0;border-radius:5px 5px 0 0}
+
+    /* ── جدول الملخص ── */
+    .sum-table{width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:14px}
+    .sum-table thead th{background:#eef3fc;color:#003c96;font-weight:700;padding:5px 12px;text-align:right;border:1px solid #d0ddf5;font-size:8pt}
+    .sum-table thead th:not(:first-child){text-align:center}
+    .sum-table tbody td{padding:5px 12px;border:1px solid #e4ecf8;color:#1a1a2e;vertical-align:middle}
+    .sum-table tbody tr:nth-child(even) td{background:#f8faff}
+    .sum-table .td-lbl{font-weight:600;color:#2d3748;border-right:4px solid #f05a1e}
+    .sum-table .td-num{text-align:center;font-weight:800;font-variant-numeric:tabular-nums;font-size:10pt}
+    .sum-table .td-sub{text-align:center;font-size:7.5pt;color:#6b7280}
+    .sum-table .total-row td{background:#003c96!important;color:#fff!important;font-weight:800!important;border-color:#003c96!important}
+    .sum-table .total-row .td-lbl{border-right:4px solid #f05a1e!important}
+
+    /* ── جدول الأصناف ── */
+    .prod-table{width:100%;border-collapse:collapse;font-size:8.5pt;margin-top:4px}
+    .prod-table thead th{background:#eef3fc;color:#003c96;font-weight:700;padding:5px 10px;text-align:center;border:1px solid #d0ddf5;font-size:8pt}
+    .prod-table thead th:first-child{text-align:right}
+    .prod-table tbody td{padding:4px 10px;border:1px solid #e4ecf8;text-align:center;color:#1a1a2e}
+    .prod-table tbody td:first-child{text-align:right;font-weight:600;background:#fafbff;border-right:4px solid #f05a1e}
+    .prod-table tbody tr:nth-child(even) td{background:#f8faff}
+    .prod-table tbody tr:nth-child(even) td:first-child{background:#f5f8ff}
+    .prod-table tfoot td{background:#003c96!important;color:#fff!important;font-weight:800!important;padding:6px 10px;text-align:center;border-color:#003c96!important}
+    .prod-table tfoot td:first-child{text-align:right;border-right:4px solid #f05a1e!important}
+
+    /* ── شريط زر الطباعة ── */
+    .print-bar{display:flex;align-items:center;gap:12px;padding:10px 0 14px;border-bottom:1px solid #e2e5f0;margin-bottom:14px}
+    .print-btn{display:inline-flex;align-items:center;gap:7px;background:#002f7a;color:#fff;border:none;border-radius:8px;padding:8px 22px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer}
+
+    /* ── فوتر ── */
+    .footer{margin-top:14px;border-top:3px solid #002f7a;position:relative}
+    .footer::before{content:'';display:block;height:3px;width:56px;background:#f05a1e;position:absolute;top:-3px;left:0}
+    .footer-inner{display:flex;align-items:center;justify-content:space-between;padding-top:7px;font-size:7.5pt;color:#7a8aaa}
+    .footer-sig{font-weight:700;color:#002f7a;font-size:8pt}
+  `;
+
+  // ── تحويل جدول الأصناف لاستخدام class بدلاً من inline styles ──
+  tblClone.setAttribute('class','prod-table');
+  tblClone.removeAttribute('style');
+  tblClone.querySelectorAll('thead th').forEach(th=>{th.removeAttribute('style');});
+  tblClone.querySelectorAll('tbody td').forEach((td,i)=>{
+    const s=td.getAttribute('style')||'';
+    td.removeAttribute('style');
+    if(s.includes('color:#c0392b')||s.includes('color:#dc2626')||s.includes('var(--red)'))
+      td.style.color='#c0392b';
+    else if(s.includes('color:#1d6b45')||s.includes('color:#16a34a')||s.includes('var(--green)'))
+      td.style.color='#1d6b45';
+    else if(s.includes('color:#b45309')||s.includes('color:#d97706')||s.includes('var(--gold)'))
+      td.style.color='#b45309';
+    else if(s.includes('color:#003c96')||s.includes('color:#2c5de5')||s.includes('var(--accent)'))
+      td.style.color='#003c96';
+    else if(s.includes('color:#6b7280')||s.includes('var(--muted)'))
+      td.style.color='#6b7280';
+  });
+  tblClone.querySelectorAll('tfoot td').forEach(td=>{td.removeAttribute('style');});
+
+  const w=window.open('','_blank','width=900,height=750,scrollbars=yes,resizable=yes');
+  if(!w){alert('يرجى السماح بالنوافذ المنبثقة');return;}
+  w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head>
+    <meta charset="UTF-8">
+    <title>مقارنة أهداف الأصناف</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>${CSS}</style>
+  </head><body>
+
+  <!-- زر الطباعة -->
+  <div class="print-bar no-print">
+    <button class="print-btn" onclick="window.print()">🖨️ طباعة / حفظ PDF</button>
+    <span style="font-size:11px;color:#5a6482">مقارنة أهداف الأصناف — ${dateLabel} — ${printDate}</span>
+  </div>
+
+  <!-- رأس الصفحة -->
+  <div class="header">
+    <div class="header-accent"></div>
+    <div class="header-body">
+      <div class="hdr-logo-wrap">
+        ${logoHtml}
+        <div>
+          <div class="company-name">شركة ركان المتوسط</div>
+          <div class="report-title">مقارنة أهداف الأصناف</div>
+        </div>
+      </div>
+      <div class="hdr-divider"></div>
+      <div class="hdr-right">
+        <span class="date-val">${printDate}</span>
+        <span>${timeStr}</span>
+      </div>
+    </div>
+  </div>
+  <div class="header-rule"></div>
+
+  <!-- بطاقة المراسلة -->
+  <div class="memo-card-wrap">
+    <table class="memo-card">
+      <tr>
+        <td class="mc-lbl">المشرف</td><td class="mc-sep">:</td>
+        <td class="mc-val">${supLabel}</td>
+        <td class="mc-lbl" style="border-right:1px solid #edf2f8;padding-right:12px">القناة</td><td class="mc-sep">:</td>
+        <td class="mc-val">${catLabel}</td>
+      </tr>
+      <tr>
+        <td class="mc-lbl">المندوب</td><td class="mc-sep">:</td>
+        <td class="mc-val" style="color:#003c96;font-weight:800">${repLabel}</td>
+        <td class="mc-lbl" style="border-right:1px solid #edf2f8;padding-right:12px">الفترة</td><td class="mc-sep">:</td>
+        <td class="mc-val" style="color:#003c96;font-weight:700">${dateLabel}</td>
+      </tr>
+      <tr>
+        <td class="mc-lbl subj">الموضوع</td><td class="mc-sep subj">:</td>
+        <td class="mc-val subj" colspan="4">مقارنة أهداف الأصناف — ${dateLabel}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ملخص الإنجاز -->
+  <div class="sec-hdr">ملخص الإنجاز</div>
+  <table class="sum-table">
+    <thead><tr><th>البيان</th><th>القيمة (وحدة)</th><th>التفاصيل</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="td-lbl">إجمالي الهدف</td>
+        <td class="td-num" style="color:#b45309">${fmtN(totalTarget)}</td>
+        <td class="td-sub">الكمية المستهدفة للفترة</td>
+      </tr>
+      <tr>
+        <td class="td-lbl">إجمالي الفعلي (صافي)</td>
+        <td class="td-num" style="color:#003c96">${fmtN(totalActual)}</td>
+        <td class="td-sub">المبيعات مطروحاً منها المرتجعات</td>
+      </tr>
+      <tr>
+        <td class="td-lbl">${remaining>0?'الكميات المتبقية':'الكميات المحققة'}</td>
+        <td class="td-num" style="color:${remaining>0?'#c0392b':'#1d6b45'}">${fmtN(Math.abs(remaining))}</td>
+        <td class="td-sub">${remaining>0?'الفارق المتبقي لبلوغ الهدف':'تم تجاوز الهدف'}</td>
+      </tr>
+      <tr class="total-row">
+        <td class="td-lbl">نسبة الإنجاز الإجمالية</td>
+        <td class="td-num" style="font-size:12pt">${overallAch.toFixed(1)}%</td>
+        <td style="text-align:center;padding:6px 12px">
+          <div style="background:rgba(255,255,255,.2);border-radius:20px;height:6px;overflow:hidden;width:85%;margin:0 auto">
+            <div style="width:${achBarW}%;height:100%;background:#fff;border-radius:20px"></div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- عنوان جدول الأصناف -->
+  <div class="sec-hdr" style="margin-top:6px">تفصيل الأصناف</div>
+  ${tblClone.outerHTML}
+
+  <!-- الفوتر -->
+  <div class="footer">
+    <div class="footer-inner">
+      <span class="footer-sig">أحمد العكاري — القسم المالي</span>
+      <span>مقارنة أهداف الأصناف &nbsp;·&nbsp; ${printDate}</span>
+    </div>
+  </div>
+
+  </body></html>`);
+  w.document.close();
+}
+
 
 function printAllRepsBySupvisor(){
   _openPrintWindowAllBySup();
@@ -12137,6 +12525,12 @@ function _openPrintWindowAllBySup(){
   ].filter(Boolean).join(' | ')||'كل البيانات';
 
   var salesRows=D.sales_table||[];
+  var _gfFromA=(typeof GF!=='undefined')?GF.dateFrom:'';
+  var _gfToA  =(typeof GF!=='undefined')?GF.dateTo:'';
+  var _exFromA=(fromF&&fromF!==_gfFromA)?fromF:'';
+  var _exToA  =(toF  &&toF!==_gfToA)   ?toF  :'';
+  var _exMonA =(monthF&&(!_gfFromA||!monthF))?monthF:'';
+  var hasDate=!!(_exFromA||_exToA||_exMonA);
   var hdrs=salesRows.length?Object.keys(salesRows[0]||{}):[]; 
   var _fc=function(){var ns=Array.from(arguments);for(var i=0;i<ns.length;i++){var h=hdrs.find(function(h){return _cn(h).replace(/[\u200b-\u200f\ufeff]/g,'').trim()===ns[i].replace(/[\u200b-\u200f\ufeff]/g,'').trim();});if(h)return h;}return null;};
   var kRep=_fc('المندوب','اسم المندوب');
@@ -12156,8 +12550,8 @@ function _openPrintWindowAllBySup(){
     var rnRaw=_cn(r[kRep]);var rn=_resolveR(rnRaw);if(!rn)return;
     if(hasDate){
       var rawD=String(r[kDate2]||'');var d=new Date(rawD);if(isNaN(d))return;
-      if(monthF){var rowM=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');if(rowM!==monthF)return;}
-      var ds=rawD.substring(0,10);if(fromF&&ds<fromF)return;if(toF&&ds>toF)return;
+      if(_exMonA){var rowM=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');if(rowM!==_exMonA)return;}
+      var ds=rawD.substring(0,10);if(_exFromA&&ds<_exFromA)return;if(_exToA&&ds>_exToA)return;
     }
     var type=_cn(r[kType]||''),prod=_cn(r[kProd]||'');if(!prod)return;
     var norm=_nP(prod);
@@ -12176,9 +12570,9 @@ function _openPrintWindowAllBySup(){
   [...new Set([...Object.keys(sQ),...Object.keys(rQ)])].forEach(function(rn){
     var sP=sQ[rn]||{},rP=rQ[rn]||{},sp=sN[rn]||{},rp=rN[rn]||{};
     act[rn]={};
-    [...new Set([...Object.keys(sP),...Object.keys(rP)])].forEach(function(p){act[rn][p]=Math.max(0,(sP[p]||0)-(rP[p]||0));});
+    [...new Set([...Object.keys(sP),...Object.keys(rP)])].forEach(function(p){act[rn][p]=(sP[p]||0)-(rP[p]||0);});
     actN[rn]={};
-    [...new Set([...Object.keys(sp),...Object.keys(rp)])].forEach(function(n){actN[rn][n]=Math.max(0,(sp[n]||0)-(rp[n]||0));});
+    [...new Set([...Object.keys(sp),...Object.keys(rp)])].forEach(function(n){actN[rn][n]=(sp[n]||0)-(rp[n]||0);});
   });
 
   function buildRepTable(rn){
@@ -12188,8 +12582,9 @@ function _openPrintWindowAllBySup(){
     var rTgt=0,rAct=0,rows='';
     entries.forEach(function(e){
       var prod=e[0],tgt=e[1];
-      var a=(act[rn]&&act[rn][prod])||0;
-      if(!a){var norm=_nP(prod);a=(actN[rn]&&actN[rn][norm])||0;}
+      var a=(act[rn]&&act[rn][prod]!==undefined)?act[rn][prod]:null;
+      if(a===null){var norm=_nP(prod);a=(actN[rn]&&actN[rn][norm]!==undefined)?actN[rn][norm]:null;}
+      if(a===null)a=0;
       var t=Math.round(tgt||0);rTgt+=t;rAct+=a;
       var ach=t>0?(a/t*100):0;
       var bw=Math.min(ach/150*100,100).toFixed(1);
