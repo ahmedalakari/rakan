@@ -416,8 +416,8 @@ body.dark #miz-filter-bar.scrolled{
 }
 .miz-kpi{
   background:var(--surface);
-  border-radius:14px;
-  padding:16px 18px 14px;
+  border-radius:12px;
+  padding:13px 15px 12px;
   border:1px solid var(--border);
   box-shadow:var(--shadow-card);
   display:flex;flex-direction:column;
@@ -442,13 +442,13 @@ body.dark #miz-filter-bar.scrolled{
   /* allow wrapping — no truncate */
 }
 .miz-kpi-value{
-  font-size:clamp(18px,1.8vw,26px);
+  font-size:clamp(15px,1.6vw,22px);
   font-weight:800;
   color:var(--miz-clr,var(--accent));
-  line-height:1.1;letter-spacing:-.5px;
-  /* allow the number to breathe */
-  word-break:break-all;
-  overflow-wrap:anywhere;
+  line-height:1.15;letter-spacing:-.3px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 .miz-kpi-sub{
   font-size:10px;color:var(--muted);margin-top:6px;
@@ -468,35 +468,35 @@ body.dark #miz-filter-bar.scrolled{
 #miz-kpis-secondary,
 #miz-kpis-returns{
   display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
   gap:12px;
   margin-bottom:12px;
 }
 #miz-mo-kpis{
   display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
   gap:10px;
   margin-bottom:14px;
 }
 #miz-growth-compare-kpis{
   display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:10px;
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:12px;
   margin-bottom:14px;
 }
 #miz-cmp-kpis{
   display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
   gap:10px;
   margin-bottom:14px;
 }
 /* Responsive breakpoints */
 @media(max-width:1400px){
-  #miz-kpis-main,#miz-kpis-secondary,#miz-kpis-returns{grid-template-columns:repeat(4,minmax(0,1fr))}
+  #miz-kpis-main,#miz-kpis-secondary,#miz-kpis-returns{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
 }
 @media(max-width:1100px){
-  #miz-kpis-main,#miz-kpis-secondary,#miz-kpis-returns,#miz-cmp-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
-  #miz-mo-kpis,#miz-growth-compare-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #miz-kpis-main,#miz-kpis-secondary,#miz-kpis-returns,#miz-cmp-kpis{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+  #miz-mo-kpis,#miz-growth-compare-kpis{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
   .miz-kpi-value{font-size:clamp(16px,2.5vw,22px)}
 }
 @media(max-width:700px){
@@ -3252,7 +3252,7 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
             <tr style="background:var(--surface2);border-bottom:1px solid var(--border)">
               <th rowspan="2" style="padding:7px 9px;text-align:right;color:var(--text2);font-weight:700;white-space:nowrap;vertical-align:middle">#</th>
               <th rowspan="2" style="padding:7px 9px;text-align:right;color:var(--text2);font-weight:700;vertical-align:middle">الصنف</th>
-              <th colspan="2" style="padding:6px 9px;text-align:center;color:var(--accent2);font-weight:800;white-space:nowrap;border-bottom:1px solid var(--border)">🏭 الرئيسية</th>
+              <th colspan="2" style="padding:6px 9px;text-align:center;color:var(--accent2);font-weight:800;white-space:nowrap;border-bottom:1px solid var(--border)">🏭 الرئيسية (صافي)</th>
 
               <th colspan="2" style="padding:6px 9px;text-align:center;color:var(--gold);font-weight:800;white-space:nowrap;border-bottom:1px solid var(--border)">✅ صافي الميزان</th>
               <th colspan="2" style="padding:6px 9px;text-align:center;color:rgba(99,179,237,.9);font-weight:800;white-space:nowrap;border-bottom:1px solid var(--border);font-size:10px">📍 تاجوراء</th>
@@ -8795,8 +8795,8 @@ let _mizDetailOpen   = false;
 let _mizDetailPage   = 1;
 const _MIZ_PAGE_SIZE = 50;
 
-const _mFmt  = n => new Intl.NumberFormat('ar-LY',{maximumFractionDigits:0}).format(n||0);
-const _mFmtK = n => { if(!n) return '0'; if(Math.abs(n)>=1e6) return (n/1e6).toFixed(1)+'م'; if(Math.abs(n)>=1e3) return (n/1e3).toFixed(1)+'ك'; return String(n); };
+const _mFmt  = n => { const v=Math.round(n||0); return v.toLocaleString('en-US').replace(/,/g,'.'); };
+const _mFmtK = n => { const a=Math.abs(n||0); if(a>=1e9) return (n/1e9).toFixed(1)+'B'; if(a>=1e6) return (n/1e6).toFixed(1)+'M'; if(a>=1e3) return (n/1e3).toFixed(0)+'K'; return String(Math.round(n||0)); };
 const _mPct  = (a,b) => b>0 ? (a/b*100).toFixed(1)+'%' : '--';
 const _mDiff = (a,b) => { const d=a-b; const p=b>0?((d/b)*100).toFixed(1):null; return {d,p}; };
 
@@ -8868,12 +8868,15 @@ function _mizanBuildPrintCSS(fs, isLandscape){
     +'.filter-strip{background:#f2f4f9;border:1px solid #e4e6ef;border-radius:6px;padding:5px 10px;margin-bottom:8px;font-size:8.5px;color:#5b6580;line-height:1.6}'
     +'.filter-strip .fl-label{font-weight:700;color:#4361ee;margin-left:6px}'
     +'.sec-title{font-size:10px;font-weight:900;color:#4361ee;border-bottom:1.5px solid #4361ee;padding-bottom:3px;margin:12px 0 7px;display:flex;align-items:center;gap:4px}'
-    // KPI grid
-    +'.kpi-grid{display:grid;gap:6px;margin-bottom:8px}'
-    +'.kpi-card{background:#f7f8fc;border:1px solid #e4e6ef;border-top:2.5px solid #4361ee;border-radius:6px;padding:7px 9px;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
-    +'.kpi-card .lbl{font-size:7.5px;color:#8fa8c8;font-weight:600;margin-bottom:2px}'
-    +'.kpi-card .val{font-size:13px;font-weight:900;color:#1e2749;line-height:1.1}'
-    +'.kpi-card .sub{font-size:7px;color:#b0bcd8;margin-top:1px}'
+    // KPI grid — miz-kpi و kpi-card
+    +'.kpi-grid{display:grid;gap:6px;margin-bottom:10px}'
+    +'.kpi-card,.miz-kpi{background:#f7f8fc;border:1px solid #e0e3ef;border-top:3px solid #4361ee;border-radius:8px;padding:8px 10px;-webkit-print-color-adjust:exact;print-color-adjust:exact;break-inside:avoid;display:flex;flex-direction:column;min-width:0}'
+    +'.kpi-card .lbl,.miz-kpi-label{font-size:7.5px;color:#5b6580;font-weight:700;margin-bottom:3px;line-height:1.4}'
+    +'.kpi-card .val,.miz-kpi-value{font-size:14px;font-weight:900;color:#1e2749;line-height:1.15;word-break:break-all;margin-bottom:2px}'
+    +'.kpi-card .sub,.miz-kpi-sub{font-size:7px;color:#8fa8c8;margin-top:1px;line-height:1.5}'
+    +'.miz-kpi-icon{font-size:12px;margin-bottom:4px;line-height:1}'
+    +'.miz-kpi-trend{font-size:7px;font-weight:700;margin-top:3px;padding:2px 6px;border-radius:999px;background:#e8ecff;color:#4361ee;display:inline-block}'
+    +''
     // جداول
     +'table{width:100%;border-collapse:collapse;font-size:'+f+'px;table-layout:auto}'
     +'thead th{background:#4361ee;color:#fff;font-weight:700;padding:5px 4px;text-align:center;font-size:'+fh+'px;white-space:nowrap;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
@@ -8986,21 +8989,56 @@ function _mizKpisHtml(htmlStr, cols){
   if(!htmlStr) return '';
   var tmp = document.createElement('div');
   tmp.innerHTML = htmlStr;
-  var cards = tmp.querySelectorAll('.miz-kpi,.kpi-card,[class*="kpi"]');
+  var cards = tmp.querySelectorAll('.miz-kpi,.kpi-card');
   if(!cards.length) return '';
   var n = Math.min(cols||4, cards.length);
-  var out = '<div class="kpi-grid" style="grid-template-columns:repeat('+n+',1fr)">';
+  // تقليل الأعمدة إذا كانت البطاقات كثيرة جداً لتناسب الصفحة
+  var colCount = cards.length > 6 ? Math.min(n, 4) : Math.min(n, cards.length);
+  var out = '<div class="kpi-grid" style="grid-template-columns:repeat('+colCount+',1fr)">';
   cards.forEach(function(c){
     var icon  = c.querySelector('.miz-kpi-icon,.kpi-icon');
     var label = c.querySelector('.miz-kpi-label,.kpi-label');
     var val   = c.querySelector('.miz-kpi-value,.kpi-value');
-    var sub   = c.querySelector('.miz-kpi-sub,.kpi-sub');
-    var clr   = '#4361ee';
-    try{ var cv=c.style.getPropertyValue('--miz-clr'); if(cv&&cv.trim()&&!cv.includes('var(')) clr=cv.trim(); }catch(x){}
-    out += '<div class="kpi-card" style="border-top-color:'+clr+';">'
-         + '<div class="lbl">'+(icon?icon.textContent:'')+' '+(label?label.textContent:'')+'</div>'
-         + '<div class="val" style="color:'+clr+'">'+(val?val.textContent:'')+'</div>'
-         + '<div class="sub">'+(sub?sub.textContent:'')+'</div>'
+    // جمع كل عناصر sub
+    var subs  = c.querySelectorAll('.miz-kpi-sub,.kpi-sub');
+    var trend = c.querySelector('.miz-kpi-trend');
+    // استخراج لون --miz-clr
+    var clr = '#4361ee';
+    try{
+      var cv=c.style.getPropertyValue('--miz-clr');
+      if(cv&&cv.trim()){
+        if(cv.includes('var(--accent2)')) clr='#f07820';
+        else if(cv.includes('var(--gold)')) clr='#c49b00';
+        else if(cv.includes('var(--red)')) clr='#ee4444';
+        else if(cv.includes('var(--green)')) clr='#2ea06e';
+        else if(cv.includes('var(--purple)')) clr='#7c3aed';
+        else if(cv.includes('var(--accent)')) clr='#4361ee';
+        else if(!cv.includes('var(')) clr=cv.trim();
+      }
+    }catch(x){}
+    // استخراج اللون من style المباشر
+    if(clr==='#4361ee'){
+      var styleAttr=c.getAttribute('style')||'';
+      var m=styleAttr.match(/--miz-clr:\s*([^;]+)/);
+      if(m){
+        var v=m[1].trim();
+        if(v.includes('var(--accent2)')) clr='#f07820';
+        else if(v.includes('var(--gold)')) clr='#c49b00';
+        else if(v.includes('var(--red)')) clr='#ee4444';
+        else if(v.includes('var(--green)')) clr='#2ea06e';
+        else if(v.includes('var(--purple)')) clr='#7c3aed';
+        else if(!v.includes('var(')) clr=v;
+      }
+    }
+    var subHtml='';
+    subs.forEach(function(s){ var t=s.textContent.trim(); if(t) subHtml+='<div class="miz-kpi-sub">'+t+'</div>'; });
+    var trendHtml=trend?'<div class="miz-kpi-trend">'+trend.textContent.trim()+'</div>':'';
+    out += '<div class="miz-kpi" style="--miz-clr:'+clr+';border-top-color:'+clr+';">'
+         + '<div class="miz-kpi-icon">'+(icon?icon.textContent:'')+'</div>'
+         + '<div class="miz-kpi-label">'+(label?label.textContent:'')+'</div>'
+         + '<div class="miz-kpi-value" style="color:'+clr+'">'+(val?val.textContent:'')+'</div>'
+         + subHtml
+         + trendHtml
          + '</div>';
   });
   return out+'</div>';
@@ -9099,7 +9137,8 @@ function _mizanPrint(){
   // ── KPIs ──
   p += _mizSec('📊','المؤشرات الرئيسية');
   p += _mizKpisHtml(_mizGc('miz-kpis-main'),4);
-  p += _mizKpisHtml(_mizGc('miz-kpis-secondary'),4);
+  var _secCards=(document.getElementById('miz-kpis-secondary')||{}).querySelectorAll?document.getElementById('miz-kpis-secondary').querySelectorAll('.miz-kpi,.kpi-card').length:0;
+  p += _mizKpisHtml(_mizGc('miz-kpis-secondary'), _secCards>4?Math.min(_secCards,4):4);
   p += _mizKpisHtml(_mizGc('miz-kpis-returns'),4);
 
   // شريط المقارنة
@@ -9156,7 +9195,8 @@ function _mizanPrint(){
   if(moK||moT){
     p += '<div class="pb"></div>';
     p += _mizSec('📅','مقارنة الشهر عبر السنوات'+(moName?' — '+moName:''));
-    p += _mizKpisHtml(moK,4);
+    var _moKCards=document.getElementById('miz-mo-kpis')?document.getElementById('miz-mo-kpis').querySelectorAll('.miz-kpi,.kpi-card').length:0;
+  p += _mizKpisHtml(moK, _moKCards>4?4:Math.max(_moKCards,2));
     if(chY||chMom){
       p += '<div class="chart-grid" style="grid-template-columns:1fr 1fr">';
       p += _mizChartHtml(chY,'📊 المقارنة السنوية');
@@ -9171,7 +9211,8 @@ function _mizanPrint(){
   if(gwK||gwT){
     p += '<div class="pb"></div>';
     p += _mizSec('📊','تحليل النمو الشامل — الميزان vs الرئيسية');
-    p += _mizKpisHtml(gwK,4);
+    var _gwCards=document.getElementById('miz-growth-compare-kpis')?document.getElementById('miz-growth-compare-kpis').querySelectorAll('.miz-kpi,.kpi-card').length:0;
+    p += _mizKpisHtml(gwK, _gwCards>4?3:4);
     if(gwT) p += '<div style="overflow-x:auto;margin-bottom:8px"><table>'+_mizCleanTableHtml(gwT)+'</table></div>';
   }
 
@@ -9450,7 +9491,12 @@ function renderMizanPage(){
   if(moFilter){
     // ── جلب كل السنوات للشهر المختار (بدون تقييد السنة) ──
     const _allMizRows  = window._mizAllYearsMizan || D._mizanRows  || [];
-    const _allSalRows  = window._mizAllYearsSales || D.sales_table || [];
+    const _allSalRowsRaw = window._mizAllYearsSales || D.sales_table || [];
+    // تأكد من التطبيع
+    if(_allSalRowsRaw.length && !_allSalRowsRaw[0].__normalized && typeof _mizNormalizeRows==='function'){
+      _mizNormalizeRows(_allSalRowsRaw);
+    }
+    const _allSalRows = _allSalRowsRaw;
 
     // فلتر المصدر والمندوب والصنف والزبون فقط (بدون تقييد السنة أو الشهر)
     const _baseFilter = (rows, isMizan) => rows.filter(r=>{
@@ -9508,10 +9554,10 @@ function renderMizanPage(){
       if(!years.length){
         kpiMain.innerHTML=`<div style="grid-column:span 4;text-align:center;color:var(--muted);padding:24px;font-size:13px">📅 لا توجد بيانات لشهر ${moNameAr} في أي سنة</div>`;
       } else {
-        kpiMain.style.gridTemplateColumns=`repeat(${Math.max(years.length,2)},1fr)`;
+        kpiMain.style.gridTemplateColumns='repeat(auto-fit,minmax(190px,1fr))';
         kpiMain.innerHTML = years.map((y,idx)=>{
           const d=byYear[y];
-          const tot=(d.miz||0)+(d.sal||0);
+          const tot=Math.max(0,(d.miz||0)-(d.retMiz||0))+Math.max(0,(d.sal||0)-(d.retSal||0));
           const prev=idx>0?byYear[years[idx-1]]:null;
           const prevTot=prev?(prev.miz||0)+(prev.sal||0):0;
           const growth=prev&&prevTot>0?((tot-prevTot)/prevTot*100).toFixed(1):null;
@@ -9536,24 +9582,28 @@ function renderMizanPage(){
     const kpiSec = document.getElementById('miz-kpis-secondary');
     if(kpiSec && years.length){
       const totMizAll  = years.reduce((s,y)=>s+(byYear[y].miz||0),0);
+      const totRetMizAll = years.reduce((s,y)=>s+(byYear[y].retMiz||0),0);
       const totSalAll  = years.reduce((s,y)=>s+(byYear[y].sal||0),0);
-      const totAll_    = totMizAll+totSalAll;
+      const totRetSalAll = years.reduce((s,y)=>s+(byYear[y].retSal||0),0);
+      const netMizAll  = totMizAll - totRetMizAll;
+      const netSalAll  = totSalAll - totRetSalAll;
+      const totAll_    = netMizAll+netSalAll;
       const totQty_    = years.reduce((s,y)=>s+(byYear[y].qty||0),0);
       const allCusts_  = new Set(years.flatMap(y=>[...byYear[y].custs])).size;
       const allReps_   = new Set(years.flatMap(y=>[...byYear[y].reps])).size;
-      kpiSec.style.gridTemplateColumns='repeat(4,1fr)';
+      kpiSec.style.gridTemplateColumns='repeat(auto-fit,minmax(190px,1fr))';
       kpiSec.innerHTML=`
         <div class="miz-kpi" style="--miz-clr:var(--gold)">
           <div class="miz-kpi-icon">📊</div>
-          <div class="miz-kpi-label">إجمالي ${moNameAr} (كل السنوات)</div>
+          <div class="miz-kpi-label">صافي ${moNameAr} (كل السنوات)</div>
           <div class="miz-kpi-value">${_mFmt(totAll_)}</div>
           <div class="miz-kpi-sub">ميزان + رئيسية — ${years.length} سنة</div>
         </div>
         <div class="miz-kpi" style="--miz-clr:#63b3ed">
           <div class="miz-kpi-icon">⚖️</div>
-          <div class="miz-kpi-label">إجمالي الميزان</div>
-          <div class="miz-kpi-value">${_mFmt(totMizAll)}</div>
-          <div class="miz-kpi-sub">${totAll_>0?((totMizAll/totAll_)*100).toFixed(1)+'% من الكل':'—'}</div>
+          <div class="miz-kpi-label">صافي الميزان</div>
+          <div class="miz-kpi-value">${_mFmt(netMizAll)}</div>
+          <div class="miz-kpi-sub">${totAll_>0?((netMizAll/totAll_)*100).toFixed(1)+'% من الصافي الكلي':'—'}</div>
         </div>
         <div class="miz-kpi" style="--miz-clr:var(--accent)">
           <div class="miz-kpi-icon">🏪</div>
@@ -9597,31 +9647,92 @@ function renderMizanPage(){
         </div>
         <div class="miz-kpi" style="--miz-clr:var(--gold)">
           <div class="miz-kpi-icon">🏆</div>
-          <div class="miz-kpi-label">أفضل سنة في ${moNameAr}</div>
-          <div class="miz-kpi-value">${years.length?years.reduce((b,y)=>(byYear[y].miz||0)+(byYear[y].sal||0)>(byYear[b].miz||0)+(byYear[b].sal||0)?y:b,years[0]):'—'}</div>
-          <div class="miz-kpi-sub">${years.length?_mFmt((()=>{const by=years.reduce((b,y)=>(byYear[y].miz||0)+(byYear[y].sal||0)>(byYear[b].miz||0)+(byYear[b].sal||0)?y:b,years[0]); return (byYear[by].miz||0)+(byYear[by].sal||0);})())+' دينار':''}</div>
+          <div class="miz-kpi-label">أفضل سنة في ${moNameAr} (صافي)</div>
+          <div class="miz-kpi-value">${years.length?years.reduce((b,y)=>((byYear[y].miz||0)-(byYear[y].retMiz||0)+(byYear[y].sal||0)-(byYear[y].retSal||0))>((byYear[b].miz||0)-(byYear[b].retMiz||0)+(byYear[b].sal||0)-(byYear[b].retSal||0))?y:b,years[0]):'—'}</div>
+          <div class="miz-kpi-sub">${years.length?_mFmt((()=>{const by=years.reduce((b,y)=>((byYear[y].miz||0)-(byYear[y].retMiz||0)+(byYear[y].sal||0)-(byYear[y].retSal||0))>((byYear[b].miz||0)-(byYear[b].retMiz||0)+(byYear[b].sal||0)-(byYear[b].retSal||0))?y:b,years[0]); return (byYear[by].miz||0)-(byYear[by].retMiz||0)+(byYear[by].sal||0)-(byYear[by].retSal||0);})())+' دينار':''}</div>
         </div>`;
     } else if(kpiRet){ kpiRet.innerHTML=''; }
 
-    // ── شريط المقارنة: نسبة الميزان vs الرئيسية للشهر ──
+    // ── شريط المقارنة: بطاقة لكل سنة — ميزان vs رئيسية (صافي) ──
     const cmpEl = document.getElementById('miz-compare-bar');
     if(cmpEl && years.length){
-      const totMizCmp = years.reduce((s,y)=>s+(byYear[y].miz||0),0);
-      const totSalCmp = years.reduce((s,y)=>s+(byYear[y].sal||0),0);
-      const totAllCmp = totMizCmp+totSalCmp;
-      const ratio = totSalCmp>0?(totMizCmp/totSalCmp*100).toFixed(1):0;
-      const clr = ratio>=80?'var(--green)':ratio>=40?'var(--gold)':'var(--red)';
-      cmpEl.innerHTML=`<div class="card" style="padding:12px 16px;border:1px solid ${clr}40">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
-          <div style="font-size:12px;font-weight:700;color:var(--text2)">📅 مقارنة شهر ${moNameAr} — الميزان vs الرئيسية (كل السنوات)</div>
-          <div style="font-size:11px;color:var(--muted)">الميزان: <strong style="color:#63b3ed">${_mFmt(totMizCmp)}</strong> &nbsp;|&nbsp; الرئيسية: <strong style="color:var(--accent2)">${_mFmt(totSalCmp)}</strong></div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px">
-          <div style="flex:1;background:var(--surface2);border-radius:6px;height:12px;overflow:hidden">
-            <div style="background:${clr};height:12px;border-radius:6px;width:${Math.min(ratio,100)}%;transition:width .4s"></div>
+      // إجماليات كل السنوات
+      const totMizCmp    = years.reduce((s,y)=>s+(byYear[y].miz||0),0);
+      const totRetMizCmp = years.reduce((s,y)=>s+(byYear[y].retMiz||0),0);
+      const totSalCmp    = years.reduce((s,y)=>s+(byYear[y].sal||0),0);
+      const totRetSalCmp = years.reduce((s,y)=>s+(byYear[y].retSal||0),0);
+      const netMizAll = totMizCmp - totRetMizCmp;
+      const netSalAll = totSalCmp - totRetSalCmp;
+      const ratioAll  = netSalAll>0?(netMizAll/netSalAll*100).toFixed(1):0;
+      const clrAll    = ratioAll>=80?'var(--green)':ratioAll>=40?'var(--gold)':'var(--red)';
+
+      // بناء بطاقة لكل سنة
+      const yearCards = years.map((y,yi)=>{
+        const netMizY = Math.max(0,(byYear[y].miz||0)-(byYear[y].retMiz||0));
+        const netSalY = Math.max(0,(byYear[y].sal||0)-(byYear[y].retSal||0));
+        const ratioY  = netSalY>0?(netMizY/netSalY*100).toFixed(1): netMizY>0?'∞':'0';
+        const clrY    = parseFloat(ratioY)>=80?'#48bb78':parseFloat(ratioY)>=40?'var(--gold)':'var(--red)';
+        const isLatest= yi===years.length-1;
+        const prevY   = yi>0?years[yi-1]:null;
+        const prevNetMiz = prevY?Math.max(0,(byYear[prevY].miz||0)-(byYear[prevY].retMiz||0)):0;
+        const prevNetSal = prevY?Math.max(0,(byYear[prevY].sal||0)-(byYear[prevY].retSal||0)):0;
+        const prevTot    = prevNetMiz+prevNetSal;
+        const curTot     = netMizY+netSalY;
+        const growthY    = prevTot>0?((curTot-prevTot)/prevTot*100).toFixed(1):null;
+        const gClr       = growthY===null?'var(--muted)':parseFloat(growthY)>=0?'#48bb78':'var(--red)';
+        const gTxt       = growthY===null?'—':(parseFloat(growthY)>=0?'▲ +':'▼ ')+growthY+'%';
+        return `<div style="background:var(--surface);border:1px solid var(--border);border-top:3px solid ${clrY};border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-width:0;position:relative;${isLatest?'box-shadow:0 2px 12px rgba(99,179,237,.15)':''}">
+          ${isLatest?`<span style="position:absolute;top:7px;left:8px;font-size:9px;font-weight:800;color:#63b3ed;background:rgba(99,179,237,.12);padding:2px 7px;border-radius:10px">الأحدث</span>`:''}
+          <div style="font-size:11px;font-weight:800;color:var(--text)">${moNameAr} ${y}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+            <div>
+              <div style="font-size:9px;color:var(--muted);margin-bottom:1px">⚖️ الميزان (صافي)</div>
+              <div style="font-size:12px;font-weight:800;color:#63b3ed">${_mFmt(netMizY)}</div>
+            </div>
+            <div>
+              <div style="font-size:9px;color:var(--muted);margin-bottom:1px">🏭 الرئيسية (صافي)</div>
+              <div style="font-size:12px;font-weight:800;color:var(--accent2)">${_mFmt(netSalY)}</div>
+            </div>
           </div>
-          <div style="font-size:16px;font-weight:800;color:${clr};min-width:55px">${ratio}%</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
+            <div style="flex:1;background:var(--surface2);border-radius:4px;height:6px;overflow:hidden">
+              <div style="background:${clrY};height:6px;border-radius:4px;width:${Math.min(parseFloat(ratioY)||0,100)}%;transition:width .4s"></div>
+            </div>
+            <span style="font-size:11px;font-weight:800;color:${clrY};min-width:42px;text-align:left">${ratioY}%</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:9px;color:var(--muted)">صافي الإجمالي: ${_mFmt(curTot)}</span>
+            <span style="font-size:9.5px;font-weight:700;color:${gClr}">${gTxt}</span>
+          </div>
+        </div>`;
+      }).join('');
+
+      // بطاقة الإجمالي
+      const totalCard = `<div style="background:var(--surface2);border:1.5px solid var(--border2);border-top:3px solid ${clrAll};border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-width:0">
+        <div style="font-size:11px;font-weight:800;color:var(--text2)">📊 إجمالي ${moNameAr} (كل السنوات)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+          <div>
+            <div style="font-size:9px;color:var(--muted);margin-bottom:1px">⚖️ الميزان (صافي)</div>
+            <div style="font-size:12px;font-weight:800;color:#63b3ed">${_mFmt(netMizAll)}</div>
+          </div>
+          <div>
+            <div style="font-size:9px;color:var(--muted);margin-bottom:1px">🏭 الرئيسية (صافي)</div>
+            <div style="font-size:12px;font-weight:800;color:var(--accent2)">${_mFmt(netSalAll)}</div>
+          </div>
         </div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
+          <div style="flex:1;background:var(--surface2);border-radius:4px;height:6px;overflow:hidden">
+            <div style="background:${clrAll};height:6px;border-radius:4px;width:${Math.min(ratioAll,100)}%;transition:width .4s"></div>
+          </div>
+          <span style="font-size:11px;font-weight:800;color:${clrAll};min-width:42px;text-align:left">${ratioAll}%</span>
+        </div>
+      </div>`;
+
+      cmpEl.innerHTML=`<div style="margin-bottom:4px;font-size:11px;font-weight:700;color:var(--text2)">
+        📅 مقارنة شهر ${moNameAr} — الميزان vs الرئيسية — صافي
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
+        ${yearCards}${totalCard}
       </div>`;
     } else if(cmpEl){ cmpEl.innerHTML=''; }
 
@@ -9632,15 +9743,15 @@ function renderMizanPage(){
       _mizChartMonthly=new Chart(ctx1.getContext('2d'),{
         type:'bar',
         data:{labels:years,datasets:[
-          {label:'الميزان',data:years.map(y=>byYear[y].miz||0),backgroundColor:'rgba(99,179,237,.75)',borderRadius:5,borderWidth:0},
-          {label:'الرئيسية',data:years.map(y=>byYear[y].sal||0),backgroundColor:'rgba(72,187,120,.6)',borderRadius:5,borderWidth:0},
-          {label:'المرتجعات',data:years.map(y=>(byYear[y].retMiz||0)+(byYear[y].retSal||0)),backgroundColor:'rgba(252,129,129,.55)',borderRadius:5,borderWidth:0},
+          {label:'صافي الميزان',  data:years.map(y=>Math.max(0,(byYear[y].miz||0)-(byYear[y].retMiz||0))),backgroundColor:'rgba(99,179,237,.8)',borderRadius:5,borderWidth:0},
+          {label:'صافي الرئيسية',data:years.map(y=>Math.max(0,(byYear[y].sal||0)-(byYear[y].retSal||0))),backgroundColor:'rgba(72,187,120,.7)',borderRadius:5,borderWidth:0},
         ]},
         options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
           plugins:{legend:{labels:{color:'var(--text)',font:{family:'Cairo',size:11},padding:14,boxWidth:12,usePointStyle:true}},
             tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${_mFmt(ctx.raw)} د`}},
-            title:{display:true,text:`مبيعات شهر ${moNameAr} عبر السنوات`,color:'var(--text2)',font:{family:'Cairo',size:12,weight:'bold'},padding:{bottom:8}}},
-          scales:{x:{ticks:{color:'var(--muted)',font:{family:'Cairo',size:11}}},y:{ticks:{color:'var(--muted)',font:{family:'Cairo',size:10},callback:v=>_mFmtK(v)},grid:{color:'rgba(0,0,0,.05)'}}}
+            title:{display:true,text:`صافي مبيعات شهر ${moNameAr} عبر السنوات`,color:'var(--text2)',font:{family:'Cairo',size:12,weight:'bold'},padding:{bottom:8}}},
+          scales:{x:{ticks:{color:'var(--muted)',font:{family:'Cairo',size:11}}},
+                  y:{ticks:{color:'var(--muted)',font:{family:'Cairo',size:10},callback:v=>_mFmtK(v)},grid:{color:'rgba(0,0,0,.05)'}}}
         }
       });
     }
@@ -9650,7 +9761,7 @@ function renderMizanPage(){
     if(ctx3 && years.length){
       if(_mizChartRegions){_mizChartRegions.destroy();_mizChartRegions=null;}
       // مخطط خطي للنمو سنة بسنة
-      const totals_=years.map(y=>(byYear[y].miz||0)+(byYear[y].sal||0));
+      const totals_=years.map(y=>Math.max(0,(byYear[y].miz||0)-(byYear[y].retMiz||0))+Math.max(0,(byYear[y].sal||0)-(byYear[y].retSal||0)));
       const growths_=totals_.map((v,i)=>i===0||totals_[i-1]===0?null:parseFloat(((v-totals_[i-1])/totals_[i-1]*100).toFixed(1)));
       _mizChartRegions=new Chart(ctx3.getContext('2d'),{
         type:'line',
@@ -9749,9 +9860,13 @@ function renderMizanPage(){
     const mSalesMo=mizForYear.filter(r=>{ const dt=r.__date||_dt(r); if(!dt)return false; const [,m]=dt.split('-'); if(m!==moFilter)return false; const t=r.__type!==undefined?r.__type:_col(r,'النوع','نوع'); return t==='مبيع'; });
     const mRetsMo =mizForYear.filter(r=>{ const dt=r.__date||_dt(r); if(!dt)return false; const [,m]=dt.split('-'); if(m!==moFilter)return false; const t=r.__type!==undefined?r.__type:_col(r,'النوع','نوع'); return t.includes('مرتجع'); });
     const mizTotalMo=mSalesMo.reduce((s,r)=>s+(r.__total!==undefined?r.__total:_colN(r,'الاجمالي الصافي','الإجمالي الصافي','الصافي')),0);
-    const salTotalMo=salForYear.filter(r=>{ const dt=r.__date||_miz_getDate(r); if(!dt)return false; const [,m]=dt.split('-'); return m===moFilter; }).filter(r=>_miz_getType(r)==='مبيع').reduce((s,r)=>s+(r.__total!==undefined?r.__total:_miz_getTotal(r)),0);
+    const mizRetTotalMo=mRetsMo.reduce((s,r)=>s+(r.__total!==undefined?r.__total:_colN(r,'الاجمالي الصافي','الإجمالي الصافي','الصافي')),0);
+    const mizNetTotalMo=mizTotalMo-mizRetTotalMo;
+    const salGrossTotalMo=salForYear.filter(r=>{ const dt=r.__date||_miz_getDate(r); if(!dt)return false; const [,m]=dt.split('-'); return m===moFilter; }).filter(r=>_miz_getType(r)==='مبيع').reduce((s,r)=>s+(r.__total!==undefined?r.__total:_miz_getTotal(r)),0);
+    const salRetTotalMo=salForYear.filter(r=>{ const dt=r.__date||_miz_getDate(r); if(!dt)return false; const [,m]=dt.split('-'); return m===moFilter; }).filter(r=>_miz_getType(r).includes('مرتجع')).reduce((s,r)=>s+(r.__total!==undefined?r.__total:_miz_getTotal(r)),0);
+    const salTotalMo=salGrossTotalMo-salRetTotalMo;
     const retTotalMo=mRetsMo.reduce((s,r)=>s+(r.__total!==undefined?r.__total:_colN(r,'الاجمالي الصافي','الإجمالي الصافي','الصافي')),0);
-    _renderMizanInsightsV2(mSalesMo,mRetsMo,srcMapMo,topItemsFullMo,topCustsMo,topRepsFullMo,mizTotalMo,salTotalMo,retTotalMo);
+    _renderMizanInsightsV2(mSalesMo,mRetsMo,srcMapMo,topItemsFullMo,topCustsMo,topRepsFullMo,mizNetTotalMo,salTotalMo,retTotalMo);
 
     // ── جدول المقارنة السنوية المدمج في صفحة التفاصيل ──
     // (نحدث قسم miz-mo-pick ليتزامن تلقائياً)
@@ -9771,18 +9886,23 @@ function renderMizanPage(){
     const mizCusts = new Set(mSales.map(r=>_col(r,'اسم الزبون','الزبون','العميل')).filter(Boolean));
     const mizItems = new Set(mSales.map(r=>_col(r,'المادة','الصنف')).filter(Boolean));
     const mizRepsS = new Set(mSales.map(r=>_col(r,'المندوب','اسم المندوب')).filter(Boolean));
-    const salTotal = getTotal(sRows,false);
+    const sRowsSales = sRows.filter(r=>_miz_getType(r)==='مبيع');
+    const sRowsRets  = sRows.filter(r=>_miz_getType(r).includes('مرتجع'));
+    const salGrossTotal = getTotal(sRowsSales,false);
+    const salRetTotal   = getTotal(sRowsRets,false);
+    const salNetQty     = getQty(sRowsSales,false) - getQty(sRowsRets,false);
+    const salTotal = salGrossTotal - salRetTotal;  // صافي الرئيسية
     const retRate  = mizSalesTotal>0?(mizRetTotal/mizSalesTotal*100).toFixed(1):0;
 
     const kpiMain = document.getElementById('miz-kpis-main');
-    if(kpiMain){ kpiMain.style.gridTemplateColumns='repeat(4,1fr)'; kpiMain.innerHTML = `
+    if(kpiMain){ kpiMain.style.gridTemplateColumns='repeat(auto-fit,minmax(190px,1fr))'; kpiMain.innerHTML = `
       <div class="miz-kpi" style="--miz-clr:#63b3ed"><div class="miz-kpi-icon">⚖️</div><div class="miz-kpi-label">إجمالي مبيعات الميزان</div><div class="miz-kpi-value">${_mFmt(mizSalesTotal)}</div><div class="miz-kpi-sub">دينار ليبي</div></div>
       <div class="miz-kpi" style="--miz-clr:var(--accent2)"><div class="miz-kpi-icon">✅</div><div class="miz-kpi-label">صافي المبيعات</div><div class="miz-kpi-value">${_mFmt(mizNetTotal)}</div><div class="miz-kpi-sub">بعد خصم المرتجعات</div></div>
       <div class="miz-kpi" style="--miz-clr:var(--gold)"><div class="miz-kpi-icon">🧾</div><div class="miz-kpi-label">عدد الفواتير</div><div class="miz-kpi-value">${_mFmt(mizInvs.size)}</div><div class="miz-kpi-sub">فاتورة مبيعات</div></div>
       <div class="miz-kpi" style="--miz-clr:#fc8181"><div class="miz-kpi-icon">💰</div><div class="miz-kpi-label">متوسط الفاتورة</div><div class="miz-kpi-value">${mizInvs.size>0?_mFmt(Math.round(mizSalesTotal/mizInvs.size)):'—'}</div><div class="miz-kpi-sub">دينار / فاتورة</div></div>`;
     }
     const kpiSec = document.getElementById('miz-kpis-secondary');
-    if(kpiSec){ kpiSec.style.gridTemplateColumns='repeat(4,1fr)'; kpiSec.innerHTML = `
+    if(kpiSec){ kpiSec.style.gridTemplateColumns='repeat(auto-fit,minmax(190px,1fr))'; kpiSec.innerHTML = `
       <div class="miz-kpi" style="--miz-clr:var(--accent)"><div class="miz-kpi-icon">🏪</div><div class="miz-kpi-label">الزبائن النشطون</div><div class="miz-kpi-value">${_mFmt(mizCusts.size)}</div><div class="miz-kpi-sub">زبون مختلف</div></div>
       <div class="miz-kpi" style="--miz-clr:#b794f4"><div class="miz-kpi-icon">👤</div><div class="miz-kpi-label">المناديب النشطون</div><div class="miz-kpi-value">${_mFmt(mizRepsS.size)}</div><div class="miz-kpi-sub">مندوب نشط</div></div>
       <div class="miz-kpi" style="--miz-clr:var(--text2)"><div class="miz-kpi-icon">📦</div><div class="miz-kpi-label">الأصناف المباعة</div><div class="miz-kpi-value">${_mFmt(mizItems.size)}</div><div class="miz-kpi-sub">صنف مختلف</div></div>
@@ -9797,10 +9917,10 @@ function renderMizanPage(){
 
     const cmpEl = document.getElementById('miz-compare-bar');
     if(cmpEl && salTotal>0){
-      const ratio=(mizSalesTotal/salTotal*100).toFixed(1);
-      const diff_=mizSalesTotal-salTotal;
+      const ratio=(mizNetTotal/salTotal*100).toFixed(1);
+      const diff_=mizNetTotal-salTotal;
       const clr=ratio>=80?'var(--green)':ratio>=40?'var(--gold)':'var(--red)';
-      cmpEl.innerHTML=`<div class="card" style="padding:14px;border:1px solid ${clr}40"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px"><div style="font-size:12px;font-weight:700;color:var(--text2)">⚖️ المقارنة مع المبيعات الرئيسية</div><div style="font-size:11px;color:var(--muted)">الميزان: <strong style="color:#63b3ed">${_mFmt(mizSalesTotal)}</strong> &nbsp;|&nbsp; الرئيسية: <strong style="color:var(--accent2)">${_mFmt(salTotal)}</strong> &nbsp;|&nbsp; الفرق: <strong style="color:${diff_>=0?'var(--green)':'var(--red)'}">${diff_>=0?'+':''}${_mFmt(diff_)}</strong></div></div><div style="display:flex;align-items:center;gap:10px"><div style="flex:1;background:var(--surface2);border-radius:6px;height:12px;overflow:hidden"><div style="background:${clr};height:12px;border-radius:6px;width:${Math.min(ratio,100)}%;transition:width .4s"></div></div><div style="font-size:16px;font-weight:800;color:${clr};min-width:55px;text-align:left">${ratio}%</div></div></div>`;
+      cmpEl.innerHTML=`<div class="card" style="padding:14px;border:1px solid ${clr}40"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px"><div style="font-size:12px;font-weight:700;color:var(--text2)">⚖️ المقارنة مع المبيعات الرئيسية (صافي)</div><div style="font-size:11px;color:var(--muted)">صافي الميزان: <strong style="color:#63b3ed">${_mFmt(mizNetTotal)}</strong> &nbsp;|&nbsp; صافي الرئيسية: <strong style="color:var(--accent2)">${_mFmt(salTotal)}</strong> &nbsp;|&nbsp; الفرق: <strong style="color:${diff_>=0?'var(--green)':'var(--red)'}">${diff_>=0?'+':''}${_mFmt(diff_)}</strong></div></div><div style="display:flex;align-items:center;gap:10px"><div style="flex:1;background:var(--surface2);border-radius:6px;height:12px;overflow:hidden"><div style="background:${clr};height:12px;border-radius:6px;width:${Math.min(ratio,100)}%;transition:width .4s"></div></div><div style="font-size:16px;font-weight:800;color:${clr};min-width:55px;text-align:left">${ratio}%</div></div></div>`;
     } else if(cmpEl){ cmpEl.innerHTML=''; }
 
     // ── المبيعات الشهرية (الوضع العادي) ──
@@ -9869,7 +9989,7 @@ function renderMizanPage(){
     const srcMapFull={};
     mSales.forEach(r=>{ const s=r._mizanSource||'غير محدد'; if(!srcMapFull[s])srcMapFull[s]={sales:0,rets:0}; const val=r.__total!==undefined?r.__total:_colN(r,'الاجمالي الصافي','الإجمالي الصافي','الصافي'); srcMapFull[s].sales+=val; });
     mRets.forEach(r=>{ const s=r._mizanSource||'غير محدد'; if(!srcMapFull[s])srcMapFull[s]={sales:0,rets:0}; const val=r.__total!==undefined?r.__total:_colN(r,'الاجمالي الصافي','الإجمالي الصافي','الصافي'); srcMapFull[s].rets+=val; });
-    _renderMizanInsightsV2(mSales,mRets,srcMapFull,topItemsFull,topCusts,topReps,mizSalesTotal,salTotal,mizRetTotal);
+    _renderMizanInsightsV2(mSales,mRets,srcMapFull,topItemsFull,topCusts,topReps,mizNetTotal,salTotal,mizRetTotal);
   } // end else (normal mode)
 
   // ── الجدول التفصيلي ──
@@ -9889,25 +10009,41 @@ function renderMizanPage(){
 
     // ── بناء gd للنمو الشامل من الصفوف المفلترة ──
     const _buildGd = (mizRows, salRows) => {
-      const gd = { taj:{}, kar25:{}, kar24:{}, main:{} };
+      const gd = { taj:{}, kar25:{}, kar24:{}, main:{}, ret_taj:{}, ret_kar25:{}, ret_kar24:{}, ret_main:{} };
       const _addToGd = (obj, mo, val) => { if(mo) obj[mo] = (obj[mo]||0) + val; };
       mizRows.forEach(r => {
         const tp = r.__type !== undefined ? r.__type : _mizCol(r,'النوع','نوع');
-        if(tp.includes('مرتجع')) return;
         const mo  = (r.__date || _mizDt(r)).substring(0,7);
         const val = r.__total !== undefined ? r.__total : _mizColN(r,'الاجمالي الصافي','الإجمالي الصافي','الصافي');
         const src = r._mizanSource || '';
-        if(src.includes('تاجوراء'))          _addToGd(gd.taj,   mo, val);
-        else if(src.includes('2024'))        _addToGd(gd.kar24,  mo, val);
-        else                                 _addToGd(gd.kar25,  mo, val);
+        if(tp.includes('مرتجع')){
+          if(src.includes('تاجوراء'))      _addToGd(gd.ret_taj,   mo, val);
+          else if(src.includes('2024'))    _addToGd(gd.ret_kar24,  mo, val);
+          else                             _addToGd(gd.ret_kar25,  mo, val);
+        } else {
+          if(src.includes('تاجوراء'))      _addToGd(gd.taj,   mo, val);
+          else if(src.includes('2024'))    _addToGd(gd.kar24,  mo, val);
+          else                             _addToGd(gd.kar25,  mo, val);
+        }
       });
       salRows.forEach(r => {
         const tp = _miz_getType(r);
-        if(tp !== 'مبيع') return;
         const mo  = (r.__date || _miz_getDate(r)).substring(0,7);
         const val = r.__total !== undefined ? r.__total : _miz_getTotal(r);
-        _addToGd(gd.main, mo, val);
+        if(tp.includes('مرتجع')) _addToGd(gd.ret_main, mo, val);
+        else                     _addToGd(gd.main, mo, val);
       });
+      // حساب الصافي الشهري = مبيع − مرتجعات
+      const netObj = (gross, ret) => {
+        const keys = new Set([...Object.keys(gross), ...Object.keys(ret)]);
+        const net = {};
+        keys.forEach(k => { net[k] = Math.max(0, (gross[k]||0) - (ret[k]||0)); });
+        return net;
+      };
+      gd.net_taj   = netObj(gd.taj,   gd.ret_taj);
+      gd.net_kar25 = netObj(gd.kar25, gd.ret_kar25);
+      gd.net_kar24 = netObj(gd.kar24, gd.ret_kar24);
+      gd.net_main  = netObj(gd.main,  gd.ret_main);
       return gd;
     };
 
@@ -9918,10 +10054,9 @@ function renderMizanPage(){
     ])].sort();
 
     if(_gdAllMos.length){
-      _renderMizanGrowthBadges(_gdData, _gdAllMos);
-      renderMizanGrowthCompare(_gdData, _gdAllMos, window._mizFilteredSalesAll||[]);
-      // ── القسمان المُصلَحان: جدول المناطق + مخطط النمو الشامل ──
       const _moF = (document.getElementById('f-miz-month')?.value||'').padStart(2,'0');
+      _renderMizanGrowthBadges(_gdData, _gdAllMos, _moF||null);
+      renderMizanGrowthCompare(_gdData, _gdAllMos, window._mizFilteredSalesAll||[], _moF||null);
       _renderMizanSourceTable(window._mizFilteredMizanAll||[], _moF||null);
       _renderMizanGrowthChart(_gdData, _gdAllMos, _moF||null);
     }
@@ -10242,12 +10377,12 @@ window.processMultipleFiles = async function(files){
 // ══════════════════════════════════════════════
 //  بادجات النمو — بطاقة لكل سنة لكل مصدر
 // ══════════════════════════════════════════════
-function _renderMizanGrowthBadges(gd, allMos){
+function _renderMizanGrowthBadges(gd, allMos, moFilter){
   const el=document.getElementById('miz-growth-badges');
   if(!el) return;
 
   const _sumYear = (obj, year) =>
-    Object.entries(obj).filter(([m])=>m.startsWith(year)).reduce((s,[,v])=>s+v,0);
+    Object.entries(obj).filter(([m])=>m.startsWith(year)&&(!moFilter||m.substring(5,7)===moFilter)).reduce((s,[,v])=>s+v,0);
   const _growth = (a,b) => b>0 ? ((a-b)/b*100).toFixed(1) : null;
 
   // جمع كل السنوات المتاحة
@@ -10256,10 +10391,10 @@ function _renderMizanGrowthBadges(gd, allMos){
 
   // ألوان ثابتة لكل مصدر
   const SRC_CFG = [
-    { key:'taj',   label:'⚖️ تاجوراء',      clr:'#63b3ed' },
-    { key:'kar25', label:'⚖️ كريمية 25+26', clr:'#f6ad55' },
-    { key:'kar24', label:'⚖️ كريمية 2024',  clr:'#fc8181' },
-    { key:'main',  label:'🏭 الرئيسية',      clr:'#68d391' },
+    { key:'net_taj',   label:'⚖️ تاجوراء',      clr:'#63b3ed' },
+    { key:'net_kar25', label:'⚖️ كريمية 25+26', clr:'#f6ad55' },
+    { key:'net_kar24', label:'⚖️ كريمية 2024',  clr:'#fc8181' },
+    { key:'net_main',  label:'🏭 الرئيسية',      clr:'#68d391' },
   ];
 
   // بناء بطاقة واحدة لكل (مصدر × سنة)
@@ -10306,10 +10441,10 @@ function _renderMizanGrowthBadges(gd, allMos){
     const lastY    = lastMo.substring(0,4);
     const lastM    = lastMo.substring(5,7);
     const prevMo   = (parseInt(lastY)-1)+'-'+lastM;
-    const curMiz   = (gd.taj[lastMo]||0)+(gd.kar25[lastMo]||0)+(gd.kar24[lastMo]||0);
-    const prevMiz  = (gd.taj[prevMo]||0)+(gd.kar25[prevMo]||0)+(gd.kar24[prevMo]||0);
-    const curMain  = gd.main[lastMo]||0;
-    const prevMain = gd.main[prevMo]||0;
+    const curMiz   = (gd.net_taj[lastMo]||0)+(gd.net_kar25[lastMo]||0)+(gd.net_kar24[lastMo]||0);
+    const prevMiz  = (gd.net_taj[prevMo]||0)+(gd.net_kar25[prevMo]||0)+(gd.net_kar24[prevMo]||0);
+    const curMain  = gd.net_main[lastMo]||0;
+    const prevMain = gd.net_main[prevMo]||0;
     if(curMiz+curMain > 0){
       const gMiz  = _growth(curMiz, prevMiz);
       const gMain = _growth(curMain, prevMain);
@@ -10385,25 +10520,38 @@ function renderMizanMonthCompare(){
   };
 
   if(srcFilter!=='main'){
-    // قسم المقارنة عبر السنوات: نستخدم كل السنوات (بدون فلتر التاريخ)
-    // لأن الهدف هو مقارنة الشهر المختار عبر جميع السنوات المتاحة
     const mizSource = window._mizAllYearsMizan || D._mizanRows || [];
     mizSource.forEach(r=>{
-      const dt=_mizDt(r); if(!dt) return;
+      const dt = r.__date || _mizDt(r); if(!dt) return;
       const [y,m]=dt.split('-'); if(m!==mo) return;
-      const tp=_miz_getType(r), val=_miz_getTotal(r);
-      const inv=_miz_getInv(r), cust=_miz_getCust(r);
-      addEntry(y, true, val, tp.includes('مرتجع'), inv, cust);
+      const tp  = r.__type!==undefined ? r.__type : _miz_getType(r);
+      const val = r.__total!==undefined ? r.__total : _miz_getTotal(r);
+      const inv = r.__inv  || _miz_getInv(r);
+      const cu  = r.__cust || _miz_getCust(r);
+      addEntry(y, true, val, tp.includes('مرتجع'), inv, cu);
     });
   }
   if(srcFilter!=='mizan'){
+    // نستخدم D.sales_table كاملاً (مبيع + مرتجعات) مع fallback لكل حقل
     const salesSource = window._mizAllYearsSales || D.sales_table || [];
+    // تأكد من تطبيع الصفوف أولاً إن لم تكن مُطبّعة
+    if(salesSource.length && !salesSource[0].__normalized && typeof _mizNormalizeRows==='function'){
+      _mizNormalizeRows(salesSource);
+    }
     salesSource.forEach(r=>{
-      const dt=_mizDt(r); if(!dt) return;
+      const dt = r.__date || _mizDt(r); if(!dt) return;
       const [y,m]=dt.split('-'); if(m!==mo) return;
-      const tp=_miz_getType(r), val=_miz_getTotal(r);
-      const inv=_miz_getInv(r), cust=_miz_getCust(r);
-      addEntry(y, false, val, tp.includes('مرتجع'), inv, cust);
+      // __type مُعبّأ من _mizNormalizeRows أو نقرأه مباشرة
+      const tp = r.__type !== undefined ? r.__type : (()=>{
+        for(const k of Object.keys(r)) if(/^(النوع|نوع)$/i.test(String(k||'').trim())) return String(r[k]||'').trim();
+        return '';
+      })();
+      // تجاهل صفوف بدون نوع (صفوف رأسية أو فارغة)
+      if(!tp) return;
+      const val = r.__total!==undefined ? r.__total : _miz_getTotal(r);
+      const inv = r.__inv  || _miz_getInv(r);
+      const cu  = r.__cust || _miz_getCust(r);
+      addEntry(y, false, val, tp.includes('مرتجع'), inv, cu);
     });
   }
 
@@ -10415,43 +10563,68 @@ function renderMizanMonthCompare(){
   }
 
   // ── حساب الإجماليات ──
-  const totMizan = years.reduce((s,y)=>s+(byYear[y].mizan||0),0);
-  const totMain  = years.reduce((s,y)=>s+(byYear[y].main||0),0);
+  const totMizanGross = years.reduce((s,y)=>s+(byYear[y].mizan||0),0);
+  const totRetMizan   = years.reduce((s,y)=>s+(byYear[y].ret_mizan||0),0);
+  const totMainGross  = years.reduce((s,y)=>s+(byYear[y].main||0),0);
+  const totRetMain    = years.reduce((s,y)=>s+(byYear[y].ret_main||0),0);
+  const totMizan = totMizanGross - totRetMizan;
+  const totMain  = totMainGross  - totRetMain;
   const totAll   = totMizan+totMain;
   const totCusts = new Set(years.flatMap(y=>[...byYear[y].custs])).size;
   const totInvs  = new Set(years.flatMap(y=>[...byYear[y].invs])).size;
-  const bestYear = years.reduce((b,y)=>{
-    const tv=(byYear[y].mizan||0)+(byYear[y].main||0);
-    return tv>(byYear[b]?(byYear[b].mizan||0)+(byYear[b].main||0):0)?y:b;
-  }, years[0]);
+  const _yNet=y=>Math.max(0,(byYear[y].mizan||0)-(byYear[y].ret_mizan||0))+Math.max(0,(byYear[y].main||0)-(byYear[y].ret_main||0));
+  const bestYear = years.reduce((b,y)=>_yNet(y)>_yNet(b)?y:b, years[0]);
 
-  // ── KPIs ──
-  if(kpisEl) kpisEl.innerHTML = `
-    <div class="miz-kpi" style="--miz-clr:var(--gold)">
-      <div class="miz-kpi-icon">📅</div>
-      <div class="miz-kpi-label">إجمالي شهر ${_MO_NAMES[moNum]}</div>
-      <div class="miz-kpi-value">${_mFmt(totAll)}</div>
-      <div class="miz-kpi-sub">كل السنوات المتاحة (${years.length})</div>
-    </div>
-    <div class="miz-kpi" style="--miz-clr:#63b3ed">
-      <div class="miz-kpi-icon">⚖️</div>
-      <div class="miz-kpi-label">إجمالي الميزان</div>
-      <div class="miz-kpi-value">${_mFmt(totMizan)}</div>
-      <div class="miz-kpi-sub">${totAll>0?((totMizan/totAll)*100).toFixed(1)+'% من الكل':'—'}</div>
-    </div>
-    <div class="miz-kpi" style="--miz-clr:var(--accent2)">
-      <div class="miz-kpi-icon">🏭</div>
-      <div class="miz-kpi-label">إجمالي الرئيسية</div>
-      <div class="miz-kpi-value">${_mFmt(totMain)}</div>
-      <div class="miz-kpi-sub">${totAll>0?((totMain/totAll)*100).toFixed(1)+'% من الكل':'—'}</div>
-    </div>
-    <div class="miz-kpi" style="--miz-clr:#b794f4">
-      <div class="miz-kpi-icon">🏆</div>
-      <div class="miz-kpi-label">أفضل سنة</div>
-      <div class="miz-kpi-value">${bestYear}</div>
-      <div class="miz-kpi-sub">${_mFmt((byYear[bestYear].mizan||0)+(byYear[bestYear].main||0))} دينار</div>
-    </div>
-  `;
+  // ── KPIs: بطاقة إجمالية + بطاقة لكل سنة (ميزان + رئيسية) ──
+  if(kpisEl){
+    // بطاقة الإجمالي
+    const summaryCard = `
+      <div class="miz-kpi" style="--miz-clr:var(--gold)">
+        <div class="miz-kpi-icon">📅</div>
+        <div class="miz-kpi-label">صافي ${_MO_NAMES[moNum]} — الكل</div>
+        <div class="miz-kpi-value">${_mFmt(totAll)}</div>
+        <div class="miz-kpi-sub">${years.length} سنة &nbsp;|&nbsp; 🏆 ${bestYear}</div>
+      </div>`;
+
+    // بطاقة لكل سنة
+    const yearCards = years.map((y,yi)=>{
+      const netMizY  = Math.max(0,(byYear[y].mizan||0)-(byYear[y].ret_mizan||0));
+      const netMainY = Math.max(0,(byYear[y].main||0)-(byYear[y].ret_main||0));
+      const netTotY  = netMizY + netMainY;
+      const isBest   = y === bestYear;
+      const prevY    = yi>0 ? years[yi-1] : null;
+      const prevNet  = prevY ? _yNet(prevY) : 0;
+      const growth   = prevNet>0 ? ((netTotY-prevNet)/prevNet*100).toFixed(1) : null;
+      const gClr     = growth===null ? 'var(--muted)' : parseFloat(growth)>=0 ? 'var(--green)' : 'var(--red)';
+      const gTxt     = growth===null ? '—' : (parseFloat(growth)>=0?'▲ +':'▼ ')+growth+'%';
+      const clr      = isBest ? 'var(--gold)' : (yi===years.length-1 ? '#63b3ed' : 'var(--text2)');
+      return `<div class="miz-kpi" style="--miz-clr:${clr};position:relative">
+        ${isBest?'<div style="position:absolute;top:8px;left:8px;font-size:9px;font-weight:800;color:var(--gold);background:rgba(246,173,85,.15);padding:2px 6px;border-radius:10px">🏆 الأفضل</div>':''}
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <div class="miz-kpi-icon" style="margin-bottom:0">📅</div>
+          <span style="font-size:10px;font-weight:800;color:${clr};background:color-mix(in srgb,${clr} 10%,transparent);padding:2px 8px;border-radius:20px">${y}</span>
+        </div>
+        <div class="miz-kpi-label">${_MO_NAMES[moNum]} ${y}</div>
+        <div class="miz-kpi-value" style="font-size:clamp(14px,1.4vw,18px)">${_mFmt(netTotY)}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px">
+          <div style="background:rgba(99,179,237,.08);border-radius:6px;padding:4px 6px">
+            <div style="font-size:8.5px;color:var(--muted)">⚖️ الميزان</div>
+            <div style="font-size:11px;font-weight:700;color:#63b3ed">${_mFmt(netMizY)}</div>
+          </div>
+          <div style="background:rgba(240,120,32,.08);border-radius:6px;padding:4px 6px">
+            <div style="font-size:8.5px;color:var(--muted)">🏭 الرئيسية</div>
+            <div style="font-size:11px;font-weight:700;color:var(--accent2)">${_mFmt(netMainY)}</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+          <span style="font-size:9px;color:var(--muted)">${totAll>0?((netTotY/totAll)*100).toFixed(1)+'% من الكل':'—'}</span>
+          <span style="font-size:9.5px;font-weight:700;color:${gClr}">${gTxt}</span>
+        </div>
+      </div>`;
+    }).join('');
+
+    kpisEl.innerHTML = summaryCard + yearCards;
+  }
 
   // ── مخطط العمود ──
   const ctxBar = document.getElementById('miz-mo-chart-bar');
@@ -10460,8 +10633,8 @@ function renderMizanMonthCompare(){
     _mizMoChartBar = new Chart(ctxBar.getContext('2d'),{
       type:'bar',
       data:{labels:years,datasets:[
-        {label:'الرئيسية',data:years.map(y=>byYear[y].main||0),backgroundColor:'rgba(72,187,120,.7)',borderRadius:5},
-        {label:'الميزان', data:years.map(y=>byYear[y].mizan||0),backgroundColor:'rgba(99,179,237,.75)',borderRadius:5},
+        {label:'الرئيسية (صافي)',data:years.map(y=>Math.max(0,(byYear[y].main||0)-(byYear[y].ret_main||0))),backgroundColor:'rgba(72,187,120,.7)',borderRadius:5},
+        {label:'الميزان (صافي)', data:years.map(y=>Math.max(0,(byYear[y].mizan||0)-(byYear[y].ret_mizan||0))),backgroundColor:'rgba(99,179,237,.75)',borderRadius:5},
       ]},
       options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
         plugins:{legend:{labels:{color:'var(--text)',font:{family:'Cairo',size:11},padding:14,boxWidth:12,usePointStyle:true}},
@@ -10476,7 +10649,7 @@ function renderMizanMonthCompare(){
   const ctxGrw = document.getElementById('miz-mo-chart-growth');
   if(ctxGrw && years.length>1){
     if(_mizMoChartGrw){_mizMoChartGrw.destroy();_mizMoChartGrw=null;}
-    const totals = years.map(y=>(byYear[y].mizan||0)+(byYear[y].main||0));
+    const totals = years.map(y=>_yNet(y));
     const growths = totals.map((v,i)=>i===0||totals[i-1]===0?null:parseFloat(((v-totals[i-1])/totals[i-1]*100).toFixed(1)));
     _mizMoChartGrw = new Chart(ctxGrw.getContext('2d'),{
       type:'line',
@@ -10499,26 +10672,28 @@ function renderMizanMonthCompare(){
     let h=`<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;direction:rtl">
       <thead><tr style="background:var(--surface2);border-bottom:2px solid var(--border)">
         <th style="padding:10px 14px;text-align:right;color:var(--text2);font-weight:700">السنة</th>
-        <th style="padding:10px 14px;text-align:center;color:#63b3ed;font-weight:700">⚖️ الميزان</th>
-        <th style="padding:10px 14px;text-align:center;color:var(--accent2);font-weight:700">🏭 الرئيسية</th>
-        <th style="padding:10px 14px;text-align:center;color:var(--gold);font-weight:700">الإجمالي</th>
+        <th style="padding:10px 14px;text-align:center;color:#63b3ed;font-weight:700">⚖️ الميزان (صافي)</th>
+        <th style="padding:10px 14px;text-align:center;color:var(--accent2);font-weight:700">🏭 الرئيسية (صافي)</th>
+        <th style="padding:10px 14px;text-align:center;color:var(--gold);font-weight:700">الصافي الكلي</th>
         <th style="padding:10px 14px;text-align:center;color:var(--red);font-weight:700">المرتجعات</th>
         <th style="padding:10px 14px;text-align:center;color:var(--text2);font-weight:700">نمو %</th>
         <th style="padding:10px 14px;text-align:center;color:var(--text2);font-weight:700">حصة من الكل</th>
       </tr></thead><tbody>`;
     years.forEach((y,i)=>{
       const e=byYear[y];
-      const total=(e.mizan||0)+(e.main||0);
+      const netMizY=Math.max(0,(e.mizan||0)-(e.ret_mizan||0));
+      const netMainY=Math.max(0,(e.main||0)-(e.ret_main||0));
+      const total=netMizY+netMainY;
       const ret=(e.ret_mizan||0)+(e.ret_main||0);
-      const prevTotal=i>0?(byYear[years[i-1]].mizan||0)+(byYear[years[i-1]].main||0):0;
-      const grw=i>0&&prevTotal>0?((total-prevTotal)/prevTotal*100).toFixed(1):null;
+      const prevNet=i>0?_yNet(years[i-1]):0;
+      const grw=i>0&&prevNet>0?((total-prevNet)/prevNet*100).toFixed(1):null;
       const grwClr=grw===null?'var(--muted)':parseFloat(grw)>=0?'#48bb78':'var(--red)';
       const share=totAll>0?(total/totAll*100).toFixed(1):0;
       const isBest=y===bestYear;
       h+=`<tr style="border-bottom:1px solid var(--border);${i%2?'background:var(--surface2)':''}${isBest?';outline:2px solid rgba(246,201,14,.3);outline-offset:-1px':''}">
         <td style="padding:10px 14px;font-weight:800;color:${isBest?'var(--gold)':'var(--text)'}">${isBest?'🏆 ':''} ${y}</td>
-        <td style="padding:10px 14px;text-align:center;font-weight:600;color:${(e.mizan||0)>0?'#63b3ed':'var(--muted)'}">${(e.mizan||0)>0?_mFmt(e.mizan):'—'}</td>
-        <td style="padding:10px 14px;text-align:center;font-weight:600;color:${(e.main||0)>0?'var(--accent2)':'var(--muted)'}">${(e.main||0)>0?_mFmt(e.main):'—'}</td>
+        <td style="padding:10px 14px;text-align:center;font-weight:600;color:${netMizY>0?'#63b3ed':'var(--muted)'}">${netMizY>0?_mFmt(netMizY):'—'}</td>
+        <td style="padding:10px 14px;text-align:center;font-weight:600;color:${netMainY>0?'var(--accent2)':'var(--muted)'}">${netMainY>0?_mFmt(netMainY):'—'}</td>
         <td style="padding:10px 14px;text-align:center;font-weight:800;color:var(--gold)">${_mFmt(total)}</td>
         <td style="padding:10px 14px;text-align:center;color:${ret>0?'var(--red)':'var(--muted)'}">${ret>0?_mFmt(ret):'—'}</td>
         <td style="padding:10px 14px;text-align:center;font-weight:700;color:${grwClr}">${grw!==null?(parseFloat(grw)>=0?'+':'')+grw+'%':'—'}</td>
@@ -10530,9 +10705,9 @@ function renderMizanMonthCompare(){
         </td>
       </tr>`;
     });
-    // إجمالي
+    // إجمالي الصافي
     h+=`<tr style="background:var(--surface2);font-weight:800;border-top:2px solid var(--border)">
-      <td style="padding:10px 14px;color:var(--text)">الإجمالي (${years.length} سنة)</td>
+      <td style="padding:10px 14px;color:var(--text)">الصافي الكلي (${years.length} سنة)</td>
       <td style="padding:10px 14px;text-align:center;color:#63b3ed">${_mFmt(totMizan)}</td>
       <td style="padding:10px 14px;text-align:center;color:var(--accent2)">${_mFmt(totMain)}</td>
       <td style="padding:10px 14px;text-align:center;color:var(--gold)">${_mFmt(totAll)}</td>
@@ -10549,48 +10724,111 @@ function _renderMizanSourceTable(mizRows, moFilter){
   const el = document.getElementById('miz-source-table');
   if(!el) return;
 
-  const moNameAr = moFilter ? (['','يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'][parseInt(moFilter,10)]||moFilter) : '';
+  const MO_AR = ['','يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const moNameAr = moFilter ? (MO_AR[parseInt(moFilter,10)]||moFilter) : '';
 
-  // بناء البيانات حسب المصدر (مبيع فقط)
+  // ── دالة مساعدة: تجميع صفوف حسب نوع المصدر ──
+  const _aggRows = (rows, getType, getTotal, getQty, getInv, getCust, getRep, srcLabel) => {
+    const d = {sales:0, qty:0, invs:new Set(), custs:new Set(), reps:new Set(), rets:0};
+    rows.forEach(r => {
+      // تطبيق فلتر الشهر إذا كان محدداً
+      if(moFilter){
+        const dt = r.__date||_miz_getDate(r)||'';
+        const m = dt.split('-')[1]||'';
+        if(m !== moFilter) return;
+      }
+      const tp = getType(r);
+      const val = getTotal(r);
+      if(tp.includes('مرتجع')){ d.rets += val; }
+      else if(tp === 'مبيع'){
+        d.sales += val;
+        d.qty   += getQty(r);
+        const inv = getInv(r); if(inv) d.invs.add(inv);
+        const cu  = getCust(r); if(cu)  d.custs.add(cu);
+        const rp  = getRep(r);  if(rp)  d.reps.add(rp);
+      }
+    });
+    return d;
+  };
+
+  // ── بيانات الميزان حسب المصدر ──
   const srcMap = {};
-  mizRows.filter(r=>{
-    const tp = r.__type!==undefined ? r.__type : _mizCol(r,'النوع','نوع');
-    return tp === 'مبيع';
-  }).forEach(r=>{
+  mizRows.forEach(r=>{
+    // تطبيق فلتر الشهر
+    if(moFilter){
+      const dt = r.__date||_mizDt(r)||'';
+      const m = dt.split('-')[1]||'';
+      if(m !== moFilter) return;
+    }
     const src = r._mizanSource || 'غير محدد';
+    const tp  = r.__type!==undefined ? r.__type : _mizCol(r,'النوع','نوع');
     const val = r.__total!==undefined ? r.__total : _mizColN(r,'الاجمالي الصافي','الإجمالي الصافي','الصافي');
     const qty = _mizColN(r,'الكمية الخارجة','الكمية');
     const inv = _mizCol(r,'رقم الفاتورة','الفاتورة');
-    const cust= r.__cust!==undefined ? r.__cust : _mizCol(r,'اسم الزبون','الزبون');
-    const rep = r.__rep!==undefined  ? r.__rep  : _mizCol(r,'المندوب','اسم المندوب');
+    const cu  = r.__cust!==undefined ? r.__cust : _mizCol(r,'اسم الزبون','الزبون');
+    const rp  = r.__rep!==undefined  ? r.__rep  : _mizCol(r,'المندوب','اسم المندوب');
     if(!srcMap[src]) srcMap[src]={sales:0,qty:0,invs:new Set(),custs:new Set(),reps:new Set(),rets:0};
-    srcMap[src].sales += val;
-    srcMap[src].qty   += qty;
-    if(inv)  srcMap[src].invs.add(inv);
-    if(cust) srcMap[src].custs.add(cust);
-    if(rep)  srcMap[src].reps.add(rep);
+    if(tp.includes('مرتجع')) srcMap[src].rets += val;
+    else if(tp==='مبيع'){
+      srcMap[src].sales += val;
+      srcMap[src].qty   += qty;
+      if(inv) srcMap[src].invs.add(inv);
+      if(cu)  srcMap[src].custs.add(cu);
+      if(rp)  srcMap[src].reps.add(rp);
+    }
   });
-  // المرتجعات
-  mizRows.filter(r=>{
-    const tp = r.__type!==undefined ? r.__type : _mizCol(r,'النوع','نوع');
-    return tp.includes('مرتجع');
-  }).forEach(r=>{
-    const src = r._mizanSource || 'غير محدد';
-    const val = r.__total!==undefined ? r.__total : _mizColN(r,'الاجمالي الصافي','الإجمالي الصافي','الصافي');
-    if(!srcMap[src]) srcMap[src]={sales:0,qty:0,invs:new Set(),custs:new Set(),reps:new Set(),rets:0};
-    srcMap[src].rets += val;
+
+  // ── بيانات الرئيسية ──
+  const salRows = window._mizFilteredSalesAll || window._mizFilteredSalesRows || D.sales_table || [];
+  const mainData = {sales:0, qty:0, invs:new Set(), custs:new Set(), reps:new Set(), rets:0};
+  salRows.forEach(r=>{
+    if(moFilter){
+      const dt = r.__date||_miz_getDate(r)||'';
+      const m = dt.split('-')[1]||'';
+      if(m !== moFilter) return;
+    }
+    const tp  = _miz_getType(r);
+    const val = r.__total!==undefined ? r.__total : _miz_getTotal(r);
+    const qty = r.__qty!==undefined ? r.__qty : _miz_getQty(r);
+    const inv = _miz_getInv(r);
+    const cu  = _miz_getCust(r);
+    const rp  = _miz_getRep(r);
+    if(tp.includes('مرتجع')) mainData.rets += val;
+    else if(tp==='مبيع'){
+      mainData.sales += val;
+      mainData.qty   += qty;
+      if(inv) mainData.invs.add(inv);
+      if(cu)  mainData.custs.add(cu);
+      if(rp)  mainData.reps.add(rp);
+    }
   });
 
   const srcs = Object.keys(srcMap).sort();
-  if(!srcs.length){ el.innerHTML='<div style="text-align:center;color:var(--muted);padding:16px;font-size:12px">لا توجد بيانات</div>'; return; }
+  const hasMain = mainData.sales > 0 || mainData.rets > 0;
 
-  const totSales = srcs.reduce((s,k)=>s+(srcMap[k].sales||0),0);
-  const totRets  = srcs.reduce((s,k)=>s+(srcMap[k].rets||0),0);
-  const totQty   = srcs.reduce((s,k)=>s+(srcMap[k].qty||0),0);
+  if(!srcs.length && !hasMain){
+    el.innerHTML='<div style="text-align:center;color:var(--muted);padding:16px;font-size:12px">لا توجد بيانات</div>';
+    return;
+  }
 
-  const SRC_CLR = {'تاجوراء 2025+2026':'#63b3ed','كريمية 2025+2026':'#f6ad55','كريمية 2024':'#fc8181'};
+  // الإجماليات الكلية (ميزان + رئيسية)
+  const totMizSales = srcs.reduce((s,k)=>s+(srcMap[k].sales||0),0);
+  const totMizRets  = srcs.reduce((s,k)=>s+(srcMap[k].rets||0),0);
+  const totMizQty   = srcs.reduce((s,k)=>s+(srcMap[k].qty||0),0);
+  const grandSales  = totMizSales + (mainData.sales||0);
+  const grandRets   = totMizRets  + (mainData.rets||0);
+  const grandQty    = totMizQty   + (mainData.qty||0);
 
-  const title = moFilter ? `📋 مقارنة المناطق — شهر ${moNameAr} (كل السنوات)` : '📋 مقارنة المناطق التفصيلي';
+  const SRC_CLR = {
+    'تاجوراء 2025+2026':'#63b3ed',
+    'كريمية 2025+2026':'#f6ad55',
+    'كريمية 2024':'#fc8181',
+    'الرئيسية':'#68d391'
+  };
+
+  const title = moFilter
+    ? `📋 مقارنة المناطق — شهر ${moNameAr} (كل السنوات)`
+    : '📋 مقارنة المناطق التفصيلي';
 
   let h = `<div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:10px">${title}</div>`;
   h += `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px;direction:rtl">
@@ -10605,10 +10843,11 @@ function _renderMizanSourceTable(mizRows, moFilter){
       <th style="padding:9px 12px;text-align:center;color:var(--text2);font-weight:700">الحصة</th>
     </tr></thead><tbody>`;
 
+  // ── صفوف الميزان ──
   srcs.forEach((src,i)=>{
     const d = srcMap[src];
     const net = (d.sales||0)-(d.rets||0);
-    const share = totSales>0?((d.sales/totSales)*100).toFixed(1):0;
+    const share = grandSales>0?((d.sales/grandSales)*100).toFixed(1):0;
     const clr = SRC_CLR[src]||'var(--accent3)';
     const retRate = d.sales>0?((d.rets/d.sales)*100).toFixed(1):0;
     h += `<tr style="border-bottom:1px solid var(--border);${i%2?'background:var(--surface2)':''}">
@@ -10635,13 +10874,45 @@ function _renderMizanSourceTable(mizRows, moFilter){
     </tr>`;
   });
 
-  // صف الإجمالي
+  // ── صف الرئيسية ──
+  if(hasMain){
+    const netMain = (mainData.sales||0)-(mainData.rets||0);
+    const shareMain = grandSales>0?((mainData.sales/grandSales)*100).toFixed(1):0;
+    const retRateMain = mainData.sales>0?((mainData.rets/mainData.sales)*100).toFixed(1):0;
+    const clrMain = '#68d391';
+    const rowIdx = srcs.length;
+    h += `<tr style="border-bottom:2px solid var(--border);border-top:1px dashed var(--border2);${rowIdx%2?'background:var(--surface2)':''}">
+      <td style="padding:9px 12px;font-weight:700">
+        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${clrMain};margin-left:6px;vertical-align:middle"></span>
+        🏭 الرئيسية
+      </td>
+      <td style="padding:9px 12px;text-align:center;font-weight:600;color:#63b3ed">${_mFmt(mainData.sales||0)}</td>
+      <td style="padding:9px 12px;text-align:center;color:${(mainData.rets||0)>0?'var(--red)':'var(--muted)'}">
+        ${(mainData.rets||0)>0?`${_mFmt(mainData.rets)} <span style="font-size:9px;color:var(--muted)">(${retRateMain}%)</span>`:'—'}
+      </td>
+      <td style="padding:9px 12px;text-align:center;font-weight:800;color:${netMain>=0?'var(--gold)':'var(--red)'}">${_mFmt(netMain)}</td>
+      <td style="padding:9px 12px;text-align:center;color:var(--text2)">${_mFmt(mainData.qty||0)}</td>
+      <td style="padding:9px 12px;text-align:center;color:var(--accent)">${mainData.custs.size}</td>
+      <td style="padding:9px 12px;text-align:center;color:#b794f4">${mainData.reps.size}</td>
+      <td style="padding:9px 12px;text-align:center">
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="flex:1;background:var(--surface);border-radius:3px;height:6px;min-width:40px">
+            <div style="background:${clrMain};height:6px;border-radius:3px;width:${shareMain}%;opacity:.8"></div>
+          </div>
+          <span style="font-size:10px;font-weight:700;color:${clrMain};min-width:32px">${shareMain}%</span>
+        </div>
+      </td>
+    </tr>`;
+  }
+
+  // ── صف الإجمالي الكلي ──
+  const totalRows = srcs.length + (hasMain?1:0);
   h += `<tr style="background:var(--surface2);font-weight:800;border-top:2px solid var(--border)">
-    <td style="padding:9px 12px;color:var(--text)">الإجمالي (${srcs.length} مصدر)</td>
-    <td style="padding:9px 12px;text-align:center;color:#63b3ed">${_mFmt(totSales)}</td>
-    <td style="padding:9px 12px;text-align:center;color:var(--red)">${totRets>0?_mFmt(totRets):'—'}</td>
-    <td style="padding:9px 12px;text-align:center;color:var(--gold)">${_mFmt(totSales-totRets)}</td>
-    <td style="padding:9px 12px;text-align:center;color:var(--text2)">${_mFmt(totQty)}</td>
+    <td style="padding:9px 12px;color:var(--text)">الإجمالي (${totalRows} مصدر)</td>
+    <td style="padding:9px 12px;text-align:center;color:#63b3ed">${_mFmt(grandSales)}</td>
+    <td style="padding:9px 12px;text-align:center;color:var(--red)">${grandRets>0?_mFmt(grandRets):'—'}</td>
+    <td style="padding:9px 12px;text-align:center;color:var(--gold)">${_mFmt(grandSales-grandRets)}</td>
+    <td style="padding:9px 12px;text-align:center;color:var(--text2)">${_mFmt(grandQty)}</td>
     <td colspan="3" style="padding:9px 12px;text-align:center;color:var(--muted)">—</td>
   </tr></tbody></table></div>`;
 
@@ -10665,14 +10936,14 @@ function _renderMizanGrowthChart(gd, allMos, moFilter){
     const years = [...new Set(allMos.map(m=>m.substring(0,4)))].sort();
     const getMizYear = y => {
       let s=0;
-      Object.entries(gd.taj).forEach(([m,v])=>{ if(m.startsWith(y)&&m.substring(5,7)===moFilter) s+=v; });
-      Object.entries(gd.kar25).forEach(([m,v])=>{ if(m.startsWith(y)&&m.substring(5,7)===moFilter) s+=v; });
-      Object.entries(gd.kar24).forEach(([m,v])=>{ if(m.startsWith(y)&&m.substring(5,7)===moFilter) s+=v; });
+      Object.entries(gd.net_taj).forEach(([m,v])=>{ if(m.startsWith(y)&&m.substring(5,7)===moFilter) s+=v; });
+      Object.entries(gd.net_kar25).forEach(([m,v])=>{ if(m.startsWith(y)&&m.substring(5,7)===moFilter) s+=v; });
+      Object.entries(gd.net_kar24).forEach(([m,v])=>{ if(m.startsWith(y)&&m.substring(5,7)===moFilter) s+=v; });
       return s;
     };
     const getMainYear = y => {
       let s=0;
-      Object.entries(gd.main).forEach(([m,v])=>{ if(m.startsWith(y)&&m.substring(5,7)===moFilter) s+=v; });
+      Object.entries(gd.net_main).forEach(([m,v])=>{ if(m.startsWith(y)&&m.substring(5,7)===moFilter) s+=v; });
       return s;
     };
     _mizChartGrowthMain = new Chart(ctx.getContext('2d'),{
@@ -10690,12 +10961,12 @@ function _renderMizanGrowthChart(gd, allMos, moFilter){
     });
   } else {
     // الوضع العادي: خط نمو شهري شامل لكل المصادر
-    const mizArr  = allMos.map(m=>(gd.taj[m]||0)+(gd.kar25[m]||0)+(gd.kar24[m]||0));
-    const mainArr = allMos.map(m=>gd.main[m]||0);
+    const mizArr  = allMos.map(m=>(gd.net_taj[m]||0)+(gd.net_kar25[m]||0)+(gd.net_kar24[m]||0));
+    const mainArr = allMos.map(m=>gd.net_main[m]||0);
     const totalArr= allMos.map((_,i)=>mizArr[i]+mainArr[i]);
     _mizChartGrowthMain = new Chart(ctx.getContext('2d'),{
       type:'line',
-      data:{labels:allMos,datasets:[
+      data:{labels:_effMos,datasets:[
         {label:'الإجمالي الكلي',data:totalArr,borderColor:'var(--gold)',backgroundColor:'rgba(246,173,85,.12)',borderWidth:2.5,pointRadius:3,tension:.3,fill:true},
         {label:'الميزان',data:mizArr,borderColor:'#63b3ed',backgroundColor:'rgba(99,179,237,.08)',borderWidth:1.5,pointRadius:2,tension:.3,fill:false},
         {label:'الرئيسية',data:mainArr,borderColor:'#68d391',backgroundColor:'rgba(72,187,120,.08)',borderWidth:1.5,pointRadius:2,tension:.3,fill:false},
@@ -10710,15 +10981,16 @@ function _renderMizanGrowthChart(gd, allMos, moFilter){
   }
 }
 
-function renderMizanGrowthCompare(gd, allMos, salesRows){
-  const _sum = obj => Object.values(obj).reduce((s,v)=>s+v,0);
+function renderMizanGrowthCompare(gd, allMos, salesRows, moFilter){
+  // _sum يفلتر حسب الشهر إذا كان محدداً
+  const _sum = obj => Object.entries(obj).reduce((s,[k,v])=>s+((!moFilter||k.substring(5,7)===moFilter)?v:0),0);
   const _growth = (a,b) => b>0 ? ((a-b)/b*100).toFixed(1) : null;
 
-  const totTaj   = _sum(gd.taj);
-  const totKar25 = _sum(gd.kar25);
-  const totKar24 = _sum(gd.kar24);
+  const totTaj   = _sum(gd.net_taj);
+  const totKar25 = _sum(gd.net_kar25);
+  const totKar24 = _sum(gd.net_kar24);
   const totMiz   = totTaj+totKar25+totKar24;
-  const totMain  = _sum(gd.main);
+  const totMain  = _sum(gd.net_main);
   const totAll   = totMiz+totMain;
 
   // ── KPIs النمو ──
@@ -10732,47 +11004,56 @@ function renderMizanGrowthCompare(gd, allMos, salesRows){
     const retMizTotal=retMiz.reduce((s,r)=>s+_miz_getTotal(r),0);
     const retRate=totMiz>0?(retMizTotal/totMiz*100).toFixed(1):0;
 
+    const _moLbl = moFilter ? (['','يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'][parseInt(moFilter,10)]||moFilter) : '';
+    const _moSub = moFilter ? ` — شهر ${_moLbl}` : '';
     kpiEl.innerHTML=`
-      <div class="kpi-card" style="border-top:3px solid var(--gold)">
-        <div class="kpi-label">المجموع الكلي (الملفين)</div>
-        <div class="kpi-value" style="color:var(--gold)">${_mFmt(totAll)}</div>
-        <div class="kpi-sub">ميزان + رئيسية</div>
+      <div class="miz-kpi" style="--miz-clr:var(--gold)">
+        <div class="miz-kpi-icon">📊</div>
+        <div class="miz-kpi-label">الصافي الكلي${_moSub}</div>
+        <div class="miz-kpi-value">${_mFmt(totAll)}</div>
+        <div class="miz-kpi-sub">⚖️ ${_mFmt(totMiz)} &nbsp;|&nbsp; 🏭 ${_mFmt(totMain)}</div>
       </div>
-      <div class="kpi-card" style="border-top:3px solid #63b3ed">
-        <div class="kpi-label">حصة الميزان</div>
-        <div class="kpi-value" style="color:#63b3ed">${mizShare}%</div>
-        <div class="kpi-sub">${_mFmt(totMiz)} دينار</div>
+      <div class="miz-kpi" style="--miz-clr:#63b3ed">
+        <div class="miz-kpi-icon">⚖️</div>
+        <div class="miz-kpi-label">صافي الميزان${_moSub}</div>
+        <div class="miz-kpi-value">${_mFmt(totMiz)}</div>
+        <div class="miz-kpi-sub">${totAll>0?mizShare+'% من الكل':'—'}</div>
       </div>
-      <div class="kpi-card" style="border-top:3px solid var(--accent2)">
-        <div class="kpi-label">حصة الرئيسية</div>
-        <div class="kpi-value" style="color:var(--accent2)">${mainShare}%</div>
-        <div class="kpi-sub">${_mFmt(totMain)} دينار</div>
+      <div class="miz-kpi" style="--miz-clr:var(--accent2)">
+        <div class="miz-kpi-icon">🏭</div>
+        <div class="miz-kpi-label">صافي الرئيسية${_moSub}</div>
+        <div class="miz-kpi-value">${_mFmt(totMain)}</div>
+        <div class="miz-kpi-sub">${totAll>0?mainShare+'% من الكل':'—'}</div>
       </div>
-      <div class="kpi-card" style="border-top:3px solid ${gMizMain&&parseFloat(gMizMain)>=0?'var(--green)':'var(--red)'}">
-        <div class="kpi-label">نمو الميزان مقابل الرئيسية</div>
-        <div class="kpi-value" style="color:${gMizMain&&parseFloat(gMizMain)>=0?'var(--green)':'var(--red)'}">${gMizMain?(parseFloat(gMizMain)>=0?'+':'')+gMizMain+'%':'—'}</div>
-        <div class="kpi-sub">نسبة الفرق</div>
+      <div class="miz-kpi" style="--miz-clr:${gMizMain&&parseFloat(gMizMain)>=0?'var(--green)':'var(--red)'}">
+        <div class="miz-kpi-icon">📈</div>
+        <div class="miz-kpi-label">الميزان vs الرئيسية</div>
+        <div class="miz-kpi-value">${gMizMain?(parseFloat(gMizMain)>=0?'+':'')+gMizMain+'%':'—'}</div>
+        <div class="miz-kpi-sub">نسبة الفرق بين المصدرين</div>
       </div>
-      <div class="kpi-card" style="border-top:3px solid ${gKar&&parseFloat(gKar)>=0?'var(--green)':'var(--red)'}">
-        <div class="kpi-label">نمو الكريمية 24→25</div>
-        <div class="kpi-value" style="color:${gKar&&parseFloat(gKar)>=0?'var(--green)':'var(--red)'}">${gKar?(parseFloat(gKar)>=0?'+':'')+gKar+'%':'—'}</div>
-        <div class="kpi-sub">${_mFmt(totKar24)} → ${_mFmt(totKar25)}</div>
+      <div class="miz-kpi" style="--miz-clr:${gKar&&parseFloat(gKar)>=0?'var(--green)':'var(--red)'}">
+        <div class="miz-kpi-icon">📉</div>
+        <div class="miz-kpi-label">نمو الكريمية 24→25</div>
+        <div class="miz-kpi-value">${gKar?(parseFloat(gKar)>=0?'+':'')+gKar+'%':'—'}</div>
+        <div class="miz-kpi-sub">${_mFmt(totKar24)} → ${_mFmt(totKar25)}</div>
       </div>
-      <div class="kpi-card" style="border-top:3px solid var(--red)">
-        <div class="kpi-label">نسبة ارتجاع الميزان</div>
-        <div class="kpi-value" style="color:${retRate>10?'var(--red)':retRate>5?'var(--gold)':'var(--green)'}">${retRate}%</div>
-        <div class="kpi-sub">${_mFmt(retMizTotal)} دينار مرتجع</div>
+      <div class="miz-kpi" style="--miz-clr:var(--red)">
+        <div class="miz-kpi-icon">↩️</div>
+        <div class="miz-kpi-label">نسبة الارتجاع (ميزان)</div>
+        <div class="miz-kpi-value">${retRate}%</div>
+        <div class="miz-kpi-sub">${_mFmt(retMizTotal)} دينار مرتجع</div>
       </div>`;
   }
 
   // ── مخطط مقارنة سنوية ──
   const yearlyData={};
   const pushY=(obj,src)=>Object.entries(obj).forEach(([m,v])=>{
+    if(moFilter && m.substring(5,7)!==moFilter) return;
     const y=m.substring(0,4);
     if(!yearlyData[y]) yearlyData[y]={main:0,taj:0,kar25:0,kar24:0};
     yearlyData[y][src]=(yearlyData[y][src]||0)+v;
   });
-  pushY(gd.main,'main'); pushY(gd.taj,'taj'); pushY(gd.kar25,'kar25'); pushY(gd.kar24,'kar24');
+  pushY(gd.net_main,'main'); pushY(gd.net_taj,'taj'); pushY(gd.net_kar25,'kar25'); pushY(gd.net_kar24,'kar24');
   const years=Object.keys(yearlyData).sort();
   const ctxY=document.getElementById('miz-chart-yearly');
   if(ctxY){
@@ -10792,10 +11073,13 @@ function renderMizanGrowthCompare(gd, allMos, salesRows){
   }
 
   // ── مخطط MoM% ──
-  const mizMoArr=allMos.map(m=>(gd.taj[m]||0)+(gd.kar25[m]||0)+(gd.kar24[m]||0));
-  const mainMoArr=allMos.map(m=>gd.main[m]||0);
+  // إذا كان moFilter محدداً: نُجمّع بالسنة بدلاً من الشهر
+  const _effMos = moFilter ? allMos.filter(m=>m.substring(5,7)===moFilter) : allMos;
+  const mizMoArr=_effMos.map(m=>(gd.net_taj[m]||0)+(gd.net_kar25[m]||0)+(gd.net_kar24[m]||0));
+  const mainMoArr=_effMos.map(m=>gd.net_main[m]||0);
   const mizMoM=mizMoArr.map((v,i)=>i===0||mizMoArr[i-1]===0?null:parseFloat(((v-mizMoArr[i-1])/mizMoArr[i-1]*100).toFixed(1)));
   const mainMoM=mainMoArr.map((v,i)=>i===0||mainMoArr[i-1]===0?null:parseFloat(((v-mainMoArr[i-1])/mainMoArr[i-1]*100).toFixed(1)));
+  const _chartMos = _effMos; // استخدام الأشهر المفلترة في الرسوم
   const ctxM=document.getElementById('miz-chart-mom');
   if(ctxM){
     if(_mizChartMoM){_mizChartMoM.destroy();_mizChartMoM=null;}
@@ -10817,18 +11101,18 @@ function renderMizanGrowthCompare(gd, allMos, salesRows){
     let h=`<table style="width:100%;border-collapse:collapse;font-size:11px;direction:rtl;min-width:700px">
       <thead><tr style="background:var(--surface2);border-bottom:2px solid var(--border)">
         <th style="padding:8px 10px;text-align:right;color:var(--text2);white-space:nowrap">الشهر</th>
-        <th style="padding:8px 10px;text-align:center;color:var(--accent2)">🏭 الرئيسية</th>
-        <th style="padding:8px 10px;text-align:center;color:rgba(99,179,237,.9)">📍 تاجوراء</th>
-        <th style="padding:8px 10px;text-align:center;color:rgba(246,173,85,.9)">📍 كريمية 25</th>
-        <th style="padding:8px 10px;text-align:center;color:rgba(252,129,129,.8)">📍 كريمية 24</th>
-        <th style="padding:8px 10px;text-align:center;color:#63b3ed">⚖️ الميزان الكلي</th>
-        <th style="padding:8px 10px;text-align:center;color:var(--gold);font-weight:700">📊 الإجمالي</th>
+        <th style="padding:8px 10px;text-align:center;color:var(--accent2)">🏭 الرئيسية (صافي)</th>
+        <th style="padding:8px 10px;text-align:center;color:rgba(99,179,237,.9)">📍 تاجوراء (صافي)</th>
+        <th style="padding:8px 10px;text-align:center;color:rgba(246,173,85,.9)">📍 كريمية 25 (صافي)</th>
+        <th style="padding:8px 10px;text-align:center;color:rgba(252,129,129,.8)">📍 كريمية 24 (صافي)</th>
+        <th style="padding:8px 10px;text-align:center;color:#63b3ed">⚖️ الميزان الكلي (صافي)</th>
+        <th style="padding:8px 10px;text-align:center;color:var(--gold);font-weight:700">📊 الصافي الكلي</th>
         <th style="padding:8px 10px;text-align:center;color:var(--text2)">نمو الميزان%</th>
         <th style="padding:8px 10px;text-align:center;color:var(--text2)">نمو الرئيسية%</th>
       </tr></thead><tbody>`;
     let prevMiz=0, prevMain=0;
-    allMos.forEach((mo,i)=>{
-      const main_=gd.main[mo]||0, taj_=gd.taj[mo]||0, kar25_=gd.kar25[mo]||0, kar24_=gd.kar24[mo]||0;
+    _effMos.forEach((mo,i)=>{
+      const main_=gd.net_main[mo]||0, taj_=gd.net_taj[mo]||0, kar25_=gd.net_kar25[mo]||0, kar24_=gd.net_kar24[mo]||0;
       const miz_=taj_+kar25_+kar24_;
       const total_=miz_+main_;
       const gMiz=i>0&&prevMiz>0?((miz_-prevMiz)/prevMiz*100).toFixed(1):null;
@@ -10849,7 +11133,8 @@ function renderMizanGrowthCompare(gd, allMos, salesRows){
       prevMiz=miz_; prevMain=main_;
     });
     // صف الإجمالي
-    const gt_main=_sum(gd.main),gt_taj=_sum(gd.taj),gt_kar25=_sum(gd.kar25),gt_kar24=_sum(gd.kar24);
+    const gt_main=_sum(gd.net_main),gt_taj=_sum(gd.net_taj),gt_kar25=_sum(gd.net_kar25),gt_kar24=_sum(gd.net_kar24);
+    // _sum تستخدم moFilter تلقائياً
     const gt_miz=gt_taj+gt_kar25+gt_kar24, gt_all=gt_miz+gt_main;
     h+=`<tr style="background:var(--surface2);font-weight:800;border-top:2px solid var(--border)">
       <td style="padding:8px 10px;color:var(--text)">الإجمالي</td>
@@ -11022,8 +11307,8 @@ function renderMizanComparison(){
     let h=`<table style="width:100%;border-collapse:collapse;font-size:12px;direction:rtl">
       <thead><tr style="background:var(--surface2);border-bottom:2px solid var(--border)">
         <th style="padding:9px 14px;text-align:right;color:var(--text2);font-weight:700">البند</th>
-        <th style="padding:9px 14px;text-align:center;color:#63b3ed;font-weight:700">⚖️ الميزان</th>
-        <th style="padding:9px 14px;text-align:center;color:var(--accent2);font-weight:700">🏭 الرئيسية</th>
+        <th style="padding:9px 14px;text-align:center;color:#63b3ed;font-weight:700">⚖️ الميزان (صافي)</th>
+        <th style="padding:9px 14px;text-align:center;color:var(--accent2);font-weight:700">🏭 الرئيسية (صافي)</th>
         <th style="padding:9px 14px;text-align:center;color:var(--gold);font-weight:700">الفرق</th>
         <th style="padding:9px 14px;text-align:center;color:var(--text2);font-weight:700">الأفضل</th>
       </tr></thead><tbody>`;
@@ -11126,9 +11411,9 @@ function _renderMizanItemsComparison(mSales, sSales, _col, _colN, _cn, _n){
   }));
 
   // ملخص سريع
-  const onlyMiz=rows.filter(r=>r.main===0&&r.miz>0).length;
-  const onlyMain=rows.filter(r=>r.miz===0&&r.main>0).length;
-  const both_=rows.filter(r=>r.miz>0&&r.main>0).length;
+  const onlyMiz=rows.filter(r=>r.net_main===0&&r.net_miz>0).length;
+  const onlyMain=rows.filter(r=>r.net_miz===0&&r.net_main>0).length;
+  const both_=rows.filter(r=>r.net_miz>0&&r.net_main>0).length;
   const sumEl=document.getElementById('miz-cmp-items-summary');
   if(sumEl) sumEl.innerHTML=`
     <div class="kpi-card" style="border-top:2px solid var(--gold)"><div class="kpi-label">إجمالي الأصناف</div><div class="kpi-value" style="font-size:22px">${allItems.length}</div><div class="kpi-sub">صنف مختلف</div></div>
@@ -11142,16 +11427,16 @@ function _renderMizanItemsComparison(mSales, sSales, _col, _colN, _cn, _n){
   const sort  =document.getElementById('f-cmp-sort')?.value||'mizan-desc';
 
   if(search) rows=rows.filter(r=>r.name.toLowerCase().includes(search));
-  if(filter==='mizan-only') rows=rows.filter(r=>r.main===0&&r.miz>0);
-  else if(filter==='main-only') rows=rows.filter(r=>r.miz===0&&r.main>0);
-  else if(filter==='both') rows=rows.filter(r=>r.miz>0&&r.main>0);
-  else if(filter==='mizan-higher') rows=rows.filter(r=>r.miz>r.main);
-  else if(filter==='main-higher') rows=rows.filter(r=>r.main>r.miz);
+  if(filter==='mizan-only') rows=rows.filter(r=>r.net_main===0&&r.net_miz>0);
+  else if(filter==='main-only') rows=rows.filter(r=>r.net_miz===0&&r.net_main>0);
+  else if(filter==='both') rows=rows.filter(r=>r.net_miz>0&&r.net_main>0);
+  else if(filter==='mizan-higher') rows=rows.filter(r=>r.net_miz>r.net_main);
+  else if(filter==='main-higher') rows=rows.filter(r=>r.net_main>r.net_miz);
 
-  if(sort==='mizan-desc') rows.sort((a,b)=>b.miz-a.miz);
-  else if(sort==='main-desc') rows.sort((a,b)=>b.main-a.main);
-  else if(sort==='total-desc') rows.sort((a,b)=>b.total-a.total);
-  else if(sort==='diff-desc') rows.sort((a,b)=>b.diff-a.diff);
+  if(sort==='mizan-desc') rows.sort((a,b)=>b.net_miz-a.net_miz);
+  else if(sort==='main-desc') rows.sort((a,b)=>b.net_main-a.net_main);
+  else if(sort==='total-desc') rows.sort((a,b)=>(b.net_miz+b.net_main)-(a.net_miz+a.net_main));
+  else if(sort==='diff-desc') rows.sort((a,b)=>(b.net_miz-b.net_main)-(a.net_miz-a.net_main));
   else if(sort==='name-asc') rows.sort((a,b)=>a.name.localeCompare(b.name));
 
   const cntEl=document.getElementById('miz-cmp-items-count');
@@ -11166,7 +11451,7 @@ function _renderMizanItemsComparison(mSales, sSales, _col, _colN, _cn, _n){
   // حساب الإجماليات
   const gtMain=rows.reduce((s,r)=>s+r.main,0), gtMiz=rows.reduce((s,r)=>s+r.miz,0);
   const gtTaj=rows.reduce((s,r)=>s+r.taj,0), gtKar25=rows.reduce((s,r)=>s+r.kar25,0), gtKar24=rows.reduce((s,r)=>s+r.kar24,0);
-  const gtTotal=rows.reduce((s,r)=>s+r.total,0);
+  const gtTotal=rows.reduce((s,r)=>s+(r.net_miz||0)+(r.net_main||0),0);
 
   // رسم الجدول
   const tbody=document.getElementById('miz-cmp-items-body');
@@ -11177,22 +11462,26 @@ function _renderMizanItemsComparison(mSales, sSales, _col, _colN, _cn, _n){
     if(!pageRows.length){ tbody.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:30px;color:var(--muted)">لا توجد أصناف</td></tr>`; }
     else {
       tbody.innerHTML=pageRows.map((r,i)=>{
-        const mizPct=r.total>0?(r.miz/r.total*100).toFixed(0):0;
-        const dClr=r.diff>0?'var(--green)':r.diff<0?'var(--red)':'var(--muted)';
-        const inMiz=r.miz>0, inMain=r.main>0;
-        const tag=inMiz&&inMain?'':'<span style="font-size:9px;padding:1px 5px;border-radius:6px;background:'+(inMiz?'rgba(99,179,237,.2)':'rgba(72,187,120,.2)')+';color:'+(inMiz?'#63b3ed':'var(--accent2)')+';">'+(inMiz?'ميزان فقط':'رئيسية فقط')+'</span>';
         const netMiz=(r.miz||0)-(r.ret_miz||0);
         const netQtyMiz=(r.qty_miz||0)-(r.ret_qty_miz||0);
+        const rowNetTotal=(r.net_miz||0)+(r.net_main||0);
+        const mizPct=rowNetTotal>0?((r.net_miz||0)/rowNetTotal*100).toFixed(0):0;
+        const rowNetDiff=(r.net_miz||0)-(r.net_main||0);
+        const dClr=rowNetDiff>0?'var(--green)':rowNetDiff<0?'var(--red)':'var(--muted)';
+        const inMiz=(r.net_miz||0)>0, inMain=(r.net_main||0)>0;
+        const tag=inMiz&&inMain?'':'<span style="font-size:9px;padding:1px 5px;border-radius:6px;background:'+(inMiz?'rgba(99,179,237,.2)':'rgba(72,187,120,.2)')+';color:'+(inMiz?'#63b3ed':'var(--accent2)')+';">'+(inMiz?'ميزان فقط':'رئيسية فقط')+'</span>';
         const fmt=v=>v>0?_mFmt(v):'<span style="color:var(--muted)">—</span>';
         const fmtQ=v=>v>0?v.toLocaleString('en-US',{maximumFractionDigits:0}):'<span style="color:var(--muted)">—</span>';
         const maxMiz_=rows[0]?.miz||1, maxMain_=rows[0]?.main||1;
+        const netMain=(r.net_main||0);
+        const netQtyMain=Math.max(0,(r.qty_main||0)-(r.ret_qty_main||0));
         return `<tr style="border-bottom:1px solid var(--border);${i%2?'background:var(--surface2)':''}">
           <td style="padding:6px 9px;color:var(--muted);text-align:center;font-size:10px">${start+i+1}</td>
           <td style="padding:6px 9px;font-weight:600;color:var(--text);max-width:160px">
             <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap"><span style="font-size:11px">${r.name}</span>${tag}</div>
           </td>
-          <td style="padding:5px 8px;text-align:center;font-size:11px;font-weight:700;color:var(--accent2)">${fmt(r.main)}</td>
-          <td style="padding:5px 8px;text-align:center;font-size:11px;color:var(--accent2)">${fmtQ(r.qty_main)}</td>
+          <td style="padding:5px 8px;text-align:center;font-size:11px;font-weight:700;color:var(--accent2)">${netMain>0?_mFmt(netMain):'<span style=\"color:var(--muted)\">—</span>'}</td>
+          <td style="padding:5px 8px;text-align:center;font-size:11px;color:var(--accent2)">${netQtyMain>0?netQtyMain.toLocaleString('en-US',{maximumFractionDigits:0}):'<span style=\"color:var(--muted)\">—</span>'}</td>
           <td style="padding:5px 8px;text-align:center;font-size:11px;font-weight:700;color:${netMiz>0?'var(--gold)':'var(--muted)'}">${netMiz>0?_mFmt(netMiz):'—'}</td>
           <td style="padding:5px 8px;text-align:center;font-size:11px;color:${netQtyMiz>0?'var(--gold)':'var(--muted)'}">${netQtyMiz>0?netQtyMiz.toLocaleString('en-US',{maximumFractionDigits:0}):'—'}</td>
           <td style="padding:5px 8px;text-align:center;font-size:11px;color:rgba(99,179,237,.9)">${fmt(r.taj)}</td>
@@ -11201,9 +11490,9 @@ function _renderMizanItemsComparison(mSales, sSales, _col, _colN, _cn, _n){
           <td style="padding:5px 8px;text-align:center;font-size:11px;color:rgba(246,173,85,.9)">${fmtQ(r.kar25_qty)}</td>
           <td style="padding:5px 8px;text-align:center;font-size:11px;color:rgba(252,129,129,.9)">${fmt(r.kar24)}</td>
           <td style="padding:5px 8px;text-align:center;font-size:11px;color:rgba(252,129,129,.9)">${fmtQ(r.kar24_qty)}</td>
-          <td style="padding:5px 8px;text-align:center;font-size:11px;font-weight:700;color:var(--gold)">${_mFmt(r.total)}</td>
+          <td style="padding:5px 8px;text-align:center;font-size:11px;font-weight:700;color:var(--gold)">${rowNetTotal>0?_mFmt(rowNetTotal):'<span style=\"color:var(--muted)\">—</span>'}</td>
           <td style="padding:5px 8px;text-align:center;font-size:11px;color:var(--gold)">${fmtQ(r.qty_total)}</td>
-          <td style="padding:5px 8px;text-align:center;font-size:11px;font-weight:700;color:${dClr}">${r.diff>0?'+':''}${r.diff!==0?_mFmt(r.diff):'—'}</td>
+          <td style="padding:5px 8px;text-align:center;font-size:11px;font-weight:700;color:${dClr}">${rowNetDiff>0?'+':''}${rowNetDiff!==0?_mFmt(rowNetDiff):'—'}</td>
           <td style="padding:5px 8px;text-align:center;font-size:10px">
             <div style="display:flex;align-items:center;gap:4px;justify-content:center">
               <div style="width:28px;background:var(--surface2);border-radius:2px;height:4px;overflow:hidden"><div style="background:#63b3ed;height:4px;width:${mizPct}%"></div></div>
@@ -11222,6 +11511,10 @@ function _renderMizanItemsComparison(mSales, sSales, _col, _colN, _cn, _n){
   const gtQtyMain=rows.reduce((s,r)=>s+(r.qty_main||0),0);
   const gtRetQtyMiz=rows.reduce((s,r)=>s+(r.ret_qty_miz||0),0);
   const gtNetQtyMiz=gtQtyMiz-gtRetQtyMiz;
+  const gtRetMain=rows.reduce((s,r)=>s+(r.ret_main||0),0);
+  const gtNetMain=gtMain-gtRetMain;
+  const gtRetQtyMain=rows.reduce((s,r)=>s+(r.ret_qty_main||0),0);
+  const gtNetQtyMain=gtQtyMain-gtRetQtyMain;
   const gtTajQty=rows.reduce((s,r)=>s+(r.taj_qty||0),0);
   const gtKar25Qty=rows.reduce((s,r)=>s+(r.kar25_qty||0),0);
   const gtKar24Qty=rows.reduce((s,r)=>s+(r.kar24_qty||0),0);
@@ -11230,8 +11523,8 @@ function _renderMizanItemsComparison(mSales, sSales, _col, _colN, _cn, _n){
   if(tfoot) tfoot.innerHTML=`<tr style="background:var(--surface2);font-weight:800;border-top:2px solid var(--border)">
     <td style="padding:7px 9px;text-align:center;color:var(--muted)">—</td>
     <td style="padding:7px 9px;color:var(--text)">الإجمالي (${rows.length} صنف)</td>
-    <td style="padding:7px 9px;text-align:center;color:var(--accent2)">${_mFmt(gtMain)}</td>
-    <td style="padding:7px 9px;text-align:center;color:var(--accent2)">${fmtQ_(gtQtyMain)}</td>
+    <td style="padding:7px 9px;text-align:center;color:var(--accent2)">${_mFmt(gtNetMain)}</td>
+    <td style="padding:7px 9px;text-align:center;color:var(--accent2)">${fmtQ_(gtNetQtyMain)}</td>
     <td style="padding:7px 9px;text-align:center;color:var(--gold)">${_mFmt(gtNetMiz)}</td>
     <td style="padding:7px 9px;text-align:center;color:var(--gold)">${fmtQ_(gtNetQtyMiz)}</td>
     <td style="padding:7px 9px;text-align:center;color:rgba(99,179,237,.8)">${_mFmt(gtTaj)}</td>
