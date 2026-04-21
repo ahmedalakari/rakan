@@ -1820,6 +1820,13 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
         </div>
         <span class="nav-label">المستشار الذكي</span>
       </div>
+      <!-- ── تحليل الميزان ── -->
+      <div class="nav-item" onclick="showPage('mizan')" data-page="mizan" data-tooltip="تحليل الميزان">
+        <div class="nav-icon-wrap">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3L2 7l10 4 10-4-10-4z"/><path d="M2 17l10 4 10-4M2 12l10 4 10-4"/></svg>
+        </div>
+        <span class="nav-label">تحليل الميزان</span>
+      </div>
     </div>
 
   </div><!-- end nav-scroll -->
@@ -1890,6 +1897,10 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
       <span class="mn-dot"></span>
       <span class="mn-icon-wrap"><span class="mn-icon">💸</span></span>
       <span>المصروفات</span>
+    </button>
+    <button class="mob-nav-item" onclick="showPage('mizan')" id="mnav-mizan">
+      <div class="mn-icon-wrap"><span class="mn-icon">⚖️</span><span class="mn-dot"></span></div>
+      <span>الميزان</span>
     </button>
   </div>
 </nav>
@@ -2749,6 +2760,81 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
 
 
 <!-- ═══════════ PAGE: التحليل الذكي ═══════════ -->
+<!-- ══════════════════════════════════════════════════════
+     صفحة تحليل مبيعات الميزان
+══════════════════════════════════════════════════════ -->
+<div class="page" id="page-mizan">
+
+  <!-- Header -->
+  <div style="margin-bottom:var(--gap)">
+    <div style="font-size:18px;font-weight:800;color:#63b3ed;margin-bottom:4px">⚖️ تحليل مبيعات الميزان</div>
+    <div style="color:var(--muted);font-size:12px">مقارنة وتحليل بين مبيعات الميزان والمبيعات الرئيسية — تاجوراء / كريمية 2024-2026</div>
+  </div>
+
+  <!-- فلاتر -->
+  <div class="filter-bar" style="margin-bottom:var(--gap);flex-wrap:wrap;gap:8px">
+    <select id="f-miz-source" onchange="renderMizanPage()" style="min-width:160px">
+      <option value="">كل المصادر</option>
+      <option value="تاجوراء 2025+2026">تاجوراء 2025+2026</option>
+      <option value="كريمية 2025+2026">كريمية 2025+2026</option>
+      <option value="كريمية 2024">كريمية 2024</option>
+    </select>
+    <input type="text" id="f-miz-item" placeholder="🔍 صنف..." oninput="renderMizanPage()" style="min-width:140px">
+    <input type="text" id="f-miz-cust" placeholder="🔍 زبون..." oninput="renderMizanPage()" style="min-width:140px">
+    <input type="date" id="f-miz-from" onchange="renderMizanPage()">
+    <input type="date" id="f-miz-to" onchange="renderMizanPage()">
+    <button class="btn" onclick="document.getElementById('f-miz-source').value='';document.getElementById('f-miz-item').value='';document.getElementById('f-miz-cust').value='';document.getElementById('f-miz-from').value='';document.getElementById('f-miz-to').value='';renderMizanPage()">↺ إعادة</button>
+  </div>
+
+  <!-- KPI Cards -->
+  <div id="miz-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:var(--gap)"></div>
+
+  <!-- Charts row -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);margin-bottom:var(--gap)">
+    <div class="card" style="padding:14px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px">📊 المبيعات الشهرية — الميزان vs الرئيسية</div>
+      <canvas id="miz-chart-monthly" height="200"></canvas>
+    </div>
+    <div class="card" style="padding:14px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px">🏆 أعلى 10 أصناف — الميزان</div>
+      <canvas id="miz-chart-items" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- جدول المقارنة بالمصدر -->
+  <div class="card" style="padding:14px;margin-bottom:var(--gap)">
+    <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px">📋 مقارنة المصادر</div>
+    <div id="miz-source-table"></div>
+  </div>
+
+  <!-- أعلى الأصناف -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);margin-bottom:var(--gap)">
+    <div class="card" style="padding:14px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px">📦 أعلى الأصناف مبيعاً</div>
+      <div id="miz-top-items"></div>
+    </div>
+    <div class="card" style="padding:14px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px">🏪 أعلى الزبائن</div>
+      <div id="miz-top-custs"></div>
+    </div>
+  </div>
+
+  <!-- التوصيات والتحليل الذكي -->
+  <div class="card" style="padding:14px;margin-bottom:var(--gap)">
+    <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px">💡 توصيات وتحليل ذكي</div>
+    <div id="miz-insights" style="font-size:12px;line-height:1.8;color:var(--text2)">
+      <div style="color:var(--muted);text-align:center;padding:20px">⚖️ أضف روابط مبيعات الميزان في المزامنة لتفعيل التحليل</div>
+    </div>
+  </div>
+
+  <!-- جدول تفصيلي -->
+  <div class="card" style="padding:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px">📄 البيانات التفصيلية</div>
+    <div class="table-wrap table-compact" id="miz-detail-table"></div>
+  </div>
+
+</div>
+
 <div class="page" id="page-ai">
 
   <!-- Header -->
@@ -3030,6 +3116,18 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
         <input class="gs-input" id="gs-reps" placeholder="https://docs.google.com/spreadsheets/..." style="border-color:rgba(255,215,0,.4)">
         <label style="font-size:11px;color:var(--red);display:block;margin-bottom:4px;margin-top:8px">💸 المصروفات (CSV)</label>
         <input class="gs-input" id="gs-expenses" placeholder="https://docs.google.com/spreadsheets/d/.../export?format=csv&sheet=Sheet1" style="border-color:rgba(240,82,82,.4)">
+        <!-- ── مبيعات الميزان ── -->
+        <div style="margin-top:12px;padding:10px;background:var(--surface2);border-radius:var(--r-md);border:1px solid rgba(99,179,237,.3)">
+          <div style="font-size:11px;font-weight:700;color:#63b3ed;margin-bottom:8px">⚖️ مبيعات الميزان</div>
+          <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px">تاجوراء 2025+2026 (CSV)</label>
+          <input class="gs-input" id="gs-mizan-tajura" placeholder="https://docs.google.com/spreadsheets/d/...&gid=...">
+          <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;margin-top:6px">كريمية 2025+2026 (CSV)</label>
+          <input class="gs-input" id="gs-mizan-karima2526" placeholder="https://docs.google.com/spreadsheets/d/...&gid=...">
+          <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;margin-top:6px">كريمية 2024 (CSV)</label>
+          <input class="gs-input" id="gs-mizan-karima2024" placeholder="https://docs.google.com/spreadsheets/d/...&gid=...">
+          <div style="font-size:10px;color:var(--muted);margin-top:4px">💡 رابط CSV: https://docs.google.com/spreadsheets/d/ID/export?format=csv&gid=GID</div>
+        </div>
+
         <label style="font-size:11px;color:var(--accent3);display:block;margin-bottom:4px;margin-top:8px">🎯 توزيع أهداف الأصناف (xlsx — رابط تنزيل مباشر)</label>
         <input class="gs-input" id="gs-targets" placeholder="https://docs.google.com/spreadsheets/d/.../export?format=xlsx" style="border-color:rgba(255,159,67,.4)">
         <div style="font-size:10px;color:var(--muted);margin-top:3px;padding-right:2px">💡 في Google Sheets: ملف ← تنزيل ← Microsoft Excel ← انسخ رابط الصفحة التي ستفتح</div>
@@ -3076,6 +3174,9 @@ let _autoRefreshTimer = null;
 
 // ── الروابط المضمّنة — تُستخدم تلقائياً عند التحميل ──
 const GS_URLS_EMBEDDED = {
+  'mizan-tajura':     'https://docs.google.com/spreadsheets/d/e/2PACX-1vRWc92kbFekkH3nYDscIRJJr0ZMGwH7HUs6hirIM4yizq_pQ9-QRa9DuAZoModbQcDeI4vlhTl4ZmdJ/pub?gid=1920682927&single=true&output=csv',
+  'mizan-karima2526': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRWc92kbFekkH3nYDscIRJJr0ZMGwH7HUs6hirIM4yizq_pQ9-QRa9DuAZoModbQcDeI4vlhTl4ZmdJ/pub?gid=1039640451&single=true&output=csv',
+  'mizan-karima2024': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRWc92kbFekkH3nYDscIRJJr0ZMGwH7HUs6hirIM4yizq_pQ9-QRa9DuAZoModbQcDeI4vlhTl4ZmdJ/pub?gid=1569598274&single=true&output=csv',
   sales:      'https://docs.google.com/spreadsheets/d/1TXtv9VPciMz474soeyV8sdyuPEnCrZRE/export?format=csv&gid=220916455',
   collection: 'https://docs.google.com/spreadsheets/d/1yrQLca-MiCyxrXNSJ_GqFiw5d1QN1i3Y/export?format=csv&gid=556704038',
   debt:       'https://docs.google.com/spreadsheets/d/1PexDCIHXFSyxdwvzhN4CgMD-ZvqUDAO-/export?format=csv&gid=742356649',
@@ -3339,7 +3440,7 @@ function lineChart(id,labels,datasets){
 // ══════════════════════════════════════════════════════
 //  NAVIGATION
 // ══════════════════════════════════════════════════════
-const PAGE_TITLES={'overview':'📈 نظرة عامة — لوحة القيادة','sales':'📊 تحليل المبيعات','reps':'👥 تقرير المندوبين','rep-goals':'🎯 أهداف المناديب','customers':'🏪 إدارة الزبائن','products':'📦 تحليل الأصناف','debt':'💳 المديونية','aging':'⏳ أعمار الذمم','collection':'💰 التحصيل','inventory':'🏭 جرد المخازن','expenses':'💸 تحليل المصروفات','ai':'🤖 المستشار الذكي'};
+const PAGE_TITLES={'overview':'📈 نظرة عامة — لوحة القيادة','sales':'📊 تحليل المبيعات','reps':'👥 تقرير المندوبين','rep-goals':'🎯 أهداف المناديب','customers':'🏪 إدارة الزبائن','products':'📦 تحليل الأصناف','debt':'💳 المديونية','aging':'⏳ أعمار الذمم','collection':'💰 التحصيل','inventory':'🏭 جرد المخازن','expenses':'💸 تحليل المصروفات','ai':'🤖 المستشار الذكي','mizan':'⚖️ تحليل مبيعات الميزان'};
 const PAGE_RENDERS={'overview':renderOverviewPage,'sales':renderSalesPage,'reps':renderRepPage,'rep-goals':renderRepGoalsPage,'customers':renderCustomersPage,'products':renderProductsPage,'debt':renderDebtPage,'aging':renderAgingPage,'collection':renderCollectionPage,'inventory':renderInventoryPage,'expenses':renderExpensesPage,'ai':renderAiPage};
 
 let currentPage='overview';
@@ -8081,6 +8182,350 @@ function _rebuildItemData(){
   D.top_products=Object.fromEntries(D.item_full.slice(0,20).map(p=>[p.name,p.ns]));
 }
 
+
+// ══════════════════════════════════════════════════════
+//  تحليل مبيعات الميزان — renderMizanPage
+// ══════════════════════════════════════════════════════
+let _mizanChartMonthly = null;
+let _mizanChartItems   = null;
+
+function _mizanFmt(n){ return new Intl.NumberFormat('ar-LY',{maximumFractionDigits:0}).format(n||0); }
+
+function renderMizanPage(){
+  const mizanRows = D._mizanRows || [];
+  const salesRows = D._salesRows || D.sales_table || [];
+
+  // ── تطبيق الفلاتر ──
+  const src   = document.getElementById('f-miz-source')?.value||'';
+  const item  = (document.getElementById('f-miz-item')?.value||'').trim().toLowerCase();
+  const cust  = (document.getElementById('f-miz-cust')?.value||'').trim().toLowerCase();
+  const from  = document.getElementById('f-miz-from')?.value||'';
+  const to    = document.getElementById('f-miz-to')?.value||'';
+
+  const _cn = s => String(s||'').replace(/^\uFEFF/,'').replace(/[\u200B-\u200F\u202A-\u202E\u2060\u00A0]/g,'').trim();
+  const _n  = v => { const x=parseFloat(String(v||'').replace(/,/g,''));return isNaN(x)?0:x; };
+  const _date = r => {
+    for(const k of Object.keys(r)){
+      if(/تاريخ|date/i.test(k)){ const v=_cn(r[k]).substring(0,10); if(v.match(/\d{4}-\d{2}-\d{2}/))return v; }
+    }
+    return '';
+  };
+
+  // كشف أعمدة الميزان
+  const _col = (row,  ...names) => {
+    const keys = Object.keys(row);
+    for(const n of names){ const k=keys.find(k=>_cn(k)===n||_cn(k).includes(n)); if(k)return _cn(row[k]); }
+    return '';
+  };
+  const _colN = (row, ...names) => _n(_col(row,...names));
+
+  // فلترة بيانات الميزان
+  let mRows = mizanRows.filter(r=>{
+    if(src && r._mizanSource !== src) return false;
+    const mat  = _col(r,'المادة','الصنف','المنتج').toLowerCase();
+    const cu   = _col(r,'اسم الزبون','الزبون','العميل').toLowerCase();
+    const dt   = _date(r);
+    if(item && !mat.includes(item)) return false;
+    if(cust && !cu.includes(cust))  return false;
+    if(from && dt && dt < from)     return false;
+    if(to   && dt && dt > to)       return false;
+    // فقط مبيع (ليس مرتجع)
+    const tp = _col(r,'النوع','نوع').toLowerCase();
+    if(tp && !tp.includes('مبيع') && !tp.includes('بيع')) return false;
+    return true;
+  });
+
+  // فلترة بيانات المبيعات الرئيسية بنفس التاريخ
+  let sRows = salesRows.filter(r=>{
+    const tp  = _cn(r['النوع']||r['نوع']||'');
+    if(tp && tp !== 'مبيع') return false;
+    const dt  = _date(r);
+    const mat = _cn(r['المادة']||r['الصنف']||'').toLowerCase();
+    const cu  = _cn(r['اسم الزبون']||r['الزبون']||'').toLowerCase();
+    if(item && !mat.includes(item)) return false;
+    if(cust && !cu.includes(cust))  return false;
+    if(from && dt && dt < from)     return false;
+    if(to   && dt && dt > to)       return false;
+    return true;
+  });
+
+  // ── KPIs ──
+  const mizTotal  = mRows.reduce((s,r)=>s+_colN(r,'الاجمالي الصافي','الإجمالي الصافي','الصافي'),0);
+  const mizQty    = mRows.reduce((s,r)=>s+_colN(r,'الكمية الخارجة','الكمية'),0);
+  const mizInvSet = new Set(mRows.map(r=>_col(r,'رقم الفاتورة','الفاتورة')).filter(Boolean));
+  const mizCustS  = new Set(mRows.map(r=>_col(r,'اسم الزبون','الزبون','العميل')).filter(Boolean));
+  const mizItemS  = new Set(mRows.map(r=>_col(r,'المادة','الصنف','المنتج')).filter(Boolean));
+
+  const salTotal  = sRows.reduce((s,r)=>s+_n(r['الاجمالي الصافي']||r['الإجمالي الصافي']||0),0);
+  const pct       = salTotal>0 ? (mizTotal/salTotal*100).toFixed(1) : '--';
+  const diff      = mizTotal - salTotal;
+
+  const kpiEl = document.getElementById('miz-kpis');
+  if(kpiEl) kpiEl.innerHTML = `
+    <div class="kpi-card"><div class="kpi-label">إجمالي مبيعات الميزان</div><div class="kpi-value" style="color:#63b3ed">${_mizanFmt(mizTotal)}</div><div class="kpi-sub">دينار</div></div>
+    <div class="kpi-card"><div class="kpi-label">مبيعات الرئيسية (للمقارنة)</div><div class="kpi-value" style="color:var(--accent2)">${_mizanFmt(salTotal)}</div><div class="kpi-sub">دينار</div></div>
+    <div class="kpi-card"><div class="kpi-label">نسبة الميزان من الكل</div><div class="kpi-value" style="color:var(--gold)">${pct}%</div><div class="kpi-sub">من المبيعات الرئيسية</div></div>
+    <div class="kpi-card"><div class="kpi-label">الفرق</div><div class="kpi-value" style="color:${diff>=0?'var(--green)':'var(--red)'}">${diff>=0?'+':''}${_mizanFmt(diff)}</div><div class="kpi-sub">دينار</div></div>
+    <div class="kpi-card"><div class="kpi-label">عدد الفواتير</div><div class="kpi-value">${mizInvSet.size}</div><div class="kpi-sub">فاتورة ميزان</div></div>
+    <div class="kpi-card"><div class="kpi-label">الأصناف</div><div class="kpi-value">${mizItemS.size}</div><div class="kpi-sub">صنف مختلف</div></div>
+    <div class="kpi-card"><div class="kpi-label">الزبائن</div><div class="kpi-value">${mizCustS.size}</div><div class="kpi-sub">زبون</div></div>
+    <div class="kpi-card"><div class="kpi-label">إجمالي الكميات</div><div class="kpi-value">${_mizanFmt(mizQty)}</div><div class="kpi-sub">وحدة</div></div>
+  `;
+
+  // ── Chart: Monthly comparison ──
+  const mizMonthly = {}, salMonthly = {};
+  mRows.forEach(r=>{
+    const dt = _date(r); if(!dt) return;
+    const mo = dt.substring(0,7);
+    mizMonthly[mo] = (mizMonthly[mo]||0) + _colN(r,'الاجمالي الصافي','الإجمالي الصافي','الصافي');
+  });
+  sRows.forEach(r=>{
+    const dt = _date(r); if(!dt) return;
+    const mo = dt.substring(0,7);
+    salMonthly[mo] = (salMonthly[mo]||0) + _n(r['الاجمالي الصافي']||r['الإجمالي الصافي']||0);
+  });
+  const allMonths = [...new Set([...Object.keys(mizMonthly),...Object.keys(salMonthly)])].sort();
+  const ctx1 = document.getElementById('miz-chart-monthly');
+  if(ctx1){
+    if(_mizanChartMonthly){ _mizanChartMonthly.destroy(); _mizanChartMonthly=null; }
+    if(allMonths.length){
+      _mizanChartMonthly = new Chart(ctx1.getContext('2d'),{
+        type:'bar',
+        data:{
+          labels: allMonths,
+          datasets:[
+            {label:'الميزان',data:allMonths.map(m=>mizMonthly[m]||0),backgroundColor:'rgba(99,179,237,0.7)',borderRadius:4},
+            {label:'الرئيسية',data:allMonths.map(m=>salMonthly[m]||0),backgroundColor:'rgba(72,187,120,0.5)',borderRadius:4}
+          ]
+        },
+        options:{responsive:true,plugins:{legend:{labels:{color:'var(--text)',font:{family:'Cairo',size:10}}}},scales:{x:{ticks:{color:'var(--muted)',font:{size:9}}},y:{ticks:{color:'var(--muted)',font:{size:9}}}}}
+      });
+    } else {
+      ctx1.getContext('2d').clearRect(0,0,ctx1.width,ctx1.height);
+    }
+  }
+
+  // ── Chart: Top items ──
+  const itemMap = {};
+  mRows.forEach(r=>{
+    const mat = _col(r,'المادة','الصنف','المنتج'); if(!mat) return;
+    itemMap[mat] = (itemMap[mat]||0) + _colN(r,'الاجمالي الصافي','الإجمالي الصافي','الصافي');
+  });
+  const topItems = Object.entries(itemMap).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const ctx2 = document.getElementById('miz-chart-items');
+  if(ctx2){
+    if(_mizanChartItems){ _mizanChartItems.destroy(); _mizanChartItems=null; }
+    if(topItems.length){
+      _mizanChartItems = new Chart(ctx2.getContext('2d'),{
+        type:'bar',
+        data:{
+          labels: topItems.map(([k])=>k.length>20?k.substring(0,18)+'..':k),
+          datasets:[{label:'المبيعات',data:topItems.map(([,v])=>v),backgroundColor:'rgba(246,173,85,0.75)',borderRadius:4}]
+        },
+        options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'var(--muted)',font:{size:9}}},y:{ticks:{color:'var(--text)',font:{size:9,family:'Cairo'}}}}}
+      });
+    }
+  }
+
+  // ── مقارنة المصادر ──
+  const srcMap = {};
+  mizanRows.forEach(r=>{
+    const s = r._mizanSource||'غير محدد';
+    if(!srcMap[s]) srcMap[s]={total:0,qty:0,invs:new Set(),custs:new Set()};
+    const tp = _col(r,'النوع','نوع');
+    if(tp && !tp.includes('مبيع') && !tp.includes('بيع')) return;
+    srcMap[s].total += _colN(r,'الاجمالي الصافي','الإجمالي الصافي','الصافي');
+    srcMap[s].qty   += _colN(r,'الكمية الخارجة','الكمية');
+    const inv = _col(r,'رقم الفاتورة','الفاتورة'); if(inv) srcMap[s].invs.add(inv);
+    const cu  = _col(r,'اسم الزبون','الزبون','العميل'); if(cu) srcMap[s].custs.add(cu);
+  });
+  const srcEl = document.getElementById('miz-source-table');
+  if(srcEl){
+    if(!Object.keys(srcMap).length){
+      srcEl.innerHTML='<div style="color:var(--muted);text-align:center;padding:16px;font-size:12px">لا توجد بيانات — أضف روابط الميزان في المزامنة</div>';
+    } else {
+      const grandTotal = Object.values(srcMap).reduce((s,v)=>s+v.total,0);
+      let html=`<table style="width:100%;border-collapse:collapse;font-size:12px;direction:rtl">
+        <thead><tr style="background:var(--surface2)">
+          <th style="padding:8px 10px;text-align:right;color:var(--text2)">المصدر</th>
+          <th style="padding:8px 10px;text-align:center;color:var(--text2)">الفواتير</th>
+          <th style="padding:8px 10px;text-align:center;color:var(--text2)">الزبائن</th>
+          <th style="padding:8px 10px;text-align:center;color:var(--text2)">الكمية</th>
+          <th style="padding:8px 10px;text-align:center;color:var(--text2)">الإجمالي</th>
+          <th style="padding:8px 10px;text-align:center;color:var(--text2)">النسبة</th>
+        </tr></thead><tbody>`;
+      Object.entries(srcMap).forEach(([s,v])=>{
+        const pct2 = grandTotal>0?(v.total/grandTotal*100).toFixed(1):'0';
+        html+=`<tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:7px 10px;font-weight:600;color:#63b3ed">${s}</td>
+          <td style="padding:7px 10px;text-align:center">${v.invs.size}</td>
+          <td style="padding:7px 10px;text-align:center">${v.custs.size}</td>
+          <td style="padding:7px 10px;text-align:center">${_mizanFmt(v.qty)}</td>
+          <td style="padding:7px 10px;text-align:center;font-weight:700">${_mizanFmt(v.total)}</td>
+          <td style="padding:7px 10px;text-align:center">
+            <div style="background:var(--surface2);border-radius:4px;height:6px;margin-bottom:2px"><div style="background:#63b3ed;height:6px;border-radius:4px;width:${pct2}%"></div></div>
+            ${pct2}%
+          </td>
+        </tr>`;
+      });
+      html+=`<tr style="background:var(--surface2);font-weight:700">
+        <td style="padding:7px 10px">الإجمالي</td>
+        <td colspan="3" style="padding:7px 10px"></td>
+        <td style="padding:7px 10px;text-align:center;color:#63b3ed">${_mizanFmt(grandTotal)}</td>
+        <td style="padding:7px 10px;text-align:center">100%</td>
+      </tr></tbody></table>`;
+      srcEl.innerHTML = html;
+    }
+  }
+
+  // ── أعلى الأصناف ──
+  const topItemsEl = document.getElementById('miz-top-items');
+  if(topItemsEl){
+    const maxVal = topItems[0]?.[1]||1;
+    topItemsEl.innerHTML = topItems.slice(0,10).map(([k,v],i)=>`
+      <div style="margin-bottom:7px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px">
+          <span style="color:var(--text)">${i+1}. ${k}</span>
+          <span style="color:var(--gold);font-weight:700">${_mizanFmt(v)}</span>
+        </div>
+        <div style="background:var(--surface2);border-radius:3px;height:5px">
+          <div style="background:rgba(246,173,85,0.8);height:5px;border-radius:3px;width:${(v/maxVal*100).toFixed(0)}%"></div>
+        </div>
+      </div>`).join('') || '<div style="color:var(--muted);font-size:12px;text-align:center;padding:10px">لا توجد بيانات</div>';
+  }
+
+  // ── أعلى الزبائن ──
+  const custMap2 = {};
+  mRows.forEach(r=>{
+    const cu = _col(r,'اسم الزبون','الزبون','العميل'); if(!cu) return;
+    custMap2[cu] = (custMap2[cu]||0) + _colN(r,'الاجمالي الصافي','الإجمالي الصافي','الصافي');
+  });
+  const topCusts = Object.entries(custMap2).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const topCustsEl = document.getElementById('miz-top-custs');
+  if(topCustsEl){
+    const maxC = topCusts[0]?.[1]||1;
+    topCustsEl.innerHTML = topCusts.map(([k,v],i)=>`
+      <div style="margin-bottom:7px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px">
+          <span style="color:var(--text)">${i+1}. ${k}</span>
+          <span style="color:var(--accent2);font-weight:700">${_mizanFmt(v)}</span>
+        </div>
+        <div style="background:var(--surface2);border-radius:3px;height:5px">
+          <div style="background:rgba(72,187,120,0.8);height:5px;border-radius:3px;width:${(v/maxC*100).toFixed(0)}%"></div>
+        </div>
+      </div>`).join('') || '<div style="color:var(--muted);font-size:12px;text-align:center;padding:10px">لا توجد بيانات</div>';
+  }
+
+  // ── التوصيات الذكية ──
+  _renderMizanInsights(mRows, sRows, srcMap, topItems, topCusts, mizTotal, salTotal);
+
+  // ── الجدول التفصيلي ──
+  const detEl = document.getElementById('miz-detail-table');
+  if(detEl){
+    const show = mRows.slice(0,200);
+    if(!show.length){
+      detEl.innerHTML='<div style="color:var(--muted);text-align:center;padding:16px;font-size:12px">لا توجد بيانات</div>';
+    } else {
+      const cols = ['_mizanSource','التاريخ','رقم الفاتورة','المادة','الكمية الخارجة','السعر الافرادي','الحسم','الاجمالي الصافي','اسم الزبون'];
+      const labels = {_mizanSource:'المصدر',التاريخ:'التاريخ','رقم الفاتورة':'رقم الفاتورة',المادة:'المادة','الكمية الخارجة':'الكمية','السعر الافرادي':'السعر',الحسم:'الحسم','الاجمالي الصافي':'الإجمالي','اسم الزبون':'الزبون'};
+      // كشف الأعمدة الفعلية
+      const actualCols = cols.filter(c => c==='_mizanSource' || Object.keys(show[0]).some(k=>_cn(k)===c||_cn(k).includes(c)));
+      let html=`<table style="width:100%;border-collapse:collapse;font-size:11px;direction:rtl;min-width:600px">
+        <thead><tr style="background:var(--surface2)">
+          ${actualCols.map(c=>`<th style="padding:6px 8px;text-align:right;color:var(--text2);white-space:nowrap">${labels[c]||c}</th>`).join('')}
+        </tr></thead><tbody>`;
+      show.forEach((r,i)=>{
+        html+=`<tr style="border-bottom:1px solid var(--border);${i%2?'background:var(--surface2)':''}">`;
+        actualCols.forEach(c=>{
+          let val = c==='_mizanSource' ? (r._mizanSource||'') : (_col(r,c)||'');
+          if(c==='الاجمالي الصافي'||c==='السعر الافرادي') val=_mizanFmt(_n(val));
+          html+=`<td style="padding:5px 8px;white-space:nowrap">${val}</td>`;
+        });
+        html+='</tr>';
+      });
+      html+='</tbody></table>';
+      if(mRows.length>200) html+=`<div style="color:var(--muted);font-size:10px;padding:6px 10px">يُعرض أول 200 صف من ${mRows.length}</div>`;
+      detEl.innerHTML=html;
+    }
+  }
+}
+
+function _renderMizanInsights(mRows, sRows, srcMap, topItems, topCusts, mizTotal, salTotal){
+  const el = document.getElementById('miz-insights');
+  if(!el) return;
+  if(!mRows.length){
+    el.innerHTML='<div style="color:var(--muted);text-align:center;padding:20px">⚖️ أضف روابط مبيعات الميزان في المزامنة لتفعيل التحليل</div>';
+    return;
+  }
+
+  const _fmt = n => new Intl.NumberFormat('ar-LY',{maximumFractionDigits:0}).format(n||0);
+  const pct = salTotal>0?(mizTotal/salTotal*100).toFixed(1):0;
+  const insights = [];
+
+  // 1. مقارنة إجمالية
+  if(salTotal>0){
+    const ratio = (mizTotal/salTotal*100).toFixed(1);
+    if(ratio>=80) insights.push({color:'var(--green)',icon:'✅',text:`مبيعات الميزان تمثل <strong>${ratio}%</strong> من المبيعات الرئيسية — أداء قوي ومتقارب يدل على تنوع القنوات.`});
+    else if(ratio>=40) insights.push({color:'var(--gold)',icon:'📊',text:`مبيعات الميزان تمثل <strong>${ratio}%</strong> من المبيعات الرئيسية — فرصة لتنمية قناة الميزان.`});
+    else insights.push({color:'var(--red)',icon:'⚠️',text:`مبيعات الميزان تمثل <strong>${ratio}%</strong> فقط من الرئيسية — يُوصى بمراجعة توزيع المناطق وتعزيز حضور الميزان.`});
+  }
+
+  // 2. أقوى مصدر
+  const srcEntries = Object.entries(srcMap).sort((a,b)=>b[1].total-a[1].total);
+  if(srcEntries.length>1){
+    const [best,bv] = srcEntries[0];
+    const [worst,wv] = srcEntries[srcEntries.length-1];
+    insights.push({color:'#63b3ed',icon:'🏆',text:`أقوى مصدر ميزان: <strong>${best}</strong> بمبيعات ${_fmt(bv.total)} دينار. الأضعف: <strong>${worst}</strong> بـ${_fmt(wv.total)} دينار — يستحق دراسة أسباب الفجوة.`});
+  }
+
+  // 3. تركّز المبيعات
+  if(topItems.length){
+    const top3Total = topItems.slice(0,3).reduce((s,[,v])=>s+v,0);
+    const concRatio = mizTotal>0?(top3Total/mizTotal*100).toFixed(0):0;
+    if(concRatio>70) insights.push({color:'var(--gold)',icon:'📦',text:`أعلى 3 أصناف تستحوذ على <strong>${concRatio}%</strong> من مبيعات الميزان — تركّز عالٍ يزيد من مخاطر الاعتماد على أصناف محدودة. يُوصى بتوسيع السلة.`});
+    else insights.push({color:'var(--green)',icon:'📦',text:`توزيع الأصناف متنوع — أعلى 3 أصناف تمثل <strong>${concRatio}%</strong> فقط من الإجمالي.`});
+  }
+
+  // 4. الصنف الأول
+  if(topItems[0]) insights.push({color:'var(--accent2)',icon:'⭐',text:`الصنف الأكثر مبيعاً في الميزان: <strong>${topItems[0][0]}</strong> بإجمالي ${_fmt(topItems[0][1])} دينار.`});
+
+  // 5. الزبون الأول
+  if(topCusts[0]) insights.push({color:'var(--accent2)',icon:'🏪',text:`أعلى زبون في الميزان: <strong>${topCusts[0][0]}</strong> بإجمالي ${_fmt(topCusts[0][1])} دينار.`});
+
+  // 6. تغطية زمنية
+  const dates = mRows.map(r=>{
+    for(const k of Object.keys(r)) if(/تاريخ|date/i.test(k)){ const v=String(r[k]||'').substring(0,10); if(v.match(/\d{4}-\d{2}-\d{2}/))return v; }
+    return null;
+  }).filter(Boolean).sort();
+  if(dates.length>1) insights.push({color:'var(--muted)',icon:'📅',text:`تغطي بيانات الميزان الفترة من <strong>${dates[0]}</strong> إلى <strong>${dates[dates.length-1]}</strong> — إجمالي ${mRows.length} صف.`});
+
+  // 7. مقارنة المناطق (تاجوراء vs كريمية)
+  const tajTotal  = (srcMap['تاجوراء 2025+2026']?.total)||0;
+  const kar25Total= (srcMap['كريمية 2025+2026']?.total)||0;
+  const kar24Total= (srcMap['كريمية 2024']?.total)||0;
+  if(tajTotal && kar25Total){
+    const growthPct = kar24Total>0?((kar25Total-kar24Total)/kar24Total*100).toFixed(1):null;
+    insights.push({color:'#63b3ed',icon:'🗺️',text:`تاجوراء 2025+2026: ${_fmt(tajTotal)} دينار | كريمية 2025+2026: ${_fmt(kar25Total)} دينار${growthPct?` | نمو الكريمية من 2024→2025: <strong style="color:${growthPct>=0?'var(--green)':'var(--red)'}">${growthPct>=0?'+':''}${growthPct}%</strong>`:''}.`});
+  }
+
+  el.innerHTML = insights.map(ins=>`
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;margin-bottom:8px;background:var(--surface2);border-radius:var(--r-md);border-right:3px solid ${ins.color}">
+      <span style="font-size:16px;flex-shrink:0">${ins.icon}</span>
+      <span style="line-height:1.7">${ins.text}</span>
+    </div>`).join('');
+}
+
+// ── تحديث تلقائي عند فتح الصفحة ──
+const _origShowPage_mizan = showPage;
+// override showPage لتشغيل renderMizanPage عند الانتقال إليها
+(function(){
+  const _orig = showPage;
+  window.showPage = function(p){
+    _orig(p);
+    if(p==='mizan') setTimeout(renderMizanPage, 50);
+  };
+})();
+
 // ── تطبيع مفاتيح صفوف CSV: إزالة BOM والأحرف الخفية من أسماء الأعمدة ──
 function _normalizeRowKeys(rows){
   if(!rows||!rows.length)return rows;
@@ -8105,6 +8550,20 @@ function processNewData(type,rows){
   const _rawKey = type+'_table';
   if(_rawKey in RAW) RAW[_rawKey] = rows.slice();
   switch(type){
+    case 'mizan-tajura':
+    case 'mizan-karima2526':
+    case 'mizan-karima2024':{
+      // تخزين بيانات الميزان الخام
+      if(!D._mizanRows) D._mizanRows = [];
+      const src = type==='mizan-tajura'?'تاجوراء 2025+2026': type==='mizan-karima2526'?'كريمية 2025+2026':'كريمية 2024';
+      const tagged = rows.map(r=>({...r, _mizanSource: src}));
+      // استبدال البيانات القديمة من نفس المصدر
+      D._mizanRows = D._mizanRows.filter(r=>r._mizanSource!==src).concat(tagged);
+      RAW['mizan_table'] = D._mizanRows.slice();
+      // إعادة رسم صفحة الميزان إن كانت نشطة
+      if(typeof renderMizanPage === 'function') renderMizanPage();
+      break;
+    }
     case 'sales':{
       // ── المرور الواحد على كل الصفوف ──
       // تطبيع أسماء الأعمدة: إزالة BOM والأحرف الخفية والمسافات الزائدة
@@ -8918,7 +9377,10 @@ function saveGsUrls(){
     inventory: document.getElementById('gs-inventory')?.value||'',
     reps:     document.getElementById('gs-reps')?.value||'',
     targets:  document.getElementById('gs-targets')?.value||'',
-    expenses: document.getElementById('gs-expenses')?.value||''
+    expenses: document.getElementById('gs-expenses')?.value||'',
+    'mizan-tajura':     document.getElementById('gs-mizan-tajura')?.value||'',
+    'mizan-karima2526': document.getElementById('gs-mizan-karima2526')?.value||'',
+    'mizan-karima2024': document.getElementById('gs-mizan-karima2024')?.value||''
   };
   const interval=document.getElementById('gs-interval')?.value||'5';
   try{
@@ -8934,7 +9396,7 @@ function loadGsUrls(){
     const saved=localStorage.getItem(GS_STORAGE_KEY);
     if(!saved)return false;
     const urls=JSON.parse(saved);
-    ['sales','debt','aging','collection','inventory','reps','targets','expenses'].forEach(k=>{
+    ['sales','debt','aging','collection','inventory','reps','targets','expenses','mizan-tajura','mizan-karima2526','mizan-karima2024'].forEach(k=>{
       const el=document.getElementById('gs-'+k);
       if(el&&urls[k])el.value=urls[k];
     });
@@ -8964,10 +9426,10 @@ function _updateRefreshStatus(){
 
 async function _autoSyncQuiet(){
   const urls = GS_URLS_EMBEDDED;
-  const keys = ['sales','collection','debt','inventory','reps','aging','expenses'];
+  const keys = ['sales','collection','debt','inventory','reps','aging','expenses','mizan-tajura','mizan-karima2526','mizan-karima2024'];
   const msgEl=document.getElementById('loading-msg');
   const progBar=document.getElementById('ld-progress');
-  const iconMap={sales:'ldi-sales',collection:'ldi-collection',debt:'ldi-debt',inventory:'ldi-inventory',reps:'ldi-reps',aging:'ldi-aging',expenses:'ldi-expenses'};
+  const iconMap={sales:'ldi-sales',collection:'ldi-collection',debt:'ldi-debt',inventory:'ldi-inventory',reps:'ldi-reps',aging:'ldi-aging',expenses:'ldi-expenses','mizan-tajura':'ldi-mizan','mizan-karima2526':'ldi-mizan','mizan-karima2024':'ldi-mizan'};
 
   // ── جلب ملف أهداف الأصناف (xlsx) بالتوازي ──
   const targetsUrl=(document.getElementById('gs-targets')?.value?.trim())||GS_URLS_EMBEDDED['targets']||'';
@@ -9196,8 +9658,8 @@ async function _autoSyncQuiet(){
 async function syncGoogleSheets(){
   const prog=document.getElementById('gs-progress');
   const statusEl=document.getElementById('gs-status');
-  const keys=['sales','debt','aging','collection','inventory','reps','expenses'];
-  const typeLabels={sales:'مبيعات',debt:'مديونية',aging:'أعمار الذمم',collection:'تحصيل',inventory:'جرد المخازن',reps:'تصنيف المندوبين والأهداف',expenses:'المصروفات'};
+  const keys=['sales','debt','aging','collection','inventory','reps','expenses','mizan-tajura','mizan-karima2526','mizan-karima2024'];
+  const typeLabels={sales:'مبيعات',debt:'مديونية',aging:'أعمار الذمم',collection:'تحصيل',inventory:'جرد المخازن',reps:'تصنيف المندوبين والأهداف',expenses:'المصروفات','mizan-tajura':'ميزان تاجوراء 2025+2026','mizan-karima2526':'ميزان كريمية 2025+2026','mizan-karima2024':'ميزان كريمية 2024'};
 
   statusEl.textContent='⏳ جاري جلب البيانات...';
   if(prog)prog.style.width='10%';
@@ -16911,4 +17373,4 @@ function _execDailyRepsReport(collDay,visDay){
 }
 
 </script>
-</body></html>
+</body></html>,mizan_table:[]
