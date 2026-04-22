@@ -2108,6 +2108,392 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
   .inv-grid { grid-template-columns: repeat(2,1fr) !important; }
   #inv-expiry-cards { grid-template-columns: 1fr 1fr !important; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   MOBILE MASTER FIX — يُصلح جميع مشاكل التجاوب — آخر block
+   يكتسب الأولوية على كل ما فوقه
+══════════════════════════════════════════════════════════════ */
+
+/* ─── منع overflow أفقي على كل مستويات الـ DOM ─── */
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+}
+
+@media (max-width: 768px) {
+
+  /* ── الجذر ── */
+  *, *::before, *::after { box-sizing: border-box !important; }
+  html, body { overflow-x: hidden !important; width: 100% !important; }
+
+  /* ── Main content area ── */
+  #main {
+    margin-right: 0 !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  /* ── Topbar ── */
+  #topbar {
+    height: 52px !important;
+    padding: 0 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 6px !important;
+    width: 100% !important;
+    overflow: hidden !important;
+  }
+  .tb-left {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+  #topbar-title {
+    font-size: 12px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 140px !important;
+  }
+  .topbar-right {
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    flex-wrap: nowrap !important;
+    overflow: hidden !important;
+  }
+  /* إخفاء العناصر غير الضرورية في الـ topbar */
+  .tb-divider,
+  .tb-desktop-only,
+  #btn-hide-charts,
+  .last-update,
+  button[onclick="exportCurrentTable()"] {
+    display: none !important;
+  }
+  /* أزرار الـ topbar: مضغوطة */
+  #btn-today-filter,
+  #gf-toggle-btn {
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+    height: 32px !important;
+    white-space: nowrap !important;
+  }
+  #btn-settings {
+    padding: 4px 8px !important;
+    font-size: 10px !important;
+    height: 30px !important;
+  }
+  button[onclick="openFinancialReportModal()"] {
+    padding: 4px 7px !important;
+    font-size: 10px !important;
+    height: 30px !important;
+  }
+  #theme-toggle, #topbar-refresh-btn {
+    width: 32px !important;
+    height: 32px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* ── Global filter bar ── */
+  #global-filter-bar {
+    top: 52px !important;
+    padding: 6px 8px !important;
+    gap: 5px !important;
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    width: 100% !important;
+  }
+  #global-filter-bar::-webkit-scrollbar { display: none !important; }
+  #global-filter-bar .gf-label { display: none !important; }
+  #global-filter-bar .gf-select,
+  #global-filter-bar .gf-input {
+    height: 30px !important;
+    font-size: 11px !important;
+    padding: 3px 7px !important;
+    flex-shrink: 0 !important;
+    min-width: 90px !important;
+    max-width: 140px !important;
+  }
+
+  /* ── Page padding ── */
+  .page {
+    padding: 8px 8px calc(80px + env(safe-area-inset-bottom, 0px)) 8px !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  /* ── KPI grids: دائماً 2 عمود ── */
+  .kpi-grid,
+  #kpi-overview, #kpi-sales, #kpi-reps, #kpi-customers,
+  #kpi-products, #kpi-debt, #kpi-collection, #kpi-inventory,
+  #miz-kpis-main, #miz-kpis-secondary, #miz-kpis-returns,
+  #miz-cmp-kpis, #miz-mo-kpis, #miz-growth-compare-kpis {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 7px !important;
+  }
+  .kpi-card {
+    padding: 10px 12px !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+  .kpi-value { font-size: clamp(12px, 3.5vw, 18px) !important; }
+  .kpi-label { font-size: 9.5px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+  .kpi-sub { font-size: 9px !important; }
+
+  /* ── Cards ── */
+  .card {
+    padding: 10px !important;
+    gap: 8px !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+  .card-header {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 6px !important;
+    align-items: center !important;
+    scrollbar-width: none !important;
+  }
+  .card-header::-webkit-scrollbar { display: none !important; }
+
+  /* ── Grids: عمود واحد ── */
+  .grid-2, .grid-3, .grid-65, .grid-56 { grid-template-columns: 1fr !important; }
+  #ov-row2 { grid-template-columns: 1fr !important; }
+
+  /* ── Charts ── */
+  .chart-wrap { height: 170px !important; }
+  .chart-wrap.tall { height: 210px !important; }
+  .chart-wrap.short { height: 145px !important; }
+
+  /* ── Filter bars: الحل الموحّد — scroll أفقي ── */
+  .filter-bar {
+    display: flex !important;
+    flex-wrap: nowrap !important;          /* المنع من الالتفاف — scroll بدلاً منه */
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    gap: 5px !important;
+    padding: 6px 8px !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+  .filter-bar::-webkit-scrollbar { display: none !important; }
+  .filter-bar .filter-label { display: none !important; }
+  .filter-bar select,
+  .filter-bar input[type="text"] {
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    min-width: 90px !important;
+    max-width: 135px !important;
+    width: auto !important;
+    height: 30px !important;
+    font-size: 11px !important;
+    padding: 0 7px !important;
+  }
+  .filter-bar input[type="date"] {
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    min-width: 112px !important;
+    max-width: 135px !important;
+    height: 30px !important;
+    font-size: 11px !important;
+  }
+  .filter-bar button {
+    flex-shrink: 0 !important;
+    height: 30px !important;
+    padding: 0 9px !important;
+    font-size: 11px !important;
+    white-space: nowrap !important;
+  }
+
+  /* ── Mizan filter bar ── */
+  #miz-filter-bar {
+    padding: 7px 8px 5px !important;
+    margin: 0 -8px 10px !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 50 !important;
+    width: calc(100% + 16px) !important;
+  }
+  #miz-filter-bar > div {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    gap: 5px !important;
+    scrollbar-width: none !important;
+    padding-bottom: 2px !important;
+    align-items: center !important;
+  }
+  #miz-filter-bar > div::-webkit-scrollbar { display: none !important; }
+  #miz-filter-bar > div > div:first-child,
+  #miz-filter-bar .tsb-divider { display: none !important; }
+  #miz-filter-bar select,
+  #miz-filter-bar input {
+    flex-shrink: 0 !important;
+    height: 30px !important;
+    font-size: 11px !important;
+    min-width: 0 !important;
+    max-width: 125px !important;
+    padding: 0 6px !important;
+  }
+
+  /* ── Tables: scroll أفقي موحّد ── */
+  .table-wrap {
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-height: 380px !important;
+    border-radius: 10px !important;
+    position: relative !important;
+    width: 100% !important;
+  }
+  table {
+    font-size: 10.5px !important;
+    min-width: 460px !important;
+    border-collapse: collapse !important;
+    width: max-content !important;
+  }
+  thead th {
+    padding: 6px 7px !important;
+    font-size: 9.5px !important;
+    white-space: nowrap !important;
+  }
+  tbody td {
+    padding: 5px 7px !important;
+    white-space: nowrap !important;
+    font-size: 10px !important;
+  }
+  tfoot td { padding: 5px 7px !important; font-size: 9.5px !important; }
+
+  /* ── Pagination ── */
+  .table-pagination {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+  .pag-btns { flex-wrap: wrap !important; justify-content: center !important; }
+  .pag-btn { padding: 4px 8px !important; font-size: 10px !important; min-width: 28px !important; }
+
+  /* ── Aging buckets ── */
+  .aging-buckets { grid-template-columns: repeat(2, 1fr) !important; gap: 7px !important; }
+
+  /* ── Inventory ── */
+  .inv-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 7px !important; }
+  #inv-expiry-cards { grid-template-columns: repeat(2, 1fr) !important; }
+
+  /* ── Collection ── */
+  #page-collection .grid-2,
+  #page-collection .grid-3 { grid-template-columns: 1fr !important; }
+  .coll-top-row {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  .coll-top-row > div:last-child > .btn { width: 100% !important; }
+
+  /* ── Modals ── */
+  .modal-box {
+    width: 100vw !important;
+    max-height: 95vh !important;
+    border-radius: 16px 16px 0 0 !important;
+    margin: auto 0 0 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+  }
+  .modal-body { padding: 14px !important; }
+  .modal-tabs { gap: 3px !important; flex-wrap: wrap !important; }
+  .modal-tab { font-size: 11px !important; padding: 6px 9px !important; }
+
+  /* ── Toast ── */
+  #toast-container {
+    left: 10px !important;
+    right: 10px !important;
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .toast { min-width: auto !important; width: 100% !important; padding: 9px 12px !important; font-size: 11px !important; }
+
+  /* ── Dropzone ── */
+  #smart-dropzone { padding: 18px 12px !important; }
+  .sdz-title { font-size: 12px !important; }
+  #sdz-cards { grid-template-columns: repeat(3, 1fr) !important; }
+
+  /* ── Overview monthly table ── */
+  #ov-monthly-tbody td { white-space: nowrap !important; font-size: 10px !important; }
+
+  /* ── Mizan sections: جميعها scrollable ── */
+  #miz-cmp-section,
+  #miz-table-wrap,
+  #miz-cmp-items-tbl-wrap,
+  #page-mizan .table-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; }
+
+  /* ── Rep goals ── */
+  #page-rep-goals table { min-width: 500px !important; }
+  #rep-prod-targets-wrap { padding: 4px !important; }
+
+  /* ── Bottom nav bottom ── */
+  #mobile-bottom-nav { display: block !important; }
+  #sidebar { display: none !important; }
+}
+
+@media (max-width: 480px) {
+  /* KPIs: 2 cols */
+  .kpi-grid,
+  #kpi-overview, #kpi-sales, #kpi-reps, #kpi-customers,
+  #kpi-products, #kpi-debt, #kpi-collection, #kpi-inventory,
+  #miz-kpis-main, #miz-kpis-secondary, #miz-kpis-returns,
+  #miz-cmp-kpis, #miz-mo-kpis, #miz-growth-compare-kpis {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 5px !important;
+  }
+  #ov-row2 { grid-template-columns: 1fr !important; }
+  .kpi-card { padding: 9px 10px !important; }
+  .kpi-value { font-size: 11.5px !important; }
+  .card { padding: 9px !important; }
+  .chart-wrap { height: 155px !important; }
+  .chart-wrap.tall { height: 185px !important; }
+  table { font-size: 9.5px !important; min-width: 380px !important; }
+  thead th { font-size: 9px !important; padding: 5px 5px !important; }
+  tbody td { font-size: 9px !important; padding: 4px 5px !important; }
+  .filter-bar select,
+  .filter-bar input[type="text"] { min-width: 80px !important; max-width: 115px !important; font-size: 10.5px !important; }
+  .filter-bar input[type="date"] { min-width: 105px !important; max-width: 120px !important; }
+  /* Bottom nav compact */
+  .mob-nav-item { min-width: 44px !important; font-size: 8px !important; padding: 3px 4px !important; }
+  .mob-nav-item .mn-icon { font-size: 14px !important; }
+  .mob-nav-item .mn-icon-wrap { width: 34px !important; height: 24px !important; }
+  /* aging / inv */
+  .aging-buckets { grid-template-columns: repeat(2, 1fr) !important; }
+  .inv-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  #inv-expiry-cards { grid-template-columns: 1fr 1fr !important; }
+  #sdz-cards { grid-template-columns: repeat(2, 1fr) !important; }
+  /* topbar tighter */
+  #topbar { height: 48px !important; padding: 0 8px !important; }
+  #topbar-title { max-width: 100px !important; font-size: 11px !important; }
+}
+
+@media (max-width: 380px) {
+  .kpi-value { font-size: 11px !important; }
+  .kpi-label { font-size: 9px !important; }
+  .filter-bar select,
+  .filter-bar input[type="text"] { min-width: 72px !important; max-width: 100px !important; font-size: 10px !important; }
+  .filter-bar input[type="date"] { min-width: 98px !important; }
+  .mob-nav-item { min-width: 40px !important; font-size: 7.5px !important; }
+  #topbar-title { max-width: 80px !important; }
+  table { min-width: 340px !important; }
+}
 </style></head>
 <body>
 
@@ -3591,10 +3977,10 @@ body.dark #topbar { background: rgba(26,33,80,.95) !important; }
         </select>
         <div id="miz-cmp-items-count" style="font-size:11px;color:var(--muted);margin-right:auto"></div>
         <button id="btn-miz-merge" onclick="_toggleMizMerge()"
-          style="height:30px;padding:0 12px;border-radius:8px;border:1.5px solid var(--gold);background:transparent;color:var(--gold);font-family:Cairo,sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:5px"
+          style="height:30px;padding:0 12px;border-radius:8px;border:1.5px solid var(--gold);background:var(--gold);color:#000;font-family:Cairo,sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:5px"
           onmouseover="if(!window._mizMerged)this.style.background='rgba(246,173,85,.15)'"
           onmouseout="if(!window._mizMerged)this.style.background='transparent'">
-          🔀 دمج الميزان
+          🔀 دمج الميزان ✓
         </button>
         <button onclick="_mizanPrintItemsTable()"
           style="height:30px;padding:0 12px;border-radius:8px;border:1px solid #63b3ed;background:transparent;color:#63b3ed;font-family:Cairo,sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s;display:flex;align-items:center;gap:5px"
@@ -9827,7 +10213,7 @@ let _mizDetailOpen   = false;
 let _mizDetailPage   = 1;
 const _MIZ_PAGE_SIZE = 50;
 
-const _mFmt  = n => { const v=Math.round(n||0); return v.toLocaleString('en-US').replace(/,/g,'.'); };
+const _mFmt  = n => { const v=Math.round(n||0); return isNaN(v)?'—':v.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0}); };
 const _mFmtK = n => { const a=Math.abs(n||0); if(a>=1e9) return (n/1e9).toFixed(1)+'B'; if(a>=1e6) return (n/1e6).toFixed(1)+'M'; if(a>=1e3) return (n/1e3).toFixed(0)+'K'; return String(Math.round(n||0)); };
 const _mPct  = (a,b) => b>0 ? (a/b*100).toFixed(1)+'%' : '--';
 const _mDiff = (a,b) => { const d=a-b; const p=b>0?((d/b)*100).toFixed(1):null; return {d,p}; };
@@ -10348,7 +10734,7 @@ function _mizanToggleDetail(){
   if(_mizDetailOpen) _renderMizanTable(window._mizCurrentRows||[]);
 }
 
-// ── فلتر الشهر: عند اختيار شهر نمسح من/إلى ──
+// ── فلتر الشهر: عند اختيار شهر نمسح من/إلى — مع debounce لتجنب البطء ──
 function _mizanMonthChange(){
   const mo = document.getElementById('f-miz-month')?.value||'';
   if(mo){
@@ -10357,7 +10743,7 @@ function _mizanMonthChange(){
     if(el_from) el_from.value='';
     if(el_to)   el_to.value='';
   }
-  renderMizanPage();
+  _mizanDebounceRender();
 }
 
 // ── عند تغيير من/إلى نمسح فلتر الشهر والسنة ──
@@ -10366,7 +10752,7 @@ function _mizanClearMonthAndRender(){
   if(el_mo) el_mo.value='';
   const el_yr = document.getElementById('f-miz-year');
   if(el_yr) el_yr.value='';
-  renderMizanPage();
+  _mizanDebounceRender();
 }
 
 function renderMizanPage(){
@@ -12335,7 +12721,7 @@ let _mizCmpChartMain = null;
 let _mizCmpChartPie  = null;
 let _mizCmpItemPage  = 1;
 const _MIZ_CMP_PAGE  = 30;
-window._mizMerged = false;
+window._mizMerged = true; // الحالة الافتراضية: دمج مفعّل
 
 function _toggleMizMerge(){
   window._mizMerged = !window._mizMerged;
@@ -12679,7 +13065,7 @@ function _renderMizanItemsComparison(mSales, mRets, sSales, sRets, _col, _colN, 
   const finalMizSrcs = mizSrcs.length ? mizSrcs : mizSrcsAll;
 
   // ── دوال مساعدة ──
-  const fmt =v=>v>0?_mFmt(v):'<span style="color:var(--muted)">—</span>';
+  const fmt =v=>v>0?Math.round(v).toLocaleString('en-US'):'<span style="color:var(--muted)">—</span>';
   const fmtQ=v=>v>0?v.toLocaleString('en-US',{maximumFractionDigits:0}):'<span style="color:var(--muted)">—</span>';
   const MO_AR=['','يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
   const moN=MO_AR[parseInt((document.getElementById('f-miz-month')?.value||'0'),10)]||'';
@@ -22267,7 +22653,7 @@ async function _ensurePptxJS(){
 // ══════════════════════════════════════════════════════════
 function _mizanExportPDF(){
   const MO=['','يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
-  const fmt=v=>Math.round(v||0).toLocaleString('en-US').replace(/,/g,'.');
+  const fmt=v=>Math.round(v||0).toLocaleString('en-US');
   const pct=(a,b)=>b>0?((a/b)*100).toFixed(1)+'%':'—';
   const gArrow=(v)=>v===null?'—':v>=0?`<span style="color:#22c55e">▲ +${v.toFixed(1)}%</span>`:`<span style="color:#ef4444">▼ ${v.toFixed(1)}%</span>`;
   const dateStr=new Date().toLocaleDateString('ar-LY',{year:'numeric',month:'long',day:'numeric'});
@@ -22277,11 +22663,41 @@ function _mizanExportPDF(){
   const salAll  = window._mizAllYearsSales || D.sales_table || [];
   if(!mizAll.length && !salAll.length){ toast('لا توجد بيانات كافية لإنشاء التقرير','error'); return; }
 
-  const getDate = r => r.__date || _mizDt(r) || '';
-  const getType = r => r.__type !== undefined ? r.__type : _miz_getType(r);
-  const getVal  = r => r.__total !== undefined ? r.__total : (typeof _miz_getTotal==='function'?_miz_getTotal(r):0);
-  const getItem = r => r.__item !== undefined ? r.__item : (typeof _miz_getItem==='function'?_miz_getItem(r):'');
-  const getQty  = r => r.__qty  !== undefined ? r.__qty  : 0;
+  // دوال مساعدة محلية مضمونة بدون اعتماد على window.*
+  const _pdfCn = s => String(s||'').replace(/^\uFEFF/,'').replace(/[\u200B-\u200F\u202A-\u202E\u2060\u00A0]/g,'').trim();
+  const _pdfN  = v => { const x=parseFloat(String(v||'').replace(/,/g,'')); return isNaN(x)?0:x; };
+  const _pdfDt = r => {
+    if(r.__date !== undefined) return r.__date;
+    for(const k of Object.keys(r)) if(/تاريخ|date/i.test(k)){
+      const v=_pdfCn(r[k]).substring(0,10);
+      if(v.match(/\d{4}-\d{2}-\d{2}/)) return v;
+    }
+    return '';
+  };
+  const _pdfType = r => {
+    if(r.__type !== undefined) return r.__type;
+    const keys=Object.keys(r);
+    const k=keys.find(k=>/^النوع$|^نوع$/.test(_pdfCn(k)))||keys.find(k=>/نوع/.test(_pdfCn(k)));
+    return k ? _pdfCn(r[k]) : '';
+  };
+  const _pdfVal = r => {
+    if(r.__total !== undefined) return r.__total;
+    const keys=Object.keys(r);
+    const k=keys.find(k=>/اجمالي.صافي|إجمالي.صافي/.test(_pdfCn(k)))||keys.find(k=>/اجمالي|إجمالي|صافي/.test(_pdfCn(k)));
+    return k ? _pdfN(r[k]) : 0;
+  };
+  const _pdfItem = r => {
+    if(r.__item !== undefined) return r.__item;
+    const keys=Object.keys(r);
+    const k=keys.find(k=>/^المادة$|^الصنف$|^المنتج$/.test(_pdfCn(k)))||keys.find(k=>/مادة|صنف|منتج/.test(_pdfCn(k)));
+    return k ? _pdfCn(r[k]) : '';
+  };
+
+  const getDate = r => _pdfDt(r);
+  const getType = r => _pdfType(r);
+  const getVal  = r => _pdfVal(r);
+  const getItem = r => _pdfItem(r);
+  const getQty  = r => r.__qty !== undefined ? r.__qty : 0;
 
   // ── تجميع بيانات شهرية × سنوية ───────────────────────────
   const moYearMap = {}; // moYearMap['03']['2025'] = {mSales,mRets,sSales,sRets}
@@ -22340,7 +22756,7 @@ function _mizanExportPDF(){
     if(getType(r).includes('مرتجع')) d.mR+=getVal(r); else {d.mS+=getVal(r); d.mQ+=getQty(r);}
   });
   salAll.forEach(r=>{
-    const it=getItem(r)||_miz_getItem(r); if(!it) return;
+    const it=getItem(r); if(!it) return;
     const dt=getDate(r); if(!dt||dt.length<4) return;
     const yr=dt.substring(0,4);
     const d=ensureItem(it,yr);
@@ -22528,8 +22944,7 @@ td{padding:4px 6px;font-size:9.5px;white-space:nowrap}
   .footer{border-top:1pt solid #ccc;padding-top:3mm}
 }
 </style></head>
-<body onload="setTimeout(()=>
-window.print(),800)"><div class="page">
+<body onload="(document.fonts?document.fonts.ready:Promise.resolve()).then(()=>setTimeout(()=>window.print(),700))"><div class="page">
 
 <!-- ══ HEADER ══ -->
 <div class="header">
@@ -22639,15 +23054,12 @@ window.print(),800)"><div class="page">
     <tr>
       <th style="background:#003f8c;color:#fff;border:1px solid #1a3a9e;text-align:right">الصنف</th>
       ${itemYHdrs}
-      <th colspan="2" style="background:#003f8c;color:#fff;border:1px solid #1a3a9e">الإجمالي الكلي</th>
-      <th style="background:#d69e2e;color:#fff;border:1px solid #b7791f">المجموع</th>
+      ${_pdfMerged ? '<th style="background:#d69e2e;color:#fff;border:1px solid #b7791f">المجموع الكلي</th>' : '<th colspan="2" style="background:#003f8c;color:#fff;border:1px solid #1a3a9e">الإجمالي الكلي</th><th style="background:#d69e2e;color:#fff;border:1px solid #b7791f">المجموع</th>'}
     </tr>
     <tr>
       <th style="background:#0a2a6e;color:#a8c4ff;border:1px solid #1a3a9e"></th>
       ${itemYSub}
-      <th style="background:#0a2a6e;color:#a8c4ff;border:1px solid #1a3a9e;font-size:9px">⚖️ ميزان</th>
-      <th style="background:#0a2a6e;color:#fba96a;border:1px solid #1a3a9e;font-size:9px">🏭 SIRAJ</th>
-      <th style="background:#8a6000;color:#fde68a;border:1px solid #b7791f;font-size:9px">الكلي</th>
+      ${_pdfMerged ? '<th style="background:#8a6000;color:#fde68a;border:1px solid #b7791f;font-size:9px">الكلي الإجمالي</th>' : '<th style="background:#0a2a6e;color:#a8c4ff;border:1px solid #1a3a9e;font-size:9px">⚖️ ميزان</th><th style="background:#0a2a6e;color:#fba96a;border:1px solid #1a3a9e;font-size:9px">🏭 SIRAJ</th><th style="background:#8a6000;color:#fde68a;border:1px solid #b7791f;font-size:9px">الكلي</th>'}
     </tr>
   </thead>
   <tbody>${itemRowsHtml}</tbody>
@@ -22680,7 +23092,7 @@ async function _mizanExportPPTX(){
   toast('⏳ جاري إنشاء العرض التقديمي...','info');
 
   // ── دوال مساعدة ──────────────────────────────────────────
-  const fmt=v=>Math.round(v||0).toLocaleString('en-US').replace(/,/g,'.');
+  const fmt=v=>Math.round(v||0).toLocaleString('en-US');
   const fmtK=v=>{const a=Math.abs(v||0);if(a>=1e6)return (v/1e6).toFixed(1)+' M';if(a>=1e3)return (v/1e3).toFixed(0)+' K';return String(Math.round(v||0));};
   const pct=(a,b)=>b>0?((a/b)*100).toFixed(1)+'%':'0%';
   const now=new Date();
@@ -22709,10 +23121,29 @@ async function _mizanExportPPTX(){
   const salAll  = window._mizAllYearsSales || D.sales_table || [];
   if(!mizAll.length && !salAll.length){ toast('لا توجد بيانات كافية','error'); return; }
 
-  const getDate = r => r.__date || _mizDt(r) || '';
-  const getType = r => r.__type !== undefined ? r.__type : _miz_getType(r);
-  const getVal  = r => r.__total !== undefined ? r.__total : (typeof _miz_getTotal==='function'?_miz_getTotal(r):0);
-  const getItem = r => r.__item !== undefined ? r.__item : (typeof _miz_getItem==='function'?_miz_getItem(r):'');
+  // دوال مساعدة محلية مستقلة - لا تعتمد على window._miz_*
+  const _ppCn = s => String(s||'').replace(/^﻿/,'').replace(/[​-‏‪-‮⁠ ]/g,'').trim();
+  const _ppN  = v => { const x=parseFloat(String(v||'').replace(/,/g,'')); return isNaN(x)?0:x; };
+  const getDate = r => {
+    if(r.__date !== undefined) return r.__date;
+    for(const k of Object.keys(r)) if(/تاريخ|date/i.test(k)){ const v=_ppCn(r[k]).substring(0,10); if(v.match(/\d{4}-\d{2}-\d{2}/)) return v; }
+    return '';
+  };
+  const getType = r => {
+    if(r.__type !== undefined) return r.__type;
+    const keys=Object.keys(r); const k=keys.find(k=>/^النوع$|^نوع$/.test(_ppCn(k)))||keys.find(k=>/نوع/.test(_ppCn(k)));
+    return k ? _ppCn(r[k]) : '';
+  };
+  const getVal = r => {
+    if(r.__total !== undefined) return r.__total;
+    const keys=Object.keys(r); const k=keys.find(k=>/اجمالي.صافي|إجمالي.صافي/.test(_ppCn(k)))||keys.find(k=>/اجمالي|إجمالي|صافي/.test(_ppCn(k)));
+    return k ? _ppN(r[k]) : 0;
+  };
+  const getItem = r => {
+    if(r.__item !== undefined) return r.__item;
+    const keys=Object.keys(r); const k=keys.find(k=>/^المادة$|^الصنف$|^المنتج$/.test(_ppCn(k)))||keys.find(k=>/مادة|صنف|منتج/.test(_ppCn(k)));
+    return k ? _ppCn(r[k]) : '';
+  };
 
   // ── تجميع بيانات شهرية × سنوية ───────────────────────────
   const moYearMap={};
@@ -22746,7 +23177,7 @@ async function _mizanExportPPTX(){
   const itemMap={};
   const ensureItem=(n,y)=>{if(!itemMap[n])itemMap[n]={};if(!itemMap[n][y])itemMap[n][y]={mS:0,mR:0,sS:0,sR:0};return itemMap[n][y];};
   mizAll.forEach(r=>{const it=getItem(r);if(!it)return;const dt=getDate(r);if(!dt||dt.length<4)return;const yr=dt.substring(0,4);const d=ensureItem(it,yr);if(getType(r).includes('مرتجع'))d.mR+=getVal(r);else d.mS+=getVal(r);});
-  salAll.forEach(r=>{const it=getItem(r)||_miz_getItem(r);if(!it)return;const dt=getDate(r);if(!dt||dt.length<4)return;const yr=dt.substring(0,4);const d=ensureItem(it,yr);if(getType(r).includes('مرتجع'))d.sR+=getVal(r);else d.sS+=getVal(r);});
+  salAll.forEach(r=>{const it=getItem(r);if(!it)return;const dt=getDate(r);if(!dt||dt.length<4)return;const yr=dt.substring(0,4);const d=ensureItem(it,yr);if(getType(r).includes('مرتجع'))d.sR+=getVal(r);else d.sS+=getVal(r);});
 
   const allItems=[...new Set(Object.keys(itemMap))].sort((a,b)=>{
     let ta=0,tb=0;
