@@ -16663,7 +16663,7 @@ function _printTable(opts){
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html,body{font-family:'Cairo',sans-serif;font-size:${fs}px;color:#1e2749;background:#fff;direction:rtl}
-@page{size:A4 ${isLandscape?'landscape':'portrait'};margin:10mm 8mm 14mm 8mm}
+@page{size:A4 ${isLandscape?'landscape':'portrait'};margin:10mm 8mm 18mm 8mm}
 .print-header{border-bottom:2.5px solid #4361ee;padding-bottom:8px;margin-bottom:10px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .print-logo{width:44px;height:44px;border-radius:9px;flex-shrink:0;overflow:hidden;background:transparent}
 .print-logo img{width:100%;height:100%;object-fit:contain}
@@ -16687,13 +16687,13 @@ tfoot td,tfoot th{background:#dde3ff;font-weight:800;color:#1e2749;padding:5px 3
 .tag-red,.badge-red{background:#fff0f0;color:#ee4d4d}
 .tag-green,.badge-green{background:#f0fff9;color:#f07820}
 .tag-orange,.badge-orange{background:#fff8f0;color:#ff9f43}
-.print-footer{margin-top:6mm;padding-top:4px;border-top:1px solid #e4e6ef;display:flex;align-items:center;justify-content:space-between;font-size:8px;color:#9ba5bf}
+.print-footer{margin-top:8mm;padding-top:4px;border-top:1px solid #e4e6ef;display:flex;align-items:center;justify-content:space-between;font-size:8px;color:#9ba5bf}
 .print-footer .pf-right{color:#4361ee;font-weight:700}
 @media print{
-  body{-webkit-print-color-adjust:exact;print-color-adjust:exact;padding-bottom:16mm}
+  body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   thead{display:table-header-group}tfoot{display:table-footer-group}tbody{display:table-row-group}
   tr{page-break-inside:avoid}
-  .print-footer{position:fixed;bottom:0;left:0;right:0;padding:0 8mm;height:12mm;background:#fff;border-top:1px solid #e4e6ef;display:flex;align-items:center;justify-content:space-between;font-size:8px;color:#9ba5bf;margin-top:0}
+  .print-footer{display:flex;position:static;margin-top:6mm;padding-top:4px;border-top:1px solid #e4e6ef;font-size:8px;color:#9ba5bf}
 }
 /* ===== AI Advisor Styles ===== */
 .ai-mode-btn{
