@@ -7823,13 +7823,14 @@ function renderDebtPage(){
     // استخراج أعمدة الأعمار من aging_table
     const _agT=D.aging_table||[];
     const _agHdrs=_agT[0]?Object.keys(_agT[0]):[];
-    const _agFnd=(...ns)=>ns.find(n=>_agHdrs.includes(n));
-    const _ac10 =_agFnd('10','10أيام','10 أيام');
-    const _ac15 =_agFnd('15','15يوم','15 يوم');
-    const _ac30 =_agFnd('30','30يوم','30 يوم');
-    const _ac60 =_agFnd('60','60يوم','60 يوم');
-    const _ac90 =_agFnd('90','90يوم','90 يوم');
-    const _ac120=_agFnd('120','120+','120يوم','120 يوم');
+    // البحث بمطابقة تامة للـ string key (بعد التطبيع في parsing)
+    const _agFnd=(...ns)=>ns.find(n=>_agHdrs.includes(n)||_agHdrs.includes(String(n)));
+    const _ac10 =_agFnd('10');
+    const _ac15 =_agFnd('15');
+    const _ac30 =_agFnd('30');
+    const _ac60 =_agFnd('60');
+    const _ac90 =_agFnd('90');
+    const _ac120=_agFnd('120');
     const _agCols=[_ac10,_ac15,_ac30,_ac60,_ac90,_ac120].filter(Boolean);
     const _agLabels={[_ac10]:'≤10',[_ac15]:'11-15',[_ac30]:'16-30',[_ac60]:'31-60',[_ac90]:'61-90',[_ac120]:'120+'};
     const _agColors={[_ac10]:'var(--accent2)',[_ac15]:'var(--accent2)',[_ac30]:'var(--accent)',[_ac60]:'var(--accent3)',[_ac90]:'var(--red)',[_ac120]:'var(--red)'};
@@ -8025,13 +8026,13 @@ function renderAgingPage(){
       if(repF)  filtAg=filtAg.filter(r=>(r['المندوب']||'').trim()===repF.trim());
       if(catF)  filtAg=filtAg.filter(r=>(D._repCatMap&&D._repCatMap[String(r['المندوب']||'').trim()])===catF);
       const _aHdrs=filtAg[0]?Object.keys(filtAg[0]):[];
-      const _aFnd=(...ns)=>ns.find(n=>_aHdrs.includes(n));
-      const _c10=_aFnd('10','10أيام','10 أيام');
-      const _c15=_aFnd('15','15يوم','15 يوم');
-      const _c30=_aFnd('30','30يوم','30 يوم');
-      const _c60=_aFnd('60','60يوم','60 يوم');
-      const _c90=_aFnd('90','90يوم','90 يوم');
-      const _c120=_aFnd('120','120+','120يوم','120 يوم');
+      const _aFnd=(...ns)=>ns.find(n=>_aHdrs.includes(n)||_aHdrs.includes(String(n)));
+      const _c10=_aFnd('10');
+      const _c15=_aFnd('15');
+      const _c30=_aFnd('30');
+      const _c60=_aFnd('60');
+      const _c90=_aFnd('90');
+      const _c120=_aFnd('120');
       b10 =_c10 ?filtAg.reduce((s,r)=>s+_parseNum(r[_c10 ]),0):0;
       b15 =_c15 ?filtAg.reduce((s,r)=>s+_parseNum(r[_c15 ]),0):0;
       bNew=_c30 ?filtAg.reduce((s,r)=>s+_parseNum(r[_c30 ]),0):0;
@@ -8246,13 +8247,13 @@ function _renderAgingTable(){
   {const _aAll=PAG_STATE['aging']?.data||[];
   if(_aAll.length){
     const _aHdrs=Object.keys(_aAll[0]||{});
-    const _aFnd=(...ns)=>ns.find(n=>_aHdrs.includes(n));
-    const _c10=_aFnd('10','10أيام','10 أيام');
-    const _c15=_aFnd('15','15يوم','15 يوم');
-    const _c30=_aFnd('30','30يوم','30 يوم');
-    const _c60=_aFnd('60','60يوم','60 يوم');
-    const _c90=_aFnd('90','90يوم','90 يوم');
-    const _c120=_aFnd('120','120+','120يوم','120 يوم');
+    const _aFnd=(...ns)=>ns.find(n=>_aHdrs.includes(n)||_aHdrs.includes(String(n)));
+    const _c10=_aFnd('10');
+    const _c15=_aFnd('15');
+    const _c30=_aFnd('30');
+    const _c60=_aFnd('60');
+    const _c90=_aFnd('90');
+    const _c120=_aFnd('120');
     const _isRA=D.aging_table&&D.aging_table.length>0;
     if(_isRA){
       const _ageCols=[_c10,_c15,_c30,_c60,_c90,_c120].filter(Boolean);
@@ -9307,18 +9308,17 @@ function _renderInvTable(){
     });
   }
 
-  // _mkSH يُرجع <th>...</th> كامل — نستخدمه مباشرة بدون <th> خارجي
   const _ivsh=(k,lbl,sty='')=>_mkSH('inv',k,lbl,'_renderInvTable','_invSort',sty);
   const isGrouped=window._invGrouped===true;
+  // رؤوس الأعمدة الرقمية: محاذاة يمين مثل الخلايا
+  const _ivshR=(k,lbl)=>_mkSH('inv',k,lbl,'_renderInvTable','_invSort','text-align:right;');
 
-  // الأعمدة في وضع التجميع: # | المادة | الكمية | القيمة | %  → 5 أعمدة
-  // الأعمدة في وضع المستودع: # | المادة | الكمية | القيمة | % | المستودع → 6 أعمدة
   const thead=`<thead><tr>
-    <th style="width:45px;text-align:center">#</th>
+    <th style="width:40px;text-align:center">#</th>
     ${_ivsh('mat','المادة')}
-    ${_ivsh('qty','الكمية')}
-    ${_ivsh('val','القيمة (د.ل)')}
-    <th style="min-width:120px">% من المخزون</th>
+    ${_ivshR('qty','الكمية')}
+    ${_ivshR('val','القيمة (د.ل)')}
+    <th>% من المخزون</th>
     ${isGrouped?'':`${_ivsh('wh','المستودع')}`}
   </tr></thead>`;
 
@@ -9331,11 +9331,11 @@ function _renderInvTable(){
     const barW=Math.min(+pct*5,100);
     const rowNum=(PAG_STATE['inv'].page-1)*PAGE_SIZE+i+1;
     return `<tr>
-      <td class="td-num" style="text-align:center;color:var(--muted)">${rowNum}</td>
+      <td style="text-align:center;color:var(--muted);font-size:11px">${rowNum}</td>
       <td class="td-name" style="font-weight:600" title="${r['المادة']||''}">${r['المادة']||''}</td>
-      <td class="td-num td-accent" style="font-weight:800;text-align:center">${fmt(qty)}</td>
-      <td class="td-num" style="color:var(--accent2);font-weight:700;text-align:center">${val>0?fmt(val):'—'}</td>
-      <td>
+      <td style="text-align:right;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums">${fmt(qty)}</td>
+      <td style="text-align:right;font-weight:700;color:var(--accent2);font-variant-numeric:tabular-nums">${val>0?fmt(val):'—'}</td>
+      <td style="min-width:110px">
         <div style="display:flex;align-items:center;gap:6px;padding:0 4px">
           <div style="flex:1;background:var(--surface2);border-radius:3px;height:5px;overflow:hidden;min-width:60px">
             <div style="width:${barW}%;height:100%;background:var(--accent);border-radius:3px"></div>
@@ -9351,8 +9351,8 @@ function _renderInvTable(){
   const tfoot=`<tfoot><tr style="background:var(--surface2);font-weight:700;font-size:11px">
     <td style="padding:8px 10px;color:var(--text2);text-align:center">—</td>
     <td style="padding:8px 13px;color:var(--text2)">📊 ${isGrouped?'إجمالي الأصناف':'المجموع'} — ${allInvRows.length} ${isGrouped?'صنف':'صف'}</td>
-    <td style="padding:8px 13px;text-align:center" class="td-accent">${fmt(totalQty)}</td>
-    <td style="padding:8px 13px;text-align:center;color:var(--accent2)">${fmt(totalVal)} د.ل</td>
+    <td style="padding:8px 13px;text-align:right;color:var(--accent);font-variant-numeric:tabular-nums">${fmt(totalQty)}</td>
+    <td style="padding:8px 13px;text-align:right;color:var(--accent2);font-variant-numeric:tabular-nums">${fmt(totalVal)} د.ل</td>
     <td></td>
     ${isGrouped?'':`<td style="padding:8px 13px;color:var(--muted);font-size:10px">${Object.keys(D.inventory_by_warehouse||{}).length} مستودع</td>`}
   </tr></tfoot>`;
@@ -13444,18 +13444,31 @@ function processNewData(type,rows){ _onDataUpdate(); // مسح الكاش عند
       break;
     }
     case 'aging':{
-      // استخدام دالة التحليل العالمية التي تتعامل مع "لنا" و "علينا"
       const _nA=v=>_parseNum(v);
-      // الأعمدة الرقمية قد تكون كـ '30' أو 30 في الـ rows
       const agingCols=['10','15','30','60','90','120'];
-      const bk={};
-      agingCols.forEach(k=>{
-        bk[k]=rows.reduce((s,r)=>{
-          // جرب المفتاح كـ string وكـ number
-          const v=r[k]!==null&&r[k]!==undefined?r[k]:(r[+k]!==null&&r[+k]!==undefined?r[+k]:null);
-          return s+_nA(v);
-        },0);
+      // XLSX.js يقرأ أعمدة الأرقام كـ integer keys (10,15...) أو string ('10','15...)
+      // نوحّد كل صف بتحويل المفاتيح الرقمية إلى strings
+      const normRows=rows.map(r=>{
+        const out={};
+        Object.keys(r).forEach(k=>{
+          out[k]=r[k];
+          // إذا كان المفتاح رقمياً وكان ضمن أعمدة الأعمار، أضفه كـ string أيضاً
+          if(!isNaN(k) && agingCols.includes(String(k))) out[String(k)]=_nA(r[k]);
+        });
+        // تأكد من وجود كل أعمدة الأعمار كـ string keys بقيم رقمية
+        agingCols.forEach(k=>{
+          if(out[k]===undefined||out[k]===null){
+            // جرّب المفتاح كرقم
+            const intKey=parseInt(k);
+            out[k]=_nA(r[intKey]!==undefined?r[intKey]:r[k]);
+          } else {
+            out[k]=_nA(out[k]);
+          }
+        });
+        return out;
       });
+      const bk={};
+      agingCols.forEach(k=>{ bk[k]=normRows.reduce((s,r)=>s+r[k],0); });
       D.aging_buckets={
         'أقل من 10': bk['10'],
         'أقل من 15': bk['15'],
@@ -13464,16 +13477,7 @@ function processNewData(type,rows){ _onDataUpdate(); // مسح الكاش عند
         '90 يوم':    bk['90'],
         '120 يوم+':  bk['120'],
       };
-      D.aging_table=rows.map(r=>{
-        const out={};
-        Object.keys(r).forEach(k=>out[k]=r[k]);
-        agingCols.forEach(k=>{
-          const v=r[k]!==null&&r[k]!==undefined?r[k]:(r[+k]!==null&&r[+k]!==undefined?r[+k]:null);
-          out[k+'يوم']=_nA(v);
-          out[k]=_nA(v); // normalize to number
-        });
-        return out;
-      });
+      D.aging_table=normRows;
       break;
     }
     case 'collection':{
@@ -16736,7 +16740,7 @@ tfoot td,tfoot th{background:#dde3ff;font-weight:800;color:#1e2749;padding:5px 3
     <div class="print-company">شركة ركان المتوسط — لوحة التحليل الاستراتيجي</div>
     <div class="print-title">${title}</div>
   </div>
-  <div class="print-meta"><div>📅 ${dateStr}</div><div>🕐 ${timeStr}</div><div>إعداد: المحاسب أحمد العكاري</div></div>
+  <div class="print-meta"><div>📅 ${dateStr}</div><div>🕐 ${timeStr}</div>${opts.hideAuthor?'':'<div>إعداد: المحاسب أحمد العكاري</div>'}</div>
 </div>
 <div class="filter-strip"><span class="fl-label">🔍 الفلاتر المطبّقة:</span> ${filterHTML}</div>
 <table>
@@ -16933,17 +16937,220 @@ function printProductsTable(){
 }
 
 function printDebtRepTable(){
-  _printTable({
-    title:'ملخص المديونية حسب المندوب',
-    tableWrapId:'debt-rep-wrap',
-    landscape:false,
-    filterDefs:[
-      {label:'الحساب',id:'f-debt-search'},
-      {label:'المندوب',id:'f-debt-rep'},
-      {label:'القناة البيعية',id:'f-debt-cat'},
-      {label:'النوع',id:'f-debt-type'},
-    ]
+  // بناء بيانات المناديب مع القناة البيعية
+  const repDebtMap = D._repDebtMap || {};
+  const supF = document.getElementById('f-debt-sup')?.value || '';
+  const repF = document.getElementById('f-debt-rep')?.value || '';
+  const catF = document.getElementById('f-debt-cat')?.value || '';
+
+  let repArr = Object.entries(repDebtMap).map(([name, d]) => {
+    const cat = (D._repCatMap && D._repCatMap[name]) || 'غير مصنف';
+    const sup = (D._repSuperMap && D._repSuperMap[name]) || '';
+    const total = d.total, paid = d.paid, net = total - paid;
+    const pct = total > 0 ? paid / total * 100 : 0;
+    const custs = d.customers ? d.customers.size : 0;
+    return { name, cat, sup, total, paid, net, pct, custs };
   });
+
+  // تطبيق الفلاتر
+  if (supF) repArr = repArr.filter(r => r.sup === supF);
+  if (repF) repArr = repArr.filter(r => r.name === repF);
+  if (catF) repArr = repArr.filter(r => r.cat === catF);
+
+  if (!repArr.length) { alert('لا توجد بيانات للطباعة'); return; }
+
+  // تجميع حسب القناة البيعية
+  const grouped = {};
+  repArr.forEach(r => {
+    if (!grouped[r.cat]) grouped[r.cat] = [];
+    grouped[r.cat].push(r);
+  });
+
+  // ترتيب القنوات وداخل كل قناة ترتيب تنازلي حسب صافي المديونية
+  const sortedCats = Object.keys(grouped).sort((a, b) => {
+    const sumA = grouped[a].reduce((s, r) => s + r.net, 0);
+    const sumB = grouped[b].reduce((s, r) => s + r.net, 0);
+    return sumB - sumA;
+  });
+  sortedCats.forEach(cat => grouped[cat].sort((a, b) => b.net - a.net));
+
+  // دالة تنسيق الأرقام
+  const fmtN = v => Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const fmtPct = v => v.toFixed(1) + '%';
+
+  // بناء صفوف الجدول مجمّعة
+  let rowsHTML = '';
+  let grandTotal = 0, grandPaid = 0, grandNet = 0, grandCusts = 0, rowNum = 0;
+
+  sortedCats.forEach(cat => {
+    const reps = grouped[cat];
+    const catTotal = reps.reduce((s, r) => s + r.total, 0);
+    const catPaid  = reps.reduce((s, r) => s + r.paid, 0);
+    const catNet   = reps.reduce((s, r) => s + r.net, 0);
+    const catCusts = reps.reduce((s, r) => s + r.custs, 0);
+    const catPct   = catTotal > 0 ? catPaid / catTotal * 100 : 0;
+    grandTotal += catTotal; grandPaid += catPaid; grandNet += catNet; grandCusts += catCusts;
+
+    // رأس القناة
+    rowsHTML += `<tr class="cat-header">
+      <td colspan="8" style="background:#1e2c5a;color:#fff;font-weight:800;font-size:11pt;padding:7px 14px;text-align:right;letter-spacing:.3px">
+        📂 ${cat}
+        <span style="float:left;font-size:9pt;font-weight:600;opacity:.85">${reps.length} مندوب — ${fmtN(catNet)} د.ل</span>
+      </td>
+    </tr>`;
+
+    // صفوف المناديب
+    reps.forEach(r => {
+      rowNum++;
+      const pctColor = r.pct >= 80 ? '#059669' : r.pct >= 50 ? '#d97706' : '#dc2626';
+      const statusLabel = r.pct >= 80 ? 'جيد' : r.pct >= 50 ? 'متوسط' : 'ضعيف';
+      const statusBg    = r.pct >= 80 ? '#d1fae5' : r.pct >= 50 ? '#fef3c7' : '#fee2e2';
+      rowsHTML += `<tr>
+        <td style="text-align:center;color:#888">${rowNum}</td>
+        <td style="font-weight:700">${r.name}</td>
+        <td style="text-align:right">${r.custs}</td>
+        <td style="text-align:right;color:#dc2626;font-weight:700">${fmtN(r.total)}</td>
+        <td style="text-align:right;color:#059669;font-weight:700">${fmtN(r.paid)}</td>
+        <td style="text-align:right;font-weight:800;color:${r.net > 0 ? '#dc2626' : '#059669'}">${fmtN(r.net)}</td>
+        <td style="text-align:center;font-weight:700;color:${pctColor}">${fmtPct(r.pct)}</td>
+        <td style="text-align:center"><span style="background:${statusBg};color:${pctColor};padding:2px 10px;border-radius:999px;font-size:9pt;font-weight:700">${statusLabel}</span></td>
+      </tr>`;
+    });
+
+    // subtotal القناة
+    rowsHTML += `<tr class="subtotal-row">
+      <td colspan="2" style="font-weight:800;color:#1e2c5a;text-align:right;padding:6px 12px;background:#eef2ff;border-top:2px solid #c7d2fe">
+        🔹 مجموع ${cat}
+      </td>
+      <td style="text-align:right;font-weight:700;background:#eef2ff;border-top:2px solid #c7d2fe">${catCusts}</td>
+      <td style="text-align:right;font-weight:800;color:#dc2626;background:#eef2ff;border-top:2px solid #c7d2fe">${fmtN(catTotal)}</td>
+      <td style="text-align:right;font-weight:800;color:#059669;background:#eef2ff;border-top:2px solid #c7d2fe">${fmtN(catPaid)}</td>
+      <td style="text-align:right;font-weight:800;color:${catNet > 0 ? '#dc2626' : '#059669'};background:#eef2ff;border-top:2px solid #c7d2fe">${fmtN(catNet)}</td>
+      <td style="text-align:center;font-weight:700;color:${catPct>=80?'#059669':catPct>=50?'#d97706':'#dc2626'};background:#eef2ff;border-top:2px solid #c7d2fe">${fmtPct(catPct)}</td>
+      <td style="background:#eef2ff;border-top:2px solid #c7d2fe"></td>
+    </tr>
+    <tr><td colspan="8" style="height:6px;background:#f8faff"></td></tr>`;
+  });
+
+  // الإجمالي الكلي
+  const grandPct = grandTotal > 0 ? grandPaid / grandTotal * 100 : 0;
+
+  // بناء معلومات الفلاتر
+  const filterParts = [];
+  if (supF) filterParts.push('المشرف: ' + supF);
+  if (repF) filterParts.push('المندوب: ' + repF);
+  if (catF) filterParts.push('القناة: ' + catF);
+  const filterLine = filterParts.length ? '<div style="font-size:9pt;color:#555;margin-top:4px">فلتر: ' + filterParts.join(' | ') + '</div>' : '';
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('ar-LY', { year: 'numeric', month: 'long', day: 'numeric' });
+  const timeStr = now.toLocaleTimeString('ar-LY', { hour: '2-digit', minute: '2-digit' });
+
+  const html = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>ملخص المديونية حسب المندوب — مجمّع حسب القناة البيعية</title>
+<style>
+  @page { size: A4 portrait; margin: 14mm 12mm 14mm 12mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Cairo', 'Tahoma', Arial, sans-serif; font-size: 10pt; direction: rtl; color: #1a1a2e; background: #fff; }
+  .header { text-align: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 3px solid #1e2c5a; }
+  .header .logo-line { font-size: 8pt; color: #666; margin-bottom: 4px; letter-spacing: .5px; }
+  .header h1 { font-size: 16pt; font-weight: 900; color: #1e2c5a; margin-bottom: 2px; }
+  .header h2 { font-size: 11pt; font-weight: 600; color: #4361ee; margin-bottom: 6px; }
+  .header .meta { font-size: 8.5pt; color: #777; }
+  .kpi-bar { display: flex; gap: 8px; margin-bottom: 14px; }
+  .kpi-box { flex: 1; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px 10px; text-align: center; }
+  .kpi-box .lbl { font-size: 8pt; color: #6b7280; margin-bottom: 3px; }
+  .kpi-box .val { font-size: 12pt; font-weight: 800; }
+  table { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+  thead th { background: #1e2c5a; color: #fff; padding: 7px 10px; text-align: right; font-weight: 700; font-size: 9.5pt; }
+  thead th:first-child { text-align: center; width: 28px; }
+  tbody tr:nth-child(even):not(.cat-header):not(.subtotal-row) td { background: #f9fafb; }
+  tbody tr:not(.cat-header):not(.subtotal-row):hover td { background: #eff6ff; }
+  tbody td { padding: 6px 10px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+  tfoot td { padding: 8px 12px; background: #1e2c5a; color: #fff; font-weight: 800; font-size: 10pt; }
+  .footer { margin-top: 14px; font-size: 7.5pt; color: #aaa; text-align: center; border-top: 1px solid #eee; padding-top: 6px; }
+  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="header">
+  <div class="logo-line">شركة ركان المتوسط — الندى</div>
+  <h1>ملخص المديونية حسب المندوب</h1>
+  <h2>مجمّع ومرتّب حسب القناة البيعية</h2>
+  <div class="meta">${dateStr} — ${timeStr}${filterLine?'<br>'+filterLine:''}</div>
+</div>
+
+<div class="kpi-bar">
+  <div class="kpi-box">
+    <div class="lbl">📋 المناديب</div>
+    <div class="val" style="color:#1e2c5a">${rowNum}</div>
+  </div>
+  <div class="kpi-box">
+    <div class="lbl">📂 القنوات البيعية</div>
+    <div class="val" style="color:#4361ee">${sortedCats.length}</div>
+  </div>
+  <div class="kpi-box">
+    <div class="lbl">👥 العملاء</div>
+    <div class="val" style="color:#6d28d9">${grandCusts}</div>
+  </div>
+  <div class="kpi-box">
+    <div class="lbl">💳 إجمالي مدين</div>
+    <div class="val" style="color:#dc2626">${fmtN(grandTotal)}</div>
+  </div>
+  <div class="kpi-box">
+    <div class="lbl">✅ إجمالي دائن</div>
+    <div class="val" style="color:#059669">${fmtN(grandPaid)}</div>
+  </div>
+  <div class="kpi-box">
+    <div class="lbl">⚖️ صافي المديونية</div>
+    <div class="val" style="color:${grandNet > 0 ? '#dc2626' : '#059669'}">${fmtN(grandNet)}</div>
+  </div>
+  <div class="kpi-box">
+    <div class="lbl">📊 نسبة السداد</div>
+    <div class="val" style="color:${grandPct>=80?'#059669':grandPct>=50?'#d97706':'#dc2626'}">${fmtPct(grandPct)}</div>
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>المندوب</th>
+      <th style="text-align:right">العملاء</th>
+      <th style="text-align:right">إجمالي مدين</th>
+      <th style="text-align:right">إجمالي دائن</th>
+      <th style="text-align:right">صافي المديونية</th>
+      <th style="text-align:center">نسبة السداد</th>
+      <th style="text-align:center">الحالة</th>
+    </tr>
+  </thead>
+  <tbody>${rowsHTML}</tbody>
+  <tfoot>
+    <tr>
+      <td colspan="2" style="text-align:right">📊 الإجمالي الكلي — ${sortedCats.length} قناة / ${rowNum} مندوب</td>
+      <td style="text-align:right">${grandCusts}</td>
+      <td style="text-align:right;color:#fca5a5">${fmtN(grandTotal)}</td>
+      <td style="text-align:right;color:#6ee7b7">${fmtN(grandPaid)}</td>
+      <td style="text-align:right;color:${grandNet>0?'#fca5a5':'#6ee7b7'};font-size:11pt">${fmtN(grandNet)}</td>
+      <td style="text-align:center;color:${grandPct>=80?'#6ee7b7':grandPct>=50?'#fde68a':'#fca5a5'}">${fmtPct(grandPct)}</td>
+      <td></td>
+    </tr>
+  </tfoot>
+</table>
+
+<div class="footer">تم إنشاء هذا التقرير تلقائياً من لوحة التحليل الاستراتيجي — الندى | ${dateStr}</div>
+</body>
+</html>`;
+
+  const w = window.open('', '_blank', 'width=900,height=700');
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(() => { w.print(); }, 600);
 }
 
 function printDebtTable(){
@@ -16951,6 +17158,7 @@ function printDebtTable(){
     title:'جدول المديونية التفصيلي',
     tableWrapId:'debt-table-wrap',
     landscape:true,
+    hideAuthor:true,
     filterDefs:[
       {label:'الحساب',id:'f-debt-search'},
       {label:'المندوب',id:'f-debt-rep'},
@@ -16994,6 +17202,7 @@ function printInventoryTable(){
     title:'جدول جرد المخازن',
     tableWrapId:'inv-table-wrap',
     landscape:true,
+    hideAuthor:true,
     filterDefs:[
       {label:'المستودع',id:'f-inv-wh'},
       {label:'المادة',id:'f-inv-search'},
