@@ -16678,7 +16678,8 @@ thead th{background:#4361ee;color:#fff;font-weight:700;padding:5px 3px;text-alig
 tbody tr:nth-child(even){background:#f7f8fc}
 tbody tr:nth-child(odd){background:#fff}
 tbody td{padding:3px 3px;border-bottom:1px solid #eef0f6;color:#1e2749;vertical-align:middle;font-size:${fs}px;white-space:nowrap}
-tfoot{display:table-footer-group}
+tfoot{display:none}
+.tfoot-as-row td,.tfoot-as-row th{background:#dde3ff;font-weight:800;color:#1e2749;padding:5px 3px;border-top:2.5px solid #4361ee;border-bottom:2.5px solid #4361ee;font-size:${fs}px;white-space:nowrap}
 tfoot td,tfoot th{background:#dde3ff;font-weight:800;color:#1e2749;padding:5px 3px;border-top:2.5px solid #4361ee;border-bottom:2.5px solid #4361ee;font-size:${fs}px;white-space:nowrap}
 [style*="color:var"]{color:#1e2749!important}
 [style*="background:var"]{background:transparent!important}
@@ -16691,7 +16692,7 @@ tfoot td,tfoot th{background:#dde3ff;font-weight:800;color:#1e2749;padding:5px 3
 .print-footer .pf-right{color:#4361ee;font-weight:700}
 @media print{
   body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  thead{display:table-header-group}tfoot{display:table-footer-group}tbody{display:table-row-group}
+  thead{display:table-header-group}tfoot{display:none}tbody{display:table-row-group}
   tr{page-break-inside:avoid}
   .print-footer{display:flex;position:static;margin-top:6mm;padding-top:4px;border-top:1px solid #e4e6ef;font-size:8px;color:#9ba5bf}
 }
@@ -16745,8 +16746,7 @@ tfoot td,tfoot th{background:#dde3ff;font-weight:800;color:#1e2749;padding:5px 3
 <div class="filter-strip"><span class="fl-label">🔍 الفلاتر المطبّقة:</span> ${filterHTML}</div>
 <table>
   <thead>${theadHTML}</thead>
-  <tbody>${tbodyHTML}</tbody>
-  ${tfootHTML?`<tfoot>${tfootHTML}</tfoot>`:''}
+  <tbody>${tbodyHTML}${tfootHTML?`<tr class="tfoot-as-row">${tfootHTML.replace(/<\/?tr[^>]*>/g,'')}</tr>`:''}</tbody>
 </table>
 <div class="print-footer">
   <div>© 2026 شركة ركان المتوسط — جميع الحقوق محفوظة</div>
