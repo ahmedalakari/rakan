@@ -16690,7 +16690,7 @@ tfoot td,tfoot th{background:#dde3ff;font-weight:800;color:#1e2749;padding:5px 3
 .print-footer{margin-top:6mm;padding-top:4px;border-top:1px solid #e4e6ef;display:flex;align-items:center;justify-content:space-between;font-size:8px;color:#9ba5bf}
 .print-footer .pf-right{color:#4361ee;font-weight:700}
 @media print{
-  body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{-webkit-print-color-adjust:exact;print-color-adjust:exact;padding-bottom:16mm}
   thead{display:table-header-group}tfoot{display:table-footer-group}tbody{display:table-row-group}
   tr{page-break-inside:avoid}
   .print-footer{position:fixed;bottom:0;left:0;right:0;padding:0 8mm;height:12mm;background:#fff;border-top:1px solid #e4e6ef;display:flex;align-items:center;justify-content:space-between;font-size:8px;color:#9ba5bf;margin-top:0}
@@ -17065,14 +17065,16 @@ function printDebtRepTable(){
   .kpi-box .lbl { font-size: 8pt; color: #6b7280; margin-bottom: 3px; }
   .kpi-box .val { font-size: 12pt; font-weight: 800; }
   table { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+  thead { display: table-header-group; }
+  tfoot { display: none; }
   thead th { background: #1e2c5a; color: #fff; padding: 7px 10px; text-align: right; font-weight: 700; font-size: 9.5pt; }
   thead th:first-child { text-align: center; width: 28px; }
-  tbody tr:nth-child(even):not(.cat-header):not(.subtotal-row) td { background: #f9fafb; }
-  tbody tr:not(.cat-header):not(.subtotal-row):hover td { background: #eff6ff; }
+  tbody tr:nth-child(even):not(.cat-header):not(.subtotal-row):not(.grand-total-row) td { background: #f9fafb; }
   tbody td { padding: 6px 10px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
-  tfoot td { padding: 8px 12px; background: #1e2c5a; color: #fff; font-weight: 800; font-size: 10pt; }
+  .grand-total-row td { background: #1e2c5a !important; color: #fff; font-weight: 800; font-size: 10pt; padding: 8px 12px; border-top: 3px solid #4361ee; }
+  .grand-total-row { page-break-inside: avoid; }
   .footer { margin-top: 14px; font-size: 7.5pt; color: #aaa; text-align: center; border-top: 1px solid #eee; padding-top: 6px; }
-  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .header { page-break-after: avoid; } .kpi-bar { page-break-after: avoid; } }
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 </head>
@@ -17128,9 +17130,8 @@ function printDebtRepTable(){
       <th style="text-align:center">الحالة</th>
     </tr>
   </thead>
-  <tbody>${rowsHTML}</tbody>
-  <tfoot>
-    <tr>
+  <tbody>${rowsHTML}
+    <tr class="grand-total-row">
       <td colspan="2" style="text-align:right">📊 الإجمالي الكلي — ${sortedCats.length} قناة / ${rowNum} مندوب</td>
       <td style="text-align:right">${grandCusts}</td>
       <td style="text-align:right;color:#fca5a5">${fmtN(grandTotal)}</td>
@@ -17139,7 +17140,7 @@ function printDebtRepTable(){
       <td style="text-align:center;color:${grandPct>=80?'#6ee7b7':grandPct>=50?'#fde68a':'#fca5a5'}">${fmtPct(grandPct)}</td>
       <td></td>
     </tr>
-  </tfoot>
+  </tbody>
 </table>
 
 <div class="footer">تم إنشاء هذا التقرير تلقائياً من لوحة التحليل الاستراتيجي — الندى | ${dateStr}</div>
