@@ -14982,8 +14982,8 @@ async function exportCollectionExcel(){
   toast('⏳ جارٍ إعداد الملف...','info');
 
   const _n=v=>_parseNum(v);
-  const _isB=r=>{const a=String(r['الحساب المقابل']||'');return a.includes('مصرف')||a.includes('بنك')||a.includes('بطاقة');};
   const _isC=r=>(r['النوع']||'').trim().includes('مقبوضات الصندوق');
+  const _isB=r=>!_isC(r); // يطابق اللوحة: كل ما ليس نقدياً = بنكي/حوالة
   const _isBank=_isB, _isCash=_isC;
   const mnNames={1:'يناير',2:'فبراير',3:'مارس',4:'أبريل',5:'مايو',6:'يونيو',7:'يوليو',8:'أغسطس',9:'سبتمبر',10:'أكتوبر',11:'نوفمبر',12:'ديسمبر'};
 
@@ -14999,12 +14999,12 @@ async function exportCollectionExcel(){
   const cashGross2 = cashRows.reduce((s,r)=>s+_n(r['دائن']),0);
   const addTotal   = addRows.reduce((s,r)=>s+_n(r['دائن']),0);
   const dedTotal   = deductRows.reduce((s,r)=>s+_n(r['مدين']),0);
-  const dedBank2   = deductRows.filter(_isB).reduce((s,r)=>s+_n(r['مدين']),0);
   const dedCash2   = deductRows.filter(_isC).reduce((s,r)=>s+_n(r['مدين']),0);
-  const bankNet2   = Math.max(0,bankGross2+addTotal-dedBank2);
-  const bankTotal  = bankGross2;
   const cashTotal  = Math.max(0,cashGross2-dedCash2);
-  const netTotal   = D.kpis.total_collected || Math.max(0, bankTotal+cashTotal+addTotal-dedTotal);
+  // صافي التحصيل الكلي = المصدر الرئيسي (يطابق اللوحة)
+  const netTotal   = D.kpis.total_collected || Math.max(0, bankGross2+cashGross2+addTotal-dedTotal);
+  // حوالات = إجمالي − نقدي (يطابق معادلة اللوحة بالضبط)
+  const bankNet2   = Math.max(0, netTotal - cashTotal);
   const pct = (v,t)=>t>0?(v/t*100).toFixed(1)+'%':'0%';
 
   // ── شهري ────────────────────────────────────────────────────────────────────
@@ -15160,7 +15160,7 @@ async function exportCollectionExcel(){
   // بطاقات KPI — صف 7 (إضافات/خصومات)
   const kpiCols7=[
     ['➕ إضافات مكتشفة','','➖ خصومات مكتشفة','','📊 نسبة الحوالات',''],
-    [addTotal,'',dedTotal,'',pct(bankGross2,netTotal),''],
+    [addTotal,'',dedTotal,'',pct(bankNet2,netTotal),''],
     [addRows.length+' سند موزّع','',deductRows.length+' حركة ملغاة','','من صافي التحصيل',''],
   ];
   const kpiMerges7=[['A7:B7','C7:D7','E7:F7'],['A8:B8','C8:D8','E8:F8'],['A9:B9','C9:D9','E9:F9']];
@@ -15231,8 +15231,10 @@ async function exportCollectionExcel(){
   let r3=3;
   allReps.forEach((rep,ri)=>{
     const nv=(repN[rep]||0)+(repA[rep]||0),dv=repD[rep]||0;
-    const repBankNet=Math.max(0,(repBk[rep]||0)+(repA[rep]||0)-(repD[rep]||0));
-    addDataRow(ws3,[ri+1,rep,nv,dv,Math.max(0,nv-dv),repBankNet,repCk[rep]||0],r3++,{bg:ri%2===0?C.subtleRow:C.white});
+    const repNetCol=Math.max(0,nv-dv);
+    const repCash=repCk[rep]||0;
+    const repBankNet=Math.max(0,repNetCol-repCash);
+    addDataRow(ws3,[ri+1,rep,nv,dv,repNetCol,repBankNet,repCash],r3++,{bg:ri%2===0?C.subtleRow:C.white});
   });
   const t3n=allReps.reduce((s,r)=>s+(repN[r]||0)+(repA[r]||0),0);
   const t3d=allReps.reduce((s,r)=>s+(repD[r]||0),0);
