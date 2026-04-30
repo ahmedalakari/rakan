@@ -3039,6 +3039,10 @@ html, body {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
             📅 تقرير المناديب اليومي
           </button>
+          <button onclick="printRepsSummary()" title="طباعة ملخص المناديب" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r-md);border:1.5px solid var(--accent);background:var(--accent);color:#fff;font-family:Cairo,sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .18s;box-shadow:0 1px 4px rgba(44,93,229,.3)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            📋 ملخص المناديب
+          </button>
         </div>
       </div>
       <div class="filter-bar" style="margin:12px 16px 0;border-radius:var(--r-md)">
@@ -3073,7 +3077,7 @@ html, body {
           <option value="gap|desc">ترتيب: الفجوة ↓</option>
           <option value="name|asc">ترتيب: الاسم أ-ي</option>
         </select>
-        <button class="btn" onclick="['f-rep-sup','f-rep-select','f-rep-cat','f-rep-month','f-rep-from','f-rep-to','f-rep-sort','f-rep-view'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});window._repSort=null;const rt=document.getElementById('reps-table-wrap');if(rt)rt.className='table-wrap table-compact';renderRepPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
+        <button class="btn" onclick="['f-rep-sup','f-rep-select','f-rep-cat','f-rep-month','f-rep-from','f-rep-to','f-rep-sort','f-rep-view'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});window._repSort=null;const rt=document.getElementById('reps-table-wrap');if(rt)rt.className='table-wrap table-compact';clearFilterCache();renderRepPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap table-sticky-col" id="reps-table-wrap"></div>
       <div class="table-stat-bar" id="reps-stat-bar"></div>
@@ -3194,7 +3198,7 @@ html, body {
           <option value="debt">عرض: المديونية</option>
           <option value="cat">عرض: بيانات القناة البيعية</option>
         </select>
-        <button class="btn" onclick="['f-cust-sup','f-cust-search','f-cust-rep','f-cust-repcatf','f-cust-cat','f-cust-aging','f-cust-month','f-cust-from','f-cust-to','f-cust-view'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});const ct=document.getElementById('cust-table-wrap');if(ct)ct.className='table-wrap table-compact';renderCustomersPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
+        <button class="btn" onclick="['f-cust-sup','f-cust-search','f-cust-rep','f-cust-repcatf','f-cust-cat','f-cust-aging','f-cust-month','f-cust-from','f-cust-to','f-cust-view'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});const ct=document.getElementById('cust-table-wrap');if(ct)ct.className='table-wrap table-compact';clearFilterCache();renderCustomersPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap table-sticky-col" id="cust-table-wrap"></div>
       <div class="table-stat-bar" id="cust-stat-bar"></div>
@@ -3249,7 +3253,7 @@ html, body {
           <option value="qty">عرض: الكميات</option>
           <option value="ret">عرض: المرتجعات</option>
         </select>
-        <button class="btn" onclick="['f-prod-sup','f-prod-search','f-prod-rep','f-prod-cat','f-prod-cust','f-prod-month','f-prod-from','f-prod-to','f-prod-view'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});const pt=document.getElementById('prod-table-wrap');if(pt)pt.className='table-wrap table-compact';renderProductsPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
+        <button class="btn" onclick="['f-prod-sup','f-prod-search','f-prod-rep','f-prod-cat','f-prod-cust','f-prod-month','f-prod-from','f-prod-to','f-prod-view'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});const pt=document.getElementById('prod-table-wrap');if(pt)pt.className='table-wrap table-compact';clearFilterCache();renderProductsPage()" title="إعادة تعيين"><svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </div>
       <div class="table-wrap table-sticky-col" id="prod-table-wrap"></div>
       <div class="table-stat-bar" id="prod-stat-bar"></div>
@@ -5041,16 +5045,18 @@ const PAGE_RENDERS={'overview':renderOverviewPage,'sales':renderSalesPage,'reps'
 // ══════════════════════════════════════════════════════
 //  DEBOUNCED RENDER WRAPPERS — يمنع التجمّد عند الكتابة
 // ══════════════════════════════════════════════════════
-const renderSalesPageD     = debounce(renderSalesPage,    200);
-const renderRepPageD       = debounce(renderRepPage,      200);
-const renderCustomersPageD = debounce(renderCustomersPage,200);
-const renderProductsPageD  = debounce(renderProductsPage, 200);
-const renderDebtPageD      = debounce(renderDebtPage,     200);
-const renderAgingPageD     = debounce(renderAgingPage,    200);
-const renderCollectionPageD= debounce(renderCollectionPage,200);
-const renderInventoryPageD = debounce(renderInventoryPage,200);
-const renderRepGoalsPageD  = debounce(renderRepGoalsPage, 200);
-const renderMizanPageD     = debounce(renderMizanPage,    250);
+// ── تمرير clearFilterCache تلقائياً قبل كل render مُسبب من فلتر ──
+function _wrapWithCacheClear(fn){ return function(...args){ clearFilterCache(); return fn.apply(this,args); }; }
+const renderSalesPageD     = debounce(_wrapWithCacheClear(renderSalesPage),    200);
+const renderRepPageD       = debounce(_wrapWithCacheClear(renderRepPage),      200);
+const renderCustomersPageD = debounce(_wrapWithCacheClear(renderCustomersPage),200);
+const renderProductsPageD  = debounce(_wrapWithCacheClear(renderProductsPage), 200);
+const renderDebtPageD      = debounce(_wrapWithCacheClear(renderDebtPage),     200);
+const renderAgingPageD     = debounce(_wrapWithCacheClear(renderAgingPage),    200);
+const renderCollectionPageD= debounce(_wrapWithCacheClear(renderCollectionPage),200);
+const renderInventoryPageD = debounce(_wrapWithCacheClear(renderInventoryPage),200);
+const renderRepGoalsPageD  = debounce(_wrapWithCacheClear(renderRepGoalsPage), 200);
+const renderMizanPageD     = debounce(_wrapWithCacheClear(renderMizanPage),    250);
 
 
 let currentPage='overview';
@@ -15125,8 +15131,8 @@ async function exportCollectionExcel(){
   // بطاقات KPI — صف 3
   const kpiCols3=[
     ['💰 إجمالي التحصيل','','🏦 حوالات مصرفية','','💵 تحصيلات نقدية',''],
-    [netTotal,'',bankGross2,'',cashGross2,''],
-    ['بعد الخصم والإضافة','',pct(bankGross2,netTotal)+' من الإجمالي','',pct(cashGross2,netTotal)+' من الإجمالي',''],
+    [netTotal,'',bankNet2,'',cashTotal,''],
+    ['بعد الخصم والإضافة','',pct(bankNet2,netTotal)+' من الإجمالي','',pct(cashTotal,netTotal)+' من الإجمالي',''],
   ];
   const kpiMerges3=[['A3:B3','C3:D3','E3:F3'],['A4:B4','C4:D4','E4:F4'],['A5:B5','C5:D5','E5:F5']];
   const kpiColors3=[C.accentGreen,C.accentPurple,C.accentBlue];
@@ -15225,12 +15231,13 @@ async function exportCollectionExcel(){
   let r3=3;
   allReps.forEach((rep,ri)=>{
     const nv=(repN[rep]||0)+(repA[rep]||0),dv=repD[rep]||0;
-    addDataRow(ws3,[ri+1,rep,nv,dv,Math.max(0,nv-dv),repBk[rep]||0,repCk[rep]||0],r3++,{bg:ri%2===0?C.subtleRow:C.white});
+    const repBankNet=Math.max(0,(repBk[rep]||0)+(repA[rep]||0)-(repD[rep]||0));
+    addDataRow(ws3,[ri+1,rep,nv,dv,Math.max(0,nv-dv),repBankNet,repCk[rep]||0],r3++,{bg:ri%2===0?C.subtleRow:C.white});
   });
   const t3n=allReps.reduce((s,r)=>s+(repN[r]||0)+(repA[r]||0),0);
   const t3d=allReps.reduce((s,r)=>s+(repD[r]||0),0);
   addTotalRow(ws3,['','الإجمالي',t3n,t3d,Math.max(0,t3n-t3d),
-    allReps.reduce((s,r)=>s+(repBk[r]||0),0),allReps.reduce((s,r)=>s+(repCk[r]||0),0)],r3);
+    bankNet2,cashTotal],r3);
 
   // ══════════════════════════════════════════════════
   // ورقة 4: سندات التحصيل
@@ -15698,6 +15705,15 @@ function toggleTodayFilter(){
 
 let GF = { sup:'', rep:'', cat:'', month:'', dateFrom:'', dateTo:'' };
 
+// ── قراءة قيمة الفلتر مع مراعاة حالة التجميد ──────────────────────────────
+// إذا كان العنصر مجمّداً بالفلتر الشامل → أعد قيمة GF مباشرة
+function _fv(id, gfKey){
+  const el = document.getElementById(id);
+  if(!el) return (gfKey && GF[gfKey]) ? GF[gfKey] : '';
+  if(el.disabled && gfKey && GF[gfKey]) return GF[gfKey];
+  return el.value || '';
+}
+
 function toggleGlobalFilter(){
   const bar = document.getElementById('global-filter-bar');
   const btn = document.getElementById('gf-toggle-btn');
@@ -15718,14 +15734,21 @@ function resetGlobalFilter(){
   const gfCat=document.getElementById('gf-cat'); if(gfCat) gfCat.value='';
   const gfRep=document.getElementById('gf-rep'); if(gfRep) gfRep.value='';
   populateRepSelectsAndCats();
-  // إزالة التجميد عن جميع فلاتر الصفحات
+  // 1) أفرج عن جميع الفلاتر المجمّدة أولاً
   document.querySelectorAll('.gf-locked').forEach(el=>{
     el.classList.remove('gf-locked');
     el.disabled=false;
   });
   document.querySelectorAll('.gf-lock-notice').forEach(n=>n.remove());
+  // 2) مسح قيم الفلاتر المحلية (بعد رفع disabled)
+  _syncPageFiltersFromGF(); // GF فارغ الآن → سيمسح جميع القيم
+  // 3) إعادة بناء البيانات
+  clearFilterCache();
   _applyGFtoD();
   _updateGFBadge();
+  // 4) إعادة تعبئة قوائم المناديب والفئات
+  populateRepSelectsAndCats();
+  // 5) إعادة الرسم بعد اكتمال المسح
   if(PAGE_RENDERS[currentPage]) PAGE_RENDERS[currentPage]();
   toast('✅ تم إلغاء الفلتر الشامل','info');
 }
@@ -15749,6 +15772,7 @@ const _REP_CAT_PAIRS = [
 
 // ── عند تغيير الفئة: صفّي قائمة المناديب مع مراعاة المشرف ──────────────
 function _onCatChange(repId, catId, renderFn, supId){
+  clearFilterCache();
   const cat = document.getElementById(catId)?.value || '';
   const sup = supId ? document.getElementById(supId)?.value||'' : '';
   const allReps = D.reps || Object.keys(D.sales_by_rep || {});
@@ -15768,6 +15792,7 @@ function _onCatChange(repId, catId, renderFn, supId){
 
 // ── عند تغيير المندوب: اختر فئته ومشرفه تلقائياً ──────────────────────
 function _onRepChange(repId, catId, renderFn, supId){
+  clearFilterCache();
   const rep = document.getElementById(repId)?.value || '';
   if(rep){
     const rcMap = _buildRepCatMap();
@@ -15792,10 +15817,10 @@ function _initRepCatPairs(){
     const repEl = document.getElementById(repId);
     const catEl = document.getElementById(catId);
     const supEl = supId ? document.getElementById(supId) : null;
-    if(repEl) repEl.onchange = ()=>_onRepChange(repId, catId, fn, supId);
-    if(catEl) catEl.onchange = ()=>_onCatChange(repId, catId, fn, supId);
+    if(repEl) repEl.onchange = ()=>{ if(repEl.disabled) return; _onRepChange(repId, catId, fn, supId); };
+    if(catEl) catEl.onchange = ()=>{ if(catEl.disabled) return; _onCatChange(repId, catId, fn, supId); };
     if(supEl) supEl.onchange = ()=>{
-      // عند تغيير المشرف: حدّث قائمة المناديب والفئات ثم ارسم
+      if(supEl.disabled) return;
       _onSupChange(repId, supId, null);
       if(fn) fn();
     };
@@ -15859,9 +15884,11 @@ function applyGlobalFilter(){
     GF.monthYearMode = false;
   }
 
+  clearFilterCache();
   _applyGFtoD();
   _updateGFBadge();
   _syncPageFiltersFromGF();
+  populateRepSelectsAndCats();
   if(PAGE_RENDERS[currentPage]) PAGE_RENDERS[currentPage]();
 }
 
@@ -15912,14 +15939,12 @@ function _syncPageFiltersFromGF(){
     const el = document.getElementById(id);
     if(!el) return;
     if(active && gfValues[gfKey]){
-      // إذا كان العنصر select ولم يوجد الخيار بعد → أضفه مؤقتاً
+      // فلتر الـ GF نشط وله قيمة → اضبط القيمة وجمّد
       if(el.tagName === 'SELECT'){
         let val = gfValues[gfKey];
-        // f-rpt-month يستخدم YYYY-MM بينما gf-month يستخدم رقم الشهر → تحويل
         if(id === 'f-rpt-month' && val && /^\d{1,2}$/.test(val)){
           const yr = new Date().getFullYear();
           const mo = String(+val).padStart(2,'0');
-          // ابحث عن الخيار المناسب في القائمة (أي سنة)
           const matchOpt = Array.from(el.options).find(o => o.value.endsWith('-'+mo));
           val = matchOpt ? matchOpt.value : `${yr}-${mo}`;
         }
@@ -15937,10 +15962,14 @@ function _syncPageFiltersFromGF(){
       el.classList.add('gf-locked');
       el.disabled = true;
     } else if(active && !gfValues[gfKey]){
-      el.classList.add('gf-locked');
-      el.disabled = true;
+      // فلتر الـ GF نشط لكن هذا المفتاح فارغ → حرّر الفلتر المحلي (لا تجمّده)
+      if(el.tagName === 'SELECT'){
+        Array.from(el.querySelectorAll('[data-gf-injected]')).forEach(o=>o.remove());
+      }
+      el.classList.remove('gf-locked');
+      el.disabled = false;
     } else {
-      // عند الإلغاء: احذف الخيارات المحقونة وامسح القيمة
+      // GF غير نشط → احذف الخيارات المحقونة وامسح القيمة وحرّر
       if(el.tagName === 'SELECT'){
         Array.from(el.querySelectorAll('[data-gf-injected]')).forEach(o=>o.remove());
       }
@@ -15964,6 +15993,43 @@ function _syncPageFiltersFromGF(){
     }
   });
 }
+
+// ── مستمع عالمي لتغيير الفلاتر المحلية (يضمن الـrender حتى لو لم يشتغل onchange) ──
+(function(){
+  const _filterIds = [
+    'f-sales-rep','f-sales-cat','f-sales-month','f-sales-type','f-sales-sup','f-sales-from','f-sales-to',
+    'f-rep-select','f-rep-cat','f-rep-month','f-rep-sup','f-rep-from','f-rep-to','f-rep-sort','f-rep-view',
+    'f-rpt-sup','f-rpt-rep','f-rpt-cat','f-rpt-month','f-rpt-from','f-rpt-to',
+    'f-cust-sup','f-cust-rep','f-cust-repcatf','f-cust-cat','f-cust-aging','f-cust-month','f-cust-from','f-cust-to',
+    'f-prod-sup','f-prod-rep','f-prod-cat','f-prod-month','f-prod-from','f-prod-to',
+    'f-debt-sup','f-debt-rep','f-debt-cat','f-debt-type',
+    'f-aging-sup','f-aging-rep','f-aging-cat','f-aging-bucket',
+    'f-coll-sup','f-coll-rep','f-coll-cat','f-coll-month','f-coll-type','f-coll-from','f-coll-to',
+    'f-exp-from','f-exp-to',
+  ];
+  const _filterPageMap = {
+    'f-sales-':()=>renderSalesPage(),
+    'f-rep-':()=>renderRepPage(),
+    'f-rpt-':()=>renderRepGoalsPage ? renderRepGoalsPage() : null,
+    'f-cust-':()=>renderCustomersPage(),
+    'f-prod-':()=>renderProductsPage(),
+    'f-debt-':()=>renderDebtPage(),
+    'f-aging-':()=>renderAgingPage(),
+    'f-coll-':()=>renderCollectionPage(),
+    'f-exp-':()=>renderExpensesPage ? renderExpensesPage() : null,
+  };
+  document.addEventListener('change', function(e){
+    const el = e.target;
+    if(!el || !el.id) return;
+    if(el.disabled) return; // مجمّد بالفلتر الشامل → تجاهل
+    if(!_filterIds.includes(el.id)) return;
+    clearFilterCache(); // مسح الكاش عند كل تغيير فلتر
+    // ابحث عن الدالة المقابلة
+    for(const [prefix, fn] of Object.entries(_filterPageMap)){
+      if(el.id.startsWith(prefix)){ try{ fn(); }catch(ex){} return; }
+    }
+  }, true); // capture phase لضمان الأولوية
+})();
 
 function _updateGFBadge(){
   const active = GF.sup||GF.rep||GF.cat||GF.month||GF.dateFrom||GF.dateTo;
@@ -20809,18 +20875,18 @@ function _frmCalc(){
   const netSales = sales - returns;
   const netQty   = qty - retQty;
 
-  // التحصيل بين تاريخين من collection_table
+  // التحصيل بين تاريخين — نستخدم _colTag المحسوبة مسبقاً لضمان التطابق مع اللوحة
   let collected = 0;
   (D.collection_table||[]).forEach(r=>{
     const _c = s=>String(s||'').trim();
     const dateStr = _c(String(r['التاريخ']||'')).substring(0,10);
     if(!dateStr || dateStr < from || dateStr > to) return;
-    const cls = _classifyCollectionRow ? _classifyCollectionRow(r, _parseNum, _c) : 'normal';
-    if(cls==='skip') return;
+    const tag = r._colTag || '';
+    if(tag === 'تجاهل') return;
     const credit = _parseNum(r['دائن']||0);
     const debit  = _parseNum(r['مدين']||0);
-    if(cls==='deduct') collected -= debit;
-    else collected += credit;
+    if(tag === 'خصم') collected -= debit;
+    else if(credit > 0) collected += credit;
   });
 
   const pct = netSales > 0 ? (collected/netSales*100).toFixed(1) : 0;
@@ -20854,12 +20920,12 @@ function _frmCalcDay(){
     const _c = s=>String(s||'').trim();
     const dateStr = _c(String(r['التاريخ']||'')).substring(0,10);
     if(dateStr !== day) return;
-    const cls = _classifyCollectionRow ? _classifyCollectionRow(r, _parseNum, _c) : 'normal';
-    if(cls==='skip') return;
+    const tag = r._colTag || '';
+    if(tag === 'تجاهل') return;
     const credit = _parseNum(r['دائن']||0);
     const debit  = _parseNum(r['مدين']||0);
-    if(cls==='deduct') collected -= debit;
-    else collected += credit;
+    if(tag === 'خصم') collected -= debit;
+    else if(credit > 0) collected += credit;
   });
 
   _frmSet('frm-day-sales', _frmFmt(sales - returns));
@@ -22016,6 +22082,229 @@ if(document.fonts&&document.fonts.ready){
    - تحصيلات اليوم السابق (D-1)
    - مرتّبون حسب المشرف، صفحة لكل مشرف
 ══════════════════════════════════════════════════════════════════ */
+/* ── طباعة ملخص المناديب — مع نافذة اختيار التجميع ── */
+function printRepsSummary(){
+  const data = PAG_STATE['reps']?.data || [];
+  if(!data.length){ alert('لا توجد بيانات للطباعة'); return; }
+
+  // ── جمع قوائم المشرفين والقنوات ──
+  const sups = [...new Set(data.map(r=>(D._repSuperMap&&D._repSuperMap[r.name])||'').filter(s=>s&&!['ترك الفرع','موقوف',''].includes(s)))].sort();
+  const cats = [...new Set(data.map(r=>(D._repCatMap&&D._repCatMap[r.name])||'').filter(Boolean))].sort();
+
+  // ── فتح Modal الاختيار ──
+  let modal = document.getElementById('_repSummaryModal');
+  if(modal) modal.remove();
+  modal = document.createElement('div');
+  modal.id = '_repSummaryModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;font-family:Cairo,sans-serif;direction:rtl';
+  modal.innerHTML = `
+    <div style="background:var(--surface,#fff);border-radius:18px;padding:28px 32px;width:380px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.25);border:1px solid var(--border,#e8eaf5)">
+      <div style="font-size:17px;font-weight:800;color:var(--text,#1a2240);margin-bottom:18px">🖨️ خيارات طباعة ملخص المناديب</div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:12px;color:var(--text2,#5a6482);font-weight:600;margin-bottom:7px">تجميع حسب:</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <label style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:10px 13px;border-radius:10px;border:1.5px solid var(--border,#e8eaf5);transition:all .15s" id="_rsOpt_none">
+            <input type="radio" name="_rsGroup" value="none" checked style="accent-color:var(--accent,#2c5de5);width:15px;height:15px">
+            <span style="font-size:13px;font-weight:600">👥 كل المناديب بدون تجميع</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:10px 13px;border-radius:10px;border:1.5px solid var(--border,#e8eaf5);transition:all .15s" id="_rsOpt_sup">
+            <input type="radio" name="_rsGroup" value="sup" style="accent-color:var(--accent,#2c5de5);width:15px;height:15px">
+            <span style="font-size:13px;font-weight:600">🏢 تصنيف حسب المشرف <span style="color:var(--muted,#9ba5c0);font-weight:400">(${sups.length} مشرف)</span></span>
+          </label>
+          <label style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:10px 13px;border-radius:10px;border:1.5px solid var(--border,#e8eaf5);transition:all .15s" id="_rsOpt_cat">
+            <input type="radio" name="_rsGroup" value="cat" style="accent-color:var(--accent,#2c5de5);width:15px;height:15px">
+            <span style="font-size:13px;font-weight:600">📂 تصنيف حسب القناة البيعية <span style="color:var(--muted,#9ba5c0);font-weight:400">(${cats.length} قناة)</span></span>
+          </label>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+        <button onclick="document.getElementById('_repSummaryModal').remove()" style="padding:9px 20px;border-radius:10px;border:1.5px solid var(--border,#e8eaf5);background:var(--surface2,#f7f8fc);color:var(--text,#1a2240);font-family:Cairo,sans-serif;font-size:13px;font-weight:600;cursor:pointer">إلغاء</button>
+        <button onclick="_doRepSummaryPrint()" style="padding:9px 22px;border-radius:10px;border:none;background:var(--accent,#2c5de5);color:#fff;font-family:Cairo,sans-serif;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(44,93,229,.35)">🖨️ طباعة</button>
+      </div>
+    </div>`;
+  // تمييز الخيار المحدد
+  modal.querySelectorAll('input[name="_rsGroup"]').forEach(inp=>{
+    inp.addEventListener('change',()=>{
+      modal.querySelectorAll('label[id^="_rsOpt"]').forEach(l=>l.style.borderColor='var(--border,#e8eaf5)');
+      inp.closest('label').style.borderColor='var(--accent,#2c5de5)';
+      inp.closest('label').style.background='rgba(44,93,229,.05)';
+    });
+  });
+  // تعيين التمييز الابتدائي
+  modal.querySelector('#_rsOpt_none').style.borderColor='var(--accent,#2c5de5)';
+  modal.querySelector('#_rsOpt_none').style.background='rgba(44,93,229,.05)';
+  document.body.appendChild(modal);
+}
+
+function _doRepSummaryPrint(){
+  const groupBy = document.querySelector('input[name="_rsGroup"]:checked')?.value || 'none';
+  document.getElementById('_repSummaryModal')?.remove();
+
+  const data = PAG_STATE['reps']?.data || [];
+  const fmt2 = v=>(v||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fmtQ = v=>(v||0).toLocaleString('en-US');
+  const now  = new Date();
+  const dateStr = now.toLocaleDateString('ar-LY',{year:'numeric',month:'long',day:'numeric'});
+  const fromV = document.getElementById('f-rep-from')?.value||'';
+  const toV   = document.getElementById('f-rep-to')?.value||'';
+  const dateRange = fromV&&toV?`${fromV} — ${toV}`:fromV?`من ${fromV}`:toV?`إلى ${toV}`:'كل الفترات';
+
+  // ── دالة بناء مجموعة من صفوف ──
+  const buildGroup = (rows, groupLabel) => {
+    if(!rows.length) return '';
+    const totNet  = rows.reduce((s,r)=>s+r.netSales,0);
+    const totNetQ = rows.reduce((s,r)=>s+Math.max(0,(r.qty||0)-(r.retQty||0)),0);
+    const totCol  = rows.reduce((s,r)=>s+r.col,0);
+    const totRoi  = totNet>0?(totCol/totNet*100).toFixed(1):'0.0';
+
+    const hdr = groupLabel ? `<tr class="grp-hdr"><td colspan="6">📌 ${groupLabel} <span style="font-weight:400;font-size:11px;opacity:.7">(${rows.length} مندوب)</span></td></tr>` : '';
+    const trs = rows.map((r,i)=>{
+      const netQ = Math.max(0,(r.qty||0)-(r.retQty||0));
+      const roi  = r.netSales>0?(r.col/r.netSales*100).toFixed(1):'0.0';
+      const rc   = parseFloat(roi)>=80?'#16a34a':parseFloat(roi)>=60?'#b45309':'#dc2626';
+      return `<tr>
+        <td class="tc">${i+1}</td>
+        <td class="tl fw">${r.name}</td>
+        <td class="tc blue">${fmt2(r.netSales)}</td>
+        <td class="tc orange">${fmtQ(netQ)}</td>
+        <td class="tc green">${fmt2(r.col)}</td>
+        <td class="tc fw" style="color:${rc}">${roi}%</td>
+      </tr>`;
+    }).join('');
+
+    // صف مجموع المجموعة (يظهر فقط عند التجميع)
+    const subtotal = groupLabel ? `<tr class="sub-total">
+      <td colspan="2" class="tl">إجمالي المجموعة (${rows.length})</td>
+      <td class="tc">${fmt2(totNet)}</td>
+      <td class="tc">${fmtQ(totNetQ)}</td>
+      <td class="tc">${fmt2(totCol)}</td>
+      <td class="tc">${totRoi}%</td>
+    </tr>` : '';
+
+    return hdr + trs + subtotal;
+  };
+
+  // ── بناء محتوى الجدول حسب نوع التجميع ──
+  let tableBody = '';
+  let groupTitle = '';
+
+  if(groupBy==='sup'){
+    groupTitle = 'تصنيف حسب المشرف';
+    const sups = [...new Set(data.map(r=>(D._repSuperMap&&D._repSuperMap[r.name])||'غير محدد'))].sort();
+    sups.forEach(sup=>{ tableBody += buildGroup(data.filter(r=>((D._repSuperMap&&D._repSuperMap[r.name])||'غير محدد')===sup), sup); });
+  } else if(groupBy==='cat'){
+    groupTitle = 'تصنيف حسب القناة البيعية';
+    const cats = [...new Set(data.map(r=>(D._repCatMap&&D._repCatMap[r.name])||'غير محدد'))].sort();
+    cats.forEach(cat=>{ tableBody += buildGroup(data.filter(r=>((D._repCatMap&&D._repCatMap[r.name])||'غير محدد')===cat), cat); });
+  } else {
+    groupTitle = 'كل المناديب';
+    tableBody = buildGroup(data, '');
+  }
+
+  // ── شريط إحصائي (يُضاف آخر صفحة فقط) ──
+  const totNet2  = data.reduce((s,r)=>s+r.netSales,0);
+  const totNetQ2 = data.reduce((s,r)=>s+Math.max(0,(r.qty||0)-(r.retQty||0)),0);
+  const totCol2  = data.reduce((s,r)=>s+r.col,0);
+  const totRoi2  = totNet2>0?(totCol2/totNet2*100).toFixed(1):'0.0';
+  const statBar  = `
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-lbl">👥 المناديب</div><div class="stat-val purple">${data.length}</div></div>
+      <div class="stat-sep"></div>
+      <div class="stat-item"><div class="stat-lbl">📊 صافي المبيعات</div><div class="stat-val blue">${fmt2(totNet2)}</div></div>
+      <div class="stat-sep"></div>
+      <div class="stat-item"><div class="stat-lbl">📦 صافي الكمية</div><div class="stat-val orange">${fmtQ(totNetQ2)}</div></div>
+      <div class="stat-sep"></div>
+      <div class="stat-item"><div class="stat-lbl">💰 التحصيلات</div><div class="stat-val green">${fmt2(totCol2)}</div></div>
+      <div class="stat-sep"></div>
+      <div class="stat-item"><div class="stat-lbl">📈 نسبة التحصيل</div><div class="stat-val" style="color:${parseFloat(totRoi2)>=80?'#16a34a':parseFloat(totRoi2)>=60?'#b45309':'#dc2626'}">${totRoi2}%</div></div>
+    </div>`;
+
+  const html = `<!DOCTYPE html><html lang="ar" dir="rtl"><head>
+<meta charset="UTF-8"><title>ملخص المناديب — ركان المتوسط</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Cairo,sans-serif;font-size:12.5px;color:#1a2240;background:#fff;padding:18px 22px}
+.hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;padding-bottom:12px;border-bottom:2.5px solid #2c5de5}
+.hdr-title{font-size:19px;font-weight:900;color:#2c5de5}
+.hdr-sub{font-size:11px;color:#6b7280;margin-top:3px}
+.hdr-meta{text-align:left;font-size:11px;color:#5a6482;line-height:1.9}
+.grp-badge{display:inline-block;margin-bottom:10px;padding:3px 12px;background:#eef0f8;border-radius:20px;font-size:11px;font-weight:700;color:#2c5de5}
+table{width:100%;border-collapse:collapse}
+thead tr{background:#2c5de5;color:#fff}
+thead th{padding:8px 11px;font-size:12px;font-weight:700}
+th.tl,td.tl{text-align:right}
+th.tc,td.tc{text-align:center}
+td{padding:7px 11px;border-bottom:1px solid #eef0f8;font-size:12px}
+tr:nth-child(even):not(.grp-hdr):not(.sub-total){background:#f5f7ff}
+.fw{font-weight:700}
+.blue{color:#2c5de5;font-weight:600}
+.orange{color:#f07820;font-weight:600}
+.green{color:#16a34a;font-weight:600}
+.grp-hdr td{background:#1a2240;color:#fff;font-size:12.5px;font-weight:700;padding:9px 13px}
+.sub-total td{background:#dde6ff;color:#1a2240;font-weight:700;font-size:12px;padding:8px 11px;border-top:1.5px solid #2c5de5}
+tfoot tr{background:#1a2240;color:#fff;font-weight:700}
+tfoot td{padding:8px 11px;font-size:12.5px}
+/* شريط الإحصائيات — آخر صفحة فقط */
+.stat-wrap{page-break-inside:avoid;break-inside:avoid;margin-top:0}
+.stat-bar{display:flex;gap:0;border:1.5px solid #e8eaf5;border-radius:12px;overflow:hidden;margin-top:14px}
+.stat-item{flex:1;padding:12px 10px;text-align:center;background:#f5f7ff}
+.stat-lbl{font-size:10px;color:#6b7280;font-weight:600;margin-bottom:3px}
+.stat-val{font-size:14px;font-weight:900}
+.stat-val.blue{color:#2c5de5}
+.stat-val.orange{color:#f07820}
+.stat-val.green{color:#16a34a}
+.stat-val.purple{color:#7c3aed}
+.stat-sep{width:1px;background:#e8eaf5;flex-shrink:0}
+.footer{margin-top:14px;text-align:center;font-size:10px;color:#9ba5c0;border-top:1px solid #e8eaf5;padding-top:8px}
+@media print{
+  body{padding:8px 12px}
+  .stat-wrap{page-break-inside:avoid;break-inside:avoid}
+  @page{size:A4;margin:10mm}
+}
+</style></head><body>
+<div class="hdr">
+  <div>
+    <div class="hdr-title">📋 ملخص أداء المناديب</div>
+    <div class="hdr-sub">شركة ركان المتوسط — ${groupTitle}</div>
+  </div>
+  <div class="hdr-meta">
+    <div>📅 تاريخ الطباعة: ${dateStr}</div>
+    <div>📆 الفترة: ${dateRange}</div>
+    <div>👥 إجمالي المناديب: ${data.length}</div>
+  </div>
+</div>
+<table>
+  <thead><tr>
+    <th class="tc" style="width:34px">#</th>
+    <th class="tl">المندوب</th>
+    <th class="tc">صافي المبيعات (د.ل)</th>
+    <th class="tc">صافي الكمية</th>
+    <th class="tc">التحصيلات (د.ل)</th>
+    <th class="tc">نسبة التحصيل %</th>
+  </tr></thead>
+  <tbody>${tableBody}</tbody>
+</table>
+<div class="stat-wrap">
+  <table style="width:100%;border-collapse:collapse">
+    <tfoot><tr style="background:#1a2240;color:#fff;font-weight:700">
+      <td colspan="2" class="tl" style="padding:8px 11px;font-size:12.5px">📊 الإجمالي الكلي (${data.length} مندوب)</td>
+      <td class="tc" style="padding:8px 11px;font-size:12.5px">${fmt2(totNet2)}</td>
+      <td class="tc" style="padding:8px 11px;font-size:12.5px">${fmtQ(totNetQ2)}</td>
+      <td class="tc" style="padding:8px 11px;font-size:12.5px">${fmt2(totCol2)}</td>
+      <td class="tc" style="padding:8px 11px;font-size:12.5px">${totRoi2}%</td>
+    </tr></tfoot>
+  </table>
+  ${statBar}
+</div>
+<div class="footer">جميع الأرقام بالدينار الليبي — ركان المتوسط © ${now.getFullYear()}</div>
+<script>window.onload=()=>window.print()<\/script>
+</body></html>`;
+
+  const w = window.open('','_blank','width=960,height=750');
+  if(!w){ alert('يرجى السماح بالنوافذ المنبثقة'); return; }
+  w.document.open(); w.document.write(html); w.document.close();
+}
 /* ── فتح modal تقرير المناديب اليومي ── */
 function printDailyRepsReport(){
   var fromF=String(document.getElementById('f-rep-from')?.value||'').trim();
