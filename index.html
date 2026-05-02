@@ -16409,6 +16409,41 @@ function _reprocessCollection(rows){
   });
   rows=_refRows.filter((_,i)=>_refKeep.has(i));
 
+  // ── اكتشاف التحويلات بين العملاء (حوالات مقسّمة) ────────────────────────────
+  // المنطق: إذا كان سند القيد يحتوي طرف مدين وطرف دائن كلاهما حسابات عملاء
+  // (لا يوجد فيه أي حساب بنكي/مصرفي/صندوق في أي صف) → هذا تحويل بين عملاء
+  // ولا يُعدّ تحصيلاً لأنه محتسب مسبقاً في رصيد العملاء
+  const _isBankOrCashAcc=s=>{
+    const t=_c(s);
+    return t.includes('مصرف')||t.includes('بنك')||t.includes('بطاقة')||
+           t.includes('صندوق')||t.includes('كاش')||t.includes('نقد')||
+           t.includes('خزينة')||t.includes('صراف');
+  };
+  // نجمّع جميع صفوف سندات القيد حسب رقم السند
+  const _qaidVoucherRows={};
+  rows.forEach(r=>{
+    const nType=_c(r['النوع']||'');
+    if(!nType.includes('سند قيد')) return;
+    const sndId=String(r['رقم السند']||'').trim();
+    if(!sndId) return;
+    if(!_qaidVoucherRows[sndId]) _qaidVoucherRows[sndId]=[];
+    _qaidVoucherRows[sndId].push(r);
+  });
+  // سند قيد هو تحويل بين عملاء إذا: لا يوجد في أي صف منه حساب بنكي/صندوق
+  const _clientTransferVoucherIds=new Set();
+  Object.entries(_qaidVoucherRows).forEach(([sndId,vRows])=>{
+    const hasBankOrCash=vRows.some(r=>
+      _isBankOrCashAcc(r['اسم الحساب']||r['اسم العميل']||'')||
+      _isBankOrCashAcc(r['الحساب المقابل']||r['الحساب']||'')
+    );
+    // يجب أن يوجد طرف مدين وطرف دائن كلاهما بقيم > 0 (قيد متقابل بين عملاء)
+    const hasDebitRow=vRows.some(r=>_n2(r['مدين'])>0);
+    const hasCreditRow=vRows.some(r=>_n2(r['دائن'])>0);
+    if(!hasBankOrCash && hasDebitRow && hasCreditRow){
+      _clientTransferVoucherIds.add(sndId);
+    }
+  });
+
   // ── حذف "سند قيد" الغير موجود في الخصومات أو الإضافات ──────────────────────
   const _qaidKeepIds=new Set(
     rows.filter(r=>_classifyCollectionRow(r,_n2,_c)!=='normal')
@@ -16419,6 +16454,8 @@ function _reprocessCollection(rows){
     const nType=_c(r['النوع']||'');
     if(!nType.includes('سند قيد')) return true;
     const sndId=String(r['رقم السند']||'').trim();
+    // استبعاد التحويلات بين العملاء كلياً
+    if(_clientTransferVoucherIds.has(sndId)) return false;
     return _qaidKeepIds.has(sndId);
   });
 
