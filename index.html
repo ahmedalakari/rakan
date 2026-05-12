@@ -14227,9 +14227,8 @@ async function fetchAndProcessTargets(){
 
   // ── جلب كل ورقة كـ CSV بالتوازي ──
   const results = await Promise.allSettled(SHEET_DEFS.map(async ({sheetName, url})=>{
-    const sep = url.includes('?') ? '&' : '?';
     const resp = await Promise.race([
-      fetch(url + sep + 'nocache=' + Date.now(), {cache:'no-store'}),
+      fetch(url, {cache:'no-store', mode:'cors'}),
       new Promise((_,r)=>setTimeout(()=>r(new Error('timeout 30s')),30000))
     ]);
     if(!resp.ok) throw new Error('HTTP '+resp.status+' — '+sheetName);
