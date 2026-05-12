@@ -6957,8 +6957,13 @@ function renderRepGoalsPage(){
   } else {
     if(supF_g){
       const _normSG=s=>String(s||'').trim().replace(/[\s]+/g,' ');
-      if(D._supRepMap&&D._supRepMap[supF_g]){
-        const supReps=D._supRepMap[supF_g];
+      // ── عند الفلترة بشهر محدد، استخدم خريطة المشرفين الخاصة بذلك الشهر ──
+      const _activeMonth = monthF_g ? parseInt(monthF_g) : null;
+      const _monthSupMap = (_activeMonth && D._supRepMap && D._supRepMap._byMonth && D._supRepMap._byMonth[_activeMonth])
+                           || null;
+      const _effectiveSupMap = _monthSupMap || D._supRepMap;
+      if(_effectiveSupMap&&_effectiveSupMap[supF_g]){
+        const supReps=_effectiveSupMap[supF_g];
         filtRepsG=filtRepsG.filter(r=>supReps.includes(r));
       } else {
         filtRepsG=filtRepsG.filter(r=>_normSG((D._repSuperMap&&D._repSuperMap[r])||'')===_normSG(supF_g));
@@ -9468,9 +9473,17 @@ function parseExcel(buffer){
 // ── قراءة خام كـ array of arrays (لملفات ذات هيكل خاص كأهداف الأصناف) ──
 function parseExcelRaw(buffer){
   const wb=XLSX.read(buffer,{type:'array',cellDates:false,raw:true});
-  const sheet=wb.Sheets[wb.SheetNames[0]];
-  if(!sheet['!ref'])return[];
-  return XLSX.utils.sheet_to_json(sheet,{header:1,defval:null,raw:true});
+  // إذا كان الملف متعدد الأوراق، نُرجع مصفوفة من {sheetName, rows}
+  // للتوافق مع الاستخدامات الأخرى، نضيف خاصية _multiSheet
+  const sheets=wb.SheetNames.map(name=>({
+    sheetName:name,
+    rows:(()=>{const s=wb.Sheets[name];return s&&s['!ref']?XLSX.utils.sheet_to_json(s,{header:1,defval:null,raw:true}):[];})()
+  })).filter(s=>s.rows.length>0);
+  if(!sheets.length)return[];
+  // للتوافق: نُرجع صفوف الورقة الأولى كمصفوفة عادية، مع إضافة خاصية _sheets للمعالجة المتعددة
+  const result=sheets[0].rows;
+  result._sheets=sheets;
+  return result;
 }
 
 
@@ -13575,202 +13588,222 @@ function processNewData(type,rows){ _onDataUpdate(); // مسح الكاش عند
       break;
     }
     case 'targets':{
-      // ── قراءة ملف أهداف الأصناف ──
+      // ── قراءة ملف أهداف الأصناف (يدعم أوراق متعددة — كل ورقة شهر) ──
       const _ct6=s=>String(s===null||s===undefined?'':s).replace(/[\r\n]+/g,' ').trim();
       const _nt6=v=>{if(v===null||v===undefined||v==='')return 0;const s=String(v);if(s.startsWith('='))return 0;const n=parseFloat(s.replace(/,/g,''));return isNaN(n)?0:n;};
 
-      const rawRows=rows&&rows.length?rows:[];
-      if(!rawRows.length){toast('⚠ لم يتم تحميل ملف الأهداف','error');break;}
+      // ── استخراج رقم الشهر من اسم الورقة (مثل "4-2026" → 4، "5-2026" → 5) ──
+      const _sheetToMonth=name=>{
+        const m=String(name||'').match(/^(\d{1,2})[-_]/);
+        return m?parseInt(m[1],10):null;
+      };
 
-      // صف الرأس
-      let hdrRow6=[], dataStartIdx=4;
-      for(let _i=0;_i<Math.min(rawRows.length,15);_i++){
-        const _r=rawRows[_i]||[];
-        if(_r.some(v=>String(v||'').includes('أجمالي الكمية'))){
-          hdrRow6=_r; dataStartIdx=_i+1; break;
+      // ── دالة معالجة ورقة واحدة وإرجاع بياناتها ──
+      const _parseOneSheet=(rawRows,sheetMonth)=>{
+        if(!rawRows||!rawRows.length)return null;
+
+        let hdrRow=[], dataStart=4;
+        for(let _i=0;_i<Math.min(rawRows.length,15);_i++){
+          const _r=rawRows[_i]||[];
+          if(_r.some(v=>String(v||'').includes('أجمالي الكمية'))){
+            hdrRow=_r; dataStart=_i+1; break;
+          }
         }
+        if(!hdrRow.length)return null;
+
+        const _prodColIdxs=[], _totalColIdxs=[];
+        hdrRow.forEach((v,i)=>{
+          const s=_ct6(v);
+          if(s==='الصنف')_prodColIdxs.push(i);
+          if(s==='أجمالي الكمية')_totalColIdxs.push(i);
+        });
+
+        const _GROUPS=[];
+        _totalColIdxs.forEach((totalCol,gi)=>{
+          const prodCol=_prodColIdxs[gi]??totalCol+1;
+          const prevTotal=gi===0?-1:_totalColIdxs[gi-1];
+          let supCol=-1;
+          const repCols=[];
+          for(let c=prevTotal+1;c<totalCol;c++){
+            const name=_ct6(hdrRow[c]||'');
+            if(!name)continue;
+            if(name.includes('اجمالي')||name.includes('إجمالي')){if(supCol===-1)supCol=c;continue;}
+            if(name!=='أجمالي الكمية'&&name!=='الصنف')repCols.push(c);
+          }
+          if(!repCols.length)return;
+          const _rawSupRaw=String(hdrRow[supCol]===null||hdrRow[supCol]===undefined?'':hdrRow[supCol]);
+          const _supLines=_rawSupRaw.split(/[\r\n]+/).map(l=>l.trim()).filter(Boolean);
+          let supName;
+          if(_supLines.length>=2){
+            supName=_supLines[_supLines.length-1];
+          } else {
+            const _skip=new Set(['اجمالي','إجمالي','الجملة','الاسواق','الأسواق','شرق','غرب','طرابلس','المقاهي','مقاهي','شمال','جنوب','وسط','منطقة','مناطق']);
+            const _rawText=_rawSupRaw.replace(/[\r\n]+/g,' ').trim();
+            const _parts=_rawText.split(/\s+/);
+            const _filtered=_parts.filter(p=>p&&!_skip.has(p));
+            const _compoundMap={'أسواق':'أسواق','اسواق':'أسواق','جملة':'جملة','الجملة':'جملة','تجزئة':'تجزئة','مقاهي':'مقاهي ومطاعم','مطاعم':'مقاهي ومطاعم'};
+            let _name=_filtered.join(' ');
+            if(_filtered.length===1&&_compoundMap[_filtered[0]]){_name=_compoundMap[_filtered[0]];}
+            else if(_filtered.length===0){const _lastPart=_parts[_parts.length-1]||'';_name=_compoundMap[_lastPart]||_rawText;}
+            supName=_name||_rawText;
+          }
+          supName=supName.replace(/^(إجمالي|اجمالي)\s+/,'').trim();
+          const _knownSups={'الاسواق':'أسواق','الأسواق':'أسواق','اسواق':'أسواق'};
+          if(_knownSups[supName])supName=_knownSups[supName];
+          _GROUPS.push({repCols,totalCol,prodCol,supCol,supName});
+        });
+
+        const colRepMap={};
+        _GROUPS.forEach(g=>g.repCols.forEach(c=>{
+          const name=_ct6(hdrRow[c]||'');
+          if(name&&!name.includes('اجمالي')&&!name.includes('إجمالي')&&name!=='أجمالي الكمية'&&name!=='الصنف')
+            colRepMap[c]=name;
+        }));
+
+        const rpt={}, repTotals={}, supRepTotals={}, supTotals={};
+        // تسجيل المناديب حتى لو أهدافهم صفر
+        Object.values(colRepMap).forEach(name=>{if(name&&!rpt[name])rpt[name]={};});
+
+        rawRows.forEach((r,idx)=>{
+          if(idx<dataStart||!r)return;
+          let prodName='';
+          for(const g of _GROUPS){
+            const v=_ct6(r[g.prodCol]||'');
+            if(!v)continue;
+            if(v.startsWith('الإجمالي')||v.startsWith('الاجمالي')||v==='الصنف'){prodName='';break;}
+            if(!prodName)prodName=v;
+          }
+          if(!prodName)return;
+          _GROUPS.forEach(g=>{
+            const gProd=_ct6(r[g.prodCol]||'');
+            if(!gProd||gProd.startsWith('الإجمالي')||gProd.startsWith('الاجمالي'))return;
+            g.repCols.forEach(c=>{
+              const name=colRepMap[c];if(!name)return;
+              const raw=_nt6(r[c]);if(raw<0)return;
+              const val=Math.round(raw*100)/100;
+              if(!rpt[name])rpt[name]={};
+              rpt[name][prodName]=(rpt[name][prodName]||0)+val;
+              if(val>0) repTotals[name]=(repTotals[name]||0)+val;
+              if(g.supName&&val>0){
+                supRepTotals[g.supName]=(supRepTotals[g.supName]||0)+val;
+                if(!supTotals[g.supName])supTotals[g.supName]={};
+                supTotals[g.supName][prodName]=(supTotals[g.supName][prodName]||0)+val;
+              }
+            });
+          });
+        });
+
+        // حساب إجمالي المشرف من عمود الإجمالي مباشرة
+        const supTotalsFromCol={};
+        rawRows.forEach((r,idx)=>{
+          if(idx<dataStart||!r)return;
+          let isFinalTotal=false;
+          for(const g of _GROUPS){const pv=_ct6(r[g.prodCol]||'');if(pv==='الإجمالي'){isFinalTotal=true;break;}}
+          if(!isFinalTotal)return;
+          _GROUPS.forEach(g=>{
+            if(g.supCol<0||!g.supName)return;
+            const sv=_nt6(r[g.supCol]);
+            if(sv>0)supTotalsFromCol[g.supName]=(supTotalsFromCol[g.supName]||0)+sv;
+          });
+        });
+
+        const _hasDirect=Object.keys(supTotalsFromCol).length>0;
+        if(_hasDirect){Object.keys(supTotalsFromCol).forEach(s=>{supRepTotals[s]=Math.round(supTotalsFromCol[s]);});}
+        else{Object.keys(supRepTotals).forEach(s=>{supRepTotals[s]=Math.round(supRepTotals[s]);});}
+
+        // خريطة المشرف → مناديبه
+        const supRepMap={};
+        _GROUPS.forEach(g=>{
+          if(!g.supName)return;
+          if(!supRepMap[g.supName])supRepMap[g.supName]=[];
+          g.repCols.forEach(c=>{const name=colRepMap[c];if(name&&!supRepMap[g.supName].includes(name))supRepMap[g.supName].push(name);});
+        });
+
+        return {rpt,repTotals,supRepTotals,supTotals,supTotalsFromCol,supRepMap,colRepMap,month:sheetMonth};
+      };
+
+      // ── تحديد قائمة الأوراق المراد معالجتها ──
+      const _allSheets=rows._sheets||[{sheetName:'',rows:rows}];
+
+      if(!_allSheets.length||!_allSheets.some(s=>s.rows.length)){
+        toast('⚠ لم يتم تحميل ملف الأهداف','error');break;
       }
 
-      // أعمدة الصنف وأجمالي الكمية
-      const _prodColIdxs=[], _totalColIdxs=[];
-      hdrRow6.forEach((v,i)=>{
-        const s=_ct6(v);
-        if(s==='الصنف')_prodColIdxs.push(i);
-        if(s==='أجمالي الكمية')_totalColIdxs.push(i);
-      });
+      // ── مجاميع إجمالية عبر كل الأوراق ──
+      const rpt6={}, repTotals6={}, supRepTotals6={}, supTotals6={}, supTotalsFromColAll={};
+      const supRepMap6={};
+      // بيانات مفصّلة لكل شهر: D._targetsByMonth[month] = {rpt, repTotals, supRepTotals}
+      const targetsByMonth={};
 
-      // بناء المجموعات ديناميكياً
-      const _GROUPS6=[];
-      _totalColIdxs.forEach((totalCol,gi)=>{
-        const prodCol=_prodColIdxs[gi]??totalCol+1;
-        const prevTotal=gi===0?-1:_totalColIdxs[gi-1];
-        let supCol=-1;
-        const repCols=[];
-        for(let c=prevTotal+1;c<totalCol;c++){
-          const name=_ct6(hdrRow6[c]||'');
-          if(!name)continue;
-          if(name.includes('اجمالي')||name.includes('إجمالي')){if(supCol===-1)supCol=c;continue;}
-          if(name!=='أجمالي الكمية'&&name!=='الصنف')repCols.push(c);
-        }
-        if(!repCols.length)return;
-        // استخراج اسم المشرف: نستخدم القيمة الخام قبل _ct6 للحفاظ على \n
-        const _rawSupRaw=String(hdrRow6[supCol]===null||hdrRow6[supCol]===undefined?'':hdrRow6[supCol]);
-        const _supLines=_rawSupRaw.split(/[\r\n]+/).map(l=>l.trim()).filter(Boolean);
-        let supName;
-        if(_supLines.length>=2){
-          // سطرين: "اجمالي المنطقة\nاسم المشرف" → خذ السطر الأخير
-          supName=_supLines[_supLines.length-1];
-        } else {
-          // سطر واحد: احذف كلمة "اجمالي" والكلمات الوصفية
-          const _skip=new Set(['اجمالي','إجمالي','الجملة','الاسواق','الأسواق','شرق','غرب','طرابلس','المقاهي','مقاهي','شمال','جنوب','وسط','منطقة','مناطق']);
-          const _rawText=_rawSupRaw.replace(/[\r\n]+/g,' ').trim();
-          const _parts=_rawText.split(/\s+/);
-          const _filtered=_parts.filter(p=>p&&!_skip.has(p));
-          // خريطة تحويل الكلمات المركّبة لأسماء مشرفين صحيحة
-          const _compoundMap={
-            'أسواق':'أسواق','اسواق':'أسواق',
-            'جملة':'جملة','الجملة':'جملة',
-            'تجزئة':'تجزئة','مقاهي':'مقاهي ومطاعم','مطاعم':'مقاهي ومطاعم'
-          };
-          let _name=_filtered.join(' ');
-          // إذا بقيت كلمة واحدة فقط، تحقق من خريطة التحويل
-          if(_filtered.length===1&&_compoundMap[_filtered[0]]){
-            _name=_compoundMap[_filtered[0]];
-          } else if(_filtered.length===0){
-            // حاول استخراج الكلمة الأخيرة الوصفية (الاسواق → أسواق)
-            const _lastPart=_parts[_parts.length-1]||'';
-            _name=_compoundMap[_lastPart]||_rawText;
-          }
-          supName=_name||_rawText;
-        }
-        // تنقية نهائية: إذا ابتدأ الاسم بـ "إجمالي" أو "اجمالي"، احذفها
-        supName=supName.replace(/^(إجمالي|اجمالي)\s+/,'').trim();
-        // تحويل الأسماء المعروفة
-        const _knownSups={'الاسواق':'أسواق','الأسواق':'أسواق','اسواق':'أسواق'};
-        if(_knownSups[supName])supName=_knownSups[supName];
-        _GROUPS6.push({repCols,totalCol,prodCol,supCol,supName});
-      });
+      let sheetsProcessed=0;
+      for(const {sheetName,rows:shRows} of _allSheets){
+        const sheetMonth=_sheetToMonth(sheetName);
+        const res=_parseOneSheet(shRows,sheetMonth);
+        if(!res)continue;
+        sheetsProcessed++;
 
-      // خريطة عمود → اسم المندوب
-      const colRepMap6={};
-      _GROUPS6.forEach(g=>g.repCols.forEach(c=>{
-        const name=_ct6(hdrRow6[c]||'');
-        if(name&&!name.includes('اجمالي')&&!name.includes('إجمالي')&&name!=='أجمالي الكمية'&&name!=='الصنف')
-          colRepMap6[c]=name;
-      }));
+        // حفظ بيانات الشهر منفردةً
+        if(sheetMonth!==null)targetsByMonth[sheetMonth]=res;
 
-      const rpt6={}, repTotals6={}, supRepTotals6={}, supTotals6={};
-
-      // ── تسجيل كل المناديب من رأس الجدول (حتى من قيمهم صفر) ──
-      // هذا يضمن ظهورهم في فلاتر المندوب والقناة البيعية
-      Object.values(colRepMap6).forEach(name=>{
-        if(name&&!rpt6[name])rpt6[name]={};
-      });
-
-      rawRows.forEach((r,idx)=>{
-        if(idx<dataStartIdx||!r)return;
-        // تخطي صفوف الإجمالي
-        let prodName='';
-        for(const g of _GROUPS6){
-          const v=_ct6(r[g.prodCol]||'');
-          if(!v)continue;
-          if(v.startsWith('الإجمالي')||v.startsWith('الاجمالي')||v==='الصنف'){prodName='';break;}
-          if(!prodName)prodName=v;
-        }
-        if(!prodName)return;
-
-        _GROUPS6.forEach(g=>{
-          const gProd=_ct6(r[g.prodCol]||'');
-          if(!gProd||gProd.startsWith('الإجمالي')||gProd.startsWith('الاجمالي'))return;
-
-          // ── قيم المناديب مباشرة من الخلايا (تقريب لـ 2 عشرية للحد من تراكم الكسور) ──
-          g.repCols.forEach(c=>{
-            const name=colRepMap6[c];if(!name)return;
-            const raw=_nt6(r[c]);if(raw<0)return; // نقبل الصفر لإظهار أصناف هدفها=0
-            const val=Math.round(raw*100)/100; // تقريب لـ 2 عشرية يقلل تراكم الخطأ
-            if(!rpt6[name])rpt6[name]={};
-            rpt6[name][prodName]=(rpt6[name][prodName]||0)+val;
-            if(val>0) repTotals6[name]=(repTotals6[name]||0)+val;
-            // إجمالي المشرف = مجموع مناديبه
-            if(g.supName && val>0){
-              supRepTotals6[g.supName]=(supRepTotals6[g.supName]||0)+val;
-              if(!supTotals6[g.supName])supTotals6[g.supName]={};
-              supTotals6[g.supName][prodName]=(supTotals6[g.supName][prodName]||0)+val;
-            }
-          });
-
+        // دمج في الإجمالي الكلي
+        Object.entries(res.rpt).forEach(([rep,prods])=>{
+          if(!rpt6[rep])rpt6[rep]={};
+          Object.entries(prods).forEach(([prod,val])=>{rpt6[rep][prod]=(rpt6[rep][prod]||0)+val;});
         });
-      });
+        Object.entries(res.repTotals).forEach(([rep,val])=>{repTotals6[rep]=(repTotals6[rep]||0)+val;});
+        Object.entries(res.supRepTotals).forEach(([sup,val])=>{supRepTotals6[sup]=(supRepTotals6[sup]||0)+val;});
+        Object.entries(res.supTotals).forEach(([sup,prods])=>{
+          if(!supTotals6[sup])supTotals6[sup]={};
+          Object.entries(prods).forEach(([prod,val])=>{supTotals6[sup][prod]=(supTotals6[sup][prod]||0)+val;});
+        });
+        Object.entries(res.supTotalsFromCol).forEach(([sup,val])=>{supTotalsFromColAll[sup]=(supTotalsFromColAll[sup]||0)+val;});
+        Object.entries(res.supRepMap).forEach(([sup,reps])=>{
+          if(!supRepMap6[sup])supRepMap6[sup]=[];
+          reps.forEach(r=>{if(!supRepMap6[sup].includes(r))supRepMap6[sup].push(r);});
+        });
+        // ── حفظ supRepMap لكل شهر منفرداً (لمعالجة تغيير المشرف بين الأشهر) ──
+        if(sheetMonth!==null){
+          if(!supRepMap6._byMonth)supRepMap6._byMonth={};
+          supRepMap6._byMonth[sheetMonth]=res.supRepMap;
+        }
+        // تسجيل المناديب الصفريين
+        Object.values(res.colRepMap).forEach(name=>{if(name&&!rpt6[name])rpt6[name]={};});
+      }
+
+      if(!sheetsProcessed){toast('⚠ لم يتم التعرف على أي ورقة في ملف الأهداف','error');break;}
 
       D.rep_product_targets=rpt6;
       D._supProductTargets=supTotals6;
+      D._targetsByMonth=targetsByMonth; // للوصول إلى أهداف كل شهر منفرداً
 
-      // ── حساب _supTotals من عمود إجمالي المشرف مباشرة (أدق من جمع المناديب) ──
-      // نقرأ صف الإجمالي النهائي من الملف لكل مشرف
-      const supTotalsFromCol={};
-      rawRows.forEach((r,idx)=>{
-        if(idx<dataStartIdx||!r)return;
-        // نبحث في عمود الصنف لأي مجموعة عن 'الإجمالي' (صف الإجمالي النهائي)
-        let isFinalTotal=false;
-        for(const g of _GROUPS6){
-          const pv=_ct6(r[g.prodCol]||'');
-          if(pv==='الإجمالي'){isFinalTotal=true;break;}
-        }
-        if(!isFinalTotal)return;
-        // استخرج قيمة كل مشرف من عمود الإجمالي الخاص به
-        _GROUPS6.forEach(g=>{
-          if(g.supCol<0||!g.supName)return;
-          const sv=_nt6(r[g.supCol]);
-          if(sv>0){
-            supTotalsFromCol[g.supName]=(supTotalsFromCol[g.supName]||0)+sv;
-          }
-        });
-      });
-
-      // استخدم قيم عمود الإجمالي إذا وُجدت (أدق)، وإلا استخدم مجموع المناديب مقرَّباً
-      const _hasDirect=Object.keys(supTotalsFromCol).length>0;
-      if(_hasDirect){
-        // نحفظ الإجمالي الكلي قبل التقريب لضمان دقة العرض الكلي
-        D._allSupTotal=Math.round(Object.values(supTotalsFromCol).reduce((s,v)=>s+v,0));
-        Object.keys(supTotalsFromCol).forEach(s=>{
-          supRepTotals6[s]=Math.round(supTotalsFromCol[s]);
-        });
-      } else {
-        // إجمالي من مجموع المناديب قبل التقريب المنفصل
-        D._allSupTotal=Math.round(Object.values(supRepTotals6).reduce((s,v)=>s+v,0));
-        Object.keys(supRepTotals6).forEach(s=>{supRepTotals6[s]=Math.round(supRepTotals6[s]);});
-      }
+      const _hasDirect6=Object.keys(supTotalsFromColAll).length>0;
+      D._allSupTotal=_hasDirect6
+        ?Math.round(Object.values(supTotalsFromColAll).reduce((s,v)=>s+v,0))
+        :Math.round(Object.values(supRepTotals6).reduce((s,v)=>s+v,0));
       D._supTotals=supRepTotals6;
-      // خريطة المشرف → مناديبه (للفلترة في صفحة الأهداف)
-      D._supRepMap={};
-      _GROUPS6.forEach(g=>{
-        if(!g.supName)return;
-        if(!D._supRepMap[g.supName])D._supRepMap[g.supName]=[];
-        g.repCols.forEach(c=>{
-          const name=colRepMap6[c];
-          if(name&&!D._supRepMap[g.supName].includes(name))
-            D._supRepMap[g.supName].push(name);
-        });
-      });
+      D._supRepMap=supRepMap6;
+
       if(!D._repTargets)D._repTargets={};
       Object.entries(repTotals6).forEach(([rep,total])=>{
         if(!D._repTargets[rep])D._repTargets[rep]={tSales:0,tQty:0,tCol:0,cat:''};
         D._repTargets[rep].tQty=Math.round(total);
       });
-      // ── تسجيل المناديب ذوي الأهداف الصفرية في _repTargets أيضاً ──
-      Object.values(colRepMap6).forEach(name=>{
-        if(name&&!D._repTargets[name]){
-          D._repTargets[name]={tSales:0,tQty:0,tCol:0,cat:''};
-        }
+      Object.values(rpt6).forEach((_,__,arr)=>{});
+      // المناديب الصفريون
+      Object.keys(rpt6).forEach(name=>{
+        if(!D._repTargets[name])D._repTargets[name]={tSales:0,tQty:0,tCol:0,cat:''};
       });
       Object.entries(supRepTotals6).forEach(([sup,total])=>{
         if(!D._repTargets[sup])D._repTargets[sup]={tSales:0,tQty:0,tCol:0,cat:''};
         D._repTargets[sup].tQty=Math.round(total);
       });
+
       if(D._repMap)_rebuildRepData();
       const repCount6=Object.keys(rpt6).length;
       const prodCount6=new Set(Object.values(rpt6).flatMap(r=>Object.keys(r))).size;
-      
+      const monthsLoaded=Object.keys(targetsByMonth).sort((a,b)=>a-b);
+      if(monthsLoaded.length>1)toast(`✅ تم تحميل الأهداف لـ ${monthsLoaded.length} أشهر: ${monthsLoaded.join('، ')}`,'success');
+
       break;
     }
     case 'expenses':{
