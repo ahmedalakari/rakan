@@ -14262,7 +14262,7 @@ async function _autoSyncQuiet(){
   const progBar=document.getElementById('ld-progress');
   const iconMap={sales:'ldi-sales',collection:'ldi-collection',debt:'ldi-debt',inventory:'ldi-inventory',reps:'ldi-reps',aging:'ldi-aging',expenses:'ldi-expenses','mizan-tajura':'ldi-mizan','mizan-karima2526':'ldi-mizan','mizan-karima2024':'ldi-mizan'};
 
-  // ── جلب ملف أهداف الأصناف (كل الأوراق) بالتوازي ──
+  // ── جلب ملف أهداف الأصناف (بالتوازي مع الباقي) ──
   let targetsFetchPromise=null;
   targetsFetchPromise=(async()=>{
     try{ await fetchAndProcessTargets(); }
@@ -14351,9 +14351,12 @@ async function _autoSyncQuiet(){
     }
   });
 
-  /* انتظر انتهاء الكل بما فيها ملف الأهداف */
-  const allPromises=targetsFetchPromise?[...promises,targetsFetchPromise]:promises;
-  await Promise.allSettled(allPromises);
+  /* انتظر انتهاء الكل ثم عالج الأهداف بعد reps */
+  await Promise.allSettled(promises);
+
+  /* ── معالجة الأهداف بعد اكتمال reps ── */
+  try{ await fetchAndProcessTargets(); }
+  catch(e){ console.warn('أهداف الأصناف:',e.message); }
 
   const synced=completed;
 
@@ -14500,18 +14503,6 @@ async function syncGoogleSheets(){
     })
   );
 
-  // ── جلب ملف أهداف الأصناف (كل الأوراق) ──
-  let targetsOk=false;
-  statusEl.textContent='⏳ جلب أهداف الأصناف...';
-  if(prog)prog.style.width='60%';
-  try{
-    await fetchAndProcessTargets();
-    targetsOk=true;
-  }catch(e){
-    console.warn('أهداف الأصناف:',e.message);
-    toast('⚠ تعذّر جلب ملف الأهداف: '+e.message,'error');
-  }
-
   if(prog)prog.style.width='80%';
   let synced=0, errors=0;
   // ── معالجة reps أولاً حتى تكون _repSuperMap جاهزة قبل المبيعات ──
@@ -14534,6 +14525,19 @@ async function syncGoogleSheets(){
       errors++;toast(`❌ ${typeLabels[keys[i]]}: ${r.reason?.message||'خطأ'}`,'error');
     }
   });
+
+  // ── جلب ملف أهداف الأصناف (بعد reps حتى تكون _repSuperMap جاهزة) ──
+  let targetsOk=false;
+  statusEl.textContent='⏳ جلب أهداف الأصناف...';
+  try{
+    await fetchAndProcessTargets();
+    targetsOk=true;
+    toast('✅ أهداف الأصناف','success');
+  }catch(e){
+    console.warn('أهداف الأصناف:',e.message);
+    toast('⚠ تعذّر جلب الأهداف: '+e.message,'error');
+  }
+
   if(targetsOk)synced++;
   populateRepSelects();
 
