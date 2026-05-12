@@ -4783,6 +4783,10 @@ const GS_URLS_EMBEDDED = {
   reps:       'https://docs.google.com/spreadsheets/d/e/2PACX-1vTYCN2dCoLrmBquVBQ4YvHpXcDYI1ggmPyDC2FrYQBb-I0PGly3syVVPDm4eHllwA/pub?gid=883595607&single=true&output=csv',
   aging:      'https://docs.google.com/spreadsheets/d/1g17IduM2pisXsHsTQBuXf8ZQ1qQKrFew/export?format=csv&gid=1432141854',
   targets:    'https://docs.google.com/spreadsheets/d/1pHZDl3B4vozI30BLDUbKBG_mzfJ5MgaN8GABDAGI5kU/export?format=xlsx',
+  targets_csv_sheets: [
+    {sheetName:'4-2026', url:'https://docs.google.com/spreadsheets/d/1pHZDl3B4vozI30BLDUbKBG_mzfJ5MgaN8GABDAGI5kU/export?format=csv&gid=1163707596'},
+    {sheetName:'5-2026', url:'https://docs.google.com/spreadsheets/d/1pHZDl3B4vozI30BLDUbKBG_mzfJ5MgaN8GABDAGI5kU/export?format=csv&gid=1641933512'},
+  ],
   expenses:   'https://docs.google.com/spreadsheets/d/1Du6P3GxkrSZkj7VdWcC6YKgx2CXTedmVst53QobuBxo/export?format=csv&sheet=Sheet1',
 };
 
@@ -6590,9 +6594,26 @@ function renderRepProdTargets(){
     });
   });
 
+  // ── تحديد مصدر الأهداف: شهر محدد أو كل الأشهر ──
+  // عند تحديد شهر نستخدم أهداف ذلك الشهر فقط من _targetsByMonth
+  let _activeTargets=D.rep_product_targets; // الافتراضي: كل الأشهر
+  let _activeSupTotals=D._supTotals;
+  let _activeAllSupTotal=D._allSupTotal;
+  if(monthF && D._targetsByMonth){
+    const _mNum=parseInt(monthF.split('-')[1]||monthF,10);
+    const _monthData=D._targetsByMonth[_mNum];
+    if(_monthData){
+      _activeTargets=_monthData.rpt||D.rep_product_targets;
+      // بناء _supTotals للشهر من supRepTotals الخاص به
+      const _mSup=_monthData.supRepTotals||{};
+      _activeSupTotals=Object.keys(_mSup).length?_mSup:D._supTotals;
+      _activeAllSupTotal=Object.values(_mSup).reduce((s,v)=>s+v,0)||D._allSupTotal;
+    }
+  }
+
   // ── بناء قائمة المناديب من اتحاد: ملف الأهداف + بيانات المبيعات الفعلية ──
   // هذا يضمن ظهور المناديب الغير موجودين في ملف الأهداف
-  const _repsFromTargets=new Set(Object.keys(D.rep_product_targets));
+  const _repsFromTargets=new Set(Object.keys(_activeTargets));
   const _repsFromSales=new Set(Object.keys(actualByRep));
   const _allRepsUnion=[...(new Set([..._repsFromTargets,..._repsFromSales]))].sort();
 
@@ -6610,7 +6631,7 @@ function renderRepProdTargets(){
   // تجميع الأصناف عبر كل المناديب المفلترين
   const prodMap={};
   filteredReps.forEach(rn=>{
-    const targets=D.rep_product_targets[rn]||{};
+    const targets=_activeTargets[rn]||{};
     const repNormKeys=actualByRepNorm[rn]?Object.keys(actualByRepNorm[rn]):[];
     Object.entries(targets).forEach(([prod,tgt])=>{
       let actual=(actualByRep[rn]&&actualByRep[rn][prod]!==undefined)?actualByRep[rn][prod]:null;
@@ -6640,8 +6661,8 @@ function renderRepProdTargets(){
       });
     } else if(inTargets && actualByRep[rn]){
       // مندوب موجود في الأهداف: أضف أصنافه الفعلية التي ليست في قائمة أهدافه
-      const targProds=new Set(Object.keys(D.rep_product_targets[rn]||{}));
-      const targProdsNorm=new Set(Object.keys(D.rep_product_targets[rn]||{}).map(p=>_normProd(p)));
+      const targProds=new Set(Object.keys(_activeTargets[rn]||{}));
+      const targProdsNorm=new Set(Object.keys(_activeTargets[rn]||{}).map(p=>_normProd(p)));
       Object.entries(actualByRep[rn]).forEach(([prod,qty])=>{
         if(targProds.has(prod))return; // مُعالَج أعلاه
         if(targProdsNorm.has(_normProd(prod)))return; // مُعالَج بالتطبيع أعلاه
@@ -6680,8 +6701,8 @@ function renderRepProdTargets(){
   {
     const _sf=document.getElementById('f-rpt-sup')?.value||'';
     const _rf=document.getElementById('f-rpt-rep')?.value||'';
-    if(_sf && !_rf && D._supTotals && D._supTotals[_sf]!=null){
-      totalTarget=Math.round(D._supTotals[_sf]);
+    if(_sf && !_rf && _activeSupTotals && _activeSupTotals[_sf]!=null){
+      totalTarget=Math.round(_activeSupTotals[_sf]);
     }
   }
   const overallAch=totalTarget>0?(totalActual/totalTarget*100):0;
@@ -6777,7 +6798,7 @@ function renderRepProdTargets(){
   const crossData={}; // crossData[rep][prod] = {tgt, act}
   crossReps.forEach(rn=>{
     crossData[rn]={};
-    const targets=D.rep_product_targets[rn]||{};
+    const targets=_activeTargets[rn]||{};
     crossProds.forEach(prod=>{
       const tgt=Math.round(targets[prod]||0);
       let act=(actualByRep[rn]&&actualByRep[rn][prod]!==undefined)?actualByRep[rn][prod]:null;
@@ -6803,15 +6824,15 @@ function renderRepProdTargets(){
     prodRowTotals[prod]={tgt:t,act:a};
   });
 
-  // الإجمالي الكلي — نصحح بنفس منطق الجدول الأول (_supTotals / _allSupTotal)
+  // الإجمالي الكلي — نصحح بنفس منطق الجدول الأول (_activeSupTotals / _activeAllSupTotal)
   let grandTgt=crossReps.reduce((s,rn)=>s+repColTotals[rn].tgt,0);
   const grandAct=crossReps.reduce((s,rn)=>s+repColTotals[rn].act,0);
   {
     const _sf=supF; const _rf=repName; const _cf=catF;
-    if(_sf && D._supTotals && D._supTotals[_sf]!=null){
-      grandTgt=Math.round(D._supTotals[_sf]);
-    } else if(!_sf&&!_rf&&!_cf && D._supTotals){
-      grandTgt=D._allSupTotal||Math.round(Object.values(D._supTotals).reduce((s,v)=>s+v,0));
+    if(_sf && _activeSupTotals && _activeSupTotals[_sf]!=null){
+      grandTgt=Math.round(_activeSupTotals[_sf]);
+    } else if(!_sf&&!_rf&&!_cf && _activeSupTotals){
+      grandTgt=_activeAllSupTotal||Math.round(Object.values(_activeSupTotals).reduce((s,v)=>s+v,0));
     }
   }
 
@@ -6946,8 +6967,21 @@ function renderRepGoalsPage(){
   const toF_g   =document.getElementById('f-rpt-to')?.value||'';
   const hasDateF=!!(monthF_g||fromF_g||toF_g);
 
+  // ── تحديد مصدر الأهداف حسب الشهر المختار ──
+  let _activeTargetsG=D.rep_product_targets;
+  let _activeSupTotalsG=D._supTotals;
+  if(monthF_g && D._targetsByMonth){
+    const _mNumG=parseInt(monthF_g.split('-')[1]||monthF_g,10);
+    const _monthDataG=D._targetsByMonth[_mNumG];
+    if(_monthDataG){
+      _activeTargetsG=_monthDataG.rpt||D.rep_product_targets;
+      const _mSupG=_monthDataG.supRepTotals||{};
+      _activeSupTotalsG=Object.keys(_mSupG).length?_mSupG:D._supTotals;
+    }
+  }
+
   // تحديد المناديب المفلترين — من اتحاد ملف الأهداف + بيانات المبيعات
-  const _tRepsG=new Set(Object.keys(D.rep_product_targets));
+  const _tRepsG=new Set(Object.keys(_activeTargetsG));
   const _sRepsG=new Set((D.sales_table||[]).map(r=>String(r['المندوب']||r['اسم المندوب']||'').trim()).filter(Boolean));
   let filtRepsG=[...(new Set([..._tRepsG,..._sRepsG]))].sort();
 
@@ -7028,11 +7062,11 @@ function renderRepGoalsPage(){
   let totalTarget=0,totalActual=0,above100=0,below80=0;
   const repAchArr=[];
 
-  // إذا كان الفلتر مشرف واحد محدد → استخدم إجماليه من D._supTotals (الأدق)
-  const _supName = supF_g && D._supTotals && D._supTotals[supF_g]!=null ? supF_g : null;
+  // إذا كان الفلتر مشرف واحد محدد → استخدم إجماليه من _activeSupTotalsG (الأدق)
+  const _supName = supF_g && _activeSupTotalsG && _activeSupTotalsG[supF_g]!=null ? supF_g : null;
 
   filtRepsG.forEach(rn=>{
-    const targets=D.rep_product_targets[rn]||{};
+    const targets=_activeTargetsG[rn]||{};
     let rTgt=0,rAct=0;
     const repNormKeysG=aqN[rn]?Object.keys(aqN[rn]):[];
     // أولاً: الأصناف الموجودة في ملف الأهداف
@@ -7064,7 +7098,7 @@ function renderRepGoalsPage(){
 
   // تصحيح إجمالي الهدف: فقط عند فلتر مشرف محدد
   if(_supName && !repF_g){
-    totalTarget=Math.round(D._supTotals[_supName]);
+    totalTarget=Math.round(_activeSupTotalsG[_supName]);
   }
   const overallAch=totalTarget>0?(totalActual/totalTarget*100):0;
   const isFiltered=!!(supF_g||repF_g||catF_g||monthF_g||fromF_g||toF_g);
@@ -14163,6 +14197,100 @@ function _updateRefreshStatus(){
   if(el)el.textContent=mins>0?`🔄 تحديث تلقائي كل ${mins} دقيقة`:'⏸ التحديث التلقائي متوقف';
 }
 
+// ══════════════════════════════════════════════════════
+//  دالة مركزية لجلب ومعالجة ملف الأهداف
+//  تكتشف الأوراق تلقائياً من الملف — تدعم إضافة أوراق مستقبلاً
+// ══════════════════════════════════════════════════════
+async function fetchAndProcessTargets(){
+  const SPREADSHEET_ID='1pHZDl3B4vozI30BLDUbKBG_mzfJ5MgaN8GABDAGI5kU';
+  const BASE='https://docs.google.com/spreadsheets/d/'+SPREADSHEET_ID;
+  const T=()=>'&t='+Date.now();
+
+  // ── دالة تحويل نص CSV إلى array of arrays ──
+  function _csvToArrays(text){
+    const clean=text.replace(/^\uFEFF/,'').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+    return clean.split('\n').map(line=>{
+      const cells=[];let cur='',inQ=false;
+      for(let i=0;i<line.length;i++){
+        const ch=line[i];
+        if(ch==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else{inQ=!inQ;}}
+        else if(ch===','&&!inQ){cells.push(cur===''?null:cur);cur='';}
+        else cur+=ch;
+      }
+      cells.push(cur===''?null:cur);
+      return cells;
+    }).filter(r=>r.some(v=>v!==null&&v!==''));
+  }
+
+  // ── الخطوة 1: اكتشاف كل الأوراق من صفحة HTML للملف ──
+  let sheetDefs=[];
+  try{
+    const htmlResp=await Promise.race([
+      fetch(BASE+'/htmlview'+T(),{cache:'no-store'}),
+      new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),15000))
+    ]);
+    if(htmlResp.ok){
+      const html=await htmlResp.text();
+      // استخراج أسماء وGID من HTML: data-id و aria-label أو الطريقة الأكثر موثوقية
+      const matches=[...html.matchAll(/gid=(\d+)[^"]*"[^>]*>([^<]+)<\/a>/g)];
+      // طريقة بديلة: ابحث عن نمط الأوراق في JSON المضمّن
+      const jsonMatch=html.match(/"sheetId":(\d+),"title":"([^"]+)"/g)||[];
+      if(jsonMatch.length){
+        sheetDefs=jsonMatch.map(m=>{
+          const [,gid,name]=m.match(/"sheetId":(\d+),"title":"([^"]+)"/);
+          return {sheetName:name,gid};
+        });
+      } else if(matches.length){
+        sheetDefs=matches.map(([,gid,name])=>({sheetName:name.trim(),gid}));
+      }
+    }
+  }catch(e){ console.warn('targets: فشل اكتشاف الأوراق',e.message); }
+
+  // ── إذا فشل الاكتشاف، استخدم الأوراق المحددة مسبقاً ──
+  if(!sheetDefs.length){
+    sheetDefs=GS_URLS_EMBEDDED['targets_csv_sheets']||[];
+    if(!sheetDefs.length){
+      throw new Error('تعذّر اكتشاف أوراق الملف');
+    }
+    console.info('targets: استخدام الأوراق الافتراضية',sheetDefs.map(s=>s.sheetName));
+  } else {
+    // تحويل gid إلى url
+    sheetDefs=sheetDefs.map(s=>({
+      sheetName:s.sheetName,
+      url:BASE+'/export?format=csv&gid='+s.gid
+    }));
+    console.info('targets: اكتُشفت',sheetDefs.length,'ورقة:',sheetDefs.map(s=>s.sheetName).join('، '));
+  }
+
+  // ── الخطوة 2: جلب كل ورقة كـ CSV بالتوازي ──
+  const csvResults=await Promise.allSettled(sheetDefs.map(async ({sheetName,url})=>{
+    const resp=await Promise.race([
+      fetch((url||'')+T(),{cache:'no-store'}),
+      new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),30000))
+    ]);
+    if(!resp.ok)throw new Error('HTTP '+resp.status);
+    const text=await resp.text();
+    if(!text||text.trim().length<10)throw new Error('ملف فارغ');
+    if(text.trim().startsWith('<!DOCTYPE')||text.trim().startsWith('<html'))
+      throw new Error('HTML — تحقق من إعدادات المشاركة');
+    return {sheetName, rows:_csvToArrays(text)};
+  }));
+
+  const sheets=csvResults.map((r,i)=>{
+    if(r.status==='fulfilled')return r.value;
+    console.warn('targets: فشل جلب',sheetDefs[i].sheetName,r.reason?.message);
+    return null;
+  }).filter(Boolean);
+
+  if(!sheets.length)throw new Error('فشل جلب جميع أوراق الأهداف');
+
+  const result=sheets[0].rows;
+  result._sheets=sheets;
+  processNewData('targets',result);
+  console.info('targets: تمت معالجة',sheets.length,'ورقة:',sheets.map(s=>s.sheetName).join('، '));
+  return true;
+}
+
 async function _autoSyncQuiet(){
   showProcessingBar('🔄 جاري تحميل البيانات...');
   const urls = GS_URLS_EMBEDDED;
@@ -14171,24 +14299,12 @@ async function _autoSyncQuiet(){
   const progBar=document.getElementById('ld-progress');
   const iconMap={sales:'ldi-sales',collection:'ldi-collection',debt:'ldi-debt',inventory:'ldi-inventory',reps:'ldi-reps',aging:'ldi-aging',expenses:'ldi-expenses','mizan-tajura':'ldi-mizan','mizan-karima2526':'ldi-mizan','mizan-karima2024':'ldi-mizan'};
 
-  // ── جلب ملف أهداف الأصناف (xlsx) بالتوازي ──
-  const targetsUrl=(document.getElementById('gs-targets')?.value?.trim())||GS_URLS_EMBEDDED['targets']||'';
+  // ── جلب ملف أهداف الأصناف (كل الأوراق) بالتوازي ──
   let targetsFetchPromise=null;
-  if(targetsUrl){
-    targetsFetchPromise=(async()=>{
-      try{
-        const resp=await Promise.race([fetch(targetsUrl+'&t='+Date.now(),{method:'GET',cache:'no-store'}),new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),30000))]);
-        if(!resp.ok)throw new Error('HTTP '+resp.status);
-        const _arrBuf=await resp.arrayBuffer();
-        if(!_arrBuf||_arrBuf.byteLength<100)throw new Error('ملف فارغ');
-        const buf=new Uint8Array(_arrBuf);
-        D._targetsBuffer=buf;
-        const rawRows=parseExcelRaw(buf);
-        processNewData('targets',rawRows);
-        
-      }catch(e){console.warn('أهداف الأصناف:',e.message);}
-    })();
-  }
+  targetsFetchPromise=(async()=>{
+    try{ await fetchAndProcessTargets(); }
+    catch(e){ console.warn('أهداف الأصناف:',e.message); }
+  })();
   const CACHE_KEY='rakan_data_cache_v2';
   const CACHE_TS_KEY='rakan_cache_ts_v2';
   const CACHE_TTL=15*60*1000; // 15 دقيقة
@@ -14421,26 +14537,16 @@ async function syncGoogleSheets(){
     })
   );
 
-  // ── جلب ملف أهداف الأصناف (xlsx) ──
-  const targetsUrl=(document.getElementById('gs-targets')?.value?.trim())||GS_URLS_EMBEDDED['targets']||'';
+  // ── جلب ملف أهداف الأصناف (كل الأوراق) ──
   let targetsOk=false;
-  if(targetsUrl){
-    statusEl.textContent='⏳ جلب أهداف الأصناف (xlsx)...';
-    if(prog)prog.style.width='60%';
-    try{
-      const resp=await fetch(targetsUrl+'&t='+Date.now(),{method:'GET',cache:'no-store'});
-      if(!resp.ok)throw new Error('HTTP '+resp.status);
-      const _arrBuf2=await resp.arrayBuffer();
-      if(!_arrBuf2||_arrBuf2.byteLength<100)throw new Error('ملف فارغ');
-      const buf=new Uint8Array(_arrBuf2);
-      D._targetsBuffer=buf;
-      const rawRows=parseExcelRaw(buf);
-      processNewData('targets',rawRows);
-      
-      targetsOk=true;
-    }catch(e){
-      console.warn('أهداف الأصناف:',e.message);
-    }
+  statusEl.textContent='⏳ جلب أهداف الأصناف...';
+  if(prog)prog.style.width='60%';
+  try{
+    await fetchAndProcessTargets();
+    targetsOk=true;
+  }catch(e){
+    console.warn('أهداف الأصناف:',e.message);
+    toast('⚠ تعذّر جلب ملف الأهداف: '+e.message,'error');
   }
 
   if(prog)prog.style.width='80%';
