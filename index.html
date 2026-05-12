@@ -4784,8 +4784,8 @@ const GS_URLS_EMBEDDED = {
   aging:      'https://docs.google.com/spreadsheets/d/1g17IduM2pisXsHsTQBuXf8ZQ1qQKrFew/export?format=csv&gid=1432141854',
   targets:    'https://docs.google.com/spreadsheets/d/1pHZDl3B4vozI30BLDUbKBG_mzfJ5MgaN8GABDAGI5kU/export?format=xlsx',
   targets_csv_sheets: [
-    {sheetName:'4-2026', url:'https://docs.google.com/spreadsheets/d/1pHZDl3B4vozI30BLDUbKBG_mzfJ5MgaN8GABDAGI5kU/export?format=csv&gid=1163707596'},
-    {sheetName:'5-2026', url:'https://docs.google.com/spreadsheets/d/1pHZDl3B4vozI30BLDUbKBG_mzfJ5MgaN8GABDAGI5kU/export?format=csv&gid=1641933512'},
+    {sheetName:'4-2026', url:'https://docs.google.com/spreadsheets/d/e/2PACX-1vRB7mfBbNJgcU9jDXZTlXh3t1EVJWNN7oz7V900AXOohdgYHWEpzbu01XYhf8rT7UNo1ax28KgDspbx/pub?gid=1163707596&single=true&output=csv'},
+    {sheetName:'5-2026', url:'https://docs.google.com/spreadsheets/d/e/2PACX-1vRB7mfBbNJgcU9jDXZTlXh3t1EVJWNN7oz7V900AXOohdgYHWEpzbu01XYhf8rT7UNo1ax28KgDspbx/pub?gid=1641933512&single=true&output=csv'},
   ],
   expenses:   'https://docs.google.com/spreadsheets/d/1Du6P3GxkrSZkj7VdWcC6YKgx2CXTedmVst53QobuBxo/export?format=csv&sheet=Sheet1',
 };
@@ -14204,9 +14204,11 @@ function _updateRefreshStatus(){
 async function fetchAndProcessTargets(){
   const SPREADSHEET_ID='1pHZDl3B4vozI30BLDUbKBG_mzfJ5MgaN8GABDAGI5kU';
   const BASE='https://docs.google.com/spreadsheets/d/'+SPREADSHEET_ID;
-  const T=()=>'&t='+Date.now();
+  const PUB ='https://docs.google.com/spreadsheets/d/e/2PACX-1vRB7mfBbNJgcU9jDXZTlXh3t1EVJWNN7oz7V900AXOohdgYHWEpzbu01XYhf8rT7UNo1ax28KgDspbx';
+  const TS  =()=>'?t='+Date.now();
+  const TSA =()=>'&t='+Date.now();
 
-  // ── دالة تحويل نص CSV إلى array of arrays ──
+  // ── دالة تحويل CSV إلى array of arrays ──
   function _csvToArrays(text){
     const clean=text.replace(/^\uFEFF/,'').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
     return clean.split('\n').map(line=>{
@@ -14222,72 +14224,80 @@ async function fetchAndProcessTargets(){
     }).filter(r=>r.some(v=>v!==null&&v!==''));
   }
 
-  // ── الخطوة 1: اكتشاف كل الأوراق من صفحة HTML للملف ──
+  // ── الخطوة 1: اكتشاف الأوراق من صفحة pub/html (تدعم CORS) ──
   let sheetDefs=[];
   try{
     const htmlResp=await Promise.race([
-      fetch(BASE+'/htmlview'+T(),{cache:'no-store'}),
+      fetch(PUB+'/pubhtml'+TS(),{cache:'no-store'}),
       new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),15000))
     ]);
     if(htmlResp.ok){
       const html=await htmlResp.text();
-      // استخراج أسماء وGID من HTML: data-id و aria-label أو الطريقة الأكثر موثوقية
-      const matches=[...html.matchAll(/gid=(\d+)[^"]*"[^>]*>([^<]+)<\/a>/g)];
-      // طريقة بديلة: ابحث عن نمط الأوراق في JSON المضمّن
-      const jsonMatch=html.match(/"sheetId":(\d+),"title":"([^"]+)"/g)||[];
-      if(jsonMatch.length){
-        sheetDefs=jsonMatch.map(m=>{
-          const [,gid,name]=m.match(/"sheetId":(\d+),"title":"([^"]+)"/);
-          return {sheetName:name,gid};
-        });
-      } else if(matches.length){
-        sheetDefs=matches.map(([,gid,name])=>({sheetName:name.trim(),gid}));
+      // استخراج أسماء الأوراق وgid من روابط التبويب
+      // النمط: gid=NNNN في روابط التنقل بين الأوراق
+      const tabMatches=[...html.matchAll(/[?&]gid=(\d+)[^"]*"[^>]*>\s*<[^>]*>\s*([^<]+)\s*</g)];
+      if(tabMatches.length){
+        sheetDefs=tabMatches.map(([,gid,name])=>({
+          sheetName:name.trim(),
+          gid,
+          url:BASE+'/export?format=csv&gid='+gid
+        }));
+      } else {
+        // بديل: ابحث عن أسماء tabs بطريقة أخرى
+        const altMatches=[...html.matchAll(/id="(\d+)"[^>]*class="[^"]*tab[^"]*"[^>]*>([^<]+)</g)];
+        if(altMatches.length){
+          sheetDefs=altMatches.map(([,gid,name])=>({
+            sheetName:name.trim(),
+            gid,
+            url:BASE+'/export?format=csv&gid='+gid
+          }));
+        }
       }
+      console.info('targets: اكتُشف',sheetDefs.length,'ورق من pubhtml');
     }
-  }catch(e){ console.warn('targets: فشل اكتشاف الأوراق',e.message); }
+  }catch(e){ console.warn('targets: فشل اكتشاف pubhtml:',e.message); }
 
-  // ── إذا فشل الاكتشاف، استخدم الأوراق المحددة مسبقاً ──
+  // ── إذا فشل الاكتشاف، استخدم الأوراق الافتراضية من GS_URLS_EMBEDDED ──
   if(!sheetDefs.length){
-    sheetDefs=GS_URLS_EMBEDDED['targets_csv_sheets']||[];
-    if(!sheetDefs.length){
-      throw new Error('تعذّر اكتشاف أوراق الملف');
-    }
-    console.info('targets: استخدام الأوراق الافتراضية',sheetDefs.map(s=>s.sheetName));
-  } else {
-    // تحويل gid إلى url
-    sheetDefs=sheetDefs.map(s=>({
+    const fallback=GS_URLS_EMBEDDED['targets_csv_sheets']||[];
+    if(!fallback.length) throw new Error('لا توجد أوراق أهداف محددة');
+    sheetDefs=fallback.map(s=>({
       sheetName:s.sheetName,
-      url:BASE+'/export?format=csv&gid='+s.gid
+      gid:null,
+      url:s.url
     }));
-    console.info('targets: اكتُشفت',sheetDefs.length,'ورقة:',sheetDefs.map(s=>s.sheetName).join('، '));
+    console.info('targets: استخدام الأوراق الافتراضية:',sheetDefs.map(s=>s.sheetName).join('، '));
+  } else {
+    console.info('targets: أوراق مكتشفة:',sheetDefs.map(s=>s.sheetName).join('، '));
   }
 
   // ── الخطوة 2: جلب كل ورقة كـ CSV بالتوازي ──
   const csvResults=await Promise.allSettled(sheetDefs.map(async ({sheetName,url})=>{
+    const sep=url.includes('?')?'&':'?';
     const resp=await Promise.race([
-      fetch((url||'')+T(),{cache:'no-store'}),
+      fetch(url+sep+'t='+Date.now(),{cache:'no-store'}),
       new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),30000))
     ]);
-    if(!resp.ok)throw new Error('HTTP '+resp.status);
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
     const text=await resp.text();
-    if(!text||text.trim().length<10)throw new Error('ملف فارغ');
+    if(!text||text.trim().length<10) throw new Error('ملف فارغ');
     if(text.trim().startsWith('<!DOCTYPE')||text.trim().startsWith('<html'))
-      throw new Error('HTML — تحقق من إعدادات المشاركة');
+      throw new Error('الاستجابة HTML — تأكد من المشاركة العامة');
     return {sheetName, rows:_csvToArrays(text)};
   }));
 
   const sheets=csvResults.map((r,i)=>{
-    if(r.status==='fulfilled')return r.value;
-    console.warn('targets: فشل جلب',sheetDefs[i].sheetName,r.reason?.message);
+    if(r.status==='fulfilled') return r.value;
+    console.warn('targets: فشل جلب',sheetDefs[i]?.sheetName,r.reason?.message);
     return null;
   }).filter(Boolean);
 
-  if(!sheets.length)throw new Error('فشل جلب جميع أوراق الأهداف');
+  if(!sheets.length) throw new Error('فشل جلب جميع أوراق الأهداف');
 
   const result=sheets[0].rows;
   result._sheets=sheets;
   processNewData('targets',result);
-  console.info('targets: تمت معالجة',sheets.length,'ورقة:',sheets.map(s=>s.sheetName).join('، '));
+  console.info('targets: ✅ معالجة',sheets.length,'ورقة:',sheets.map(s=>s.sheetName).join('، '));
   return true;
 }
 
