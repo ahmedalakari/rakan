@@ -13813,6 +13813,9 @@ function processNewData(type,rows){ _onDataUpdate(); // مسح الكاش عند
       D._supProductTargets=supTotals6;
       D._targetsByMonth=targetsByMonth; // للوصول إلى أهداف كل شهر منفرداً
 
+      // ── حساب الإجمالي الكلي الصحيح ──
+      // supTotalsFromColAll = مجموع supCol لكل مشرف من صف الإجمالي في كل ورقة
+      // وهو الرقم الصحيح (مثبت بالتحليل: أبريل=296,176 مايو=495,641)
       const _hasDirect6=Object.keys(supTotalsFromColAll).length>0;
       D._allSupTotal=_hasDirect6
         ?Math.round(Object.values(supTotalsFromColAll).reduce((s,v)=>s+v,0))
@@ -13840,6 +13843,12 @@ function processNewData(type,rows){ _onDataUpdate(); // مسح الكاش عند
       const prodCount6=new Set(Object.values(rpt6).flatMap(r=>Object.keys(r))).size;
       const monthsLoaded=Object.keys(targetsByMonth).sort((a,b)=>a-b);
       if(monthsLoaded.length>1)toast(`✅ تم تحميل الأهداف لـ ${monthsLoaded.length} أشهر: ${monthsLoaded.join('، ')}`,'success');
+
+      /* ── إعادة رسم الصفحة الحالية إذا كانت صفحة الأهداف ── */
+      if(currentPage==='rep-goals' && typeof renderRepGoalsPage==='function'){
+        _invalidatePageCache();
+        setTimeout(()=>renderRepGoalsPage(), 50);
+      }
 
       break;
     }
@@ -14205,20 +14214,31 @@ function _updateRefreshStatus(){
 //  تكتشف الأوراق تلقائياً من الملف — تدعم إضافة أوراق مستقبلاً
 // ══════════════════════════════════════════════════════
 async function fetchAndProcessTargets(){
-  // ── دالة تحويل CSV إلى array of arrays ──
+  // ── دالة تحويل CSV إلى array of arrays (تدعم الخلايا المحتوية على \n) ──
   function _csvToArrays(text){
     const clean=text.replace(/^\uFEFF/,'').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
-    return clean.split('\n').map(line=>{
-      const cells=[];let cur='',inQ=false;
-      for(let i=0;i<line.length;i++){
-        const ch=line[i];
-        if(ch==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else{inQ=!inQ;}}
-        else if(ch===','&&!inQ){cells.push(cur===''?null:cur);cur='';}
-        else cur+=ch;
+    const rows=[];
+    let cur='', inQ=false, cells=[];
+    for(let i=0;i<clean.length;i++){
+      const ch=clean[i];
+      if(ch==='"'){
+        if(inQ && clean[i+1]==='"'){cur+='"';i++;}  // escaped quote
+        else{inQ=!inQ;}                               // toggle quote mode
+      } else if(ch===','&&!inQ){
+        cells.push(cur===''?null:cur); cur='';
+      } else if(ch==='\n'&&!inQ){
+        cells.push(cur===''?null:cur); cur='';
+        if(cells.some(v=>v!==null&&v!=='')) rows.push(cells);
+        cells=[];
+      } else {
+        cur+=ch;
       }
-      cells.push(cur===''?null:cur);
-      return cells;
-    }).filter(r=>r.some(v=>v!==null&&v!==''));
+    }
+    // آخر خلية وصف
+    cells.push(cur===''?null:cur);
+    if(cells.some(v=>v!==null&&v!=='')) rows.push(cells);
+    // تنظيف \n داخل الخلايا المقتبسة → مسافة
+    return rows.map(row=>row.map(v=>v===null?null:v.replace(/\n/g,' ').trim()||null));
   }
 
   // ── قائمة الأوراق — أضف هنا عند إضافة شهر جديد ──
@@ -14262,12 +14282,8 @@ async function _autoSyncQuiet(){
   const progBar=document.getElementById('ld-progress');
   const iconMap={sales:'ldi-sales',collection:'ldi-collection',debt:'ldi-debt',inventory:'ldi-inventory',reps:'ldi-reps',aging:'ldi-aging',expenses:'ldi-expenses','mizan-tajura':'ldi-mizan','mizan-karima2526':'ldi-mizan','mizan-karima2024':'ldi-mizan'};
 
-  // ── جلب ملف أهداف الأصناف (بالتوازي مع الباقي) ──
-  let targetsFetchPromise=null;
-  targetsFetchPromise=(async()=>{
-    try{ await fetchAndProcessTargets(); }
-    catch(e){ console.warn('أهداف الأصناف:',e.message); }
-  })();
+  // ── الأهداف تُجلب بعد اكتمال كل البيانات (خاصة reps) ──
+  // لا نطلقها بالتوازي لأنها تحتاج _repSuperMap جاهزاً
   const CACHE_KEY='rakan_data_cache_v2';
   const CACHE_TS_KEY='rakan_cache_ts_v2';
   const CACHE_TTL=15*60*1000; // 15 دقيقة
@@ -14355,8 +14371,15 @@ async function _autoSyncQuiet(){
   await Promise.allSettled(promises);
 
   /* ── معالجة الأهداف بعد اكتمال reps ── */
-  try{ await fetchAndProcessTargets(); }
-  catch(e){ console.warn('أهداف الأصناف:',e.message); }
+  try{
+    await fetchAndProcessTargets();
+    /* أعد رسم الصفحة الحالية فور اكتمال الأهداف */
+    _invalidatePageCache();
+    populateMonthSelects();
+    populateRepSelects();
+    const _tp=window.currentPage||'overview';
+    if(PAGE_RENDERS[_tp])PAGE_RENDERS[_tp]();
+  }catch(e){ console.warn('أهداف الأصناف:',e.message); }
 
   const synced=completed;
 
@@ -14533,6 +14556,12 @@ async function syncGoogleSheets(){
     await fetchAndProcessTargets();
     targetsOk=true;
     toast('✅ أهداف الأصناف','success');
+    /* أعد رسم الصفحة الحالية فور اكتمال الأهداف */
+    _invalidatePageCache();
+    populateMonthSelects();
+    populateRepSelects();
+    const _tp=window.currentPage||'overview';
+    if(PAGE_RENDERS[_tp])PAGE_RENDERS[_tp]();
   }catch(e){
     console.warn('أهداف الأصناف:',e.message);
     toast('⚠ تعذّر جلب الأهداف: '+e.message,'error');
