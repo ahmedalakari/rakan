@@ -13261,8 +13261,11 @@ function _normalizeRowKeys(rows){
 }
 
 function processNewData(type,rows){ _onDataUpdate(); // مسح الكاش عند تحديث البيانات
+  // ── حفظ _sheets قبل التطبيع لأن _normalizeRowKeys تُنشئ مصفوفة جديدة ──
+  const _savedSheets=rows._sheets||null;
   // تطبيع أسماء الأعمدة فور استلام البيانات (سواء من CSV أو Excel)
   rows=_normalizeRowKeys(rows);
+  if(_savedSheets)rows._sheets=_savedSheets;
   _invalidatePageCache(); // مسح كاش الرسوم عند وصول بيانات جديدة
   // ── حفظ البيانات الخام للفلتر الشامل ──
   const _rawKey = type+'_table';
@@ -14202,12 +14205,6 @@ function _updateRefreshStatus(){
 //  تكتشف الأوراق تلقائياً من الملف — تدعم إضافة أوراق مستقبلاً
 // ══════════════════════════════════════════════════════
 async function fetchAndProcessTargets(){
-  const SPREADSHEET_ID='1pHZDl3B4vozI30BLDUbKBG_mzfJ5MgaN8GABDAGI5kU';
-  const BASE='https://docs.google.com/spreadsheets/d/'+SPREADSHEET_ID;
-  const PUB ='https://docs.google.com/spreadsheets/d/e/2PACX-1vRB7mfBbNJgcU9jDXZTlXh3t1EVJWNN7oz7V900AXOohdgYHWEpzbu01XYhf8rT7UNo1ax28KgDspbx';
-  const TS  =()=>'?t='+Date.now();
-  const TSA =()=>'&t='+Date.now();
-
   // ── دالة تحويل CSV إلى array of arrays ──
   function _csvToArrays(text){
     const clean=text.replace(/^\uFEFF/,'').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
@@ -14224,80 +14221,37 @@ async function fetchAndProcessTargets(){
     }).filter(r=>r.some(v=>v!==null&&v!==''));
   }
 
-  // ── الخطوة 1: اكتشاف الأوراق من صفحة pub/html (تدعم CORS) ──
-  let sheetDefs=[];
-  try{
-    const htmlResp=await Promise.race([
-      fetch(PUB+'/pubhtml'+TS(),{cache:'no-store'}),
-      new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),15000))
-    ]);
-    if(htmlResp.ok){
-      const html=await htmlResp.text();
-      // استخراج أسماء الأوراق وgid من روابط التبويب
-      // النمط: gid=NNNN في روابط التنقل بين الأوراق
-      const tabMatches=[...html.matchAll(/[?&]gid=(\d+)[^"]*"[^>]*>\s*<[^>]*>\s*([^<]+)\s*</g)];
-      if(tabMatches.length){
-        sheetDefs=tabMatches.map(([,gid,name])=>({
-          sheetName:name.trim(),
-          gid,
-          url:BASE+'/export?format=csv&gid='+gid
-        }));
-      } else {
-        // بديل: ابحث عن أسماء tabs بطريقة أخرى
-        const altMatches=[...html.matchAll(/id="(\d+)"[^>]*class="[^"]*tab[^"]*"[^>]*>([^<]+)</g)];
-        if(altMatches.length){
-          sheetDefs=altMatches.map(([,gid,name])=>({
-            sheetName:name.trim(),
-            gid,
-            url:BASE+'/export?format=csv&gid='+gid
-          }));
-        }
-      }
-      console.info('targets: اكتُشف',sheetDefs.length,'ورق من pubhtml');
-    }
-  }catch(e){ console.warn('targets: فشل اكتشاف pubhtml:',e.message); }
+  // ── قائمة الأوراق — أضف هنا عند إضافة شهر جديد ──
+  const SHEET_DEFS = GS_URLS_EMBEDDED['targets_csv_sheets']||[];
+  if(!SHEET_DEFS.length) throw new Error('لا توجد أوراق أهداف محددة');
 
-  // ── إذا فشل الاكتشاف، استخدم الأوراق الافتراضية من GS_URLS_EMBEDDED ──
-  if(!sheetDefs.length){
-    const fallback=GS_URLS_EMBEDDED['targets_csv_sheets']||[];
-    if(!fallback.length) throw new Error('لا توجد أوراق أهداف محددة');
-    sheetDefs=fallback.map(s=>({
-      sheetName:s.sheetName,
-      gid:null,
-      url:s.url
-    }));
-    console.info('targets: استخدام الأوراق الافتراضية:',sheetDefs.map(s=>s.sheetName).join('، '));
-  } else {
-    console.info('targets: أوراق مكتشفة:',sheetDefs.map(s=>s.sheetName).join('، '));
-  }
-
-  // ── الخطوة 2: جلب كل ورقة كـ CSV بالتوازي ──
-  const csvResults=await Promise.allSettled(sheetDefs.map(async ({sheetName,url})=>{
-    const sep=url.includes('?')?'&':'?';
-    const resp=await Promise.race([
-      fetch(url+sep+'t='+Date.now(),{cache:'no-store'}),
-      new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),30000))
+  // ── جلب كل ورقة كـ CSV بالتوازي ──
+  const results = await Promise.allSettled(SHEET_DEFS.map(async ({sheetName, url})=>{
+    const sep = url.includes('?') ? '&' : '?';
+    const resp = await Promise.race([
+      fetch(url + sep + 'nocache=' + Date.now(), {cache:'no-store'}),
+      new Promise((_,r)=>setTimeout(()=>r(new Error('timeout 30s')),30000))
     ]);
-    if(!resp.ok) throw new Error('HTTP '+resp.status);
-    const text=await resp.text();
-    if(!text||text.trim().length<10) throw new Error('ملف فارغ');
+    if(!resp.ok) throw new Error('HTTP '+resp.status+' — '+sheetName);
+    const text = await resp.text();
+    if(!text || text.trim().length < 10) throw new Error('ملف فارغ — '+sheetName);
     if(text.trim().startsWith('<!DOCTYPE')||text.trim().startsWith('<html'))
-      throw new Error('الاستجابة HTML — تأكد من المشاركة العامة');
-    return {sheetName, rows:_csvToArrays(text)};
+      throw new Error('استجابة HTML بدلاً من CSV — تأكد من نشر الورقة على الويب');
+    return {sheetName, rows: _csvToArrays(text)};
   }));
 
-  const sheets=csvResults.map((r,i)=>{
+  const sheets = results.map((r,i)=>{
     if(r.status==='fulfilled') return r.value;
-    console.warn('targets: فشل جلب',sheetDefs[i]?.sheetName,r.reason?.message);
+    console.warn('⚠ targets فشل جلب ورقة "'+SHEET_DEFS[i].sheetName+'":', r.reason?.message);
     return null;
   }).filter(Boolean);
 
   if(!sheets.length) throw new Error('فشل جلب جميع أوراق الأهداف');
 
-  const result=sheets[0].rows;
-  result._sheets=sheets;
-  processNewData('targets',result);
-  console.info('targets: ✅ معالجة',sheets.length,'ورقة:',sheets.map(s=>s.sheetName).join('، '));
+  const result = sheets[0].rows;
+  result._sheets = sheets;
+  processNewData('targets', result);
+  console.info('✅ targets: تمت معالجة', sheets.length, 'ورقة:', sheets.map(s=>s.sheetName).join('، '));
   return true;
 }
 
